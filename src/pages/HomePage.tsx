@@ -32,10 +32,10 @@ export default function HomePage() {
           </div>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          CS229 机器学习交互式课程
+          机器学习交互式课程
         </h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
-          基于 Stanford CS229 Lecture Notes（Andrew Ng & Tengyu Ma, 2023）构建的交互式学习网站。
+          一套面向机器学习初学者的交互式学习网站。
           从监督学习到强化学习，逐章逐节深入理解机器学习的核心思想与算法。
         </p>
 

@@ -1,28 +1,28 @@
-# CS229 机器学习交互式课程
+# 机器学习交互式课程
 
-基于 Stanford CS229 Lecture Notes（Andrew Ng & Tengyu Ma, 2023）构建的交互式机器学习学习网站。
+一套面向机器学习初学者的交互式学习网站。
 
 🔗 **在线访问**：https://georgec77.github.io/machine-learning-interactive-web/
 
 ## 课程结构
 
-网站按照 CS229 Lecture Notes 的完整目录组织，共分为五大部分：
+网站覆盖机器学习从基础到进阶的核心主题，共分为五大部分：
 
-- **Part I — Supervised Learning**
-  - Linear Regression
-  - Classification and Logistic Regression
-  - Generalized Linear Models
-  - Generative Learning Algorithms
-  - Kernel Methods
-  - Support Vector Machines
-- **Part II — Deep Learning**
-- **Part III — Generalization and Regularization**
-- **Part IV — Unsupervised Learning**
-- **Part V — Reinforcement Learning and Control**
+- **第一部分 — 监督学习**
+  - 线性回归
+  - 分类与逻辑回归
+  - 广义线性模型
+  - 生成学习算法
+  - 核方法
+  - 支持向量机
+- **第二部分 — 深度学习**
+- **第三部分 — 泛化与正则化**
+- **第四部分 — 无监督学习**
+- **第五部分 — 强化学习**
 
 每个章节的小节都有独立的网页。当前已完成：
 
-- Chapter 1, Section 1.1: LMS algorithm（线性回归交互式内容）
+- 第一章第一节：LMS 算法（线性回归交互式内容）
 
 其他小节为占位页面，将陆续补充交互式教学内容。
 

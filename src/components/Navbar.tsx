@@ -11,8 +11,8 @@ export default function Navbar() {
             className="flex items-center gap-2 text-lg font-bold text-blue-700 hover:text-blue-800 transition-colors"
           >
             <GraduationCap className="w-6 h-6" />
-            <span className="hidden sm:inline">CS229 机器学习交互式课程</span>
-            <span className="sm:hidden">CS229 课程</span>
+            <span className="hidden sm:inline">机器学习交互式课程</span>
+            <span className="sm:hidden">机器学习课程</span>
           </NavLink>
 
           <div className="flex items-center gap-2">
