@@ -15,7 +15,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { courseManifest, getCompletedCount, getTotalSectionCount } from '@/course/manifest';
+import { courseManifest, getCompletedCount, getTotalSectionCount, type Chapter } from '@/course/manifest';
+
+function getChapterEntryPath(chapter: Chapter): string {
+  // The first chapter's legacy content lives at /overview
+  if (chapter.id === 'ch01') return '/overview';
+  return chapter.sections[0]?.path || '/';
+}
 
 export default function HomePage() {
   const completed = getCompletedCount();
@@ -36,7 +42,7 @@ export default function HomePage() {
         </h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
           一套面向机器学习初学者的交互式学习网站。
-          从监督学习到强化学习，逐章逐节深入理解机器学习的核心思想与算法。
+          从监督学习到强化学习，逐章深入理解机器学习的核心思想与算法。
         </p>
 
         {/* Progress */}
@@ -96,7 +102,7 @@ export default function HomePage() {
                 <AccordionTrigger className="text-lg font-bold text-gray-900 hover:no-underline py-5">
                   <div className="flex items-center gap-3 text-left">
                     <span className="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center text-sm font-bold border border-blue-200">
-                      P{part.number}
+                      第{part.number}部分
                     </span>
                     <div>
                       <div className="text-base md:text-lg">{part.title}</div>
@@ -107,45 +113,38 @@ export default function HomePage() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="space-y-6 pb-2">
-                    {part.chapters.map((chapter) => (
-                      <div key={chapter.id}>
-                        <h3 className="text-base font-bold text-gray-800 mb-3 flex items-center gap-2">
-                          <span className="w-6 h-6 rounded bg-slate-100 text-slate-700 flex items-center justify-center text-xs border border-slate-200">
-                            {chapter.number}
-                          </span>
-                          {chapter.title}
-                        </h3>
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-                          {chapter.sections.map((section) => (
-                            <Link
-                              key={section.id}
-                              to={section.path}
-                              className="group flex items-start gap-3 p-4 rounded-xl border border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm transition-all"
-                            >
-                              <div className="mt-0.5 flex-shrink-0">
-                                {section.completed ? (
-                                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                                ) : (
-                                  <Circle className="w-5 h-5 text-gray-300 group-hover:text-blue-300" />
-                                )}
-                              </div>
-                              <div className="flex-grow min-w-0">
-                                <div className="font-semibold text-gray-900 text-sm group-hover:text-blue-600 transition-colors truncate">
-                                  {section.title}
-                                </div>
-                                {section.description && (
-                                  <div className="text-xs text-gray-500 mt-1 line-clamp-2">
-                                    {section.description}
-                                  </div>
-                                )}
-                              </div>
-                              <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-400 flex-shrink-0 mt-1" />
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 pb-2">
+                    {part.chapters.map((chapter) => {
+                      const chapterCompleted = chapter.sections.filter((s) => s.completed).length;
+                      const chapterTotal = chapter.sections.length;
+                      const isFullyCompleted = chapterCompleted === chapterTotal && chapterTotal > 0;
+                      const entryPath = getChapterEntryPath(chapter);
+
+                      return (
+                        <Link
+                          key={chapter.id}
+                          to={entryPath}
+                          className="group flex items-start gap-3 p-5 rounded-xl border border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm transition-all"
+                        >
+                          <div className="mt-0.5 flex-shrink-0">
+                            {isFullyCompleted ? (
+                              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                            ) : (
+                              <Circle className={`w-5 h-5 ${chapterCompleted > 0 ? 'text-blue-400' : 'text-gray-300'} group-hover:text-blue-400`} />
+                            )}
+                          </div>
+                          <div className="flex-grow min-w-0">
+                            <div className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                              {chapter.number}. {chapter.title}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1.5">
+                              {chapterCompleted}/{chapterTotal} 小节已完成
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-400 flex-shrink-0 mt-1" />
+                        </Link>
+                      );
+                    })}
                   </div>
                 </AccordionContent>
               </AccordionItem>
