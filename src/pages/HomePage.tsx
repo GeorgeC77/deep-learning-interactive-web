@@ -138,7 +138,11 @@ export default function HomePage() {
                               {chapter.number}. {chapter.title}
                             </div>
                             <div className="text-xs text-gray-500 mt-1.5">
-                              {chapterCompleted}/{chapterTotal} 小节已完成
+                              {chapterCompleted === chapterTotal ? (
+                                <span className="text-emerald-600 font-medium">已完成</span>
+                              ) : (
+                                `${chapterCompleted}/${chapterTotal} 小节已完成`
+                              )}
                             </div>
                           </div>
                           <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-400 flex-shrink-0 mt-1" />
