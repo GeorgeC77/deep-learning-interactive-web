@@ -1,73 +1,54 @@
-# React + TypeScript + Vite
+# CS229 机器学习交互式课程
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+基于 Stanford CS229 Lecture Notes（Andrew Ng & Tengyu Ma, 2023）构建的交互式机器学习学习网站。
 
-Currently, two official plugins are available:
+🔗 **在线访问**：https://georgec77.github.io/machine-learning-interactive-web/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 课程结构
 
-## React Compiler
+网站按照 CS229 Lecture Notes 的完整目录组织，共分为五大部分：
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Part I — Supervised Learning**
+  - Linear Regression
+  - Classification and Logistic Regression
+  - Generalized Linear Models
+  - Generative Learning Algorithms
+  - Kernel Methods
+  - Support Vector Machines
+- **Part II — Deep Learning**
+- **Part III — Generalization and Regularization**
+- **Part IV — Unsupervised Learning**
+- **Part V — Reinforcement Learning and Control**
 
-## Expanding the ESLint configuration
+每个章节的小节都有独立的网页。当前已完成：
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Chapter 1, Section 1.1: LMS algorithm（线性回归交互式内容）
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+其他小节为占位页面，将陆续补充交互式教学内容。
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 技术栈
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- React 19 + TypeScript
+- Vite
+- Tailwind CSS + shadcn/ui
+- KaTeX（公式渲染）
+- D3.js（交互式图表）
+
+## 本地开发
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 部署
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+项目使用 GitHub Actions 自动部署到 GitHub Pages。每次 `push` 到 `main` 分支后，Actions 会自动构建并发布。
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 版权声明
+
+本课程内容采用 **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** 许可。
+
+仅供个人学习交流使用。**未经授权，严禁以任何形式用于商业用途**，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
+
+详见 [LICENSE](./LICENSE)。
