@@ -20,6 +20,7 @@ import { courseManifest, getCompletedCount, getTotalSectionCount, type Chapter }
 function getChapterEntryPath(chapter: Chapter): string {
   // The first chapter's legacy content lives at /overview
   if (chapter.id === 'ch01') return '/overview';
+  if (chapter.id === 'ch02') return '/ch02/overview';
   return chapter.sections[0]?.path || '/';
 }
 

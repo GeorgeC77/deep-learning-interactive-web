@@ -11,6 +11,15 @@ import NormalEquationPage from './pages/NormalEquationPage';
 import ProbabilisticPage from './pages/ProbabilisticPage';
 import OverfittingPage from './pages/OverfittingPage';
 
+// Chapter 2 pages
+import Chapter02OverviewPage from './pages/chapters/chapter02/OverviewPage';
+import Chapter02ModelPage from './pages/chapters/chapter02/ModelPage';
+import Chapter02CostFunctionPage from './pages/chapters/chapter02/CostFunctionPage';
+import Chapter02GradientDescentPage from './pages/chapters/chapter02/GradientDescentPage';
+import Chapter02PerceptronPage from './pages/chapters/chapter02/PerceptronPage';
+import Chapter02MulticlassPage from './pages/chapters/chapter02/MulticlassPage';
+import Chapter02NewtonPage from './pages/chapters/chapter02/NewtonPage';
+
 // Chapter / Section pages
 import Chapter01Section01Page from './pages/chapters/chapter01/section-01-lms';
 import Chapter01Section02Page from './pages/chapters/chapter01/section-02';
@@ -79,6 +88,15 @@ function App() {
           <Route path="/normal-equation" element={<NormalEquationPage />} />
           <Route path="/probabilistic" element={<ProbabilisticPage />} />
           <Route path="/overfitting" element={<OverfittingPage />} />
+
+          {/* Chapter 2 routes */}
+          <Route path="/ch02/overview" element={<Chapter02OverviewPage />} />
+          <Route path="/ch02/model" element={<Chapter02ModelPage />} />
+          <Route path="/ch02/cost-function" element={<Chapter02CostFunctionPage />} />
+          <Route path="/ch02/gradient-descent" element={<Chapter02GradientDescentPage />} />
+          <Route path="/ch02/perceptron" element={<Chapter02PerceptronPage />} />
+          <Route path="/ch02/multiclass" element={<Chapter02MulticlassPage />} />
+          <Route path="/ch02/newton" element={<Chapter02NewtonPage />} />
 
           {/* Chapter / Section routes */}
           <Route path="/ch01/s01" element={<Chapter01Section01Page />} />
