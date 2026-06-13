@@ -1,5 +1,5 @@
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary } from 'lucide-react';
+import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,10 +28,22 @@ const logisticRegressionItems = [
   { to: '/ch02/newton', label: '牛顿法', icon: Zap },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' {
+const generalizedLinearModelItems = [
+  { to: '/ch03/overview', label: '课程概览', icon: BookOpen },
+  { to: '/ch03/exponential-family', label: '指数族分布', icon: FunctionSquare },
+  { to: '/ch03/building-glm', label: '构建 GLM', icon: Sparkles },
+  { to: '/ch03/ols-as-glm', label: '最小二乘', icon: LineChart },
+  { to: '/ch03/logistic-as-glm', label: '逻辑回归', icon: GitBranch },
+  { to: '/ch03/softmax-as-glm', label: 'Softmax', icon: Layers },
+  { to: '/ch03/summary', label: '本章总结', icon: CheckCircle2 },
+];
+
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' {
   if (path === '/') return 'home';
   const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
   if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
+  const glmPaths = new Set(generalizedLinearModelItems.map((i) => i.to));
+  if (glmPaths.has(path) || path.startsWith('/ch03/')) return 'glm';
   return 'linear';
 }
 
@@ -108,6 +120,35 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {logisticRegressionItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {chapter === 'glm' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <Sparkles className="w-4 h-4" />
+                  广义线性模型
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {generalizedLinearModelItems.map((item) => {
                     const isActive = currentPath === item.to;
                     return (
                       <DropdownMenuItem key={item.to} asChild>

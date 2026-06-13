@@ -20,6 +20,15 @@ import Chapter02PerceptronPage from './pages/chapters/chapter02/PerceptronPage';
 import Chapter02MulticlassPage from './pages/chapters/chapter02/MulticlassPage';
 import Chapter02NewtonPage from './pages/chapters/chapter02/NewtonPage';
 
+// Chapter 3 pages
+import Chapter03OverviewPage from './pages/chapters/chapter03/OverviewPage';
+import Chapter03ExponentialFamilyPage from './pages/chapters/chapter03/ExponentialFamilyPage';
+import Chapter03BuildingGLMPage from './pages/chapters/chapter03/BuildingGLMPage';
+import Chapter03OLSasGLMPage from './pages/chapters/chapter03/OLSasGLMPage';
+import Chapter03LogisticAsGLMPage from './pages/chapters/chapter03/LogisticAsGLMPage';
+import Chapter03SoftmaxAsGLMPage from './pages/chapters/chapter03/SoftmaxAsGLMPage';
+import Chapter03SummaryPage from './pages/chapters/chapter03/SummaryPage';
+
 // Chapter / Section pages
 import Chapter01Section01Page from './pages/chapters/chapter01/section-01-lms';
 import Chapter01Section02Page from './pages/chapters/chapter01/section-02';
@@ -97,6 +106,15 @@ function App() {
           <Route path="/ch02/perceptron" element={<Chapter02PerceptronPage />} />
           <Route path="/ch02/multiclass" element={<Chapter02MulticlassPage />} />
           <Route path="/ch02/newton" element={<Chapter02NewtonPage />} />
+
+          {/* Chapter 3 routes */}
+          <Route path="/ch03/overview" element={<Chapter03OverviewPage />} />
+          <Route path="/ch03/exponential-family" element={<Chapter03ExponentialFamilyPage />} />
+          <Route path="/ch03/building-glm" element={<Chapter03BuildingGLMPage />} />
+          <Route path="/ch03/ols-as-glm" element={<Chapter03OLSasGLMPage />} />
+          <Route path="/ch03/logistic-as-glm" element={<Chapter03LogisticAsGLMPage />} />
+          <Route path="/ch03/softmax-as-glm" element={<Chapter03SoftmaxAsGLMPage />} />
+          <Route path="/ch03/summary" element={<Chapter03SummaryPage />} />
 
           {/* Chapter / Section routes */}
           <Route path="/ch01/s01" element={<Chapter01Section01Page />} />
