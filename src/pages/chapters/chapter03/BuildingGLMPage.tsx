@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ShieldAlert, Sparkles, GitBranch, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Sparkles, GitBranch, CheckCircle2 } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
