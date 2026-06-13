@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import type { MouseEvent, Dispatch, SetStateAction } from 'react';
 import { ShieldAlert, Map, CheckCircle2, Lightbulb } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
@@ -80,13 +81,14 @@ export default function FeatureMappingPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：从二维到三维</h2>
         <p className="text-gray-700 mb-4">
           左图是原始二维空间，右图是经过二次特征映射后的三维空间。
-          点击左图中的点，观察它在右图中的位置如何变化。
+          点击左图中的点可高亮显示；点击左图空白处可添加新点。
         </p>
         <FeatureMappingDemo
           points={points}
           mappedPoints={mappedPoints}
           selectedPoint={selectedPoint}
           setSelectedPoint={setSelectedPoint}
+          setPoints={setPoints}
         />
         <div className="flex justify-center gap-6 mt-4 text-sm">
           <div className="flex items-center gap-2">
@@ -163,19 +165,32 @@ function FeatureMappingDemo({
   mappedPoints,
   selectedPoint,
   setSelectedPoint,
+  setPoints,
 }: {
   points: { x: number; y: number; label: number }[];
   mappedPoints: Point[];
   selectedPoint: number | null;
   setSelectedPoint: (idx: number | null) => void;
+  setPoints: Dispatch<SetStateAction<{ x: number; y: number; label: number }[]>>;
 }) {
   const width = 520;
   const height = 320;
   const padding = 40;
   const plotSize = Math.min(width, height) - 2 * padding;
+  const [addLabel, setAddLabel] = useState(1);
 
   const xScale = (x: number) => padding + x * plotSize;
   const yScale = (y: number) => padding + (1 - y) * plotSize;
+
+  const handleSvgClick = (e: MouseEvent<SVGSVGElement>) => {
+    const svg = e.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const x = (e.clientX - rect.left - padding) / plotSize;
+    const y = 1 - (e.clientY - rect.top - padding) / plotSize;
+    if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
+      setPoints((prev) => [...prev, { x, y, label: addLabel }]);
+    }
+  };
 
   // 3D projection: simple isometric-ish projection
   const project3D = (p: Point) => {
@@ -190,10 +205,35 @@ function FeatureMappingDemo({
 
   return (
     <div className="grid md:grid-cols-2 gap-6 bg-gray-50 rounded-xl p-5 border border-gray-200">
+      <div className="md:col-span-2 flex justify-center gap-3">
+        <button
+          onClick={() => setAddLabel(1)}
+          className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+            addLabel === 1 ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          添加 +1 点
+        </button>
+        <button
+          onClick={() => setAddLabel(-1)}
+          className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+            addLabel === -1 ? 'bg-rose-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          添加 -1 点
+        </button>
+        <button
+          onClick={() => setPoints(SAMPLE_DATA)}
+          className="px-3 py-1.5 rounded text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+        >
+          重置
+        </button>
+      </div>
+
       {/* Original 2D space */}
       <div>
         <h3 className="text-center text-sm font-semibold text-gray-700 mb-2">原始二维空间</h3>
-        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200">
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" onClick={handleSvgClick}>
           {/* grid */}
           {[0, 0.25, 0.5, 0.75, 1].map((t) => (
             <g key={t}>
@@ -217,7 +257,10 @@ function FeatureMappingDemo({
               stroke={selectedPoint === i ? '#1f2937' : 'white'}
               strokeWidth={selectedPoint === i ? 3 : 2}
               className="cursor-pointer transition-all"
-              onClick={() => setSelectedPoint(selectedPoint === i ? null : i)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedPoint(selectedPoint === i ? null : i);
+              }}
             />
           ))}
         </svg>
