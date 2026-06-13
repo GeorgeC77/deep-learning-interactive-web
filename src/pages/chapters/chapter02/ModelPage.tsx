@@ -246,7 +246,7 @@ function drawLogisticChart(
 
   // legend
   const legend = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  legend.setAttribute('transform', `translate(${INNER_W - 155}, 10)`);
+  legend.setAttribute('transform', `translate(10, 10)`);
 
   const legendBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   legendBg.setAttribute('width', '150');
@@ -353,7 +353,7 @@ export default function ModelPage() {
 
         <FormulaCard
           title="二分类标签"
-          formula={<KaTeX math="y \\in \\{0, 1\\}" display />}
+          formula={<KaTeX math={String.raw`y \in \{0, 1\}`} display />}
           description="y = 1 表示正类（例如：通过考试、患病、是垃圾邮件），y = 0 表示负类。"
         />
 
@@ -384,7 +384,7 @@ export default function ModelPage() {
           <div className="bg-red-50 rounded-xl border border-red-200 p-5">
             <h3 className="font-bold text-red-800 mb-2">输出范围不受限</h3>
             <p className="text-gray-700 text-sm">
-              线性回归的假设 <KaTeX math="h_\\theta(x) = \\theta^T x" /> 可以取任意实数值，
+              线性回归的假设 <KaTeX math={String.raw`h_\theta(x) = \theta^T x`} /> 可以取任意实数值，
               而概率必须在 0 到 1 之间。
             </p>
           </div>
@@ -424,7 +424,7 @@ export default function ModelPage() {
           title="Sigmoid 函数"
           formula={
             <KaTeX
-              math="g(z) = \\frac{1}{1 + e^{-z}}"
+              math={String.raw`g(z) = \frac{1}{1 + e^{-z}}`}
               display
             />
           }
@@ -436,13 +436,13 @@ export default function ModelPage() {
             <h3 className="font-semibold text-indigo-800 mb-2">重要性质</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li>
-                <KaTeX math="0 < g(z) < 1" />，输出可解释为概率。
+                <KaTeX math={String.raw`0 < g(z) < 1`} />，输出可解释为概率。
               </li>
               <li>
-                <KaTeX math="g(0) = 0.5" />，是分类的天然阈值。
+                <KaTeX math={String.raw`g(0) = 0.5`} />，是分类的天然阈值。
               </li>
               <li>
-                <KaTeX math="g'(z) = g(z)(1 - g(z))" />，导数形式简洁，便于梯度下降。
+                <KaTeX math={String.raw`g'(z) = g(z)(1 - g(z))`} />，导数形式简洁，便于梯度下降。
               </li>
             </ul>
           </div>
@@ -460,7 +460,7 @@ export default function ModelPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">逻辑回归的假设函数</h2>
         <p className="text-gray-700 mb-4">
-          在线性回归中，我们用 <KaTeX math="\\theta^T x" /> 直接作为预测值。在逻辑回归中，
+          在线性回归中，我们用 <KaTeX math={String.raw`\theta^T x`} /> 直接作为预测值。在逻辑回归中，
           我们把它作为 Sigmoid 函数的输入：
         </p>
 
@@ -468,7 +468,7 @@ export default function ModelPage() {
           title="逻辑回归假设"
           formula={
             <KaTeX
-              math="h_\\theta(x) = g(\\theta^T x) = \\frac{1}{1 + e^{-\\theta^T x}}"
+              math={String.raw`h_\theta(x) = g(\theta^T x) = \frac{1}{1 + e^{-\theta^T x}}`}
               display
             />
           }
@@ -476,7 +476,7 @@ export default function ModelPage() {
         />
 
         <p className="text-gray-700 mt-4 mb-4">
-          这里 <KaTeX math="z = \\theta^T x" /> 仍然是一个线性组合，但经过 Sigmoid 变换后，
+          这里 <KaTeX math={String.raw`z = \theta^T x`} /> 仍然是一个线性组合，但经过 Sigmoid 变换后，
           输出始终落在 (0, 1) 之间。参数 θ 控制了 Sigmoid 曲线的"位置"和"陡峭程度"，
           从而决定了分类的决策边界。
         </p>
@@ -489,7 +489,7 @@ export default function ModelPage() {
           <h2 className="text-2xl font-bold text-gray-900">概率解释</h2>
         </div>
         <p className="text-gray-700 mb-4">
-          逻辑回归的输出有自然的概率含义。我们可以把 <KaTeX math="h_\\theta(x)" /> 理解为：
+          逻辑回归的输出有自然的概率含义。我们可以把 <KaTeX math={String.raw`h_\theta(x)`} /> 理解为：
           给定输入 x 和参数 θ，样本属于正类的概率。
         </p>
 
@@ -497,7 +497,7 @@ export default function ModelPage() {
           title="正类概率"
           formula={
             <KaTeX
-              math="h_\\theta(x) = P(y = 1 \\mid x; \\theta)"
+              math={String.raw`h_\theta(x) = P(y = 1 \mid x; \theta)`}
               display
             />
           }
@@ -508,7 +508,7 @@ export default function ModelPage() {
           title="负类概率"
           formula={
             <KaTeX
-              math="P(y = 0 \\mid x; \\theta) = 1 - h_\\theta(x)"
+              math={String.raw`P(y = 0 \mid x; \theta) = 1 - h_\theta(x)`}
               display
             />
           }
@@ -517,7 +517,7 @@ export default function ModelPage() {
 
         <div className="mt-4 p-4 bg-rose-50 rounded-lg border border-rose-200">
           <p className="text-gray-700 text-sm">
-            <strong>例子：</strong>如果模型预测 <KaTeX math="h_\\theta(x) = 0.85" />，
+            <strong>例子：</strong>如果模型预测 <KaTeX math={String.raw`h_\theta(x) = 0.85`} />，
             说明它有 85% 的把握认为该样本属于正类。我们通常会设定阈值 0.5，
             当概率 ≥ 0.5 时预测为正类。
           </p>
@@ -533,33 +533,33 @@ export default function ModelPage() {
 
         <div className="p-4 bg-gray-50 rounded-lg mb-4">
           <KaTeX
-            math="\\hat{y} = \\begin{cases} 1, & \\text{if } h_\\theta(x) \\geq 0.5 \\\\ 0, & \\text{if } h_\\theta(x) < 0.5 \\end{cases}"
+            math={String.raw`\hat{y} = \begin{cases} 1, & \text{if } h_\theta(x) \geq 0.5 \\ 0, & \text{if } h_\theta(x) < 0.5 \end{cases}`}
             display
           />
         </div>
 
         <p className="text-gray-700 mb-4">
-          由于 Sigmoid 函数是单调递增的，<KaTeX math="h_\\theta(x) \\geq 0.5" /> 等价于
-          <KaTeX math="\\theta^T x \\geq 0" />。因此，决策边界由下面的等式决定：
+          由于 Sigmoid 函数是单调递增的，<KaTeX math={String.raw`h_\theta(x) \geq 0.5`} /> 等价于
+          <KaTeX math={String.raw`\theta^T x \geq 0`} />。因此，决策边界由下面的等式决定：
         </p>
 
         <FormulaCard
           title="决策边界"
-          formula={<KaTeX math="\\theta^T x = 0" display />}
+          formula={<KaTeX math={String.raw`\theta^T x = 0`} display />}
           description="决策边界是一个超平面，将特征空间分成两个区域：一侧预测 y = 1，另一侧预测 y = 0。"
         />
 
         <div className="mt-4 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
           <h3 className="font-semibold text-emerald-800 mb-2">一维情形的直观理解</h3>
           <p className="text-gray-700 text-sm">
-            当只有一个特征时，<KaTeX math="\\theta^T x = \\theta_0 + \\theta_1 x" />，
+            当只有一个特征时，<KaTeX math={String.raw`\theta^T x = \theta_0 + \theta_1 x`} />，
             决策边界是数轴上的一个点：
           </p>
           <div className="my-2">
-            <KaTeX math="x = -\\frac{\\theta_0}{\\theta_1}" display />
+            <KaTeX math={String.raw`x = -\frac{\theta_0}{\theta_1}`} display />
           </div>
           <p className="text-gray-700 text-sm">
-            改变 <KaTeX math="\\theta_0" /> 会平移边界位置，改变 <KaTeX math="\\theta_1" /> 的绝对值会改变 Sigmoid 曲线在边界附近的陡峭程度。
+            改变 <KaTeX math={String.raw`\theta_0`} /> 会平移边界位置，改变 <KaTeX math={String.raw`\theta_1`} /> 的绝对值会改变 Sigmoid 曲线在边界附近的陡峭程度。
           </p>
         </div>
       </section>
@@ -568,7 +568,7 @@ export default function ModelPage() {
       <InteractiveDemo title="交互演示：Sigmoid 曲线与决策边界">
         <p className="text-gray-700 mb-4">
           下方的训练数据是围绕真实边界 x = 5 生成的二分类样本。红色点表示 y = 0，绿色点表示 y = 1。
-          拖动滑块调整 <KaTeX math="\\theta_0" /> 和 <KaTeX math="\\theta_1" />，
+          拖动滑块调整 <KaTeX math={String.raw`\theta_0`} /> 和 <KaTeX math={String.raw`\theta_1`} />，
           观察蓝色 Sigmoid 曲线和灰色虚线决策边界如何变化。
         </p>
 
@@ -586,7 +586,7 @@ export default function ModelPage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  偏置项 <KaTeX math="\\theta_0" /> = <span className="text-blue-700 font-mono">{theta0.toFixed(1)}</span>
+                  偏置项 <KaTeX math={String.raw`\theta_0`} /> = <span className="text-blue-700 font-mono">{theta0.toFixed(1)}</span>
                 </label>
                 <Slider
                   value={[theta0]}
@@ -600,7 +600,7 @@ export default function ModelPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  权重 <KaTeX math="\\theta_1" /> = <span className="text-blue-700 font-mono">{theta1.toFixed(1)}</span>
+                  权重 <KaTeX math={String.raw`\theta_1`} /> = <span className="text-blue-700 font-mono">{theta1.toFixed(1)}</span>
                 </label>
                 <Slider
                   value={[theta1]}

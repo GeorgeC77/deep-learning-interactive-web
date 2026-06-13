@@ -107,10 +107,10 @@ type Preset = {
 
 const PRESETS: Preset[] = [
   {
-    label: 'α = 0.1',
+    label: 'α = 0.2',
     desc: '批量适中',
     mode: 'batch',
-    alpha: 0.1,
+    alpha: 0.2,
     beta: 0.92,
     steps: 100,
     behavior: '批量梯度下降配合动量，稳步收敛，决策边界平滑移向最优分类面',
@@ -944,7 +944,7 @@ export default function GradientDescentPage() {
                   <td className="px-4 py-3 text-sm font-medium text-gray-800">{p.desc}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{p.behavior}</td>
                   <td className="px-4 py-3 text-sm">
-                    {p.mode === 'batch' && p.alpha === 0.1 && (
+                    {p.mode === 'batch' && p.alpha === 0.2 && (
                       <span className="text-teal-600 font-medium">稳定收敛，决策边界清晰分开两类</span>
                     )}
                     {p.mode === 'batch' && p.alpha === 0.01 && (

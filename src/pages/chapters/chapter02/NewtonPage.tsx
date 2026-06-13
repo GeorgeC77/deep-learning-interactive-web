@@ -104,7 +104,7 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
     svg.selectAll('*').remove();
 
     const xScale = d3.scaleLinear().domain([-5, 5]).range([0, WIDTH]);
-    const yScale = d3.scaleLinear().domain([-8, -1]).range([HEIGHT, 0]);
+    const yScale = d3.scaleLinear().domain([-8, 0]).range([HEIGHT, 0]);
 
     const g = svg.append('g').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
@@ -211,7 +211,7 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
       const gdLine = d3
         .line<{ theta: number; ell: number }>()
         .x((d) => xScale(Math.max(-5, Math.min(5, d.theta))))
-        .y((d) => yScale(Math.max(-8, Math.min(-1, d.ell))))
+        .y((d) => yScale(Math.max(-8, Math.min(0, d.ell))))
         .curve(d3.curveLinear);
       g.append('path')
         .datum(gdTrail)
@@ -226,7 +226,7 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
       const last = gdTrail[gdTrail.length - 1];
       g.append('circle')
         .attr('cx', xScale(Math.max(-5, Math.min(5, last.theta))))
-        .attr('cy', yScale(Math.max(-8, Math.min(-1, last.ell))))
+        .attr('cy', yScale(Math.max(-8, Math.min(0, last.ell))))
         .attr('r', 5)
         .attr('fill', '#e25b5b')
         .attr('stroke', '#fff')
@@ -251,7 +251,7 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
       .text('对数似然函数 ℓ(θ) 与优化轨迹');
   }, [curveData, newtonHistory, gdHistory, currentStep]);
 
-  return <svg ref={svgRef} className="w-full h-auto" style={{ maxHeight: 360 }} />;
+  return <svg ref={svgRef} viewBox="0 0 560 360" className="w-full h-auto" style={{ maxHeight: 360 }} />;
 }
 
 /* ------------------------------------------------------------------ */
@@ -386,7 +386,7 @@ function StepChart({ newtonHistory, gdHistory, currentStep }: NewtonChartProps) 
       .text('参数 θ 随迭代步数的变化');
   }, [newtonHistory, gdHistory, currentStep]);
 
-  return <svg ref={svgRef} className="w-full h-auto" style={{ maxHeight: 360 }} />;
+  return <svg ref={svgRef} viewBox="0 0 560 360" className="w-full h-auto" style={{ maxHeight: 360 }} />;
 }
 
 /* ------------------------------------------------------------------ */
