@@ -37,7 +37,7 @@ function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' {
 
 export default function Navbar() {
   const location = useLocation();
-  const currentPath = location.hash.slice(1) || '/';
+  const currentPath = location.pathname;
   const chapter = getCurrentChapter(currentPath);
 
   return (
