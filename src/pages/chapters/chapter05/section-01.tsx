@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import FeatureMappingPage from './FeatureMappingPage';
 
 export default function Chapter05Section01Page() {
-  return <SectionPlaceholder sectionPath="/ch05/s01" />;
+  return <FeatureMappingPage />;
 }

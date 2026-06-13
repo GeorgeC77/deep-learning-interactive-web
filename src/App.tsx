@@ -35,6 +35,13 @@ import Chapter04GenerativeVsDiscriminativePage from './pages/chapters/chapter04/
 import Chapter04GaussianDiscriminantAnalysisPage from './pages/chapters/chapter04/GaussianDiscriminantAnalysisPage';
 import Chapter04NaiveBayesPage from './pages/chapters/chapter04/NaiveBayesPage';
 
+// Chapter 5 pages
+import Chapter05OverviewPage from './pages/chapters/chapter05/OverviewPage';
+import Chapter05FeatureMappingPage from './pages/chapters/chapter05/FeatureMappingPage';
+import Chapter05LMSInFeatureSpacePage from './pages/chapters/chapter05/LMSInFeatureSpacePage';
+import Chapter05KernelTrickPage from './pages/chapters/chapter05/KernelTrickPage';
+import Chapter05KernelPropertiesPage from './pages/chapters/chapter05/KernelPropertiesPage';
+
 // Chapter / Section pages
 import Chapter01Section01Page from './pages/chapters/chapter01/section-01-lms';
 import Chapter01Section02Page from './pages/chapters/chapter01/section-02';
@@ -125,6 +132,13 @@ function App() {
           <Route path="/ch04/generative-vs-discriminative" element={<Chapter04GenerativeVsDiscriminativePage />} />
           <Route path="/ch04/gaussian-discriminant-analysis" element={<Chapter04GaussianDiscriminantAnalysisPage />} />
           <Route path="/ch04/naive-bayes" element={<Chapter04NaiveBayesPage />} />
+
+          {/* Chapter 5 routes */}
+          <Route path="/ch05/overview" element={<Chapter05OverviewPage />} />
+          <Route path="/ch05/feature-mapping" element={<Chapter05FeatureMappingPage />} />
+          <Route path="/ch05/lms-in-feature-space" element={<Chapter05LMSInFeatureSpacePage />} />
+          <Route path="/ch05/kernel-trick" element={<Chapter05KernelTrickPage />} />
+          <Route path="/ch05/kernel-properties" element={<Chapter05KernelPropertiesPage />} />
 
           {/* Chapter / Section routes */}
           <Route path="/ch01/s01" element={<Chapter01Section01Page />} />

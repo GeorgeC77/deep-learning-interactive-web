@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import LMSInFeatureSpacePage from './LMSInFeatureSpacePage';
 
 export default function Chapter05Section02Page() {
-  return <SectionPlaceholder sectionPath="/ch05/s02" />;
+  return <LMSInFeatureSpacePage />;
 }

@@ -1,5 +1,5 @@
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator } from 'lucide-react';
+import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator, Map, Boxes } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +45,15 @@ const generativeLearningItems = [
   { to: '/ch04/naive-bayes', label: '朴素贝叶斯', icon: Brain },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' {
+const kernelMethodsItems = [
+  { to: '/ch05/overview', label: '课程概览', icon: BookOpen },
+  { to: '/ch05/feature-mapping', label: '特征映射', icon: Map },
+  { to: '/ch05/lms-in-feature-space', label: '特征空间 LMS', icon: TrendingDown },
+  { to: '/ch05/kernel-trick', label: '核技巧', icon: Sparkles },
+  { to: '/ch05/kernel-properties', label: '核函数性质', icon: Boxes },
+];
+
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' {
   if (path === '/') return 'home';
   const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
   if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
@@ -53,6 +61,8 @@ function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm'
   if (glmPaths.has(path) || path.startsWith('/ch03/')) return 'glm';
   const generativePaths = new Set(generativeLearningItems.map((i) => i.to));
   if (generativePaths.has(path) || path.startsWith('/ch04/')) return 'generative';
+  const kernelPaths = new Set(kernelMethodsItems.map((i) => i.to));
+  if (kernelPaths.has(path) || path.startsWith('/ch05/')) return 'kernel';
   return 'linear';
 }
 
@@ -187,6 +197,35 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {generativeLearningItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {chapter === 'kernel' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <Sparkles className="w-4 h-4" />
+                  核方法
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {kernelMethodsItems.map((item) => {
                     const isActive = currentPath === item.to;
                     return (
                       <DropdownMenuItem key={item.to} asChild>

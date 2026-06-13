@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import KernelPropertiesPage from './KernelPropertiesPage';
 
 export default function Chapter05Section04Page() {
-  return <SectionPlaceholder sectionPath="/ch05/s04" />;
+  return <KernelPropertiesPage />;
 }
