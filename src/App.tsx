@@ -42,6 +42,11 @@ import Chapter05LMSInFeatureSpacePage from './pages/chapters/chapter05/LMSInFeat
 import Chapter05KernelTrickPage from './pages/chapters/chapter05/KernelTrickPage';
 import Chapter05KernelPropertiesPage from './pages/chapters/chapter05/KernelPropertiesPage';
 
+// Chapter 6 pages
+import Chapter06OverviewPage from './pages/chapters/chapter06/OverviewPage';
+import Chapter06MarginIntuitionPage from './pages/chapters/chapter06/MarginIntuitionPage';
+import Chapter06SVMTheoryPage from './pages/chapters/chapter06/SVMTheoryPage';
+
 // Chapter / Section pages
 import Chapter01Section01Page from './pages/chapters/chapter01/section-01-lms';
 import Chapter01Section02Page from './pages/chapters/chapter01/section-02';
@@ -139,6 +144,11 @@ function App() {
           <Route path="/ch05/lms-in-feature-space" element={<Chapter05LMSInFeatureSpacePage />} />
           <Route path="/ch05/kernel-trick" element={<Chapter05KernelTrickPage />} />
           <Route path="/ch05/kernel-properties" element={<Chapter05KernelPropertiesPage />} />
+
+          {/* Chapter 6 routes */}
+          <Route path="/ch06/overview" element={<Chapter06OverviewPage />} />
+          <Route path="/ch06/margin-intuition" element={<Chapter06MarginIntuitionPage />} />
+          <Route path="/ch06/svm-theory" element={<Chapter06SVMTheoryPage />} />
 
           {/* Chapter / Section routes */}
           <Route path="/ch01/s01" element={<Chapter01Section01Page />} />

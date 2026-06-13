@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import MarginIntuitionPage from './MarginIntuitionPage';
 
 export default function Chapter06Section01Page() {
-  return <SectionPlaceholder sectionPath="/ch06/s01" />;
+  return <MarginIntuitionPage />;
 }

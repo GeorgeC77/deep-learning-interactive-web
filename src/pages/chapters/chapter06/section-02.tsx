@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import SVMTheoryPage from './SVMTheoryPage';
 
 export default function Chapter06Section02Page() {
-  return <SectionPlaceholder sectionPath="/ch06/s02" />;
+  return <SVMTheoryPage />;
 }
