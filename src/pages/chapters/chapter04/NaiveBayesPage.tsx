@@ -15,6 +15,12 @@ const TRAIN_SPAM = [
   '限时 优惠 抢购 特价 免费 赠送 点击 查看',
   '恭喜 您 中奖 了 请 尽快 联系 客服 领取',
   '免费 获得 iphone 点击 链接 填写 信息',
+  '恭喜 您 的 快递 已 中奖 请 点击 链接 领取 奖品',
+  '尊敬 的 用户 您 已 获得 万元 大奖 立即 拨打 电话 领奖',
+  '点击 下方 链接 下载 免费 软件 即可 获得 红包',
+  '限时 秒杀 全场 一折 立即 下单 享受 优惠',
+  '您 的 账户 存在 异常 请 点击 链接 验证 信息',
+  '免费 抽奖 100% 中奖  ipad 手机 等 您 来 拿',
 ];
 
 const TRAIN_HAM = [
@@ -22,6 +28,12 @@ const TRAIN_HAM = [
   '报告 已经 提交 请 查收 附件',
   '今晚 三点 交 报告 记得 按时',
   '会议 记录 已经 发送 请 确认',
+  '下周 三 上午 十 点 项目 评审 记得 准备 材料',
+  '请 大家 本周 五 前 完成 周报 并 发送 给 组长',
+  '明天 下午 的 培训 取消 请 互相 转告',
+  '附件 是 本次 会议 的 纪要 请 查阅 并 反馈',
+  '请 您 确认 一下 合同 的 修改 意见',
+  '本周 项目 进度 正常 下周 计划 已经 更新',
 ];
 
 function tokenize(text: string): string[] {
@@ -178,11 +190,19 @@ export default function NaiveBayesPage() {
         />
       </section>
 
+      {/* Training data */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">训练数据</h2>
+        <p className="text-gray-700 mb-4">
+          下面是用 10 封垃圾邮件和 10 封正常邮件构成的训练集。程序会统计每个词在两类邮件中出现的次数，形成词表。
+        </p>
+        <TrainingDataDisplay />
+      </section>
+
       {/* Interactive demo */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：垃圾邮件分类器</h2>
         <p className="text-gray-700 mb-4">
-          下面是一个用 4 封垃圾邮件和 4 封正常邮件训练的小型朴素贝叶斯分类器。
           输入一段中文文本后，程序会从文本中提取训练词表里出现过的词作为特征，
           再用拉普拉斯平滑的朴素贝叶斯计算后验概率。
         </p>
@@ -286,6 +306,43 @@ export default function NaiveBayesPage() {
           </li>
         </ul>
       </section>
+    </div>
+  );
+}
+
+
+function TrainingDataDisplay() {
+  return (
+    <div className="grid md:grid-cols-2 gap-5">
+      <div className="bg-rose-50 rounded-xl p-4 border border-rose-200">
+        <h3 className="font-semibold text-rose-800 mb-3 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-rose-200 text-rose-700 flex items-center justify-center text-xs">🚫</span>
+          垃圾邮件（10 封）
+        </h3>
+        <ul className="space-y-2 text-sm text-gray-700">
+          {TRAIN_SPAM.map((text, idx) => (
+            <li key={idx} className="bg-white rounded-md px-3 py-2 border border-rose-100">
+              <span className="text-rose-500 font-medium mr-2">{idx + 1}.</span>
+              {text}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+        <h3 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center text-xs">✉️</span>
+          正常邮件（10 封）
+        </h3>
+        <ul className="space-y-2 text-sm text-gray-700">
+          {TRAIN_HAM.map((text, idx) => (
+            <li key={idx} className="bg-white rounded-md px-3 py-2 border border-emerald-100">
+              <span className="text-emerald-500 font-medium mr-2">{idx + 1}.</span>
+              {text}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
