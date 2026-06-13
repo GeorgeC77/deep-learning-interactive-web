@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import NaiveBayesPage from './NaiveBayesPage';
 
 export default function Chapter04Section02Page() {
-  return <SectionPlaceholder sectionPath="/ch04/s02" />;
+  return <NaiveBayesPage />;
 }

@@ -38,12 +38,21 @@ const generalizedLinearModelItems = [
   { to: '/ch03/summary', label: '本章总结', icon: CheckCircle2 },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' {
+const generativeLearningItems = [
+  { to: '/ch04/overview', label: '课程概览', icon: BookOpen },
+  { to: '/ch04/generative-vs-discriminative', label: '生成式 vs 判别式', icon: Scale },
+  { to: '/ch04/gaussian-discriminant-analysis', label: '高斯判别分析', icon: Calculator },
+  { to: '/ch04/naive-bayes', label: '朴素贝叶斯', icon: Brain },
+];
+
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' {
   if (path === '/') return 'home';
   const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
   if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
   const glmPaths = new Set(generalizedLinearModelItems.map((i) => i.to));
   if (glmPaths.has(path) || path.startsWith('/ch03/')) return 'glm';
+  const generativePaths = new Set(generativeLearningItems.map((i) => i.to));
+  if (generativePaths.has(path) || path.startsWith('/ch04/')) return 'generative';
   return 'linear';
 }
 
@@ -149,6 +158,35 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {generalizedLinearModelItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {chapter === 'generative' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <Scale className="w-4 h-4" />
+                  生成学习算法
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {generativeLearningItems.map((item) => {
                     const isActive = currentPath === item.to;
                     return (
                       <DropdownMenuItem key={item.to} asChild>

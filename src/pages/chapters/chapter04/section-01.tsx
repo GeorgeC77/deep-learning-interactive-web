@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import GaussianDiscriminantAnalysisPage from './GaussianDiscriminantAnalysisPage';
 
 export default function Chapter04Section01Page() {
-  return <SectionPlaceholder sectionPath="/ch04/s01" />;
+  return <GaussianDiscriminantAnalysisPage />;
 }

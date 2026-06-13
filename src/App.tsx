@@ -29,6 +29,12 @@ import Chapter03LogisticAsGLMPage from './pages/chapters/chapter03/LogisticAsGLM
 import Chapter03SoftmaxAsGLMPage from './pages/chapters/chapter03/SoftmaxAsGLMPage';
 import Chapter03SummaryPage from './pages/chapters/chapter03/SummaryPage';
 
+// Chapter 4 pages
+import Chapter04OverviewPage from './pages/chapters/chapter04/OverviewPage';
+import Chapter04GenerativeVsDiscriminativePage from './pages/chapters/chapter04/GenerativeVsDiscriminativePage';
+import Chapter04GaussianDiscriminantAnalysisPage from './pages/chapters/chapter04/GaussianDiscriminantAnalysisPage';
+import Chapter04NaiveBayesPage from './pages/chapters/chapter04/NaiveBayesPage';
+
 // Chapter / Section pages
 import Chapter01Section01Page from './pages/chapters/chapter01/section-01-lms';
 import Chapter01Section02Page from './pages/chapters/chapter01/section-02';
@@ -113,6 +119,12 @@ function App() {
           <Route path="/ch03/logistic-as-glm" element={<Chapter03LogisticAsGLMPage />} />
           <Route path="/ch03/softmax-as-glm" element={<Chapter03SoftmaxAsGLMPage />} />
           <Route path="/ch03/summary" element={<Chapter03SummaryPage />} />
+
+          {/* Chapter 4 routes */}
+          <Route path="/ch04/overview" element={<Chapter04OverviewPage />} />
+          <Route path="/ch04/generative-vs-discriminative" element={<Chapter04GenerativeVsDiscriminativePage />} />
+          <Route path="/ch04/gaussian-discriminant-analysis" element={<Chapter04GaussianDiscriminantAnalysisPage />} />
+          <Route path="/ch04/naive-bayes" element={<Chapter04NaiveBayesPage />} />
 
           {/* Chapter / Section routes */}
           <Route path="/ch01/s01" element={<Chapter01Section01Page />} />
