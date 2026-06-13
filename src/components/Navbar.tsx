@@ -28,9 +28,17 @@ const logisticRegressionItems = [
   { to: '/ch02/newton', label: '牛顿法', icon: Zap },
 ];
 
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' {
+  if (path === '/') return 'home';
+  const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
+  if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
+  return 'linear';
+}
+
 export default function Navbar() {
   const location = useLocation();
   const currentPath = location.hash.slice(1) || '/';
+  const chapter = getCurrentChapter(currentPath);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm">
@@ -62,59 +70,63 @@ export default function Navbar() {
               目录
             </NavLink>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                <BookOpen className="w-4 h-4" />
-                线性回归
-                <ChevronDown className="w-3.5 h-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {linearRegressionItems.map((item) => {
-                  const isActive = currentPath === item.to;
-                  return (
-                    <DropdownMenuItem key={item.to} asChild>
-                      <Link
-                        to={item.to}
-                        className={cn(
-                          'flex items-center gap-2 cursor-pointer',
-                          isActive && 'bg-blue-50 text-blue-700'
-                        )}
-                      >
-                        <item.icon className="w-4 h-4" />
-                        {item.label}
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {chapter === 'linear' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <BookOpen className="w-4 h-4" />
+                  线性回归
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {linearRegressionItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
-            <DropdownMenu>
-              <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                <Binary className="w-4 h-4" />
-                分类与逻辑回归
-                <ChevronDown className="w-3.5 h-3.5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {logisticRegressionItems.map((item) => {
-                  const isActive = currentPath === item.to;
-                  return (
-                    <DropdownMenuItem key={item.to} asChild>
-                      <Link
-                        to={item.to}
-                        className={cn(
-                          'flex items-center gap-2 cursor-pointer',
-                          isActive && 'bg-blue-50 text-blue-700'
-                        )}
-                      >
-                        <item.icon className="w-4 h-4" />
-                        {item.label}
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {chapter === 'logistic' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <Binary className="w-4 h-4" />
+                  分类与逻辑回归
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {logisticRegressionItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             <a
               href="https://github.com/GeorgeC77/machine-learning-interactive-web/blob/main/LICENSE"

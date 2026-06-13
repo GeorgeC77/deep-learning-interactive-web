@@ -20,7 +20,7 @@ export default function OverviewPage() {
           <BookOpen className="w-12 h-12 text-blue-600" />
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          线性回归：从入门到精通
+          线性回归：从一元到多元回归
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           本教程系统讲解机器学习中线性回归的理论基础与核心算法，从模型建立到优化求解，带你深入理解这一经典算法。
