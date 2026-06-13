@@ -175,48 +175,52 @@ export default function SVMTheoryPage() {
 function SoftMarginDemo() {
   const [cValue, setCValue] = useState(1.0);
 
-  // Fixed dataset: linearly separable with some outliers
+  // Dataset: most +1 points in upper-right, most -1 points in lower-left,
+  // with one outlier (-1) mixed into the +1 region to show soft margin effect.
   const points = useMemo(
     () => [
-      { x: 1.2, y: 2.5, label: 1 },
-      { x: 1.8, y: 3.0, label: 1 },
-      { x: 2.2, y: 2.0, label: 1 },
-      { x: 2.8, y: 2.8, label: 1 },
-      { x: 1.5, y: 3.5, label: 1 },
-      { x: 3.5, y: 1.0, label: -1 },
-      { x: 4.0, y: 0.8, label: -1 },
-      { x: 4.5, y: 1.5, label: -1 },
-      { x: 5.0, y: 0.5, label: -1 },
-      { x: 3.8, y: 1.8, label: -1 },
-      // A few outliers to show soft margin effect
-      { x: 2.8, y: 1.3, label: -1 },
-      { x: 3.2, y: 2.6, label: 1 },
+      { x: 3.0, y: 3.0, label: 1 },
+      { x: 4.0, y: 3.0, label: 1 },
+      { x: 3.0, y: 4.0, label: 1 },
+      { x: 4.0, y: 4.0, label: 1 },
+      { x: 5.0, y: 3.0, label: 1 },
+      { x: 1.0, y: 1.0, label: -1 },
+      { x: 2.0, y: 1.0, label: -1 },
+      { x: 1.0, y: 2.0, label: -1 },
+      { x: 2.0, y: 2.0, label: -1 },
+      { x: 3.0, y: 1.0, label: -1 },
+      // outlier: a -1 point in the +1 region
+      { x: 3.5, y: 3.5, label: -1, isOutlier: true },
     ],
     []
   );
 
-  // Approximate decision boundary for visualization: shift based on C
-  // For demonstration only, not computed from real SVM solver
+  // Approximate decision boundary for visualization.
+  // Boundary: x + y = s(C). Larger C moves boundary toward the outlier.
   const boundaryShift = useMemo(() => {
-    // Larger C => boundary closer to hard-margin (around x+y = 4.5)
-    // Smaller C => boundary shifts to allow more slack (x+y = 4.2)
-    return 4.5 - 0.4 / (1 + cValue);
+    // C = 0  -> boundary ignores outlier: x + y ≈ 3.5
+    // C -> ∞ -> boundary classifies outlier correctly: x + y ≈ 5.3
+    return 3.5 + 1.8 * (1 - Math.exp(-cValue));
+  }, [cValue]);
+
+  const margin = useMemo(() => {
+    // Wider margin for small C, narrower for large C
+    return 1.5 * Math.exp(-0.5 * cValue) + 0.2;
   }, [cValue]);
 
   const width = 520;
-  const height = 360;
+  const height = 420;
   const padding = 40;
   const xMin = 0;
   const xMax = 6;
   const yMin = 0;
-  const yMax = 4;
+  const yMax = 5;
 
   const xScale = (x: number) => padding + ((x - xMin) / (xMax - xMin)) * (width - 2 * padding);
   const yScale = (y: number) => padding + (1 - (y - yMin) / (yMax - yMin)) * (height - 2 * padding);
 
   // Boundary line: x + y = boundaryShift => y = boundaryShift - x
   const boundaryPoints: { x: number; y: number }[] = [];
-  const margin = 0.5 / Math.sqrt(cValue + 0.2); // visual margin width
   const marginPos: { x: number; y: number }[] = [];
   const marginNeg: { x: number; y: number }[] = [];
 
@@ -234,6 +238,8 @@ function SoftMarginDemo() {
   const pathPos = marginPos.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`).join(' ');
   const pathNeg = marginNeg.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`).join(' ');
 
+  const misclassifiedCount = points.filter((p) => p.label * (p.x + p.y - boundaryShift) <= 0).length;
+
   return (
     <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 space-y-4">
       <div>
@@ -250,17 +256,17 @@ function SoftMarginDemo() {
           className="w-full accent-blue-500"
         />
         <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>C 小：允许更多误分类，间隔宽</span>
+          <span>C 小：允许误分类，间隔宽</span>
           <span>C 大：惩罚更重，间隔窄</span>
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 360 }}>
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 420 }}>
         {/* grid */}
         {[0, 1, 2, 3, 4, 5, 6].map((x) => (
           <line key={`v-${x}`} x1={xScale(x)} y1={yScale(yMin)} x2={xScale(x)} y2={yScale(yMax)} stroke="#e5e7eb" />
         ))}
-        {[0, 1, 2, 3, 4].map((y) => (
+        {[0, 1, 2, 3, 4, 5].map((y) => (
           <line key={`h-${y}`} x1={xScale(xMin)} y1={yScale(y)} x2={xScale(xMax)} y2={yScale(y)} stroke="#e5e7eb" />
         ))}
         {/* axes */}
@@ -273,7 +279,7 @@ function SoftMarginDemo() {
             <text x={xScale(x)} y={yScale(yMin) + 18} textAnchor="middle" fontSize={10} fill="#4b5563">{x}</text>
           </g>
         ))}
-        {[0, 1, 2, 3, 4].map((y) => (
+        {[0, 1, 2, 3, 4, 5].map((y) => (
           <g key={`yt-${y}`}>
             <line x1={padding - 5} y1={yScale(y)} x2={padding} y2={yScale(y)} stroke="#6b7280" />
             <text x={padding - 8} y={yScale(y) + 3} textAnchor="end" fontSize={10} fill="#4b5563">{y}</text>
@@ -288,21 +294,45 @@ function SoftMarginDemo() {
         {pathD && <path d={pathD} fill="none" stroke="#2563eb" strokeWidth={3} />}
 
         {/* points */}
-        {points.map((p, i) => (
-          <circle
-            key={i}
-            cx={xScale(p.x)}
-            cy={yScale(p.y)}
-            r={6}
-            fill={p.label === 1 ? '#10b981' : '#f43f5e'}
-            stroke="white"
-            strokeWidth={2}
-          />
-        ))}
+        {points.map((p, i) => {
+          const isMisclassified = p.label * (p.x + p.y - boundaryShift) <= 0;
+          return (
+            <g key={i}>
+              <circle
+                cx={xScale(p.x)}
+                cy={yScale(p.y)}
+                r={p.isOutlier ? 8 : 6}
+                fill={p.label === 1 ? '#10b981' : '#f43f5e'}
+                stroke={p.isOutlier ? '#f59e0b' : 'white'}
+                strokeWidth={p.isOutlier ? 3 : 2}
+              />
+              {isMisclassified && (
+                <g stroke="#7f1d1d" strokeWidth={2}>
+                  <line x1={xScale(p.x) - 5} y1={yScale(p.y) - 5} x2={xScale(p.x) + 5} y2={yScale(p.y) + 5} />
+                  <line x1={xScale(p.x) + 5} y1={yScale(p.y) - 5} x2={xScale(p.x) - 5} y2={yScale(p.y) + 5} />
+                </g>
+              )}
+            </g>
+          );
+        })}
       </svg>
 
+      <div className="grid md:grid-cols-2 gap-4 text-center">
+        <div className="bg-white rounded-lg p-3 border border-gray-200">
+          <p className="text-xs text-gray-500">当前误分类样本数</p>
+          <p className={`text-xl font-mono font-bold ${misclassifiedCount === 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            {misclassifiedCount}
+          </p>
+        </div>
+        <div className="bg-white rounded-lg p-3 border border-gray-200">
+          <p className="text-xs text-gray-500">间隔宽度（近似）</p>
+          <p className="text-xl font-mono font-bold text-blue-600">{margin.toFixed(2)}</p>
+        </div>
+      </div>
+
       <div className="text-sm text-gray-600">
-        提示：这是用于演示 C 参数影响的简化可视化。真实 SVM 的边界和间隔由二次规划求解器决定。
+        橙色外圈的点是异常点。C 较小时，SVM 忽略异常点以获得更宽的间隔；C 增大时，边界向异常点移动以减少误分类。
+        这是用于演示 C 参数影响的简化可视化。
       </div>
     </div>
   );
