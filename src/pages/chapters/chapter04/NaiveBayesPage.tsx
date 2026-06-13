@@ -32,6 +32,24 @@ function tokenize(text: string): string[] {
     .filter((t) => t.length > 0);
 }
 
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// 从输入文本中提取词汇表里存在的特征词，并统计出现次数。
+// 这样即使用户输入的是连续中文，也能识别出训练集中的关键词。
+function extractFeatures(text: string, vocab: Set<string>): string[] {
+  const features: string[] = [];
+  vocab.forEach((word) => {
+    const regex = new RegExp(escapeRegExp(word), 'g');
+    const matches = text.match(regex);
+    if (matches) {
+      features.push(...matches);
+    }
+  });
+  return features;
+}
+
 function buildVocabAndCounts(docs: string[]) {
   const counts: Record<string, number> = {};
   let total = 0;
@@ -57,7 +75,7 @@ export default function NaiveBayesPage() {
   }, [spamData, hamData]);
 
   const result = useMemo(() => {
-    const words = tokenize(input);
+    const words = extractFeatures(input, vocab);
     if (words.length === 0) return null;
 
     const priorSpam = TRAIN_SPAM.length / (TRAIN_SPAM.length + TRAIN_HAM.length);
@@ -165,7 +183,8 @@ export default function NaiveBayesPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：垃圾邮件分类器</h2>
         <p className="text-gray-700 mb-4">
           下面是一个用 4 封垃圾邮件和 4 封正常邮件训练的小型朴素贝叶斯分类器。
-          输入一段中文文本，观察模型如何判断它是垃圾邮件还是正常邮件。
+          输入一段中文文本后，程序会从文本中提取训练词表里出现过的词作为特征，
+          再用拉普拉斯平滑的朴素贝叶斯计算后验概率。
         </p>
 
         <div className="space-y-3 mb-4">
@@ -225,7 +244,7 @@ export default function NaiveBayesPage() {
               </div>
             </div>
             <div className="mt-4 text-xs text-gray-500">
-              分词结果：{result.words.join(' · ') || '（无有效词汇）'}
+              识别到的特征词：{result.words.join(' · ') || '（无有效词汇）'}
             </div>
           </div>
         )}
