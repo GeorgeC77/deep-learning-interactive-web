@@ -275,9 +275,25 @@ function StepChart({ newtonHistory, gdHistory, currentStep }: NewtonChartProps) 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
 
+    const thetaStar = newtonHistory[newtonHistory.length - 1] ?? 0;
     const maxStep = Math.max(newtonHistory.length, gdHistory.length) - 1;
     const xScale = d3.scaleLinear().domain([0, Math.max(1, maxStep)]).range([0, WIDTH]);
-    const yScale = d3.scaleLinear().domain([-5, 5]).range([HEIGHT, 0]);
+
+    // Show log-distance to optimum: makes Newton's quadratic convergence visible
+    const eps = 1e-12;
+    const newtonData = newtonHistory.map((theta, i) => ({
+      step: i,
+      logDist: Math.log10(Math.max(eps, Math.abs(theta - thetaStar))),
+    }));
+    const gdData = gdHistory.map((theta, i) => ({
+      step: i,
+      logDist: Math.log10(Math.max(eps, Math.abs(theta - thetaStar))),
+    }));
+
+    const allValues = [...newtonData, ...gdData].map((d) => d.logDist);
+    const yMin = Math.floor(Math.min(-6, ...allValues));
+    const yMax = Math.ceil(Math.max(0, ...allValues));
+    const yScale = d3.scaleLinear().domain([yMin, yMax]).range([HEIGHT, 0]);
 
     const g = svg.append('g').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
@@ -289,7 +305,7 @@ function StepChart({ newtonHistory, gdHistory, currentStep }: NewtonChartProps) 
       .attr('stroke', '#e0e0e0')
       .attr('stroke-dasharray', '2,2');
     g.append('g')
-      .call(d3.axisLeft(yScale).ticks(10).tickSize(-WIDTH).tickFormat(() => ''))
+      .call(d3.axisLeft(yScale).ticks(Math.max(4, yMax - yMin)).tickSize(-WIDTH).tickFormat(() => ''))
       .selectAll('line')
       .attr('stroke', '#e0e0e0')
       .attr('stroke-dasharray', '2,2');
@@ -308,7 +324,7 @@ function StepChart({ newtonHistory, gdHistory, currentStep }: NewtonChartProps) 
       .text('迭代步数');
 
     g.append('g')
-      .call(d3.axisLeft(yScale).ticks(10))
+      .call(d3.axisLeft(yScale).ticks(Math.max(4, yMax - yMin)))
       .append('text')
       .attr('transform', 'rotate(-90)')
       .attr('x', -HEIGHT / 2)
@@ -317,33 +333,31 @@ function StepChart({ newtonHistory, gdHistory, currentStep }: NewtonChartProps) 
       .attr('font-size', '13px')
       .attr('font-weight', 'bold')
       .style('text-anchor', 'middle')
-      .text('θ');
+      .text('log₁₀|θ − θ*|');
 
-    // Optimum line
-    const thetaStar = newtonHistory[newtonHistory.length - 1] ?? 0;
+    // Optimum line (logDist = -∞, so draw at bottom as reference)
     g.append('line')
       .attr('x1', 0)
       .attr('x2', WIDTH)
-      .attr('y1', yScale(thetaStar))
-      .attr('y2', yScale(thetaStar))
+      .attr('y1', yScale(yMin))
+      .attr('y2', yScale(yMin))
       .attr('stroke', '#00b4a6')
       .attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '6,4')
       .attr('opacity', 0.5);
     g.append('text')
       .attr('x', WIDTH - 40)
-      .attr('y', yScale(thetaStar) - 6)
+      .attr('y', yScale(yMin) - 6)
       .attr('fill', '#00b4a6')
       .attr('font-size', '11px')
       .text('θ*');
 
     // Newton line
-    const newtonData = newtonHistory.map((theta, i) => ({ step: i, theta }));
     if (newtonData.length > 1) {
       const line = d3
-        .line<{ step: number; theta: number }>()
+        .line<{ step: number; logDist: number }>()
         .x((d) => xScale(d.step))
-        .y((d) => yScale(d.theta))
+        .y((d) => yScale(d.logDist))
         .curve(d3.curveLinear);
       g.append('path').datum(newtonData).attr('fill', 'none').attr('stroke', '#f08a5d').attr('stroke-width', 2.5).attr('d', line);
     }
@@ -353,17 +367,16 @@ function StepChart({ newtonHistory, gdHistory, currentStep }: NewtonChartProps) 
       .append('circle')
       .attr('class', 'newton-dot')
       .attr('cx', (d) => xScale(d.step))
-      .attr('cy', (d) => yScale(d.theta))
+      .attr('cy', (d) => yScale(d.logDist))
       .attr('r', 3)
       .attr('fill', '#f08a5d');
 
     // GD line
-    const gdData = gdHistory.map((theta, i) => ({ step: i, theta: Math.max(-5, Math.min(5, theta)) }));
     if (gdData.length > 1) {
       const line = d3
-        .line<{ step: number; theta: number }>()
+        .line<{ step: number; logDist: number }>()
         .x((d) => xScale(d.step))
-        .y((d) => yScale(d.theta))
+        .y((d) => yScale(d.logDist))
         .curve(d3.curveLinear);
       g.append('path').datum(gdData).attr('fill', 'none').attr('stroke', '#e25b5b').attr('stroke-width', 2).attr('opacity', 0.75).attr('d', line);
     }
@@ -373,7 +386,7 @@ function StepChart({ newtonHistory, gdHistory, currentStep }: NewtonChartProps) 
       .append('circle')
       .attr('class', 'gd-dot')
       .attr('cx', (d) => xScale(d.step))
-      .attr('cy', (d) => yScale(d.theta))
+      .attr('cy', (d) => yScale(d.logDist))
       .attr('r', 2.5)
       .attr('fill', '#e25b5b')
       .attr('opacity', 0.8);
@@ -393,7 +406,7 @@ function StepChart({ newtonHistory, gdHistory, currentStep }: NewtonChartProps) 
       .attr('font-size', '14px')
       .attr('font-weight', 'bold')
       .attr('fill', '#1a3a5c')
-      .text('参数 θ 随迭代步数的变化');
+      .text('到最优解的距离随迭代步数的变化');
   }, [newtonHistory, gdHistory, currentStep]);
 
   return <svg ref={svgRef} viewBox="0 0 560 360" className="w-full h-auto" style={{ maxHeight: 360 }} />;
@@ -752,7 +765,7 @@ export default function NewtonPage() {
       <section className="mb-10">
         <InteractiveDemo title="交互式演示：牛顿法 vs 梯度上升">
           <InteractivePanel
-            hint="调整初始点 θ₀ 和梯度上升学习率 α，观察牛顿法与梯度上升在 1D 逻辑回归对数似然上的收敛轨迹。"
+            hint="调整初始点 θ₀ 和梯度上升学习率 α，观察牛顿法与梯度上升在 1D 逻辑回归对数似然上的收敛轨迹。下图纵轴为 log₁₀|θ − θ*|，下降越快表示收敛越迅速。"
             chart={
               <div className="space-y-4">
                 <NewtonComparisonChart newtonHistory={newtonHistory} gdHistory={gdHistory} currentStep={currentStep} />
@@ -888,9 +901,9 @@ export default function NewtonPage() {
                 <div className="text-xs text-med-gray space-y-1">
                   <p className="font-medium">观察要点：</p>
                   <ol className="list-decimal list-inside space-y-1">
-                    <li>牛顿法通常在 3-5 步内到达 θ*</li>
-                    <li>梯度上升对学习率 α 敏感</li>
-                    <li>初始点远离最优时差异更明显</li>
+                    <li>牛顿法通常在 3-5 步内让 log|θ − θ*| 急剧下降</li>
+                    <li>梯度上升对学习率 α 敏感，距离下降慢得多</li>
+                    <li>初始点远离最优时，两种方法的差距更明显</li>
                   </ol>
                 </div>
               </div>
