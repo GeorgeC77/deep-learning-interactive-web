@@ -47,6 +47,14 @@ import Chapter06OverviewPage from './pages/chapters/chapter06/OverviewPage';
 import Chapter06MarginIntuitionPage from './pages/chapters/chapter06/MarginIntuitionPage';
 import Chapter06SVMTheoryPage from './pages/chapters/chapter06/SVMTheoryPage';
 
+// Chapter 7 pages
+import Chapter07OverviewPage from './pages/chapters/chapter07/OverviewPage';
+import Chapter07NonlinearSupervisedLearningPage from './pages/chapters/chapter07/NonlinearSupervisedLearningPage';
+import Chapter07NeuralNetworksPage from './pages/chapters/chapter07/NeuralNetworksPage';
+import Chapter07ModernNNModulesPage from './pages/chapters/chapter07/ModernNNModulesPage';
+import Chapter07BackpropagationPage from './pages/chapters/chapter07/BackpropagationPage';
+import Chapter07VectorizationPage from './pages/chapters/chapter07/VectorizationPage';
+
 // Chapter / Section pages
 import Chapter01Section01Page from './pages/chapters/chapter01/section-01-lms';
 import Chapter01Section02Page from './pages/chapters/chapter01/section-02';
@@ -149,6 +157,14 @@ function App() {
           <Route path="/ch06/overview" element={<Chapter06OverviewPage />} />
           <Route path="/ch06/margin-intuition" element={<Chapter06MarginIntuitionPage />} />
           <Route path="/ch06/svm-theory" element={<Chapter06SVMTheoryPage />} />
+
+          {/* Chapter 7 routes */}
+          <Route path="/ch07/overview" element={<Chapter07OverviewPage />} />
+          <Route path="/ch07/nonlinear-supervised-learning" element={<Chapter07NonlinearSupervisedLearningPage />} />
+          <Route path="/ch07/neural-networks" element={<Chapter07NeuralNetworksPage />} />
+          <Route path="/ch07/modern-nn-modules" element={<Chapter07ModernNNModulesPage />} />
+          <Route path="/ch07/backpropagation" element={<Chapter07BackpropagationPage />} />
+          <Route path="/ch07/vectorization" element={<Chapter07VectorizationPage />} />
 
           {/* Chapter / Section routes */}
           <Route path="/ch01/s01" element={<Chapter01Section01Page />} />

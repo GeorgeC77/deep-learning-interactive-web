@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import VectorizationPage from './VectorizationPage';
 
 export default function Chapter07Section05Page() {
-  return <SectionPlaceholder sectionPath="/ch07/s05" />;
+  return <VectorizationPage />;
 }

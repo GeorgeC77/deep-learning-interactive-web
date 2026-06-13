@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import NonlinearSupervisedLearningPage from './NonlinearSupervisedLearningPage';
 
 export default function Chapter07Section01Page() {
-  return <SectionPlaceholder sectionPath="/ch07/s01" />;
+  return <NonlinearSupervisedLearningPage />;
 }

@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import ModernNNModulesPage from './ModernNNModulesPage';
 
 export default function Chapter07Section03Page() {
-  return <SectionPlaceholder sectionPath="/ch07/s03" />;
+  return <ModernNNModulesPage />;
 }

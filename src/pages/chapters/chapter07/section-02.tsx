@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import NeuralNetworksPage from './NeuralNetworksPage';
 
 export default function Chapter07Section02Page() {
-  return <SectionPlaceholder sectionPath="/ch07/s02" />;
+  return <NeuralNetworksPage />;
 }

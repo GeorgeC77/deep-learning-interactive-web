@@ -1,5 +1,5 @@
-import SectionPlaceholder from '@/components/SectionPlaceholder';
+import BackpropagationPage from './BackpropagationPage';
 
 export default function Chapter07Section04Page() {
-  return <SectionPlaceholder sectionPath="/ch07/s04" />;
+  return <BackpropagationPage />;
 }
