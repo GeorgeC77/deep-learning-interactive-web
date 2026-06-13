@@ -353,7 +353,9 @@ function PoissonPlot({ lambda }: { lambda: number }) {
 
   return (
     <div className="mt-6">
-      <div className="text-center text-sm text-gray-600 mb-2">λ = e^η = {lambda.toFixed(3)}</div>
+      <div className="text-center text-sm text-gray-600 mb-2">
+        λ = e<sup>η</sup> = {formatLambda(lambda)}
+      </div>
       <div className="flex items-end justify-center gap-1 h-48 px-4">
         {visible.map(({ k, p }) => (
           <div key={k} className="flex-1 flex flex-col items-center min-w-[18px]">
@@ -375,4 +377,11 @@ function factorial(n: number): number {
   let res = 1;
   for (let i = 2; i <= n; i++) res *= i;
   return res;
+}
+
+function formatLambda(lambda: number): string {
+  if (lambda === 0) return '0';
+  if (lambda >= 1000 || lambda < 0.001) return lambda.toExponential(2);
+  if (Number.isInteger(lambda)) return String(lambda);
+  return String(parseFloat(lambda.toFixed(3)));
 }
