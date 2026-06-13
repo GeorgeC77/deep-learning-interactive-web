@@ -4,22 +4,24 @@ import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
 const POINTS = [
-  { x: 1.5, y: 2.0, label: 1 },
-  { x: 2.0, y: 3.0, label: 1 },
-  { x: 2.5, y: 1.5, label: 1 },
-  { x: 3.0, y: 2.5, label: 1 },
-  { x: 1.0, y: 3.5, label: 1 },
-  { x: 4.0, y: 1.0, label: -1 },
-  { x: 3.5, y: 0.5, label: -1 },
-  { x: 5.0, y: 1.5, label: -1 },
-  { x: 4.5, y: 0.8, label: -1 },
-  { x: 5.5, y: 0.5, label: -1 },
+  // label +1 in the upper-right region
+  { x: 3.5, y: 3.2, label: 1 },
+  { x: 4.0, y: 2.8, label: 1 },
+  { x: 4.5, y: 3.5, label: 1 },
+  { x: 5.0, y: 2.5, label: 1 },
+  { x: 3.8, y: 4.0, label: 1 },
+  // label -1 in the lower-left region
+  { x: 1.0, y: 1.0, label: -1 },
+  { x: 1.5, y: 0.6, label: -1 },
+  { x: 2.0, y: 1.2, label: -1 },
+  { x: 0.8, y: 1.8, label: -1 },
+  { x: 2.3, y: 0.5, label: -1 },
 ];
 
 export default function MarginIntuitionPage() {
   const [w1, setW1] = useState(1.0);
   const [w2, setW2] = useState(1.0);
-  const [b, setB] = useState(-3.5);
+  const [b, setB] = useState(-4.0);
 
   // Signed geometric margin for point (x, y)
   const signedValue = (x: number, y: number) =>
@@ -209,6 +211,7 @@ function SVMDemo({
   const yScale = (y: number) => padding + (1 - (y - yMin) / (yMax - yMin)) * (height - 2 * padding);
 
   const norm = Math.sqrt(w1 * w1 + w2 * w2);
+  const signedValue = (x: number, y: number) => (w1 * x + w2 * y + b) / norm;
 
   // Decision boundary: w1*x + w2*y + b = 0  =>  y = -(w1*x + b) / w2
   const decisionPoints: { x: number; y: number }[] = [];
@@ -284,9 +287,9 @@ function SVMDemo({
           </g>
         ))}
 
-        {/* margin boundaries */}
-        {pathPos && <path d={pathPos} fill="none" stroke="#93c5fd" strokeWidth={2} strokeDasharray="6,4" />}
-        {pathNeg && <path d={pathNeg} fill="none" stroke="#93c5fd" strokeWidth={2} strokeDasharray="6,4" />}
+        {/* margin boundaries (only shown when all points are correctly classified) */}
+        {allCorrect && pathPos && <path d={pathPos} fill="none" stroke="#93c5fd" strokeWidth={2} strokeDasharray="6,4" />}
+        {allCorrect && pathNeg && <path d={pathNeg} fill="none" stroke="#93c5fd" strokeWidth={2} strokeDasharray="6,4" />}
 
         {/* decision boundary */}
         {pathD && <path d={pathD} fill="none" stroke="#2563eb" strokeWidth={3} />}
@@ -294,16 +297,24 @@ function SVMDemo({
         {/* points */}
         {POINTS.map((p, i) => {
           const isSV = supportVectors.includes(i);
+          const isMisclassified = p.label * signedValue(p.x, p.y) <= 0;
           return (
-            <circle
-              key={i}
-              cx={xScale(p.x)}
-              cy={yScale(p.y)}
-              r={isSV ? 9 : 6}
-              fill={p.label === 1 ? '#10b981' : '#f43f5e'}
-              stroke={isSV ? '#1f2937' : 'white'}
-              strokeWidth={isSV ? 3 : 2}
-            />
+            <g key={i}>
+              <circle
+                cx={xScale(p.x)}
+                cy={yScale(p.y)}
+                r={isSV ? 9 : 6}
+                fill={p.label === 1 ? '#10b981' : '#f43f5e'}
+                stroke={isSV ? '#1f2937' : 'white'}
+                strokeWidth={isSV ? 3 : 2}
+              />
+              {isMisclassified && (
+                <g stroke="#7f1d1d" strokeWidth={2}>
+                  <line x1={xScale(p.x) - 5} y1={yScale(p.y) - 5} x2={xScale(p.x) + 5} y2={yScale(p.y) + 5} />
+                  <line x1={xScale(p.x) + 5} y1={yScale(p.y) - 5} x2={xScale(p.x) - 5} y2={yScale(p.y) + 5} />
+                </g>
+              )}
+            </g>
           );
         })}
       </svg>
