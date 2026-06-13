@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Brain, Calculator, ShieldAlert, ArrowRight, Scale } from 'lucide-react';
+import { Brain, Calculator, ShieldAlert, ArrowRight, Scale } from 'lucide-react';
 
 const roadmapItems = [
   { label: '生成式 vs 判别式', path: '/ch04/generative-vs-discriminative', icon: Scale, desc: '两种建模思路的本质区别', color: 'bg-blue-100 text-blue-700 border-blue-300' },

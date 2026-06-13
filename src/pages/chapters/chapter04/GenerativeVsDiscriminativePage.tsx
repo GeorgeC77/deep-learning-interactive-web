@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldAlert, Scale, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Scale, CheckCircle2 } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 

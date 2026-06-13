@@ -1,5 +1,5 @@
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
