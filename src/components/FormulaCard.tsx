@@ -1,15 +1,17 @@
 import type { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface FormulaCardProps {
   title: string;
   formula: ReactNode;
   description?: ReactNode;
+  className?: string;
 }
 
-export default function FormulaCard({ title, formula, description }: FormulaCardProps) {
+export default function FormulaCard({ title, formula, description, className }: FormulaCardProps) {
   return (
-    <Card className="my-4 border-blue-200 bg-blue-50/50">
+    <Card className={cn('my-4 border-blue-200 bg-blue-50/50', className)}>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg text-blue-800">{title}</CardTitle>
       </CardHeader>
