@@ -1,6 +1,6 @@
 import { Binary, FunctionSquare, TrendingDown, BarChart3, Brain, Layers, Zap, ShieldAlert, GraduationCap, ArrowRight, Activity } from 'lucide-react';
-import KaTeX from '../../components/KaTeX';
-import FormulaCard from '../../components/FormulaCard';
+import KaTeX from '@/components/KaTeX';
+import FormulaCard from '@/components/FormulaCard';
 
 const roadmapItems = [
   { label: '模型表示', path: '/ch02/model', icon: FunctionSquare, desc: '假设函数与 sigmoid', color: 'bg-blue-100 text-blue-700 border-blue-300' },

@@ -390,7 +390,7 @@ export default function PerceptronPage() {
             <tbody>
               <tr className="bg-white">
                 <td className="border border-gray-200 px-4 py-2 text-gray-700">输出</td>
-                <td className="border border-gray-200 px-4 py-2 text-gray-700">离散标签 {-1, +1}</td>
+                <td className="border border-gray-200 px-4 py-2 text-gray-700">离散标签 -1 或 +1</td>
                 <td className="border border-gray-200 px-4 py-2 text-gray-700">概率 (0, 1)</td>
               </tr>
               <tr className="bg-gray-50">

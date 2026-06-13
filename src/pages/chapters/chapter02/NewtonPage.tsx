@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
 import { ShieldAlert, Zap, TrendingUp, Activity } from 'lucide-react';
-import KaTeX from '../../components/KaTeX';
-import FormulaCard from '../../components/FormulaCard';
-import InteractiveDemo from '../../components/InteractiveDemo';
-import InteractivePanel from '../../components/InteractivePanel';
+import KaTeX from '@/components/KaTeX';
+import FormulaCard from '@/components/FormulaCard';
+import InteractiveDemo from '@/components/InteractiveDemo';
+import InteractivePanel from '@/components/InteractivePanel';
 
 /* ------------------------------------------------------------------ */
 /*  1-D logistic regression demo data                                   */
