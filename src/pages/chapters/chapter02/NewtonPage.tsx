@@ -104,18 +104,28 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
     svg.selectAll('*').remove();
 
     const xScale = d3.scaleLinear().domain([-5, 5]).range([0, WIDTH]);
-    const yScale = d3.scaleLinear().domain([-8, 0]).range([HEIGHT, 0]);
+    const yScale = d3.scaleLinear().domain([-40, 0]).range([HEIGHT, 0]);
 
     const g = svg.append('g').attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
+    // Clip path to keep curves inside the plot area
+    svg.append('defs')
+      .append('clipPath')
+      .attr('id', 'plot-clip')
+      .append('rect')
+      .attr('width', WIDTH)
+      .attr('height', HEIGHT);
+
+    const plotG = g.append('g').attr('clip-path', 'url(#plot-clip)');
+
     // Grid
-    g.append('g')
+    plotG.append('g')
       .attr('transform', `translate(0,${HEIGHT})`)
       .call(d3.axisBottom(xScale).ticks(10).tickSize(-HEIGHT).tickFormat(() => ''))
       .selectAll('line')
       .attr('stroke', '#e0e0e0')
       .attr('stroke-dasharray', '2,2');
-    g.append('g')
+    plotG.append('g')
       .call(d3.axisLeft(yScale).ticks(8).tickSize(-WIDTH).tickFormat(() => ''))
       .selectAll('line')
       .attr('stroke', '#e0e0e0')
@@ -171,7 +181,7 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
       .y((d) => yScale(d.ell))
       .curve(d3.curveBasis);
 
-    g.append('path').datum(curveData).attr('fill', 'none').attr('stroke', '#3a7bd5').attr('stroke-width', 2.5).attr('d', line);
+    plotG.append('path').datum(curveData).attr('fill', 'none').attr('stroke', '#3a7bd5').attr('stroke-width', 2.5).attr('d', line);
 
     // Newton trajectory
     const newtonTrail = newtonHistory
@@ -184,7 +194,7 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
         .x((d) => xScale(d.theta))
         .y((d) => yScale(d.ell))
         .curve(d3.curveLinear);
-      g.append('path')
+      plotG.append('path')
         .datum(newtonTrail)
         .attr('fill', 'none')
         .attr('stroke', '#f08a5d')
@@ -195,7 +205,7 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
 
     if (newtonTrail.length > 0) {
       const last = newtonTrail[newtonTrail.length - 1];
-      g.append('circle')
+      plotG.append('circle')
         .attr('cx', xScale(last.theta))
         .attr('cy', yScale(last.ell))
         .attr('r', 6)
@@ -211,9 +221,9 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
       const gdLine = d3
         .line<{ theta: number; ell: number }>()
         .x((d) => xScale(Math.max(-5, Math.min(5, d.theta))))
-        .y((d) => yScale(Math.max(-8, Math.min(0, d.ell))))
+        .y((d) => yScale(Math.max(-40, Math.min(0, d.ell))))
         .curve(d3.curveLinear);
-      g.append('path')
+      plotG.append('path')
         .datum(gdTrail)
         .attr('fill', 'none')
         .attr('stroke', '#e25b5b')
@@ -224,9 +234,9 @@ function NewtonComparisonChart({ newtonHistory, gdHistory, currentStep }: Newton
 
     if (gdTrail.length > 0) {
       const last = gdTrail[gdTrail.length - 1];
-      g.append('circle')
+      plotG.append('circle')
         .attr('cx', xScale(Math.max(-5, Math.min(5, last.theta))))
-        .attr('cy', yScale(Math.max(-8, Math.min(0, last.ell))))
+        .attr('cy', yScale(Math.max(-40, Math.min(0, last.ell))))
         .attr('r', 5)
         .attr('fill', '#e25b5b')
         .attr('stroke', '#fff')
