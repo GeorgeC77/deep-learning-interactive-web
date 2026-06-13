@@ -1,4 +1,4 @@
-import { ShieldAlert, BookOpen, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ShieldAlert, BookOpen, CheckCircle2, ArrowRight, LineChart, GitBranch, Layers } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
@@ -66,40 +66,37 @@ export default function SummaryPage() {
         />
       </section>
 
-      {/* Comparison table */}
+      {/* Visual comparison */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">模型对比</h2>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
-            <thead className="bg-blue-50">
-              <tr>
-                <th className="text-left px-4 py-3 text-blue-800 font-semibold border-b border-gray-200">模型</th>
-                <th className="text-left px-4 py-3 text-blue-800 font-semibold border-b border-gray-200">分布</th>
-                <th className="text-left px-4 py-3 text-blue-800 font-semibold border-b border-gray-200">响应函数 g</th>
-                <th className="text-left px-4 py-3 text-blue-800 font-semibold border-b border-gray-200">预测 h(x)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="bg-white">
-                <td className="px-4 py-3 border-b border-gray-200 font-medium">线性回归</td>
-                <td className="px-4 py-3 border-b border-gray-200">高斯分布</td>
-                <td className="px-4 py-3 border-b border-gray-200">恒等函数</td>
-                <td className="px-4 py-3 border-b border-gray-200"><KaTeX math={String.raw`\theta^T x`} /></td>
-              </tr>
-              <tr className="bg-gray-50/50">
-                <td className="px-4 py-3 border-b border-gray-200 font-medium">逻辑回归</td>
-                <td className="px-4 py-3 border-b border-gray-200">伯努利分布</td>
-                <td className="px-4 py-3 border-b border-gray-200">Sigmoid</td>
-                <td className="px-4 py-3 border-b border-gray-200"><KaTeX math={String.raw`\frac{1}{1 + e^{-\theta^T x}}`} /></td>
-              </tr>
-              <tr className="bg-white">
-                <td className="px-4 py-3 border-b border-gray-200 font-medium">Softmax 回归</td>
-                <td className="px-4 py-3 border-b border-gray-200">多项分布</td>
-                <td className="px-4 py-3 border-b border-gray-200">Softmax</td>
-                <td className="px-4 py-3 border-b border-gray-200"><KaTeX math={String.raw`\frac{e^{\theta_j^T x}}{\sum_l e^{\theta_l^T x}}`} /></td>
-              </tr>
-            </tbody>
-          </table>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">模型对比：一个框架下的三种选择</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          <ModelCard
+            icon={LineChart}
+            title="线性回归"
+            distribution="高斯分布"
+            responseFn="恒等函数"
+            prediction={String.raw`\theta^T x`}
+            color="violet"
+            path="/ch03/ols-as-glm"
+          />
+          <ModelCard
+            icon={GitBranch}
+            title="逻辑回归"
+            distribution="伯努利分布"
+            responseFn="Sigmoid"
+            prediction={String.raw`\frac{1}{1 + e^{-\theta^T x}}`}
+            color="rose"
+            path="/ch03/logistic-as-glm"
+          />
+          <ModelCard
+            icon={Layers}
+            title="Softmax 回归"
+            distribution="多项分布"
+            responseFn="Softmax"
+            prediction={String.raw`\frac{e^{\theta_j^T x}}{\sum_l e^{\theta_l^T x}}`}
+            color="amber"
+            path="/ch03/softmax-as-glm"
+          />
         </div>
       </section>
 
@@ -129,6 +126,66 @@ export default function SummaryPage() {
         </Link>
       </section>
     </div>
+  );
+}
+
+function ModelCard({
+  icon: Icon,
+  title,
+  distribution,
+  responseFn,
+  prediction,
+  color,
+  path,
+}: {
+  icon: typeof LineChart;
+  title: string;
+  distribution: string;
+  responseFn: string;
+  prediction: string;
+  color: 'violet' | 'rose' | 'amber';
+  path: string;
+}) {
+  const colors = {
+    violet: 'bg-violet-50 border-violet-200 text-violet-700 hover:border-violet-400',
+    rose: 'bg-rose-50 border-rose-200 text-rose-700 hover:border-rose-400',
+    amber: 'bg-amber-50 border-amber-200 text-amber-700 hover:border-amber-400',
+  };
+
+  const iconBg = {
+    violet: 'bg-violet-100 text-violet-600',
+    rose: 'bg-rose-100 text-rose-600',
+    amber: 'bg-amber-100 text-amber-600',
+  };
+
+  return (
+    <Link
+      to={path}
+      className={`block rounded-xl border p-5 transition-all hover:shadow-sm ${colors[color]}`}
+    >
+      <div className="flex items-center gap-3 mb-4">
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${iconBg[color]}`}>
+          <Icon className="w-5 h-5" />
+        </div>
+        <h3 className="font-bold text-gray-900 text-lg">{title}</h3>
+      </div>
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span className="text-gray-500">分布</span>
+          <span className="font-medium text-gray-900">{distribution}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500">响应函数</span>
+          <span className="font-medium text-gray-900">{responseFn}</span>
+        </div>
+        <div className="pt-2 border-t border-gray-200/60">
+          <div className="text-gray-500 mb-1">预测函数</div>
+          <div className="text-center py-2 bg-white/60 rounded-lg">
+            <KaTeX math={prediction} />
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
 

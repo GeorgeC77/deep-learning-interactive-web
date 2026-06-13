@@ -1,4 +1,5 @@
-import { ShieldAlert, GitBranch, Activity, CheckCircle2 } from 'lucide-react';
+import { useMemo } from 'react';
+import { ShieldAlert, GitBranch, Activity, CheckCircle2, ArrowRight } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -23,6 +24,56 @@ export default function LogisticAsGLMPage() {
             © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途。
           </span>
         </div>
+      </section>
+
+      {/* Derivation flow */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">GLM 推导流程</h2>
+        <div className="grid md:grid-cols-4 gap-4">
+          <FlowCard
+            step={1}
+            title="选择分布"
+            content="伯努利分布"
+            detail={String.raw`y \in \{0, 1\}`}
+            color="rose"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={2}
+            title="确定响应函数"
+            content="Sigmoid"
+            detail={String.raw`g(\eta) = \frac{1}{1+e^{-\eta}}`}
+            color="emerald"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={3}
+            title="写出预测函数"
+            content="概率输出"
+            detail={String.raw`h(x) = \frac{1}{1+e^{-\theta^T x}}`}
+            color="blue"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={4}
+            title="最大似然"
+            content="交叉熵"
+            detail={String.raw`\min -\sum y\log h + (1-y)\log(1-h)`}
+            color="amber"
+          />
+        </div>
+      </section>
+
+      {/* Interactive sigmoid demo */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <Activity className="w-6 h-6 text-rose-600" />
+          <h2 className="text-2xl font-bold text-gray-900">交互演示：从 η 到概率</h2>
+        </div>
+        <p className="text-gray-700 mb-4">
+          伯努利分布的自然参数 η 是 log-odds。响应函数 Sigmoid 把 η 映射为概率 φ。
+        </p>
+        <SigmoidExplorer />
       </section>
 
       {/* Bernoulli choice */}
@@ -64,10 +115,7 @@ export default function LogisticAsGLMPage() {
 
       {/* Response function */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <Activity className="w-6 h-6 text-emerald-600" />
-          <h2 className="text-2xl font-bold text-gray-900">响应函数：Sigmoid</h2>
-        </div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">响应函数：Sigmoid</h2>
         <p className="text-gray-700 mb-4">
           对数配分函数 <KaTeX math={String.raw`a(\eta) = \log(1 + e^{\eta})`} />，求导得到响应函数：
         </p>
@@ -172,6 +220,101 @@ export default function LogisticAsGLMPage() {
           </li>
         </ul>
       </section>
+    </div>
+  );
+}
+
+function SigmoidExplorer() {
+  const points = useMemo(() => {
+    const arr: { x: number; y: number }[] = [];
+    for (let x = -6; x <= 6; x += 0.1) {
+      arr.push({ x, y: 1 / (1 + Math.exp(-x)) });
+    }
+    return arr;
+  }, []);
+
+  const width = 560;
+  const height = 260;
+  const padding = { top: 20, right: 30, bottom: 45, left: 55 };
+  const innerW = width - padding.left - padding.right;
+  const innerH = height - padding.top - padding.bottom;
+  const xMin = -6;
+  const xMax = 6;
+  const yMin = 0;
+  const yMax = 1;
+
+  const xScale = (x: number) => padding.left + ((x - xMin) / (xMax - xMin)) * innerW;
+  const yScale = (y: number) => padding.top + innerH - ((y - yMin) / (yMax - yMin)) * innerH;
+
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`).join(' ');
+
+  return (
+    <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" style={{ maxHeight: 300 }}>
+        {/* grid */}
+        {[0, 0.25, 0.5, 0.75, 1].map((t) => {
+          const y = yMin + t * (yMax - yMin);
+          return <line key={`h-${t}`} x1={padding.left} y1={yScale(y)} x2={padding.left + innerW} y2={yScale(y)} stroke="#e5e7eb" strokeDasharray="3,3" />;
+        })}
+        {[0, 1 / 3, 2 / 3, 1].map((t) => {
+          const x = xMin + t * (xMax - xMin);
+          return <line key={`v-${t}`} x1={xScale(x)} y1={padding.top} x2={xScale(x)} y2={padding.top + innerH} stroke="#e5e7eb" strokeDasharray="3,3" />;
+        })}
+        {/* axes */}
+        <line x1={padding.left} y1={padding.top + innerH} x2={padding.left + innerW} y2={padding.top + innerH} stroke="#6b7280" strokeWidth={1.5} />
+        <line x1={padding.left} y1={padding.top} x2={padding.left} y2={padding.top + innerH} stroke="#6b7280" strokeWidth={1.5} />
+        {/* x ticks */}
+        {[xMin, -3, 0, 3, xMax].map((x) => (
+          <g key={x}>
+            <line x1={xScale(x)} y1={padding.top + innerH} x2={xScale(x)} y2={padding.top + innerH + 5} stroke="#6b7280" />
+            <text x={xScale(x)} y={padding.top + innerH + 18} textAnchor="middle" fontSize={10} fill="#4b5563">{x}</text>
+          </g>
+        ))}
+        {/* y ticks */}
+        {[0, 0.5, 1].map((y) => (
+          <g key={y}>
+            <line x1={padding.left - 5} y1={yScale(y)} x2={padding.left} y2={yScale(y)} stroke="#6b7280" />
+            <text x={padding.left - 8} y={yScale(y) + 3} textAnchor="end" fontSize={10} fill="#4b5563">{y.toFixed(1)}</text>
+          </g>
+        ))}
+        <text x={padding.left + innerW / 2} y={height - 8} textAnchor="middle" fontSize={12} fill="#374151">η（自然参数 / log-odds）</text>
+        <text x={16} y={padding.top + innerH / 2} textAnchor="middle" fontSize={12} fill="#374151" transform={`rotate(-90, 16, ${padding.top + innerH / 2})`}>φ = P(y=1)</text>
+        {/* threshold line */}
+        <line x1={padding.left} y1={yScale(0.5)} x2={padding.left + innerW} y2={yScale(0.5)} stroke="#9ca3af" strokeWidth={1} strokeDasharray="4,4" />
+        {/* curve */}
+        <path d={pathD} fill="none" stroke="#e11d48" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <div className="text-center text-xs text-gray-500 mt-2">
+        当 η = 0 时 φ = 0.5；η 越大，模型越确信 y = 1。
+      </div>
+    </div>
+  );
+}
+
+function FlowCard({ step, title, content, detail, color }: { step: number; title: string; content: string; detail: string; color: 'rose' | 'emerald' | 'blue' | 'amber' }) {
+  const colors = {
+    rose: 'bg-rose-50 border-rose-200 text-rose-800',
+    emerald: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+    blue: 'bg-blue-50 border-blue-200 text-blue-800',
+    amber: 'bg-amber-50 border-amber-200 text-amber-800',
+  };
+
+  return (
+    <div className={`rounded-xl border p-4 ${colors[color]}`}>
+      <div className="text-xs font-bold opacity-70 mb-1">步骤 {step}</div>
+      <div className="font-bold text-gray-900 mb-1">{title}</div>
+      <div className="text-sm font-medium mb-2">{content}</div>
+      <div className="text-sm opacity-90">
+        <KaTeX math={detail} />
+      </div>
+    </div>
+  );
+}
+
+function FlowArrow() {
+  return (
+    <div className="hidden md:flex items-center justify-center">
+      <ArrowRight className="w-6 h-6 text-gray-400" />
     </div>
   );
 }

@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import { ShieldAlert, Sparkles, GitBranch, CheckCircle2 } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
 export default function BuildingGLMPage() {
+  const [model, setModel] = useState<'gaussian' | 'bernoulli' | 'poisson'>('gaussian');
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       {/* Header */}
@@ -129,6 +131,36 @@ export default function BuildingGLMPage() {
         </div>
       </section>
 
+      {/* Interactive response function demo */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：分布决定响应函数</h2>
+        <p className="text-gray-700 mb-4">
+          选择一种分布，观察 GLM 推导出的响应函数和连接函数。同一个线性得分 <KaTeX math={String.raw`\theta^T x`} /> 经过不同响应函数后，得到完全不同的预测含义。
+        </p>
+
+        <div className="flex flex-wrap gap-2 mb-6">
+          {[
+            { key: 'gaussian', label: '高斯分布 → 线性回归', activeClass: 'bg-violet-600 text-white' },
+            { key: 'bernoulli', label: '伯努利分布 → 逻辑回归', activeClass: 'bg-rose-600 text-white' },
+            { key: 'poisson', label: '泊松分布 → 泊松回归', activeClass: 'bg-amber-600 text-white' },
+          ].map((m) => (
+            <button
+              key={m.key}
+              onClick={() => setModel(m.key as typeof model)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                model === m.key
+                  ? m.activeClass
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+
+        <ResponseFunctionExplorer model={model} />
+      </section>
+
       {/* Learning objective */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">参数估计：最大似然</h2>
@@ -198,6 +230,136 @@ export default function BuildingGLMPage() {
           </li>
         </ul>
       </section>
+    </div>
+  );
+}
+
+function ResponseFunctionExplorer({ model }: { model: 'gaussian' | 'bernoulli' | 'poisson' }) {
+  const info = {
+    gaussian: {
+      distribution: '高斯分布',
+      modelName: '普通最小二乘 / 线性回归',
+      responseFn: 'g(η) = η',
+      linkFn: 'g⁻¹(μ) = μ',
+      prediction: "h(x) = \\theta^T x",
+      color: '#8b5cf6',
+      note: '响应函数是恒等函数，预测值可以取任意实数。',
+    },
+    bernoulli: {
+      distribution: '伯努利分布',
+      modelName: '逻辑回归',
+      responseFn: "g(\\theta) = \\frac{1}{1 + e^{-\\theta}}",
+      linkFn: "g^{-1}(\\phi) = \\log\\frac{\\phi}{1-\\phi}",
+      prediction: "h(x) = \\frac{1}{1 + e^{-\\theta^T x}}",
+      color: '#e11d48',
+      note: '响应函数是 Sigmoid，把线性得分压缩到 (0, 1) 区间作为概率。',
+    },
+    poisson: {
+      distribution: '泊松分布',
+      modelName: '泊松回归',
+      responseFn: 'g(η) = e^η',
+      linkFn: "g^{-1}(\\lambda) = \\log\\lambda",
+      prediction: "h(x) = e^{\\theta^T x}",
+      color: '#d97706',
+      note: '响应函数是指数函数，保证预测计数 λ 始终为正。',
+    },
+  }[model];
+
+  const points = useMemo(() => {
+    const data: { x: number; y: number }[] = [];
+    if (model === 'gaussian') {
+      for (let x = -5; x <= 5; x += 0.2) data.push({ x, y: x });
+    } else if (model === 'bernoulli') {
+      for (let x = -5; x <= 5; x += 0.1) data.push({ x, y: 1 / (1 + Math.exp(-x)) });
+    } else {
+      for (let x = -3; x <= 3; x += 0.1) data.push({ x, y: Math.exp(x) });
+    }
+    return data;
+  }, [model]);
+
+  const width = 560;
+  const height = 260;
+  const padding = { top: 20, right: 30, bottom: 45, left: 60 };
+  const innerW = width - padding.left - padding.right;
+  const innerH = height - padding.top - padding.bottom;
+  const xMin = model === 'poisson' ? -3 : -5;
+  const xMax = model === 'poisson' ? 3 : 5;
+  const yMin = 0;
+  const yMax = model === 'poisson' ? 20 : model === 'gaussian' ? 5 : 1;
+
+  const xScale = (x: number) => padding.left + ((x - xMin) / (xMax - xMin)) * innerW;
+  const yScale = (y: number) => padding.top + innerH - ((y - yMin) / (yMax - yMin)) * innerH;
+
+  const pathD = points
+    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(Math.min(p.y, yMax))}`)
+    .join(' ');
+
+  return (
+    <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+      <div className="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="font-bold text-gray-900 mb-3">{info.modelName}</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between border-b border-gray-200 py-2">
+              <span className="text-gray-500">分布</span>
+              <span className="font-medium text-gray-900">{info.distribution}</span>
+            </div>
+            <div className="flex justify-between border-b border-gray-200 py-2">
+              <span className="text-gray-500">响应函数 g</span>
+              <span className="font-medium text-gray-900"><KaTeX math={info.responseFn} /></span>
+            </div>
+            <div className="flex justify-between border-b border-gray-200 py-2">
+              <span className="text-gray-500">连接函数 g⁻¹</span>
+              <span className="font-medium text-gray-900"><KaTeX math={info.linkFn} /></span>
+            </div>
+            <div className="flex justify-between border-b border-gray-200 py-2">
+              <span className="text-gray-500">预测函数</span>
+              <span className="font-medium text-gray-900"><KaTeX math={info.prediction} /></span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-4">{info.note}</p>
+        </div>
+
+        <div>
+          <div className="text-center text-sm text-gray-600 mb-2">响应函数 g(η) 曲线</div>
+          <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" style={{ maxHeight: 300 }}>
+            {/* grid */}
+            {[0, 0.25, 0.5, 0.75, 1].map((t) => {
+              const y = yMin + t * (yMax - yMin);
+              return (
+                <line key={`h-${t}`} x1={padding.left} y1={yScale(y)} x2={padding.left + innerW} y2={yScale(y)} stroke="#e5e7eb" strokeDasharray="3,3" />
+              );
+            })}
+            {[0, 0.25, 0.5, 0.75, 1].map((t) => {
+              const x = xMin + t * (xMax - xMin);
+              return (
+                <line key={`v-${t}`} x1={xScale(x)} y1={padding.top} x2={xScale(x)} y2={padding.top + innerH} stroke="#e5e7eb" strokeDasharray="3,3" />
+              );
+            })}
+            {/* axes */}
+            <line x1={padding.left} y1={padding.top + innerH} x2={padding.left + innerW} y2={padding.top + innerH} stroke="#6b7280" strokeWidth={1.5} />
+            <line x1={padding.left} y1={padding.top} x2={padding.left} y2={padding.top + innerH} stroke="#6b7280" strokeWidth={1.5} />
+            {/* x ticks */}
+            {[xMin, xMin / 2, 0, xMax / 2, xMax].map((x) => (
+              <g key={x}>
+                <line x1={xScale(x)} y1={padding.top + innerH} x2={xScale(x)} y2={padding.top + innerH + 5} stroke="#6b7280" />
+                <text x={xScale(x)} y={padding.top + innerH + 18} textAnchor="middle" fontSize={10} fill="#4b5563">{x.toFixed(1).replace(/\.0$/, '')}</text>
+              </g>
+            ))}
+            {/* y ticks */}
+            {[yMin, yMax / 2, yMax].map((y) => (
+              <g key={y}>
+                <line x1={padding.left - 5} y1={yScale(y)} x2={padding.left} y2={yScale(y)} stroke="#6b7280" />
+                <text x={padding.left - 8} y={yScale(y) + 3} textAnchor="end" fontSize={10} fill="#4b5563">{y.toFixed(yMax === 20 ? 0 : 1)}</text>
+              </g>
+            ))}
+            <text x={padding.left + innerW / 2} y={height - 8} textAnchor="middle" fontSize={12} fill="#374151">η（自然参数）</text>
+            <text x={18} y={padding.top + innerH / 2} textAnchor="middle" fontSize={12} fill="#374151" transform={`rotate(-90, 18, ${padding.top + innerH / 2})`}>g(η)</text>
+            {/* curve */}
+            <path d={pathD} fill="none" stroke={info.color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { ShieldAlert, LineChart, GitBranch, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, LineChart, GitBranch, CheckCircle2, ArrowRight } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -22,6 +22,44 @@ export default function OLSasGLMPage() {
           <span className="text-sm font-medium text-amber-800">
             © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途。
           </span>
+        </div>
+      </section>
+
+      {/* Derivation flow */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">GLM 推导流程</h2>
+        <div className="grid md:grid-cols-4 gap-4">
+          <FlowCard
+            step={1}
+            title="选择分布"
+            content="高斯分布"
+            detail={String.raw`y \mid x \sim \mathcal{N}(\mu, \sigma^2)`}
+            color="violet"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={2}
+            title="确定响应函数"
+            content="恒等函数"
+            detail={String.raw`g(\eta) = \eta`}
+            color="emerald"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={3}
+            title="写出预测函数"
+            content="线性假设"
+            detail={String.raw`h(x) = \theta^T x`}
+            color="blue"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={4}
+            title="最大似然"
+            content="最小二乘"
+            detail={String.raw`\min \sum (h - y)^2`}
+            color="amber"
+          />
         </div>
       </section>
 
@@ -162,6 +200,34 @@ export default function OLSasGLMPage() {
           </li>
         </ul>
       </section>
+    </div>
+  );
+}
+
+function FlowCard({ step, title, content, detail, color }: { step: number; title: string; content: string; detail: string; color: 'violet' | 'emerald' | 'blue' | 'amber' }) {
+  const colors = {
+    violet: 'bg-violet-50 border-violet-200 text-violet-800',
+    emerald: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+    blue: 'bg-blue-50 border-blue-200 text-blue-800',
+    amber: 'bg-amber-50 border-amber-200 text-amber-800',
+  };
+
+  return (
+    <div className={`rounded-xl border p-4 ${colors[color]}`}>
+      <div className="text-xs font-bold opacity-70 mb-1">步骤 {step}</div>
+      <div className="font-bold text-gray-900 mb-1">{title}</div>
+      <div className="text-sm font-medium mb-2">{content}</div>
+      <div className="text-sm opacity-90">
+        <KaTeX math={detail} />
+      </div>
+    </div>
+  );
+}
+
+function FlowArrow() {
+  return (
+    <div className="hidden md:flex items-center justify-center">
+      <ArrowRight className="w-6 h-6 text-gray-400" />
     </div>
   );
 }

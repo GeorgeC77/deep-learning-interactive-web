@@ -1,4 +1,5 @@
-import { ShieldAlert, Layers, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { ShieldAlert, Layers, CheckCircle2, ArrowRight } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -25,12 +26,60 @@ export default function SoftmaxAsGLMPage() {
         </div>
       </section>
 
-      {/* Multinomial */}
+      {/* Derivation flow */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">GLM 推导流程</h2>
+        <div className="grid md:grid-cols-4 gap-4">
+          <FlowCard
+            step={1}
+            title="选择分布"
+            content="多项分布"
+            detail={String.raw`y \in \{0,1\}^k, \sum y_j = 1`}
+            color="amber"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={2}
+            title="确定响应函数"
+            content="Softmax"
+            detail={String.raw`\phi_j = \frac{e^{\eta_j}}{\sum_l e^{\eta_l}}`}
+            color="emerald"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={3}
+            title="写出预测函数"
+            content="多类概率"
+            detail={String.raw`P(y=j|x) = \frac{e^{\theta_j^T x}}{\sum_l e^{\theta_l^T x}}`}
+            color="blue"
+          />
+          <FlowArrow />
+          <FlowCard
+            step={4}
+            title="最大似然"
+            content="多分类交叉熵"
+            detail={String.raw`-\sum \sum y_j \log \phi_j`}
+            color="rose"
+          />
+        </div>
+      </section>
+
+      {/* Interactive softmax demo */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-4">
           <Layers className="w-6 h-6 text-amber-600" />
-          <h2 className="text-2xl font-bold text-gray-900">选择分布：多项分布</h2>
+          <h2 className="text-2xl font-bold text-gray-900">交互演示：Softmax 概率</h2>
         </div>
+        <p className="text-gray-700 mb-4">
+          假设有三个类别，分别有三个线性得分 <KaTeX math={String.raw`z_1, z_2, z_3`} />。Softmax 把这些得分转换为概率。
+          拖动滑块观察哪个类别的得分高，概率就接近 1。
+        </p>
+        <SoftmaxExplorer />
+      </section>
+
+      {/* Multinomial */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">选择分布：多项分布</h2>
         <p className="text-gray-700 mb-4">
           对于 k 类分类问题，标签用一个 k 维 one-hot 向量表示：
           <KaTeX math={String.raw`y \in \{0, 1\}^k`} />，且 <KaTeX math={String.raw`\sum_{j=1}^{k} y_j = 1`} />。
@@ -153,6 +202,90 @@ export default function SoftmaxAsGLMPage() {
           </li>
         </ul>
       </section>
+    </div>
+  );
+}
+
+function SoftmaxExplorer() {
+  const [scores, setScores] = useState([1, 0, -1]);
+  const labels = ['类别 1', '类别 2', '类别 3'];
+  const colors = ['#3b82f6', '#10b981', '#f59e0b'];
+
+  const expScores = scores.map((s) => Math.exp(s));
+  const sumExp = expScores.reduce((a, b) => a + b, 0);
+  const probs = expScores.map((e) => e / sumExp);
+
+  return (
+    <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+      <div className="space-y-5 mb-6">
+        {scores.map((s, i) => (
+          <div key={i}>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="font-medium text-gray-700">{labels[i]} 得分 z<sub>{i + 1}</sub></span>
+              <span className="font-mono text-gray-900">{s.toFixed(2)}</span>
+            </div>
+            <input
+              type="range"
+              min={-3}
+              max={3}
+              step={0.1}
+              value={s}
+              onChange={(e) => {
+                const next = [...scores];
+                next[i] = Number(e.target.value);
+                setScores(next);
+              }}
+              className="w-full"
+              style={{ accentColor: colors[i] }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        {probs.map((p, i) => (
+          <div key={i} className="bg-white rounded-lg p-4 border border-gray-200 text-center">
+            <div className="text-sm text-gray-500 mb-1">{labels[i]}</div>
+            <div className="text-2xl font-bold" style={{ color: colors[i] }}>
+              {(p * 100).toFixed(1)}%
+            </div>
+            <div className="w-full bg-gray-100 rounded-full h-2 mt-2">
+              <div
+                className="h-2 rounded-full transition-all duration-200"
+                style={{ width: `${p * 100}%`, backgroundColor: colors[i] }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FlowCard({ step, title, content, detail, color }: { step: number; title: string; content: string; detail: string; color: 'amber' | 'emerald' | 'blue' | 'rose' }) {
+  const colors = {
+    amber: 'bg-amber-50 border-amber-200 text-amber-800',
+    emerald: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+    blue: 'bg-blue-50 border-blue-200 text-blue-800',
+    rose: 'bg-rose-50 border-rose-200 text-rose-800',
+  };
+
+  return (
+    <div className={`rounded-xl border p-4 ${colors[color]}`}>
+      <div className="text-xs font-bold opacity-70 mb-1">步骤 {step}</div>
+      <div className="font-bold text-gray-900 mb-1">{title}</div>
+      <div className="text-sm font-medium mb-2">{content}</div>
+      <div className="text-sm opacity-90">
+        <KaTeX math={detail} />
+      </div>
+    </div>
+  );
+}
+
+function FlowArrow() {
+  return (
+    <div className="hidden md:flex items-center justify-center">
+      <ArrowRight className="w-6 h-6 text-gray-400" />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FunctionSquare, ShieldAlert, BookOpen, ChevronRight } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
@@ -163,7 +163,7 @@ export default function ExponentialFamilyPage() {
           选择一种分布，拖动 η 滑块，观察概率分布如何变化。
         </p>
 
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           {[
             { key: 'bernoulli', label: '伯努利' },
             { key: 'gaussian', label: '高斯（固定方差）' },
@@ -232,48 +232,135 @@ export default function ExponentialFamilyPage() {
 function DistributionPlot({ dist, eta }: { dist: 'bernoulli' | 'gaussian' | 'poisson'; eta: number }) {
   if (dist === 'bernoulli') {
     const phi = 1 / (1 + Math.exp(-eta));
-    return (
-      <div className="mt-4 grid grid-cols-2 gap-4 text-center">
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <div className="text-sm text-gray-500">P(y = 0)</div>
-          <div className="text-2xl font-bold text-blue-700">{(1 - phi).toFixed(4)}</div>
-        </div>
-        <div className="bg-white rounded-lg p-4 border border-gray-200">
-          <div className="text-sm text-gray-500">P(y = 1)</div>
-          <div className="text-2xl font-bold text-blue-700">{phi.toFixed(4)}</div>
-        </div>
-      </div>
-    );
+    return <BernoulliPlot phi={phi} />;
   }
 
   if (dist === 'gaussian') {
-    const mu = eta;
-    return (
-      <div className="mt-4 bg-white rounded-lg p-4 border border-gray-200">
-        <div className="text-sm text-gray-500 mb-2">均值 μ = η</div>
-        <div className="text-2xl font-bold text-blue-700">{mu.toFixed(2)}</div>
-        <div className="text-xs text-gray-500 mt-2">方差固定为 1，分布以 η 为中心对称。</div>
-      </div>
-    );
+    return <GaussianPlot mu={eta} sigma={1} />;
   }
 
-  // Poisson
-  const lambda = Math.exp(eta);
-  const probs = Array.from({ length: 11 }, (_, k) => ({
-    k,
-    p: (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k),
-  }));
-  const maxP = Math.max(...probs.map((p) => p.p));
+  return <PoissonPlot lambda={Math.exp(eta)} />;
+}
+
+function BernoulliPlot({ phi }: { phi: number }) {
+  const p0 = 1 - phi;
+  const p1 = phi;
+  const maxH = 160;
 
   return (
-    <div className="mt-4 bg-white rounded-lg p-4 border border-gray-200">
-      <div className="text-sm text-gray-500 mb-3">λ = e^η = {lambda.toFixed(3)}</div>
-      <div className="flex items-end gap-1 h-32">
-        {probs.map(({ k, p }) => (
-          <div key={k} className="flex-1 flex flex-col items-center">
+    <div className="mt-6">
+      <div className="flex items-end justify-center gap-12 h-48">
+        <div className="flex flex-col items-center">
+          <div
+            className="w-20 bg-blue-400 rounded-t transition-all duration-200"
+            style={{ height: `${p0 * maxH}px` }}
+          />
+          <div className="mt-2 text-center">
+            <div className="text-sm font-medium text-gray-700">y = 0</div>
+            <div className="text-lg font-bold text-blue-700">{p0.toFixed(4)}</div>
+          </div>
+        </div>
+        <div className="flex flex-col items-center">
+          <div
+            className="w-20 bg-emerald-500 rounded-t transition-all duration-200"
+            style={{ height: `${p1 * maxH}px` }}
+          />
+          <div className="mt-2 text-center">
+            <div className="text-sm font-medium text-gray-700">y = 1</div>
+            <div className="text-lg font-bold text-emerald-700">{p1.toFixed(4)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GaussianPlot({ mu, sigma }: { mu: number; sigma: number }) {
+  const points = useMemo(() => {
+    const data: { x: number; y: number }[] = [];
+    for (let x = mu - 4; x <= mu + 4; x += 0.1) {
+      const y = (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
+      data.push({ x, y });
+    }
+    return data;
+  }, [mu, sigma]);
+
+  const width = 560;
+  const height = 220;
+  const padding = { top: 20, right: 30, bottom: 40, left: 50 };
+  const innerW = width - padding.left - padding.right;
+  const innerH = height - padding.top - padding.bottom;
+  const xMin = mu - 4;
+  const xMax = mu + 4;
+  const yMax = 0.45;
+
+  const xScale = (x: number) => padding.left + ((x - xMin) / (xMax - xMin)) * innerW;
+  const yScale = (y: number) => padding.top + innerH - (y / yMax) * innerH;
+
+  const pathD = points
+    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`)
+    .join(' ');
+
+  return (
+    <div className="mt-6">
+      <div className="text-center text-sm text-gray-600 mb-2">
+        均值 μ = {mu.toFixed(2)}，方差 σ² = {sigma.toFixed(1)}
+      </div>
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto" style={{ maxHeight: 260 }}>
+        {/* axes */}
+        <line x1={padding.left} y1={padding.top + innerH} x2={padding.left + innerW} y2={padding.top + innerH} stroke="#9ca3af" strokeWidth={1.5} />
+        <line x1={padding.left} y1={padding.top} x2={padding.left} y2={padding.top + innerH} stroke="#9ca3af" strokeWidth={1.5} />
+        {/* x ticks */}
+        {[mu - 3, mu - 2, mu - 1, mu, mu + 1, mu + 2, mu + 3].map((x) => (
+          <g key={x}>
+            <line x1={xScale(x)} y1={padding.top + innerH} x2={xScale(x)} y2={padding.top + innerH + 5} stroke="#9ca3af" />
+            <text x={xScale(x)} y={padding.top + innerH + 18} textAnchor="middle" fontSize={10} fill="#6b7280">
+              {x.toFixed(0)}
+            </text>
+          </g>
+        ))}
+        {/* y ticks */}
+        {[0, 0.2, 0.4].map((y) => (
+          <g key={y}>
+            <line x1={padding.left - 5} y1={yScale(y)} x2={padding.left} y2={yScale(y)} stroke="#9ca3af" />
+            <text x={padding.left - 8} y={yScale(y) + 3} textAnchor="end" fontSize={10} fill="#6b7280">
+              {y.toFixed(1)}
+            </text>
+          </g>
+        ))}
+        {/* curve */}
+        <path d={pathD} fill="none" stroke="#8b5cf6" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+        {/* mean line */}
+        <line x1={xScale(mu)} y1={padding.top} x2={xScale(mu)} y2={padding.top + innerH} stroke="#6d28d9" strokeWidth={1.5} strokeDasharray="6,4" />
+        <text x={xScale(mu) + 5} y={padding.top + 12} fontSize={10} fill="#6d28d9">μ</text>
+      </svg>
+    </div>
+  );
+}
+
+function PoissonPlot({ lambda }: { lambda: number }) {
+  const maxK = 20;
+  const probs = useMemo(() => {
+    const arr: { k: number; p: number }[] = [];
+    for (let k = 0; k <= maxK; k++) {
+      arr.push({ k, p: (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k) });
+    }
+    return arr;
+  }, [lambda]);
+
+  const visible = probs.filter((d) => d.p > 0.0001);
+  const maxP = Math.max(...visible.map((d) => d.p));
+
+  return (
+    <div className="mt-6">
+      <div className="text-center text-sm text-gray-600 mb-2">λ = e^η = {lambda.toFixed(3)}</div>
+      <div className="flex items-end justify-center gap-1 h-48 px-4">
+        {visible.map(({ k, p }) => (
+          <div key={k} className="flex-1 flex flex-col items-center min-w-[18px]">
             <div
-              className="w-full bg-blue-500 rounded-t"
-              style={{ height: `${(p / maxP) * 100}%` }}
+              className="w-full bg-blue-500 rounded-t transition-all duration-200"
+              style={{ height: `${(p / maxP) * 160}px` }}
+              title={`P(y=${k})=${p.toFixed(4)}`}
             />
             <div className="text-xs text-gray-600 mt-1">{k}</div>
           </div>
