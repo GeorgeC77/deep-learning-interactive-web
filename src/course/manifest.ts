@@ -480,10 +480,17 @@ export const courseManifest: Part[] = [
         title: "主成分分析",
         sections: [
           {
+            id: "ch12-overview",
+            title: "12.0 课程概览",
+            path: "/ch12/overview",
+            completed: true,
+            description: "PCA 的学习路线。",
+          },
+          {
             id: "ch12-s01",
             title: "12.1 主成分分析",
             path: "/ch12/s01",
-            completed: false,
+            completed: true,
             description: "通过特征向量进行降维。",
           },
         ],
