@@ -161,11 +161,11 @@ function ComputationGraphDemo() {
   const edges = useMemo(
     () => [
       { from: 'w' as NodeKey, to: 'z' as NodeKey, label: String.raw`\frac{\partial z}{\partial w} = ${w[0].toFixed(6)}`, showGrad: step >= 4, labelPos: 'above' as const },
-      { from: 'b', to: 'z', label: String.raw`\frac{\partial z}{\partial b} = 1.000000`, showGrad: step >= 4, labelPos: 'below' as const },
-      { from: 'x', to: 'z', label: String.raw`\frac{\partial z}{\partial x} = ${w[0].toFixed(6)}`, showGrad: step >= 3, labelPos: 'below' as const },
-      { from: 'z', to: 'a', label: String.raw`\frac{\partial a}{\partial z} = ${da_dz.toFixed(6)}`, showGrad: step >= 2, labelPos: 'above' as const },
-      { from: 'a', to: 'L', label: String.raw`\frac{\partial L}{\partial a} = ${dL_da.toFixed(6)}`, showGrad: step >= 1, labelPos: 'above' as const },
-      { from: 'y', to: 'L', label: String.raw`\frac{\partial L}{\partial y} = ${(-dL_da).toFixed(6)}`, showGrad: step >= 1, labelPos: 'below' as const },
+      { from: 'b' as NodeKey, to: 'z' as NodeKey, label: String.raw`\frac{\partial z}{\partial b} = 1.000000`, showGrad: step >= 4, labelPos: 'below' as const },
+      { from: 'x' as NodeKey, to: 'z' as NodeKey, label: String.raw`\frac{\partial z}{\partial x} = ${w[0].toFixed(6)}`, showGrad: step >= 3, labelPos: 'below' as const },
+      { from: 'z' as NodeKey, to: 'a' as NodeKey, label: String.raw`\frac{\partial a}{\partial z} = ${da_dz.toFixed(6)}`, showGrad: step >= 2, labelPos: 'above' as const },
+      { from: 'a' as NodeKey, to: 'L' as NodeKey, label: String.raw`\frac{\partial L}{\partial a} = ${dL_da.toFixed(6)}`, showGrad: step >= 1, labelPos: 'above' as const },
+      { from: 'y' as NodeKey, to: 'L' as NodeKey, label: String.raw`\frac{\partial L}{\partial y} = ${(-dL_da).toFixed(6)}`, showGrad: step >= 1, labelPos: 'below' as const },
     ],
     [step, w, da_dz, dL_da]
   );
@@ -430,15 +430,15 @@ function MultiLayerBackpropDemo() {
   const forwardEdges = useMemo(
     () => [
       { from: 'x' as NodeKey, to: 'z1' as NodeKey },
-      { from: 'w1', to: 'z1' },
-      { from: 'b1', to: 'z1' },
-      { from: 'z1', to: 'a1' },
-      { from: 'a1', to: 'z2' },
-      { from: 'w2', to: 'z2' },
-      { from: 'b2', to: 'z2' },
-      { from: 'z2', to: 'a2' },
-      { from: 'a2', to: 'L' },
-      { from: 'y', to: 'L' },
+      { from: 'w1' as NodeKey, to: 'z1' as NodeKey },
+      { from: 'b1' as NodeKey, to: 'z1' as NodeKey },
+      { from: 'z1' as NodeKey, to: 'a1' as NodeKey },
+      { from: 'a1' as NodeKey, to: 'z2' as NodeKey },
+      { from: 'w2' as NodeKey, to: 'z2' as NodeKey },
+      { from: 'b2' as NodeKey, to: 'z2' as NodeKey },
+      { from: 'z2' as NodeKey, to: 'a2' as NodeKey },
+      { from: 'a2' as NodeKey, to: 'L' as NodeKey },
+      { from: 'y' as NodeKey, to: 'L' as NodeKey },
     ],
     []
   );
@@ -446,11 +446,11 @@ function MultiLayerBackpropDemo() {
   const gradientEdges = useMemo(
     () => [
       { from: 'L' as NodeKey, to: 'a2' as NodeKey, label: String.raw`\frac{\partial L}{\partial a_2} = ${dL_da2.toFixed(6)}`, show: step >= 1, labelPos: 'left' as const },
-      { from: 'a2', to: 'z2', label: String.raw`\frac{\partial a_2}{\partial z_2} = ${da2_dz2.toFixed(6)}`, show: step >= 2, labelPos: 'below' as const },
-      { from: 'z2', to: 'a1', label: String.raw`\frac{\partial z_2}{\partial a_1} = ${w2[0].toFixed(6)}`, show: step >= 3, labelPos: 'below' as const },
-      { from: 'a1', to: 'z1', label: String.raw`\frac{\partial a_1}{\partial z_1} = ${reluPrime.toFixed(6)}`, show: step >= 4, labelPos: 'below' as const },
-      { from: 'z1', to: 'w1', label: String.raw`\frac{\partial z_1}{\partial W^{[1]}} = ${x[0].toFixed(6)}`, show: step >= 5, labelPos: 'left' as const },
-      { from: 'z1', to: 'b1', label: String.raw`\frac{\partial z_1}{\partial b^{[1]}} = 1.000000`, show: step >= 5, labelPos: 'left' as const },
+      { from: 'a2' as NodeKey, to: 'z2' as NodeKey, label: String.raw`\frac{\partial a_2}{\partial z_2} = ${da2_dz2.toFixed(6)}`, show: step >= 2, labelPos: 'below' as const },
+      { from: 'z2' as NodeKey, to: 'a1' as NodeKey, label: String.raw`\frac{\partial z_2}{\partial a_1} = ${w2[0].toFixed(6)}`, show: step >= 3, labelPos: 'below' as const },
+      { from: 'a1' as NodeKey, to: 'z1' as NodeKey, label: String.raw`\frac{\partial a_1}{\partial z_1} = ${reluPrime.toFixed(6)}`, show: step >= 4, labelPos: 'below' as const },
+      { from: 'z1' as NodeKey, to: 'w1' as NodeKey, label: String.raw`\frac{\partial z_1}{\partial W^{[1]}} = ${x[0].toFixed(6)}`, show: step >= 5, labelPos: 'left' as const },
+      { from: 'z1' as NodeKey, to: 'b1' as NodeKey, label: String.raw`\frac{\partial z_1}{\partial b^{[1]}} = 1.000000`, show: step >= 5, labelPos: 'left' as const },
     ],
     [step, dL_da2, da2_dz2, w2, reluPrime, x]
   );
