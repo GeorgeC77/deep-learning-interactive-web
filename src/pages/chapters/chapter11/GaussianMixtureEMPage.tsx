@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, type ReactNode } from 'react';
-import { ShieldAlert, Activity, CheckCircle2, SkipForward, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2, Play, SkipForward, RefreshCw } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
