@@ -1,5 +1,5 @@
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator, Map, Boxes, Ruler, Activity, Network, BarChart2 } from 'lucide-react';
+import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator, Map, Boxes, Ruler, Activity, Network, BarChart2, SlidersHorizontal, SplitSquareHorizontal, Sigma } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,7 +75,15 @@ const generalizationItems = [
   { to: '/ch08/s03', label: '样本复杂度上界', icon: BarChart2 },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' {
+const regularizationItems = [
+  { to: '/ch09/overview', label: '课程概览', icon: BookOpen },
+  { to: '/ch09/s01', label: '正则化', icon: SlidersHorizontal },
+  { to: '/ch09/s02', label: '隐式正则化', icon: Brain },
+  { to: '/ch09/s03', label: '交叉验证', icon: SplitSquareHorizontal },
+  { to: '/ch09/s04', label: '贝叶斯正则化', icon: Sigma },
+];
+
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' {
   if (path === '/') return 'home';
   const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
   if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
@@ -91,6 +99,8 @@ function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm'
   if (deepPaths.has(path) || path.startsWith('/ch07/')) return 'deep';
   const generalizationPaths = new Set(generalizationItems.map((i) => i.to));
   if (generalizationPaths.has(path) || path.startsWith('/ch08/')) return 'generalization';
+  const regularizationPaths = new Set(regularizationItems.map((i) => i.to));
+  if (regularizationPaths.has(path) || path.startsWith('/ch09/')) return 'regularization';
   return 'linear';
 }
 
@@ -341,6 +351,35 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {generalizationItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {chapter === 'regularization' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <SlidersHorizontal className="w-4 h-4" />
+                  正则化
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {regularizationItems.map((item) => {
                     const isActive = currentPath === item.to;
                     return (
                       <DropdownMenuItem key={item.to} asChild>
