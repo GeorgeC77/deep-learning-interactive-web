@@ -145,7 +145,6 @@ function ComputationGraphDemo() {
 
   const width = 760;
   const height = 360;
-  const padding = 40;
 
   const nodes = {
     x: { cx: 90, cy: 240, label: 'x', value: x[0], grad: 0 },
