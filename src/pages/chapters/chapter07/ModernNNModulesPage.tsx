@@ -70,7 +70,7 @@ export default function ModernNNModulesPage() {
           <h2 className="text-2xl font-bold text-gray-900">残差连接：让梯度“抄近路”</h2>
         </div>
         <p className="text-gray-700 mb-4">
-          CS229 将残差块简化为 <KaTeX math={String.raw`\mathrm{Res}(z) = z + \mathrm{MM}(\phi(\mathrm{MM}(z)))`} display={false} />。
+          经典讲义将残差块简化为 <KaTeX math={String.raw`\mathrm{Res}(z) = z + \mathrm{MM}(\phi(\mathrm{MM}(z)))`} display={false} />。
           通过把输入直接加到输出，网络只需学习残差 <KaTeX math={String.raw`F(z)`} display={false} />；
           当残差接近 0 时，深层网络至少可以“复制”浅层输入，缓解梯度消失。
         </p>

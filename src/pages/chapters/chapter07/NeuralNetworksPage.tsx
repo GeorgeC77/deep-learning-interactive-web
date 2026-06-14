@@ -41,7 +41,7 @@ export default function NeuralNetworksPage() {
           <h2 className="text-2xl font-bold text-gray-900">从单个神经元开始：ReLU 与“拐点”</h2>
         </div>
         <p className="text-gray-700 mb-4">
-          CS229 用房价预测引入神经网络：房价不应为负，因此在某个价格之下输出被“截断”为 0。
+          我们用房价预测引入神经网络：房价不应为负，因此在某个价格之下输出被“截断”为 0。
           这就是单个神经元：
         </p>
 
@@ -77,7 +77,7 @@ export default function NeuralNetworksPage() {
           <h2 className="text-2xl font-bold text-gray-900">堆叠神经元：从手工特征到网络图</h2>
         </div>
         <p className="text-gray-700 mb-4">
-          把多个神经元“堆叠”起来，就形成网络。下例来自 CS229：输入是房屋面积、卧室数、邮编、社区富裕程度；
+          把多个神经元“堆叠”起来，就形成网络。下例是一个房价预测网络：输入是房屋面积、卧室数、邮编、社区富裕程度；
           隐藏层分别推断“家庭规模”“步行便利性”“学区质量”，最后预测房价。
         </p>
 
@@ -345,7 +345,7 @@ const HIDDEN = [
   { key: 'school', label: '学区质量' },
 ];
 
-// 手工结构：与 lecture notes 一致
+// 手工结构：经典示例
 const HANDCRAFT_WEIGHTS: Record<string, number[]> = {
   family: [0.0003, 0.15, 0, 0, -0.5],   // size, bedrooms, zip, wealth, bias
   walkable: [0, 0, 0.008, 0, -0.4],
@@ -396,16 +396,16 @@ function HouseNetworkDemo() {
   };
 
   function lineOpacity(w: number) {
-    return Math.min(1, Math.abs(w) * 400 + 0.15);
+    return Math.min(1, Math.abs(w) * 8 + 0.15);
   }
 
-  const scale = (v: number) => Math.min(1, Math.max(0, v / 2));
+  const scale = (v: number) => Math.min(0.55, Math.max(0, v / 4));
 
   return (
     <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 space-y-5">
       <Tabs value={mode} onValueChange={(v) => setMode(v as 'handcraft' | 'fc')} className="w-full">
         <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-          <TabsTrigger value="handcraft">手工结构（CS229 示例）</TabsTrigger>
+          <TabsTrigger value="handcraft">手工结构（经典示例）</TabsTrigger>
           <TabsTrigger value="fc">全连接网络</TabsTrigger>
         </TabsList>
         <TabsContent value="handcraft" className="text-sm text-gray-600 text-center mt-2">
@@ -456,7 +456,7 @@ function HouseNetworkDemo() {
                     x2={to.x}
                     y2={to.y}
                     stroke={w > 0 ? '#2563eb' : w < 0 ? '#dc2626' : '#d1d5db'}
-                    strokeWidth={Math.abs(w) * 600 + 1}
+                    strokeWidth={Math.abs(w) * 4 + 1.5}
                     opacity={lineOpacity(w)}
                   />
                 );
@@ -475,7 +475,7 @@ function HouseNetworkDemo() {
                   x2={to.x}
                   y2={to.y}
                   stroke={w > 0 ? '#2563eb' : '#dc2626'}
-                  strokeWidth={Math.abs(w) * 8 + 1}
+                  strokeWidth={Math.abs(w) * 4 + 1.5}
                   opacity={0.7}
                 />
               );
@@ -566,38 +566,53 @@ function LinearCollapseDemo() {
   const [wOut, setWOut] = useState([1]);
   const [bOut, setBOut] = useState([0.3]);
 
-  const width = 520;
-  const height = 300;
-  const padding = 44;
+  const width = 760;
+  const height = 420;
+  const padding = 56;
   const xMin = -3;
   const xMax = 5;
-  const yMin = -2;
-  const yMax = 4;
+
+  const { reluPts, linearPts, yMin, yMax } = useMemo(() => {
+    const rPts: { x: number; y: number }[] = [];
+    const lPts: { x: number; y: number }[] = [];
+    for (let x = xMin; x <= xMax; x += 0.05) {
+      const z1 = w1[0] * x + b1[0];
+      const z2 = w2[0] * x + b2[0];
+      const a1 = Math.max(0, z1);
+      const a2 = Math.max(0, z2);
+      const reluY = wOut[0] * a1 + a2 * 0.5 + bOut[0];
+      const linearY = wOut[0] * z1 + z2 * 0.5 + bOut[0];
+      rPts.push({ x, y: reluY });
+      lPts.push({ x, y: linearY });
+    }
+    const allY = rPts.concat(lPts).map((p) => p.y);
+    const dataMin = Math.min(...allY);
+    const dataMax = Math.max(...allY);
+    const margin = Math.max(0.6, (dataMax - dataMin) * 0.12);
+    return {
+      reluPts: rPts,
+      linearPts: lPts,
+      yMin: Math.min(-1, dataMin - margin),
+      yMax: Math.max(3, dataMax + margin),
+    };
+  }, [w1, b1, w2, b2, wOut, bOut]);
 
   const xScale = (x: number) => padding + ((x - xMin) / (xMax - xMin)) * (width - 2 * padding);
   const yScale = (y: number) => padding + (1 - (y - yMin) / (yMax - yMin)) * (height - 2 * padding);
 
-  const points = useMemo(() => {
-    const reluPts: { x: number; y: number }[] = [];
-    const linearPts: { x: number; y: number }[] = [];
-    for (let x = xMin; x <= xMax; x += 0.05) {
-      const z1 = w1[0] * x + b1[0];
-      const z2 = w2[0] * x + b2[0];
-      // two hidden neurons with ReLU
-      const a1 = Math.max(0, z1);
-      const a2 = Math.max(0, z2);
-      const reluY = wOut[0] * a1 + a2 * 0.5 + bOut[0]; // second hidden fixed weight for clarity
-      reluPts.push({ x, y: reluY });
+  const reluPath = reluPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`).join(' ');
+  const linearPath = linearPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`).join(' ');
 
-      // identity activation => pure linear
-      const linearY = wOut[0] * z1 + z2 * 0.5 + bOut[0];
-      linearPts.push({ x, y: linearY });
+  // generate grid lines based on current y range
+  const yTicks = useMemo(() => {
+    const ticks: number[] = [];
+    const step = Math.ceil((yMax - yMin) / 8);
+    const start = Math.floor(yMin / step) * step;
+    for (let y = start; y <= yMax; y += step) {
+      ticks.push(y);
     }
-    return { reluPts, linearPts };
-  }, [w1, b1, w2, b2, wOut, bOut]);
-
-  const reluPath = points.reluPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`).join(' ');
-  const linearPath = points.linearPts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`).join(' ');
+    return ticks;
+  }, [yMin, yMax]);
 
   return (
     <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 space-y-5">
@@ -646,11 +661,11 @@ function LinearCollapseDemo() {
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 300 }}>
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 420 }}>
         {[-3, -2, -1, 0, 1, 2, 3, 4, 5].map((x) => (
           <line key={`v-${x}`} x1={xScale(x)} y1={yScale(yMin)} x2={xScale(x)} y2={yScale(yMax)} stroke="#e5e7eb" />
         ))}
-        {[-2, -1, 0, 1, 2, 3, 4].map((y) => (
+        {yTicks.map((y) => (
           <line key={`h-${y}`} x1={xScale(xMin)} y1={yScale(y)} x2={xScale(xMax)} y2={yScale(y)} stroke="#e5e7eb" />
         ))}
         <line x1={padding} y1={yScale(0)} x2={width - padding} y2={yScale(0)} stroke="#6b7280" strokeWidth={1.5} />
@@ -662,7 +677,7 @@ function LinearCollapseDemo() {
         <path d={reluPath} fill="none" stroke="#2563eb" strokeWidth={3} strokeLinecap="round" />
 
         {/* legend */}
-        <g transform={`translate(${width - padding - 160}, ${padding})`}>
+        <g transform={`translate(${width - padding - 170}, ${padding})`}>
           <line x1={0} y1={0} x2={24} y2={0} stroke="#2563eb" strokeWidth={3} />
           <text x={30} y={4} fontSize={12} fill="#374151">带 ReLU（非线性）</text>
           <line x1={0} y1={20} x2={24} y2={20} stroke="#9ca3af" strokeWidth={3} strokeDasharray="6 4" />
