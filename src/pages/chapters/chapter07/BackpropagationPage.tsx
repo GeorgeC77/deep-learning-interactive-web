@@ -128,7 +128,7 @@ function ComputationGraphDemo() {
   const [w, setW] = useState([1.5]);
   const [b, setB] = useState([-1.0]);
   const [y, setY] = useState([0.8]);
-  const [step, setStep] = useState(0); // 0: forward only, 1: dL, 2: add da, 3: add dz, 4: full
+  const [step, setStep] = useState(0);
 
   const z = w[0] * x[0] + b[0];
   const a = 1 / (1 + Math.exp(-z));
@@ -143,27 +143,27 @@ function ComputationGraphDemo() {
   const dL_dw = dL_dz * dz_dw;
   const dL_db = dL_dz * dz_db;
 
-  const width = 760;
-  const height = 360;
+  const width = 900;
+  const height = 420;
 
   const nodes = {
-    x: { cx: 90, cy: 240, label: 'x', value: x[0], grad: 0 },
-    w: { cx: 90, cy: 120, label: 'w', value: w[0], grad: step >= 4 ? dL_dw : 0 },
-    b: { cx: 90, cy: 180, label: 'b', value: b[0], grad: step >= 4 ? dL_db : 0 },
-    z: { cx: 300, cy: 180, label: 'z', value: z, grad: step >= 3 ? dL_dz : 0 },
-    a: { cx: 470, cy: 180, label: 'a', value: a, grad: step >= 2 ? dL_da : 0 },
-    y: { cx: 470, cy: 280, label: 'y', value: y[0], grad: 0 },
-    L: { cx: 640, cy: 180, label: 'L', value: loss, grad: step >= 1 ? 1 : 0 },
+    x: { cx: 100, cy: 330, label: 'x', value: x[0], grad: 0 },
+    w: { cx: 100, cy: 90, label: 'w', value: w[0], grad: step >= 4 ? dL_dw : 0 },
+    b: { cx: 100, cy: 210, label: 'b', value: b[0], grad: step >= 4 ? dL_db : 0 },
+    z: { cx: 320, cy: 210, label: 'z', value: z, grad: step >= 3 ? dL_dz : 0 },
+    a: { cx: 540, cy: 210, label: 'a', value: a, grad: step >= 2 ? dL_da : 0 },
+    y: { cx: 540, cy: 330, label: 'y', value: y[0], grad: 0 },
+    L: { cx: 760, cy: 210, label: 'L', value: loss, grad: step >= 1 ? 1 : 0 },
   };
 
   const edges = useMemo(
     () => [
-      { from: 'x', to: 'z', label: String.raw`\partial z/\partial x = w`, value: w[0], showGrad: step >= 3 },
-      { from: 'w', to: 'z', label: String.raw`\partial z/\partial w = x`, value: x[0], showGrad: step >= 4 },
-      { from: 'b', to: 'z', label: String.raw`\partial z/\partial b = 1`, value: 1, showGrad: step >= 4 },
-      { from: 'z', to: 'a', label: String.raw`\partial a/\partial z`, value: da_dz, showGrad: step >= 2 },
-      { from: 'a', to: 'L', label: String.raw`\partial L/\partial a`, value: dL_da, showGrad: step >= 1 },
-      { from: 'y', to: 'L', label: String.raw`\partial L/\partial y`, value: -dL_da, showGrad: step >= 1 },
+      { from: 'x', to: 'z', label: String.raw`\frac{\partial z}{\partial x} = ${w[0].toFixed(2)}`, latex: true, value: w[0], showGrad: step >= 3, labelOffset: 24 },
+      { from: 'w', to: 'z', label: String.raw`\frac{\partial z}{\partial w} = ${x[0].toFixed(2)}`, latex: true, value: x[0], showGrad: step >= 4, labelOffset: -24 },
+      { from: 'b', to: 'z', label: String.raw`\frac{\partial z}{\partial b} = 1`, latex: true, value: 1, showGrad: step >= 4, labelOffset: -24 },
+      { from: 'z', to: 'a', label: String.raw`\frac{\partial a}{\partial z} = ${da_dz.toFixed(2)}`, latex: true, value: da_dz, showGrad: step >= 2, labelOffset: -24 },
+      { from: 'a', to: 'L', label: String.raw`\frac{\partial L}{\partial a} = ${dL_da.toFixed(2)}`, latex: true, value: dL_da, showGrad: step >= 1, labelOffset: -24 },
+      { from: 'y', to: 'L', label: String.raw`\frac{\partial L}{\partial y} = ${(-dL_da).toFixed(2)}`, latex: true, value: -dL_da, showGrad: step >= 1, labelOffset: 24 },
     ],
     [step, w, x, da_dz, dL_da]
   );
@@ -180,7 +180,7 @@ function ComputationGraphDemo() {
     const sy = y1 + uy * startR;
     const ex = x2 - ux * endR;
     const ey = y2 - uy * endR;
-    return { sx, sy, ex, ey };
+    return { sx, sy, ex, ey, ux, uy };
   }
 
   const nodeKeys = Object.keys(nodes) as Array<keyof typeof nodes>;
@@ -221,38 +221,23 @@ function ComputationGraphDemo() {
 
       {/* step buttons */}
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          onClick={() => setStep(0)}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-            step === 0 ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          1. 前向传播
-        </button>
-        <button
-          onClick={() => setStep(1)}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-            step >= 1 ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          2. ∂L/∂a
-        </button>
-        <button
-          onClick={() => setStep(2)}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-            step >= 2 ? 'bg-violet-600 text-white border-violet-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          3. ∂L/∂z
-        </button>
-        <button
-          onClick={() => setStep(4)}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors flex items-center gap-1 ${
-            step >= 4 ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          <Play className="w-4 h-4" /> 4. 完整反向传播
-        </button>
+        {[
+          { s: 0, label: '1. 前向传播', activeColor: 'bg-blue-600 border-blue-600' },
+          { s: 1, label: '2. ∂L/∂a', activeColor: 'bg-violet-600 border-violet-600' },
+          { s: 2, label: '3. ∂L/∂z', activeColor: 'bg-violet-600 border-violet-600' },
+          { s: 4, label: '4. 完整反向传播', activeColor: 'bg-emerald-600 border-emerald-600' },
+        ].map((btn) => (
+          <button
+            key={btn.s}
+            onClick={() => setStep(btn.s)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors flex items-center gap-1 ${
+              step >= btn.s ? `${btn.activeColor} text-white` : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {btn.s === 4 && <Play className="w-4 h-4" />}
+            {btn.label}
+          </button>
+        ))}
         <button
           onClick={() => setStep(0)}
           className="px-3 py-1.5 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center gap-1"
@@ -262,13 +247,17 @@ function ComputationGraphDemo() {
       </div>
 
       {/* graph */}
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 360 }}>
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 420 }}>
         {/* edges */}
         {edges.map((e, idx) => {
           const from = nodes[e.from as keyof typeof nodes];
           const to = nodes[e.to as keyof typeof nodes];
-          const { sx, sy, ex, ey } = arrowPath(from.cx, from.cy, to.cx, to.cy);
+          const { sx, sy, ex, ey, ux, uy } = arrowPath(from.cx, from.cy, to.cx, to.cy);
           const isActive = e.showGrad;
+          const mx = (sx + ex) / 2;
+          const my = (sy + ey) / 2;
+          const lx = mx - uy * e.labelOffset;
+          const ly = my + ux * e.labelOffset;
           return (
             <g key={idx}>
               <line
@@ -283,18 +272,18 @@ function ComputationGraphDemo() {
               {isActive && (
                 <g>
                   <rect
-                    x={(sx + ex) / 2 - 44}
-                    y={(sy + ey) / 2 - 14}
-                    width={88}
-                    height={24}
-                    rx={4}
-                    fill="#f3e8ff"
+                    x={lx - 56}
+                    y={ly - 14}
+                    width={112}
+                    height={28}
+                    rx={6}
+                    fill="#ffffff"
                     stroke="#7c3aed"
-                    strokeWidth={1}
+                    strokeWidth={1.5}
                   />
-                  <foreignObject x={(sx + ex) / 2 - 42} y={(sy + ey) / 2 - 13} width={84} height={22}>
-                    <div className="text-[10px] text-violet-800 text-center leading-[22px]">
-                      <KaTeX math={String.raw`${e.label}=${e.value.toFixed(2)}`} />
+                  <foreignObject x={lx - 52} y={ly - 12} width={104} height={24}>
+                    <div className="text-[11px] text-violet-800 text-center leading-[24px] whitespace-nowrap overflow-hidden">
+                      <KaTeX math={e.label} />
                     </div>
                   </foreignObject>
                 </g>
@@ -309,19 +298,19 @@ function ComputationGraphDemo() {
           const hasGrad = Math.abs(n.grad) > 1e-9;
           return (
             <g key={key}>
-              <circle cx={n.cx} cy={n.cy} r={28} fill={hasGrad ? '#f3e8ff' : '#eff6ff'} stroke={hasGrad ? '#7c3aed' : '#2563eb'} strokeWidth={2} />
-              <text x={n.cx} y={n.cy - 4} textAnchor="middle" fontSize={14} fontWeight={600} fill={hasGrad ? '#5b21b6' : '#1e40af'}>
+              <circle cx={n.cx} cy={n.cy} r={30} fill={hasGrad ? '#f3e8ff' : '#eff6ff'} stroke={hasGrad ? '#7c3aed' : '#2563eb'} strokeWidth={2} />
+              <text x={n.cx} y={n.cy - 4} textAnchor="middle" fontSize={15} fontWeight={600} fill={hasGrad ? '#5b21b6' : '#1e40af'}>
                 {n.label}
               </text>
-              <text x={n.cx} y={n.cy + 10} textAnchor="middle" fontSize={11} fill="#374151">
+              <text x={n.cx} y={n.cy + 11} textAnchor="middle" fontSize={12} fill="#374151">
                 {n.value.toFixed(2)}
               </text>
               {hasGrad && (
                 <g>
-                  <rect x={n.cx - 34} y={n.cy + 34} width={68} height={20} rx={4} fill="#ffffff" stroke="#7c3aed" strokeWidth={1} />
-                  <foreignObject x={n.cx - 32} y={n.cy + 35} width={64} height={18}>
-                    <div className="text-[10px] text-violet-800 text-center leading-[18px]">
-                      <KaTeX math={String.raw`\partial L/\partial ${n.label}=${n.grad.toFixed(2)}`} />
+                  <rect x={n.cx - 48} y={n.cy + 38} width={96} height={22} rx={5} fill="#ffffff" stroke="#7c3aed" strokeWidth={1.5} />
+                  <foreignObject x={n.cx - 44} y={n.cy + 39} width={88} height={20}>
+                    <div className="text-[11px] text-violet-800 text-center leading-[20px] whitespace-nowrap">
+                      <KaTeX math={String.raw`\frac{\partial L}{\partial ${n.label}}=${n.grad.toFixed(2)}`} />
                     </div>
                   </foreignObject>
                 </g>
@@ -394,21 +383,21 @@ function MultiLayerBackpropDemo() {
   const dL_dw1 = dL_dz1 * x[0];
   const dL_db1 = dL_dz1;
 
-  const width = 820;
-  const height = 340;
+  const width = 980;
+  const height = 420;
 
   const nodes = {
-    x: { cx: 60, cy: 170, label: 'x', value: x[0], grad: 0 },
-    w1: { cx: 160, cy: 80, label: 'W⁽¹⁾', value: w1[0], grad: step >= 5 ? dL_dw1 : 0 },
-    b1: { cx: 160, cy: 260, label: 'b⁽¹⁾', value: b1[0], grad: step >= 5 ? dL_db1 : 0 },
-    z1: { cx: 260, cy: 170, label: 'z₁', value: z1, grad: step >= 4 ? dL_dz1 : 0 },
-    a1: { cx: 380, cy: 170, label: 'a₁', value: a1, grad: step >= 3 ? dL_da1 : 0 },
-    w2: { cx: 480, cy: 80, label: 'W⁽²⁾', value: w2[0], grad: step >= 5 ? dL_dw2 : 0 },
-    b2: { cx: 480, cy: 260, label: 'b⁽²⁾', value: b2[0], grad: step >= 5 ? dL_db2 : 0 },
-    z2: { cx: 580, cy: 170, label: 'z₂', value: z2, grad: step >= 2 ? dL_dz2 : 0 },
-    a2: { cx: 700, cy: 170, label: 'a₂', value: a2, grad: step >= 1 ? dL_da2 : 0 },
-    y: { cx: 700, cy: 260, label: 'y', value: y[0], grad: 0 },
-    L: { cx: 760, cy: 170, label: 'L', value: loss, grad: step >= 0 ? 1 : 0 },
+    x: { cx: 80, cy: 210, label: 'x', value: x[0], grad: 0 },
+    w1: { cx: 200, cy: 90, label: 'W⁽¹⁾', value: w1[0], grad: step >= 5 ? dL_dw1 : 0 },
+    b1: { cx: 200, cy: 330, label: 'b⁽¹⁾', value: b1[0], grad: step >= 5 ? dL_db1 : 0 },
+    z1: { cx: 340, cy: 210, label: 'z₁', value: z1, grad: step >= 4 ? dL_dz1 : 0 },
+    a1: { cx: 480, cy: 210, label: 'a₁', value: a1, grad: step >= 3 ? dL_da1 : 0 },
+    w2: { cx: 620, cy: 90, label: 'W⁽²⁾', value: w2[0], grad: step >= 5 ? dL_dw2 : 0 },
+    b2: { cx: 620, cy: 330, label: 'b⁽²⁾', value: b2[0], grad: step >= 5 ? dL_db2 : 0 },
+    z2: { cx: 760, cy: 210, label: 'z₂', value: z2, grad: step >= 2 ? dL_dz2 : 0 },
+    a2: { cx: 900, cy: 210, label: 'a₂', value: a2, grad: step >= 1 ? dL_da2 : 0 },
+    y: { cx: 900, cy: 330, label: 'y', value: y[0], grad: 0 },
+    L: { cx: 900, cy: 90, label: 'L', value: loss, grad: step >= 0 ? 1 : 0 },
   };
 
   const edges = useMemo(
@@ -429,17 +418,17 @@ function MultiLayerBackpropDemo() {
 
   const gradientEdges = useMemo(
     () => [
-      { from: 'L', to: 'a2', label: String.raw`\partial L/\partial a_2`, value: dL_da2, show: step >= 1 },
-      { from: 'a2', to: 'z2', label: String.raw`\partial a_2/\partial z_2`, value: da2_dz2, show: step >= 2 },
-      { from: 'z2', to: 'a1', label: String.raw`\partial z_2/\partial a_1`, value: w2[0], show: step >= 3 },
-      { from: 'a1', to: 'z1', label: String.raw`\partial a_1/\partial z_1`, value: reluPrime, show: step >= 4 },
-      { from: 'z1', to: 'w1', label: String.raw`\partial z_1/\partial W^{[1]}`, value: x[0], show: step >= 5 },
-      { from: 'z1', to: 'b1', label: String.raw`\partial z_1/\partial b^{[1]}`, value: 1, show: step >= 5 },
+      { from: 'L', to: 'a2', label: String.raw`\frac{\partial L}{\partial a_2} = ${dL_da2.toFixed(2)}`, value: dL_da2, show: step >= 1, offset: 26 },
+      { from: 'a2', to: 'z2', label: String.raw`\frac{\partial a_2}{\partial z_2} = ${da2_dz2.toFixed(2)}`, value: da2_dz2, show: step >= 2, offset: 26 },
+      { from: 'z2', to: 'a1', label: String.raw`\frac{\partial z_2}{\partial a_1} = ${w2[0].toFixed(2)}`, value: w2[0], show: step >= 3, offset: 26 },
+      { from: 'a1', to: 'z1', label: String.raw`\frac{\partial a_1}{\partial z_1} = ${reluPrime.toFixed(2)}`, value: reluPrime, show: step >= 4, offset: 26 },
+      { from: 'z1', to: 'w1', label: String.raw`\frac{\partial z_1}{\partial W^{[1]}} = ${x[0].toFixed(2)}`, value: x[0], show: step >= 5, offset: 26 },
+      { from: 'z1', to: 'b1', label: String.raw`\frac{\partial z_1}{\partial b^{[1]}} = 1`, value: 1, show: step >= 5, offset: 26 },
     ],
     [step, dL_da2, da2_dz2, w2, reluPrime, x]
   );
 
-  function arrowPath(x1: number, y1: number, x2: number, y2: number, offset = 28) {
+  function arrowPath(x1: number, y1: number, x2: number, y2: number, offset = 32) {
     const dx = x2 - x1;
     const dy = y2 - y1;
     const len = Math.sqrt(dx * dx + dy * dy);
@@ -450,6 +439,8 @@ function MultiLayerBackpropDemo() {
       sy: y1 + uy * offset,
       ex: x2 - ux * offset,
       ey: y2 - uy * offset,
+      ux,
+      uy,
     };
   }
 
@@ -527,7 +518,7 @@ function MultiLayerBackpropDemo() {
         </button>
       </div>
 
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 340 }}>
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 420 }}>
         {/* forward edges */}
         {edges.map((e, idx) => {
           const from = nodes[e.from as keyof typeof nodes];
@@ -536,7 +527,7 @@ function MultiLayerBackpropDemo() {
           return (
             <g key={`f-${idx}`}>
               <line x1={sx} y1={sy} x2={ex} y2={ey} stroke="#d1d5db" strokeWidth={2} markerEnd="url(#arrowhead-bp)" />
-              <text x={(sx + ex) / 2} y={(sy + ey) / 2 - 6} textAnchor="middle" fontSize={11} fill="#6b7280">
+              <text x={(sx + ex) / 2} y={(sy + ey) / 2 - 8} textAnchor="middle" fontSize={12} fill="#6b7280">
                 {e.label}
               </text>
             </g>
@@ -548,14 +539,18 @@ function MultiLayerBackpropDemo() {
           if (!e.show) return null;
           const from = nodes[e.from as keyof typeof nodes];
           const to = nodes[e.to as keyof typeof nodes];
-          const { sx, sy, ex, ey } = arrowPath(from.cx, from.cy, to.cx, to.cy);
+          const { sx, sy, ex, ey, ux, uy } = arrowPath(from.cx, from.cy, to.cx, to.cy, e.offset);
+          const mx = (sx + ex) / 2;
+          const my = (sy + ey) / 2;
+          const lx = mx + uy * 22;
+          const ly = my - ux * 22;
           return (
             <g key={`g-${idx}`}>
               <line x1={sx} y1={sy} x2={ex} y2={ey} stroke="#7c3aed" strokeWidth={3} strokeDasharray="5 4" markerEnd="url(#arrowhead-bp-active)" />
-              <rect x={(sx + ex) / 2 - 48} y={(sy + ey) / 2 + 4} width={96} height={22} rx={4} fill="#f3e8ff" stroke="#7c3aed" strokeWidth={1} />
-              <foreignObject x={(sx + ex) / 2 - 46} y={(sy + ey) / 2 + 5} width={92} height={20}>
-                <div className="text-[10px] text-violet-800 text-center leading-[20px]">
-                  <KaTeX math={String.raw`${e.label}=${e.value.toFixed(2)}`} />
+              <rect x={lx - 58} y={ly - 14} width={116} height={28} rx={6} fill="#ffffff" stroke="#7c3aed" strokeWidth={1.5} />
+              <foreignObject x={lx - 54} y={ly - 12} width={108} height={24}>
+                <div className="text-[11px] text-violet-800 text-center leading-[24px] whitespace-nowrap overflow-hidden">
+                  <KaTeX math={e.label} />
                 </div>
               </foreignObject>
             </g>
@@ -577,10 +572,12 @@ function MultiLayerBackpropDemo() {
               </text>
               {hasGrad && (
                 <g>
-                  <rect x={n.cx - 38} y={n.cy + 32} width={76} height={18} rx={4} fill="#ffffff" stroke="#7c3aed" strokeWidth={1} />
-                  <text x={n.cx} y={n.cy + 45} textAnchor="middle" fontSize={10} fill="#5b21b6">
-                    {key === 'x' ? '' : `∂L/∂${n.label}=${n.grad.toFixed(2)}`}
-                  </text>
+                  <rect x={n.cx - 44} y={n.cy + 32} width={88} height={22} rx={5} fill="#ffffff" stroke="#7c3aed" strokeWidth={1.5} />
+                  <foreignObject x={n.cx - 40} y={n.cy + 33} width={80} height={20}>
+                    <div className="text-[10px] text-violet-800 text-center leading-[20px] whitespace-nowrap overflow-hidden">
+                      <KaTeX math={String.raw`\frac{\partial L}{\partial ${n.label}}=${n.grad.toFixed(2)}`} />
+                    </div>
+                  </foreignObject>
                 </g>
               )}
             </g>

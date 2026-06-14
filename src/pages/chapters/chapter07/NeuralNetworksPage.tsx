@@ -137,7 +137,7 @@ export default function NeuralNetworksPage() {
           title="神经网络 = 学习特征 + 线性模型"
           formula={
             <KaTeX
-              math={String.raw`h_\theta(x) = W^{[r]} \underbrace{\phi(x; \theta_{\backslash r})}_{a^{[r-1]}} + b^{[r]}`}
+              math={String.raw`h_\theta(x) = W^{[r]} \underbrace{\phi(x; \theta_{\text{rest}})}_{a^{[r-1]}} + b^{[r]}`}
               display
             />
           }
@@ -396,7 +396,8 @@ function HouseNetworkDemo() {
   };
 
   function lineOpacity(w: number) {
-    return Math.min(1, Math.abs(w) * 8 + 0.15);
+    if (w === 0) return 0.35;
+    return Math.min(1, Math.abs(w) * 6 + 0.25);
   }
 
   const scale = (v: number) => Math.min(0.55, Math.max(0, v / 4));
@@ -455,7 +456,7 @@ function HouseNetworkDemo() {
                     y1={from.y}
                     x2={to.x}
                     y2={to.y}
-                    stroke={w > 0 ? '#2563eb' : w < 0 ? '#dc2626' : '#d1d5db'}
+                    stroke={w > 0 ? '#2563eb' : w < 0 ? '#dc2626' : '#9ca3af'}
                     strokeWidth={Math.abs(w) * 4 + 1.5}
                     opacity={lineOpacity(w)}
                   />
