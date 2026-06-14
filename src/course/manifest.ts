@@ -501,10 +501,17 @@ export const courseManifest: Part[] = [
         title: "独立成分分析",
         sections: [
           {
+            id: "ch13-overview",
+            title: "13.0 课程概览",
+            path: "/ch13/overview",
+            completed: true,
+            description: "ICA 的学习路线。",
+          },
+          {
             id: "ch13-s01",
-            title: "13.1–13.3 独立成分分析",
+            title: "13.1 独立成分分析",
             path: "/ch13/s01",
-            completed: false,
+            completed: true,
             description: "盲源分离与密度变换。",
           },
         ],
