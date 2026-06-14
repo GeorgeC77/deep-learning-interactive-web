@@ -60,7 +60,6 @@ interface EigResult {
 function eigenDecomposition(m: [[number, number], [number, number]]): EigResult {
   const [[a, b], [_, d]] = m;
   const trace = a + d;
-  const det = a * d - b * b;
   const delta = Math.sqrt(((a - d) / 2) * ((a - d) / 2) + b * b);
   const lambda1 = trace / 2 + delta;
   const lambda2 = trace / 2 - delta;
@@ -176,8 +175,7 @@ export default function PCAPage() {
           description="y^(i) 是 x^(i) 的 k 维近似。当 k = d 时，表示没有信息损失；k 越小，压缩率越高。"
         />
         <p className="text-gray-700 mt-4">
-          反过来，也可以从 y^(i) 重构原始数据的一个近似：x̃^(i) = Σ_{j=1}^k y_j^(i) u_j。
-          可以证明，在所有可能的 k 维正交投影中，PCA 最小化了重构误差 Σ_i ‖x^(i) - x̃^(i)‖²。
+          {'反过来，也可以从 y^(i) 重构原始数据的一个近似：x̃^(i) = Σ_{j=1}^k y_j^(i) u_j。可以证明，在所有可能的 k 维正交投影中，PCA 最小化了重构误差 Σ_i ‖x^(i) - x̃^(i)‖²。'}
         </p>
       </section>
 
