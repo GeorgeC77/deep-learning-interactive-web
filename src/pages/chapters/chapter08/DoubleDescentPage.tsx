@@ -1,103 +1,31 @@
-import { useState, useMemo, type ReactNode } from 'react';
-import { ShieldAlert, TrendingUp, CheckCircle2, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useMemo, type ReactNode } from 'react';
+import { ShieldAlert, TrendingUp, CheckCircle2 } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
 
-/* -------------------------------------------------------------------------- */
-/* 数值工具                                                                   */
-/* -------------------------------------------------------------------------- */
-function solveLinearSystem(A: number[][], b: number[]): number[] {
-  const n = A.length;
-  const M = A.map((row, i) => [...row, b[i]]);
-
-  for (let i = 0; i < n; i++) {
-    let maxRow = i;
-    for (let k = i + 1; k < n; k++) {
-      if (Math.abs(M[k][i]) > Math.abs(M[maxRow][i])) maxRow = k;
-    }
-    [M[i], M[maxRow]] = [M[maxRow], M[i]];
-
-    const pivot = M[i][i];
-    if (Math.abs(pivot) < 1e-12) continue;
-
-    for (let j = i; j <= n; j++) M[i][j] /= pivot;
-
-    for (let k = 0; k < n; k++) {
-      if (k === i) continue;
-      const factor = M[k][i];
-      for (let j = i; j <= n; j++) M[k][j] -= factor * M[i][j];
-    }
-  }
-
-  return M.map((row) => row[n]);
+interface CurvePoint {
+  d: number;
+  train: number;
+  test: number;
 }
 
-function matMul(A: number[][], B: number[][]): number[][] {
-  return A.map((row) => B[0].map((_, j) => row.reduce((sum, v, k) => sum + v * B[k][j], 0)));
+interface DatasetEntry {
+  n: number;
+  noise: number;
+  maxD: number;
+  numTrials: number;
+  curve: CurvePoint[];
 }
 
-function transpose(A: number[][]): number[][] {
-  return A[0].map((_, j) => A.map((row) => row[j]));
-}
-
-function generateGaussianMatrix(rows: number, cols: number, seed: number): number[][] {
-  let s = seed;
-  const M: number[][] = [];
-  for (let i = 0; i < rows; i++) {
-    const row: number[] = [];
-    for (let j = 0; j < cols; j++) {
-      s = (s * 9301 + 49297) % 233280;
-      const u = Math.max(1e-10, s / 233280);
-      s = (s * 9301 + 49297) % 233280;
-      const v = s / 233280;
-      row.push(Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v));
-    }
-    M.push(row);
-  }
-  return M;
-}
-
-function generateDataLinear(
-  n: number,
-  d: number,
-  noiseStd: number,
-  seed: number
-): { X: number[][]; y: number[]; betaTrue: number[] } {
-  const betaTrue = Array.from({ length: d }, (_, j) => (j < 5 ? 1.0 : 0.0));
-  const X = generateGaussianMatrix(n, d, seed);
-  let s = seed + 7;
-  const y = X.map((row) => {
-    const pred = row.reduce((sum, xj, j) => sum + xj * betaTrue[j], 0);
-    s = (s * 9301 + 49297) % 233280;
-    const u = Math.max(1e-10, s / 233280);
-    s = (s * 9301 + 49297) % 233280;
-    const v = s / 233280;
-    return pred + noiseStd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-  });
-  return { X, y, betaTrue };
-}
-
-function fitLinearModel(X: number[][], y: number[]): number[] {
-  const n = X.length;
-  const d = X[0].length;
-
-  if (d <= n) {
-    const Xt = transpose(X);
-    const XtX = matMul(Xt, X);
-    const Xty = Xt.map((row) => row.reduce((sum, v, i) => sum + v * y[i], 0));
-    return solveLinearSystem(XtX, Xty);
-  } else {
-    const Xt = transpose(X);
-    const XXt = matMul(X, Xt);
-    const alpha = solveLinearSystem(XXt, y);
-    return Xt.map((row) => row.reduce((sum, v, i) => sum + v * alpha[i], 0));
-  }
-}
-
-function mseLinear(X: number[][], beta: number[], y: number[]): number {
-  const pred = X.map((row) => row.reduce((sum, xj, j) => sum + xj * beta[j], 0));
-  return pred.reduce((sum, p, i) => sum + Math.pow(p - y[i], 2), 0) / pred.length;
+interface PrecomputedData {
+  params: {
+    nValues: number[];
+    noiseValues: number[];
+    maxDValues: number[];
+    numTrials: number;
+  };
+  dataset: DatasetEntry[];
 }
 
 export default function DoubleDescentPage() {
@@ -148,7 +76,7 @@ export default function DoubleDescentPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：线性模型的双下降</h2>
         <p className="text-gray-700 mb-4">
           考虑一个高维线性模型：输入特征从高斯分布采样，真实标签由前 5 个特征的线性组合加上噪声生成。
-          调整样本数、噪声水平和最大维度，观察测试误差随特征维度变化的曲线。
+          选择不同的样本数、噪声水平和最大维度，查看预计算好的双下降曲线。
         </p>
         <DoubleDescentDemo />
       </section>
@@ -196,43 +124,51 @@ export default function DoubleDescentPage() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* 双下降交互演示                                                             */
+/* 双下降交互演示：加载预计算数据                                             */
 /* -------------------------------------------------------------------------- */
 function DoubleDescentDemo() {
+  const [precomputed, setPrecomputed] = useState<PrecomputedData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [n, setN] = useState(40);
   const [noise, setNoise] = useState(0.3);
   const [maxD, setMaxD] = useState(120);
-  const [numTrials, setNumTrials] = useState(20);
-  const [seedOffset, setSeedOffset] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${import.meta.env.BASE_URL}data/double-descent-curves.json`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data: PrecomputedData) => {
+        if (cancelled) return;
+        setPrecomputed(data);
+        if (data.params.nValues.length > 0) setN(data.params.nValues[Math.floor(data.params.nValues.length / 2)]);
+        if (data.params.noiseValues.length > 0) setNoise(data.params.noiseValues[Math.floor(data.params.noiseValues.length / 2)]);
+        if (data.params.maxDValues.length > 0) setMaxD(data.params.maxDValues[Math.floor(data.params.maxDValues.length / 2)]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : String(err));
+        setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const curveData = useMemo(() => {
-    const result: { d: number; train: number; test: number }[] = [];
-    for (let d = 1; d <= maxD; d++) {
-      let trainSum = 0;
-      let testSum = 0;
-      let validTrials = 0;
-      for (let t = 0; t < numTrials; t++) {
-        try {
-          const train = generateDataLinear(n, d, noise, seedOffset * 100000 + d * 1000 + t);
-          const test = generateDataLinear(200, d, noise, seedOffset * 100000 + d * 1000 + t + 50000);
-          const betaHat = fitLinearModel(train.X, train.y);
-          const trainErr = mseLinear(train.X, betaHat, train.y);
-          const testErr = mseLinear(test.X, betaHat, test.y);
-          if (Number.isFinite(trainErr) && Number.isFinite(testErr)) {
-            trainSum += trainErr;
-            testSum += testErr;
-            validTrials++;
-          }
-        } catch {
-          // 数值不稳定时跳过
-        }
-      }
-      if (validTrials > 0) {
-        result.push({ d, train: trainSum / validTrials, test: testSum / validTrials });
-      }
-    }
-    return result;
-  }, [n, noise, maxD, numTrials, seedOffset]);
+    if (!precomputed) return [];
+    const entry = precomputed.dataset.find(
+      (item) => item.n === n && item.noise === noise && item.maxD === maxD
+    );
+    return entry?.curve ?? [];
+  }, [precomputed, n, noise, maxD]);
+
+  const available = precomputed?.params;
 
   const CW = 720;
   const CH = 360;
@@ -252,35 +188,70 @@ function DoubleDescentDemo() {
     if (y < 0.001) return y.toExponential(1);
     if (y < 0.01) return y.toFixed(4);
     if (y < 0.1) return y.toFixed(3);
-    if (y < 1) return y.toFixed(2);
     if (y < 10) return y.toFixed(2);
     return y.toFixed(1);
   }
   const yTicks = [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64 text-gray-500">
+        正在加载预计算的双下降曲线数据…
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64 text-red-600">
+        加载数据失败：{error}
+      </div>
+    );
+  }
+
+  if (!available) return null;
 
   return (
     <div className="space-y-4">
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-5">
           <ControlRow label={`样本数 n: ${n}`}>
-            <Slider value={[n]} min={10} max={100} step={5} onValueChange={(v) => setN(v[0])} />
+            <Slider
+              value={[n]}
+              min={Math.min(...available.nValues)}
+              max={Math.max(...available.nValues)}
+              step={stepOfArray(available.nValues)}
+              onValueChange={(v) => setN(v[0])}
+            />
           </ControlRow>
-          <ControlRow label={`噪声标准差: ${noise.toFixed(2)}`}>
-            <Slider value={[noise]} min={0} max={0.5} step={0.01} onValueChange={(v) => setNoise(v[0])} />
+          <ControlRow label={`噪声标准差: ${noise.toFixed(1)}`}>
+            <Slider
+              value={[noise]}
+              min={Math.min(...available.noiseValues)}
+              max={Math.max(...available.noiseValues)}
+              step={stepOfArray(available.noiseValues)}
+              onValueChange={(v) => setNoise(v[0])}
+            />
           </ControlRow>
           <ControlRow label={`最大维度 d: ${maxD}`}>
-            <Slider value={[maxD]} min={n + 10} max={300} step={10} onValueChange={(v) => setMaxD(v[0])} />
+            <Slider
+              value={[maxD]}
+              min={Math.min(...available.maxDValues)}
+              max={Math.max(...available.maxDValues)}
+              step={stepOfArray(available.maxDValues)}
+              onValueChange={(v) => setMaxD(v[0])}
+            />
           </ControlRow>
-          <ControlRow label={`重复实验次数: ${numTrials}`}>
-            <Slider value={[numTrials]} min={5} max={50} step={5} onValueChange={(v) => setNumTrials(v[0])} />
-          </ControlRow>
-          <button
-            onClick={() => setSeedOffset((s) => s + 1)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            重新采样
-          </button>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 text-sm space-y-1">
+            <div className="flex justify-between">
+              <span className="text-gray-600">每组重复实验次数:</span>
+              <span className="font-mono font-medium text-gray-700">{available.numTrials}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">曲线点数:</span>
+              <span className="font-mono font-medium text-gray-700">{curveData.length}</span>
+            </div>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -352,4 +323,10 @@ function ControlRow({ label, children }: { label: string; children: ReactNode })
       {children}
     </div>
   );
+}
+
+function stepOfArray(values: number[]): number {
+  if (values.length < 2) return 1;
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[1] - sorted[0];
 }
