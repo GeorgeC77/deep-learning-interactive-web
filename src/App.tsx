@@ -77,6 +77,7 @@ import Chapter07Section02Page from './pages/chapters/chapter07/section-02';
 import Chapter07Section03Page from './pages/chapters/chapter07/section-03';
 import Chapter07Section04Page from './pages/chapters/chapter07/section-04';
 import Chapter07Section05Page from './pages/chapters/chapter07/section-05';
+import Chapter08OverviewPage from './pages/chapters/chapter08/OverviewPage';
 import Chapter08Section01Page from './pages/chapters/chapter08/section-01';
 import Chapter08Section02Page from './pages/chapters/chapter08/section-02';
 import Chapter08Section03Page from './pages/chapters/chapter08/section-03';
@@ -188,6 +189,7 @@ function App() {
           <Route path="/ch07/s03" element={<Chapter07Section03Page />} />
           <Route path="/ch07/s04" element={<Chapter07Section04Page />} />
           <Route path="/ch07/s05" element={<Chapter07Section05Page />} />
+          <Route path="/ch08/overview" element={<Chapter08OverviewPage />} />
           <Route path="/ch08/s01" element={<Chapter08Section01Page />} />
           <Route path="/ch08/s02" element={<Chapter08Section02Page />} />
           <Route path="/ch08/s03" element={<Chapter08Section03Page />} />
