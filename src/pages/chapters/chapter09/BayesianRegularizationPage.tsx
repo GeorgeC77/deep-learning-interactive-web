@@ -252,7 +252,7 @@ function BayesianDemo() {
   const [noise, setNoise] = useState(0.2);
   const [seed, setSeed] = useState(42);
 
-  const { train, test, weights, trainError, testError, predPoints, truePoints, mlePredPoints } = useMemo(() => {
+  const { train, weights, trainError, testError, predPoints, truePoints, mlePredPoints } = useMemo(() => {
     const tr = generateData(nTrain, noise, seed);
     const te = generateData(200, noise, seed + 1000);
     const wMap = fitPolyRidge(tr.x, tr.y, degree, lambda);
@@ -260,7 +260,6 @@ function BayesianDemo() {
     const curvePoints = Array.from({ length: 200 }, (_, i) => (i / 199) * (X_MAX - X_MIN) + X_MIN);
     return {
       train: tr,
-      test: te,
       weights: wMap,
       trainError: mse(predict(tr.x, wMap), tr.y),
       testError: mse(predict(te.x, wMap), te.y),

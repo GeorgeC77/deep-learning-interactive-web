@@ -291,7 +291,7 @@ function RegularizationDemo() {
   const [regType, setRegType] = useState<'none' | 'l2' | 'l1'>('l2');
   const [seed, setSeed] = useState(42);
 
-  const { train, test, weights, trainError, testError, predPoints, truePoints } = useMemo(() => {
+  const { train, weights, trainError, testError, predPoints, truePoints } = useMemo(() => {
     const tr = generateData(nTrain, noise, seed);
     const te = generateData(200, noise, seed + 1000);
     let w: number[];
@@ -307,7 +307,6 @@ function RegularizationDemo() {
     const curvePoints = Array.from({ length: 200 }, (_, i) => (i / 199) * (X_MAX - X_MIN) + X_MIN);
     return {
       train: tr,
-      test: te,
       weights: w,
       trainError: mse(predTrain, tr.y),
       testError: mse(predTest, te.y),
