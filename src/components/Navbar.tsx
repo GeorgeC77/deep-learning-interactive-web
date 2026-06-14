@@ -1,5 +1,5 @@
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator, Map, Boxes, Ruler, Activity, Network, BarChart2, SlidersHorizontal, SplitSquareHorizontal, Sigma, CircleDot } from 'lucide-react';
+import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator, Map, Boxes, Ruler, Activity, Network, BarChart2, SlidersHorizontal, SplitSquareHorizontal, Sigma, CircleDot, GitMerge } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -88,7 +88,16 @@ const clusteringItems = [
   { to: '/ch10/s01', label: 'K-means 聚类', icon: CircleDot },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' {
+const emItems = [
+  { to: '/ch11/overview', label: '课程概览', icon: BookOpen },
+  { to: '/ch11/s01', label: '高斯混合模型的 EM', icon: Calculator },
+  { to: '/ch11/s02', label: 'Jensen 不等式', icon: Sigma },
+  { to: '/ch11/s03', label: '一般 EM 算法', icon: Brain },
+  { to: '/ch11/s04', label: '高斯混合模型再探', icon: GitMerge },
+  { to: '/ch11/s05', label: '变分推断与 VAE', icon: Network },
+];
+
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' | 'em' {
   if (path === '/') return 'home';
   const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
   if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
@@ -108,6 +117,8 @@ function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm'
   if (regularizationPaths.has(path) || path.startsWith('/ch09/')) return 'regularization';
   const clusteringPaths = new Set(clusteringItems.map((i) => i.to));
   if (clusteringPaths.has(path) || path.startsWith('/ch10/')) return 'clustering';
+  const emPaths = new Set(emItems.map((i) => i.to));
+  if (emPaths.has(path) || path.startsWith('/ch11/')) return 'em';
   return 'linear';
 }
 
@@ -416,6 +427,35 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {clusteringItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {chapter === 'em' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <Brain className="w-4 h-4" />
+                  EM 算法
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {emItems.map((item) => {
                     const isActive = currentPath === item.to;
                     return (
                       <DropdownMenuItem key={item.to} asChild>
