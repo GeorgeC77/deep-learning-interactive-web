@@ -1,5 +1,5 @@
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator, Map, Boxes, Ruler, Activity, Network, BarChart2, SlidersHorizontal, SplitSquareHorizontal, Sigma } from 'lucide-react';
+import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator, Map, Boxes, Ruler, Activity, Network, BarChart2, SlidersHorizontal, SplitSquareHorizontal, Sigma, CircleDot } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -83,7 +83,12 @@ const regularizationItems = [
   { to: '/ch09/s04', label: '贝叶斯正则化', icon: Sigma },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' {
+const clusteringItems = [
+  { to: '/ch10/overview', label: '课程概览', icon: BookOpen },
+  { to: '/ch10/s01', label: 'K-means 聚类', icon: CircleDot },
+];
+
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' {
   if (path === '/') return 'home';
   const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
   if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
@@ -101,6 +106,8 @@ function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm'
   if (generalizationPaths.has(path) || path.startsWith('/ch08/')) return 'generalization';
   const regularizationPaths = new Set(regularizationItems.map((i) => i.to));
   if (regularizationPaths.has(path) || path.startsWith('/ch09/')) return 'regularization';
+  const clusteringPaths = new Set(clusteringItems.map((i) => i.to));
+  if (clusteringPaths.has(path) || path.startsWith('/ch10/')) return 'clustering';
   return 'linear';
 }
 
@@ -380,6 +387,35 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {regularizationItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {chapter === 'clustering' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <CircleDot className="w-4 h-4" />
+                  聚类
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {clusteringItems.map((item) => {
                     const isActive = currentPath === item.to;
                     return (
                       <DropdownMenuItem key={item.to} asChild>

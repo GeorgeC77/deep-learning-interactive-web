@@ -410,10 +410,17 @@ export const courseManifest: Part[] = [
         title: "聚类与 K-means 算法",
         sections: [
           {
+            id: "ch10-overview",
+            title: "10.0 课程概览",
+            path: "/ch10/overview",
+            completed: true,
+            description: "聚类与 K-means 的学习路线。",
+          },
+          {
             id: "ch10-s01",
             title: "10.1 K-means 聚类",
             path: "/ch10/s01",
-            completed: false,
+            completed: true,
             description: "一种迭代聚类算法。",
           },
         ],
