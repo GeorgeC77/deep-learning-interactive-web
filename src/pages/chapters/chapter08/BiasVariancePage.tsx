@@ -542,15 +542,26 @@ function TradeoffCurveDemo() {
   const CW = 720;
   const CH = 360;
   const CP = { top: 25, right: 40, bottom: 50, left: 70 };
-  const maxErr = Math.max(...curveData.map((d) => Math.max(d.train, d.test)), 0.01);
+  const rawMaxErr = Math.max(...curveData.map((d) => Math.max(d.train, d.test)), 0.01);
+  const yMax = rawMaxErr * 1.05;
 
   function cx(degree: number): number {
     return CP.left + ((degree - 1) / (maxDegree - 1 || 1)) * (CW - CP.left - CP.right);
   }
   function cy(err: number): number {
-    const ratio = Math.log10(err + 1e-6) / Math.log10(maxErr + 1e-6);
-    return CH - CP.bottom - ratio * (CH - CP.top - CP.bottom);
+    const clamped = Math.min(Math.max(err, 0), yMax);
+    return CH - CP.bottom - (clamped / yMax) * (CH - CP.top - CP.bottom);
   }
+  function formatY(y: number): string {
+    if (y === 0) return '0';
+    if (y < 0.001) return y.toExponential(1);
+    if (y < 0.01) return y.toFixed(4);
+    if (y < 0.1) return y.toFixed(3);
+    if (y < 1) return y.toFixed(2);
+    if (y < 10) return y.toFixed(2);
+    return y.toFixed(1);
+  }
+  const yTicks = [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
 
   return (
     <div className="space-y-4">
@@ -583,7 +594,7 @@ function TradeoffCurveDemo() {
             {[1, 5, 10, 15, 20].filter((d) => d <= maxDegree).map((d) => (
               <line key={`vx-${d}`} x1={cx(d)} y1={CP.top} x2={cx(d)} y2={CH - CP.bottom} stroke="#e5e7eb" strokeWidth={1} />
             ))}
-            {[0.001, 0.01, 0.1, 1.0].map((e) => (
+            {yTicks.map((e) => (
               <line key={`hy-${e}`} x1={CP.left} y1={cy(e)} x2={CW - CP.right} y2={cy(e)} stroke="#e5e7eb" strokeWidth={1} />
             ))}
             <line x1={CP.left} y1={CH - CP.bottom} x2={CW - CP.right} y2={CH - CP.bottom} stroke="#374151" strokeWidth={2} />
@@ -593,16 +604,16 @@ function TradeoffCurveDemo() {
                 {d}
               </text>
             ))}
-            {[0.001, 0.01, 0.1, 1.0].map((e) => (
+            {yTicks.map((e) => (
               <text key={`ly-${e}`} x={CP.left - 10} y={cy(e) + 4} textAnchor="end" fontSize={12} fill="#4b5563">
-                {e.toFixed(e < 0.1 ? 3 : 1)}
+                {formatY(e)}
               </text>
             ))}
             <text x={CW / 2} y={CH - 10} textAnchor="middle" fontSize={13} fill="#374151">
               多项式次数
             </text>
             <text x={20} y={CH / 2} textAnchor="middle" fontSize={13} fill="#374151" transform={`rotate(-90, 20, ${CH / 2})`}>
-              误差（对数刻度）
+              误差
             </text>
 
             <polyline
