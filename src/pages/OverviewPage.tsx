@@ -23,17 +23,13 @@ export default function OverviewPage() {
           线性回归：从一元到多元回归
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          本教程系统讲解机器学习中线性回归的理论基础与核心算法，从模型建立到优化求解，带你深入理解这一经典算法。
-          从模型假设到代价函数优化，逐步深入理解这一机器学习基石。
+          本教程系统讲解线性回归的模型假设、代价函数、优化方法与概率解释，帮助你从直觉和数学两方面理解这一经典算法。
         </p>
 
         {/* Copyright Notice */}
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本教程仅供个人学习交流使用。未经授权，严禁以任何形式用于商业用途，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-800">
+          本网站内容仅供教学与学习使用，转载请注明来源。
+        </p>
       </section>
 
       {/* 什么是线性回归 */}

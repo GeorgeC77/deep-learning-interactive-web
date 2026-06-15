@@ -165,11 +165,11 @@ function NormalEquationChart({ points, theta }: { points: { x: number; y: number
 /* ------------------------------------------------------------------ */
 const comparisonRows = [
   { aspect: '学习率 α', ne: '无需选择', gd: '需要手动选择合适值' },
-  { aspect: '迭代次数', ne: '无需迭代，一步求解', gd: '需要多次迭代收敛' },
-  { aspect: '时间复杂度', ne: 'O(n³) 矩阵求逆', gd: 'O(kn²) 每次迭代' },
-  { aspect: '特征数 n', ne: 'n ≤ 10,000 适用', gd: 'n 很大时依然高效' },
-  { aspect: '适用场景', ne: '中小规模数据集', gd: '大规模数据集' },
-  { aspect: '数值稳定性', ne: 'XᵀX 可能不可逆', gd: '对病态矩阵更鲁棒' },
+  { aspect: '迭代次数', ne: '无需迭代，直接求解', gd: '需要多次迭代收敛' },
+  { aspect: '时间复杂度', ne: '构造 XᵀX：O(mn²)；求解线性系统：~O(n³)', gd: '每次迭代：O(mn)；总成本取决于迭代次数' },
+  { aspect: '特征数 n', ne: '适合特征维度较小的问题', gd: '高维或大规模数据通常更实用' },
+  { aspect: '适用场景', ne: '特征维度较小的中小规模数据集', gd: '大规模、高维或在线学习场景' },
+  { aspect: '数值稳定性', ne: 'XᵀX 可能不可逆或病态', gd: '对病态矩阵通常更鲁棒' },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -191,7 +191,8 @@ export default function NormalEquationPage() {
     <div className="max-w-5xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-deep-blue mb-6">正规方程</h1>
       <p className="text-med-gray mb-8 leading-relaxed">
-        正规方程（Normal Equation）提供了一种直接求解线性回归参数的方法，无需迭代，一次矩阵运算即可得到最优解。
+        正规方程（Normal Equation）提供了一种直接求解线性回归参数的方法，无需迭代，
+        通过构造并求解线性方程组得到闭式解。
       </p>
 
       {/* Section 1 — "One Step" vs "Step by Step" Analogy */}
@@ -217,8 +218,8 @@ export default function NormalEquationPage() {
               </h4>
               <p className="text-sm text-emerald-700 leading-relaxed">
                 像解方程 x + 3 = 7，直接算出 x = 4。不需要猜测和迭代，
-                直接求导等于零，一步得到解析解。但如果方程太大（特征数超多），
-                解这个"方程"本身会很慢。
+                直接求导等于零，得到闭式解。但如果方程太大（特征数超多），
+                求解这个线性系统本身会很慢。
               </p>
             </div>
           </div>
@@ -238,7 +239,8 @@ export default function NormalEquationPage() {
           梯度下降通过反复迭代逐步逼近最优参数，而正规方程则直接求解。它的核心思想是：对代价函数 J(θ) 求梯度并令其为零，解出 θ 的解析表达式。
         </p>
         <p className="text-dark-gray leading-relaxed">
-          当特征数量 n 不大时（通常 n ≤ 10,000），正规方程往往比梯度下降更高效且直观，因为它不需要选择学习率，也不需要进行迭代。
+          正规方程适合特征维度较小、样本规模适中的问题。它需要构造 XᵀX 并求解线性系统，
+          计算和存储成本会随特征维度快速上升。对于高维或大规模数据，梯度下降、随机梯度下降或其他迭代优化方法通常更实用。
         </p>
       </section>
 
@@ -273,7 +275,8 @@ export default function NormalEquationPage() {
           <KaTeX math={String.raw`X^T X \theta = X^T y \quad \Rightarrow \quad \theta = (X^T X)^{-1} X^T y`} display />
         </div>
         <p className="text-dark-gray leading-relaxed">
-          这就是正规方程的核心结果。在实际计算中，我们通常使用矩阵求逆或更稳定的 QR 分解、SVD 分解来求解。
+          这就是正规方程的核心结果。公式中写作 (XᵀX)⁻¹Xᵀy，但代码实现中更推荐使用稳定的线性方程组求解或矩阵分解（如 QR、SVD、Cholesky），
+          而不是直接计算矩阵逆。
         </p>
       </section>
 
@@ -282,7 +285,7 @@ export default function NormalEquationPage() {
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
             <span className="text-xl">📊</span>
-            矩阵视角的直觉：寻找"魔法公式"
+            矩阵视角的直觉：寻找最佳线性映射
           </h3>
           <div className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -301,9 +304,9 @@ export default function NormalEquationPage() {
                 </p>
               </div>
               <div className="bg-white/80 border border-blue-200 rounded-lg p-4">
-                <h4 className="font-semibold text-blue-800 text-sm mb-2">(XᵀX)⁻¹Xᵀ：最佳转换矩阵</h4>
+                <h4 className="font-semibold text-blue-800 text-sm mb-2">(XᵀX)⁻¹Xᵀ：闭式解</h4>
                 <p className="text-xs text-blue-700 leading-relaxed">
-                  这个公式就像一个"魔法公式"——输入房屋信息，输出最可能的价格。
+                  这个公式给出了当前训练数据上平方误差最小的线性预测关系。
                   它找到了一个最佳线性变换，把房屋特征映射到房价上。
                 </p>
               </div>
@@ -311,9 +314,9 @@ export default function NormalEquationPage() {
             <div className="bg-white/60 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800 leading-relaxed">
                 <strong>类比：</strong>想象你是一位资深房产评估师，看过成千上万套房子后，
-                总结出了一条精准公式：<KaTeX math={String.raw`\text{房价} = \theta_0 + \theta_1 \times \text{面积} + \theta_2 \times \text{卧室数} + \dots`} />
-                正规方程就是自动算出这条公式的方法——把过去所有交易记录代入，
-                一步得出最准确的评估参数。
+                总结出了一条经验公式：<KaTeX math={String.raw`\text{房价} = \theta_0 + \theta_1 \times \text{面积} + \theta_2 \times \text{卧室数} + \dots`} />
+                正规方程就是自动拟合这条公式的方法——把过去所有交易记录代入，
+                直接求解在训练数据上平方误差最小的参数。
               </p>
             </div>
           </div>
@@ -355,28 +358,28 @@ export default function NormalEquationPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-white/80 border border-emerald-200 rounded-lg p-4">
               <h4 className="font-semibold text-emerald-800 text-sm mb-2 flex items-center gap-2">
-                <span>🚶</span> 小特征数（n &lt; 1000）：正规方程快
+                <span>🚶</span> 小特征数：正规方程通常更快
               </h4>
               <p className="text-sm text-emerald-700 leading-relaxed">
-                就像短距离去便利店，走路比开车更快。矩阵求逆的计算量在特征数少时完全可控，
-                而且你不需要操心学习率调参，一步到位得到精确解。
+                就像短距离去便利店，走路比开车更快。构造 XᵀX 并求解线性系统的计算量在特征数少时完全可控，
+                而且你不需要操心学习率调参，直接得到闭式解。
               </p>
             </div>
             <div className="bg-white/80 border border-blue-200 rounded-lg p-4">
               <h4 className="font-semibold text-blue-800 text-sm mb-2 flex items-center gap-2">
-                <span>🚗</span> 大特征数（n &gt; 10000）：梯度下降更实用
+                <span>🚗</span> 大特征数：梯度下降更实用
               </h4>
               <p className="text-sm text-blue-700 leading-relaxed">
-                就像跨省旅行，开车比走路更实际。当特征数巨大时，O(n³) 的矩阵求逆计算量爆炸式增长，
-                而梯度下降每次迭代只有 O(n²)，迭代几十次就能收敛，反而更快。
+                就像跨省旅行，开车比走路更实际。当特征数巨大时，构造 XᵀX 的 O(mn²) 成本和求解线性系统的 O(n³) 成本会快速上升，
+                而批量梯度下降每次迭代只有 O(mn)，迭代多次往往更实用。
               </p>
             </div>
           </div>
           <div className="mt-4 bg-white/60 border border-violet-200 rounded-lg p-3">
             <p className="text-sm text-violet-800 leading-relaxed">
-              <strong>经验法则：</strong>如果 n &lt; 1000，优先考虑正规方程（简单直接、无需调参）；
-              如果 n &gt; 10000，必须用梯度下降（正规方程算不动）；
-              中间的"灰色地带"根据具体情况和实现效率来选择。
+              <strong>经验法则：</strong>正规方程适合特征维度较小、样本规模适中的问题；
+              当特征维度很高或样本量很大时，梯度下降、随机梯度下降或其他迭代方法通常更实用。
+              具体选择还要结合实现效率、数值稳定性和内存限制。
             </p>
           </div>
         </div>
@@ -433,8 +436,8 @@ export default function NormalEquationPage() {
                   <p className="mb-1 font-medium">步骤说明：</p>
                   <ol className="list-decimal list-inside space-y-1">
                     <li>构造设计矩阵 X（含全1列）</li>
-                    <li>计算 XᵀX 并求逆</li>
-                    <li>计算 (XᵀX)⁻¹Xᵀy</li>
+                    <li>计算 XᵀX 与 Xᵀy</li>
+                    <li>求解线性方程组 (XᵀX)θ = Xᵀy</li>
                     <li>得到最优参数 θ</li>
                   </ol>
                 </div>

@@ -18,7 +18,7 @@ function polyDesignMatrix(xs: number[], degree: number): number[][] {
   });
 }
 
-/** Solve normal equation with pseudo-inverse via SVD-inspired approach */
+/** Solve regularized normal equations with small ridge stabilization. */
 function solvePseudoInverse(X: number[][], y: number[]): number[] {
   /* Gram matrix approach with ridge-like stabilization */
   const n = X[0].length;
@@ -64,7 +64,7 @@ function mse(yTrue: number[], yPred: number[]): number {
 }
 
 /* ------------------------------------------------------------------ */
-/*  data generation: 15 pts from quadratic + noise                      */
+/*  data generation: train + test sets from quadratic + noise           */
 /* ------------------------------------------------------------------ */
 function generateData(seed = 42) {
   let s = seed;
@@ -81,6 +81,10 @@ function generateData(seed = 42) {
   return pts;
 }
 
+function generateTestData(seed = 1234) {
+  return generateData(seed).map((p) => ({ ...p, x: Math.max(0.1, Math.min(9.9, p.x + 0.25)) }));
+}
+
 const FIXED_Y_DOMAIN: [number, number] = [-4, 10];
 
 /* ------------------------------------------------------------------ */
@@ -88,16 +92,20 @@ const FIXED_Y_DOMAIN: [number, number] = [-4, 10];
 /* ------------------------------------------------------------------ */
 function PolynomialFitChart({
   points,
+  testPoints,
   theta1,
   theta2,
   thetaOver,
   overDegree,
+  onClipped,
 }: {
   points: { x: number; y: number }[];
+  testPoints: { x: number; y: number }[];
   theta1: number[];
   theta2: number[];
   thetaOver: number[];
   overDegree: number;
+  onClipped?: (clipped: boolean) => void;
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -163,12 +171,14 @@ function PolynomialFitChart({
     /* all data elements inside clipped group */
     const clipG = svg.append('g').attr('clip-path', 'url(#chart-clip)');
 
-    /* helper to draw a polynomial curve */
+    /* helper to draw a polynomial curve; tracks whether any point was clipped */
     const drawCurve = (theta: number[], color: string, width_: number, dash?: string) => {
       const step = 0.05;
       const curveData: { x: number; y: number }[] = [];
+      let clipped = false;
       for (let x = xMin; x <= xMax; x += step) {
         const y = predictPoly(theta, x);
+        if (y < yMin || y > yMax) clipped = true;
         /* clamp y values */
         const yClamped = Math.max(yMin - 1, Math.min(yMax + 1, y));
         curveData.push({ x: xScale(x), y: yScale(yClamped) });
@@ -187,16 +197,19 @@ function PolynomialFitChart({
         .attr('stroke', color)
         .attr('stroke-width', width_)
         .attr('stroke-dasharray', dash || 'none');
+      return clipped;
     };
 
     /* draw three curves */
     drawCurve(theta1, '#f08a5d', 2.5);   /* underfit: linear */
     drawCurve(theta2, '#3a7bd5', 2.5);   /* good fit: quadratic */
+    let overClipped = false;
     if (overDegree >= 3) {
-      drawCurve(thetaOver, '#e25b5b', 2, '4,3'); /* overfit: variable degree */
+      overClipped = drawCurve(thetaOver, '#e25b5b', 2, '4,3'); /* overfit: variable degree */
     }
+    onClipped?.(overClipped);
 
-    /* data points */
+    /* training data points */
     clipG
       .selectAll('circle.data')
       .data(points)
@@ -209,6 +222,20 @@ function PolynomialFitChart({
       .attr('stroke', '#fff')
       .attr('stroke-width', 1.5)
       .attr('opacity', 0.85);
+
+    /* test data points (hollow) */
+    clipG
+      .selectAll('circle.test')
+      .data(testPoints)
+      .enter()
+      .append('circle')
+      .attr('cx', (d) => xScale(d.x))
+      .attr('cy', (d) => yScale(d.y))
+      .attr('r', 4)
+      .attr('fill', 'none')
+      .attr('stroke', '#636e72')
+      .attr('stroke-width', 1.5)
+      .attr('opacity', 0.7);
 
     /* legend */
     const legend = svg.append('g').attr('transform', `translate(${margin.left + 10}, ${margin.top + 10})`);
@@ -237,7 +264,7 @@ function PolynomialFitChart({
         .attr('font-family', 'Inter, sans-serif')
         .text(item.label);
     });
-  }, [points, theta1, theta2, thetaOver, overDegree]);
+  }, [points, testPoints, theta1, theta2, thetaOver, overDegree, onClipped]);
 
   return <svg ref={svgRef} className="w-full h-auto" style={{ maxHeight: 400 }} />;
 }
@@ -249,22 +276,38 @@ export default function OverfittingPage() {
   const [seed, setSeed] = useState(42);
   const [noiseLevel, setNoiseLevel] = useState(1.0);
   const [degree, setDegree] = useState(12);
+  const [clipped, setClipped] = useState(false);
 
-  const points = useMemo(() => {
+  const { points, testPoints } = useMemo(() => {
     const base = generateData(seed);
-    return base.map((p) => ({ ...p, y: 2 + 1.5 * p.x - 0.12 * p.x * p.x + (p.y - (2 + 1.5 * p.x - 0.12 * p.x * p.x)) * noiseLevel }));
+    const train = base.map((p) => ({
+      ...p,
+      y: 2 + 1.5 * p.x - 0.12 * p.x * p.x + (p.y - (2 + 1.5 * p.x - 0.12 * p.x * p.x)) * noiseLevel,
+    }));
+    const testBase = generateTestData(seed + 999);
+    const test = testBase.map((p) => ({
+      ...p,
+      y: 2 + 1.5 * p.x - 0.12 * p.x * p.x + (p.y - (2 + 1.5 * p.x - 0.12 * p.x * p.x)) * noiseLevel,
+    }));
+    return { points: train, testPoints: test };
   }, [seed, noiseLevel]);
 
   const xs = useMemo(() => points.map((p) => p.x), [points]);
   const ys = useMemo(() => points.map((p) => p.y), [points]);
+  const testXs = useMemo(() => testPoints.map((p) => p.x), [testPoints]);
+  const testYs = useMemo(() => testPoints.map((p) => p.y), [testPoints]);
 
   const theta1 = useMemo(() => solvePseudoInverse(polyDesignMatrix(xs, 1), ys), [xs, ys]);
   const theta2 = useMemo(() => solvePseudoInverse(polyDesignMatrix(xs, 2), ys), [xs, ys]);
   const thetaOver = useMemo(() => solvePseudoInverse(polyDesignMatrix(xs, degree), ys), [xs, ys, degree]);
 
-  const mse1 = useMemo(() => mse(ys, xs.map((x) => predictPoly(theta1, x))), [ys, xs, theta1]);
-  const mse2 = useMemo(() => mse(ys, xs.map((x) => predictPoly(theta2, x))), [ys, xs, theta2]);
-  const mseOver = useMemo(() => mse(ys, xs.map((x) => predictPoly(thetaOver, x))), [ys, xs, thetaOver]);
+  const trainMse1 = useMemo(() => mse(ys, xs.map((x) => predictPoly(theta1, x))), [ys, xs, theta1]);
+  const trainMse2 = useMemo(() => mse(ys, xs.map((x) => predictPoly(theta2, x))), [ys, xs, theta2]);
+  const trainMseOver = useMemo(() => mse(ys, xs.map((x) => predictPoly(thetaOver, x))), [ys, xs, thetaOver]);
+
+  const testMse1 = useMemo(() => mse(testYs, testXs.map((x) => predictPoly(theta1, x))), [testYs, testXs, theta1]);
+  const testMse2 = useMemo(() => mse(testYs, testXs.map((x) => predictPoly(theta2, x))), [testYs, testXs, theta2]);
+  const testMseOver = useMemo(() => mse(testYs, testXs.map((x) => predictPoly(thetaOver, x))), [testYs, testXs, thetaOver]);
 
   const regenerate = () => setSeed((s) => (s + 37) % 10000);
 
@@ -490,8 +533,8 @@ export default function OverfittingPage() {
       <section className="mb-10">
         <InteractiveDemo title="交互式可视化：多项式拟合对比">
           <InteractivePanel
-            hint="橙色=线性欠拟合，蓝色=二次良好拟合，红色虚线=12次过拟合"
-            chart={<PolynomialFitChart points={points} theta1={theta1} theta2={theta2} thetaOver={thetaOver} overDegree={degree} />}
+            hint={`橙色=线性欠拟合，蓝色=二次良好拟合，红色虚线=${degree}次过拟合；空心圆=测试点`}
+            chart={<PolynomialFitChart points={points} testPoints={testPoints} theta1={theta1} theta2={theta2} thetaOver={thetaOver} overDegree={degree} onClipped={setClipped} />}
             controls={
               <div className="space-y-5">
                 <div>
@@ -544,26 +587,50 @@ export default function OverfittingPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
                       <span className="text-orange-800">线性 (d=1)</span>
-                      <span className="font-mono text-orange-700">{mse1.toFixed(3)}</span>
+                      <span className="font-mono text-orange-700">{trainMse1.toFixed(3)}</span>
                     </div>
                     <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
                       <span className="text-blue-800">二次 (d=2)</span>
-                      <span className="font-mono text-blue-700">{mse2.toFixed(3)}</span>
+                      <span className="font-mono text-blue-700">{trainMse2.toFixed(3)}</span>
                     </div>
                     <div className="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                       <span className="text-red-800">{degree}次 (d={degree})</span>
-                      <span className="font-mono text-red-700">{mseOver.toFixed(3)}</span>
+                      <span className="font-mono text-red-700">{trainMseOver.toFixed(3)}</span>
                     </div>
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-dark-gray">测试 MSE 对比</p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
+                      <span className="text-orange-800">线性 (d=1)</span>
+                      <span className="font-mono text-orange-700">{testMse1.toFixed(3)}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+                      <span className="text-blue-800">二次 (d=2)</span>
+                      <span className="font-mono text-blue-700">{testMse2.toFixed(3)}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                      <span className="text-red-800">{degree}次 (d={degree})</span>
+                      <span className="font-mono text-red-700">{testMseOver.toFixed(3)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {clipped && (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                    警告：当前高次多项式曲线已超出固定 y 轴显示范围，部分剧烈波动被裁剪。
+                  </div>
+                )}
 
                 <div className="text-xs text-med-gray space-y-1">
                   <p className="font-medium text-dark-gray">观察要点：</p>
                   <ol className="list-decimal list-inside space-y-1">
                     <li>线性模型无法捕捉抛物线趋势</li>
                     <li>二次模型恰好匹配数据生成方式</li>
-                    <li>高次多项式穿过每个噪声点，波动剧烈</li>
-                    <li>12次模型的训练 MSE 极低，但泛化能力差</li>
+                    <li>{degree}次多项式穿过训练噪声点，波动剧烈</li>
+                    <li>当前高次模型的训练 MSE 较低，但测试 MSE 通常更高，泛化能力差</li>
                   </ol>
                 </div>
               </div>

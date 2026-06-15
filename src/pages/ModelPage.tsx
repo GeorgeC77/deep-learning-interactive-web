@@ -27,6 +27,25 @@ function generateData(): DataPoint[] {
   return points;
 }
 
+function computeOLS(data: DataPoint[]) {
+  const m = data.length;
+  const sumX = data.reduce((s, p) => s + p.x, 0);
+  const sumY = data.reduce((s, p) => s + p.y, 0);
+  const sumXX = data.reduce((s, p) => s + p.x * p.x, 0);
+  const sumXY = data.reduce((s, p) => s + p.x * p.y, 0);
+
+  const denom = m * sumXX - sumX * sumX;
+
+  if (Math.abs(denom) < 1e-12) {
+    return { theta0: 0, theta1: 0 };
+  }
+
+  const theta1 = (m * sumXY - sumX * sumY) / denom;
+  const theta0 = (sumY - theta1 * sumX) / m;
+
+  return { theta0, theta1 };
+}
+
 function drawScatter(
   svgEl: SVGSVGElement,
   data: DataPoint[],
@@ -237,6 +256,8 @@ function drawCostPath(
   data: DataPoint[],
   theta0: number,
   theta1: number,
+  olsTheta0: number,
+  olsTheta1: number,
 ) {
   const svg = svgEl;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -360,9 +381,9 @@ function drawCostPath(
   pt.setAttribute('stroke-width', '2');
   svg.appendChild(pt);
 
-  // minimum point (true theta: 1, 2)
-  const mCx = toX(1);
-  const mCy = toY(2);
+  // OLS minimum point for the current sample
+  const mCx = toX(olsTheta0);
+  const mCy = toY(olsTheta1);
   const minPt = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   minPt.setAttribute('cx', String(mCx));
   minPt.setAttribute('cy', String(mCy));
@@ -388,7 +409,7 @@ function drawCostPath(
   t1.setAttribute('y', String(legY + 4));
   t1.setAttribute('font-size', '9');
   t1.setAttribute('fill', '#374151');
-  t1.textContent = '最优';
+  t1.textContent = 'OLS解';
   leg.appendChild(t1);
 
   const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -417,6 +438,7 @@ export default function ModelPage() {
   const costRef = useRef<SVGSVGElement>(null);
 
   const data = useMemo(() => generateData(), []);
+  const ols = useMemo(() => computeOLS(data), [data]);
 
   useEffect(() => {
     if (scatterRef.current) {
@@ -426,9 +448,9 @@ export default function ModelPage() {
 
   useEffect(() => {
     if (costRef.current) {
-      drawCostPath(costRef.current, data, theta0, theta1);
+      drawCostPath(costRef.current, data, theta0, theta1, ols.theta0, ols.theta1);
     }
-  }, [data, theta0, theta1]);
+  }, [data, theta0, theta1, ols]);
 
   const cost = useCallback(() => {
     let s = 0;
@@ -570,10 +592,10 @@ export default function ModelPage() {
               <strong>核心直觉：</strong>不同的{" "}
               <KaTeX math={"(\\theta_0, \\theta_1)"} />{" "}
               组合会产生不同的直线。有的直线高高在上，离所有点都很远；有的直线穿过点的中间，
-              让每个点到直线的距离都比较小。我们要找的是后者——那条&quot;最公平&quot;的直线。
+              让每个点到直线的预测残差都比较小。我们要找的是后者——那条&quot;最公平&quot;的直线。
             </p>
             <p className="text-gray-700 text-sm">
-              类比：就像用一根直尺尽量靠近所有散落的点，使得每个点到直尺的垂直距离之和最小。
+              类比：就像用一根直尺尽量靠近所有散落的点，使得每个点到直尺的垂直距离的平方和最小。
               <KaTeX math={"\\theta_0"} /> 决定直尺的起始高度，
               <KaTeX math={"\\theta_1"} /> 决定直尺的倾斜角度。
             </p>
@@ -767,7 +789,8 @@ export default function ModelPage() {
           <h3 className="text-lg font-semibold text-gray-800 mb-2">代价函数等高线</h3>
           <p className="text-sm text-gray-600 mb-3">
             下图显示了在当前数据集上，代价函数 J(θ₀, θ₁) 的等高线图。
-            红色点表示你当前选择的位置，绿色点表示最优解 (θ₀=1, θ₁=2)。
+            红色点表示你当前选择的位置，绿色点表示当前样本的最小二乘解 θ̂（由数据动态计算得到）。
+            真实生成参数为 (θ₀=1, θ₁=2)，但当前样本的 OLS 解通常与它不同。
           </p>
           <div className="flex flex-col lg:flex-row gap-5 items-start">
             <div className="bg-white border border-gray-200 rounded-xl p-4 inline-block">
@@ -791,7 +814,7 @@ export default function ModelPage() {
               <ul className="space-y-2 text-sm text-gray-700 mb-4">
                 <li className="flex items-start gap-2">
                   <span className="inline-block w-4 h-4 rounded-full bg-emerald-500 mt-0.5 shrink-0" />
-                  <span><strong>绿色点</strong>是山谷的最低点——最优参数位置</span>
+                  <span><strong>绿色点</strong>是当前样本的最小二乘解（OLS 最优参数）</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="inline-block w-4 h-4 rounded-full bg-red-500 mt-0.5 shrink-0" />

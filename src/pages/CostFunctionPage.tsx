@@ -20,12 +20,33 @@ function generateData(): DataPoint[] {
   return points;
 }
 
+function computeOLS(data: DataPoint[]) {
+  const m = data.length;
+  const sumX = data.reduce((s, p) => s + p.x, 0);
+  const sumY = data.reduce((s, p) => s + p.y, 0);
+  const sumXX = data.reduce((s, p) => s + p.x * p.x, 0);
+  const sumXY = data.reduce((s, p) => s + p.x * p.y, 0);
+
+  const denom = m * sumXX - sumX * sumX;
+
+  if (Math.abs(denom) < 1e-12) {
+    return { theta0: 0, theta1: 0 };
+  }
+
+  const theta1 = (m * sumXY - sumX * sumY) / denom;
+  const theta0 = (sumY - theta1 * sumX) / m;
+
+  return { theta0, theta1 };
+}
+
 /* ── cost contour drawer ── */
 function drawContour(
   svgEl: SVGSVGElement,
   data: DataPoint[],
   currentT0: number,
   currentT1: number,
+  olsT0: number,
+  olsT1: number,
 ) {
   const svg = svgEl;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -110,9 +131,9 @@ function drawContour(
 
   contourLevels.forEach((_level, li) => {
     // simplified: draw ellipses approximating contours
-    // find center (true theta)
-    const cx = toX(1);
-    const cy = toY(2);
+    // center on the OLS solution for the current sample
+    const cx = toX(olsT0);
+    const cy = toY(olsT1);
 
     // approximate radius based on level
     const rx = 8 + li * 18;
@@ -195,10 +216,10 @@ function drawContour(
   yTitle.textContent = 'θ₁';
   svg.appendChild(yTitle);
 
-  // minimum point (true)
+  // OLS minimum point for the current sample
   const minCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  minCircle.setAttribute('cx', String(toX(1)));
-  minCircle.setAttribute('cy', String(toY(2)));
+  minCircle.setAttribute('cx', String(toX(olsT0)));
+  minCircle.setAttribute('cy', String(toY(olsT1)));
   minCircle.setAttribute('r', '7');
   minCircle.setAttribute('fill', '#10b981');
   minCircle.setAttribute('stroke', 'white');
@@ -206,12 +227,12 @@ function drawContour(
   svg.appendChild(minCircle);
 
   const minLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  minLabel.setAttribute('x', String(toX(1) + 12));
-  minLabel.setAttribute('y', String(toY(2) - 8));
+  minLabel.setAttribute('x', String(toX(olsT0) + 12));
+  minLabel.setAttribute('y', String(toY(olsT1) - 8));
   minLabel.setAttribute('font-size', '11');
   minLabel.setAttribute('font-weight', '600');
   minLabel.setAttribute('fill', '#059669');
-  minLabel.textContent = '最优 θ = (1, 2)';
+  minLabel.textContent = `OLS θ̂ = (${olsT0.toFixed(2)}, ${olsT1.toFixed(2)})`;
   svg.appendChild(minLabel);
 
   // current point
@@ -257,7 +278,7 @@ function drawContour(
   t1.setAttribute('y', '26');
   t1.setAttribute('font-size', '10');
   t1.setAttribute('fill', '#374151');
-  t1.textContent = '全局最小值';
+  t1.textContent = 'OLS解';
   legend.appendChild(t1);
 
   const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -395,12 +416,13 @@ export default function CostFunctionPage() {
   const residualRef = useRef<SVGSVGElement>(null);
 
   const data = useMemo(() => generateData(), []);
+  const ols = useMemo(() => computeOLS(data), [data]);
 
   useEffect(() => {
     if (contourRef.current) {
-      drawContour(contourRef.current, data, theta0, theta1);
+      drawContour(contourRef.current, data, theta0, theta1, ols.theta0, ols.theta1);
     }
-  }, [data, theta0, theta1]);
+  }, [data, theta0, theta1, ols]);
 
   useEffect(() => {
     if (residualRef.current) {
@@ -433,10 +455,10 @@ export default function CostFunctionPage() {
 
       {/* Mean Squared Error */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">均方误差（MSE）</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">平方误差代价函数（Half-MSE）</h2>
         <p className="text-gray-700 mb-4">
-          在线性回归中，最常用的是<strong>均方误差</strong>作为代价函数。对于一组参数 θ，
-          代价函数定义为所有训练样本上预测误差的平方和的平均：
+          在线性回归中，最常用的代价函数是<strong>均方误差的一半</strong>（Half-MSE，也称平方误差代价）。对于一组参数 θ，
+          代价函数定义为所有训练样本上预测误差的平方和的平均再乘以 1/2：
         </p>
 
         <FormulaCard
@@ -452,6 +474,7 @@ export default function CostFunctionPage() {
               其中 m 是样本数量，
               <KaTeX math={"h_\\theta(x^{(i)})"} /> 是第 i 个样本的预测值，
               <KaTeX math={"y^{(i)}"} /> 是第 i 个样本的真实值。
+              这里的 J(θ) 是 MSE 的一半；加入 1/2 不会改变最优解，只是为了让求导后的系数更简洁。
             </span>
           }
         />
@@ -487,10 +510,10 @@ export default function CostFunctionPage() {
             </div>
             <div className="bg-white rounded-lg p-4 border border-rose-200 text-center">
               <div className="text-2xl mb-2">📊</div>
-              <span className="text-sm font-semibold text-rose-700 block mb-1">取平均</span>
+              <span className="text-sm font-semibold text-rose-700 block mb-1">取平均并乘 1/2</span>
               <span className="text-xs text-gray-600">
                 除以 {" "}
-                <KaTeX math={"2m"} /> 得到平均代价
+                <KaTeX math={"2m"} /> 得到 half-MSE 代价
               </span>
             </div>
           </div>
@@ -583,7 +606,7 @@ export default function CostFunctionPage() {
         <p className="text-gray-700 mb-4">
           从几何角度看，代价函数衡量的是预测直线与数据点之间的&quot;垂直距离&quot;。
           每个样本的误差 <KaTeX math={"h_\\theta(x^{(i)}) - y^{(i)}"} /> 就是预测点到真实点在 y 轴方向的距离（残差）。
-          代价函数是所有残差平方的平均值。
+          代价函数是所有残差平方的平均值再乘以 1/2（half-MSE）。
         </p>
 
         {/* Enhanced residual explanation */}
@@ -645,7 +668,8 @@ export default function CostFunctionPage() {
           同一条线上的点具有相同的代价值。
         </p>
         <p className="text-gray-700 mb-4">
-          等高线呈同心椭圆状，中心点就是代价函数的<strong>全局最小值</strong>，对应最优参数。
+          等高线呈同心椭圆状，中心点就是当前样本上代价函数的<strong>最小值</strong>，对应最小二乘（OLS）参数。
+          注意：真实生成参数是 (1, 2)，但当前样本的 OLS 解通常与它不同。
           在右侧控制面板中调整参数，观察红色点在等高线图中的移动。
         </p>
 
@@ -713,7 +737,7 @@ export default function CostFunctionPage() {
               <div className="p-3 bg-gray-50 rounded-lg text-xs text-gray-600 space-y-2">
                 <p>
                   <span className="inline-block w-3 h-3 rounded-full bg-emerald-500 mr-1 align-middle" />
-                  绿色点：全局最优解 (θ₀=1, θ₁=2)
+                  绿色点：当前样本的 OLS 解 θ̂
                 </p>
                 <p>
                   <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-1 align-middle" />
@@ -752,9 +776,9 @@ export default function CostFunctionPage() {
             </div>
             <div className="bg-white rounded-lg p-4 border border-sky-200 text-center">
               <div className="text-2xl mb-2">📍</div>
-              <span className="text-sm font-semibold text-sky-700 block mb-1">中心点 = 最优解</span>
+              <span className="text-sm font-semibold text-sky-700 block mb-1">中心点 = OLS解</span>
               <span className="text-xs text-gray-600">
-                山谷最低处就是代价最小的地方，对应最优参数
+                山谷最低处就是当前样本代价最小的地方，对应最小二乘参数
               </span>
             </div>
           </div>
@@ -777,9 +801,10 @@ export default function CostFunctionPage() {
         <div className="mt-6 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
           <h3 className="font-semibold text-emerald-800 mb-2">重要性质</h3>
           <p className="text-gray-700 text-sm">
-            线性回归的代价函数是一个<strong>凸函数</strong>（convex function）。这意味着它只有一个全局最小值，
-            没有局部最小值。因此，使用梯度下降等优化算法时，只要学习率选择得当，
-            就一定能收敛到全局最优解。这是线性回归相比更复杂模型的一个重要优势。
+            线性回归的平方误差代价函数是一个<strong>凸函数</strong>（convex function）。
+            若设计矩阵 X 满列秩，则它有唯一的全局最优解；若存在完全共线性，则可能存在多个全局最优解。
+            因此，使用梯度下降等优化算法时，只要学习率选择得当，通常能收敛到全局最优解。
+            这是线性回归相比更复杂模型的一个重要优势。
           </p>
         </div>
       </section>
@@ -798,13 +823,13 @@ export default function CostFunctionPage() {
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">2.</span>
             <p className="text-gray-700">
-              线性回归使用均方误差（MSE）作为代价函数，系数 1/2 仅为求导方便。
+              线性回归使用 half-MSE（均方误差的一半）作为代价函数，系数 1/2 仅为求导方便。
             </p>
           </div>
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">3.</span>
             <p className="text-gray-700">
-              代价函数是参数 θ 的凸函数，有唯一全局最小值，可用梯度下降找到。
+              平方误差代价函数是凸函数；若设计矩阵 X 满列秩，则有唯一全局最优解，可用梯度下降找到。
             </p>
           </div>
           <div className="flex items-start gap-3">

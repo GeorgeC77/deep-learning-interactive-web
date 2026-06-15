@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, AlertTriangle, ChevronRight, ShieldAlert } from 'lucide-react';
+import { BookOpen, GraduationCap, ChevronRight, ShieldAlert } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
@@ -34,24 +34,9 @@ export default function HomePage() {
         </p>
 
         {/* Copyright banner */}
-        <div className="mt-6 inline-flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-xl px-6 py-4 max-w-3xl mx-auto text-left">
-          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold text-amber-900 mb-1">版权声明</p>
-            <p className="text-sm text-amber-800 leading-relaxed">
-              本课程内容仅供个人学习交流使用，采用{' '}
-              <a
-                href="https://creativecommons.org/licenses/by-nc/4.0/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-amber-900"
-              >
-                CC BY-NC 4.0
-              </a>{' '}
-              许可。未经授权，严禁以任何形式用于商业用途，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
-            </p>
-          </div>
-        </div>
+        <p className="mt-6 text-sm text-amber-800">
+          本网站内容仅供教学与学习使用，转载请注明来源。
+        </p>
       </section>
 
       {/* Course Directory */}

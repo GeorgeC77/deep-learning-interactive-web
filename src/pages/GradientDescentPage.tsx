@@ -40,7 +40,7 @@ function runGD(alpha: number, beta: number = 0.92, numSteps: number = 150, theta
 // ─── Learning Rate Presets ───────────────────────────────────────────
 const PRESETS = [
   { label: 'α = 0.05', desc: '太小', alpha: 0.05, behavior: '收敛极慢，在平台区 θ≈2 附近停滞', color: '#f08a5d' },
-  { label: 'α = 1.0', desc: '适中', alpha: 1.0, behavior: '越过障碍，收敛到全局最小值 θ≈6', color: '#00b4a6' },
+  { label: 'α = 1.0', desc: '适中', alpha: 1.0, behavior: '越过障碍，收敛到该初始点可达的最低谷 θ≈6', color: '#00b4a6' },
   { label: 'α = 2.0', desc: '太大', alpha: 2.0, behavior: '越过最小值，在 θ≈6 附近震荡', color: '#e25b5b' },
 ];
 
@@ -430,7 +430,12 @@ export default function GradientDescentPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-2">梯度下降算法</h1>
-      <p className="text-gray-600 mb-6">Gradient Descent with Momentum</p>
+      <p className="text-gray-600 mb-2">Gradient Descent with Momentum</p>
+      <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+        <strong>注意：</strong>本页使用一个 8 次多项式构造的非凸函数来展示梯度下降在复杂地形中的行为。
+        线性回归的平方误差代价函数是凸函数（设计矩阵满列秩时有唯一全局最优解），
+        其行为与本页的演示函数不同。
+      </div>
 
       {/* ─── Mountain Descent Analogy ────────────────────────────── */}
       <section className="mb-8">
@@ -459,7 +464,7 @@ export default function GradientDescentPage() {
                 <h4 className="font-semibold text-teal-800 text-sm">中步下山</h4>
               </div>
               <p className="text-xs text-teal-700 leading-relaxed">
-                学习率适中 = 稳步前进。你能越过小坑，顺着坡度顺利到达真正的山谷最低点。配合动量，下山更快更稳。
+                学习率适中 = 稳步前进。在某些非凸函数和特定初始点下，较大的学习率或动量可能帮助算法穿过平坦区域或浅局部区域，但不能保证找到全局最优。配合动量，下山通常更快更稳。
               </p>
             </div>
             <div className="bg-white/80 border border-red-200 rounded-lg p-4">
@@ -695,14 +700,14 @@ export default function GradientDescentPage() {
               <h4 className="font-semibold text-orange-800 text-sm mb-2">小学习率：困在小坑</h4>
               <p className="text-xs text-orange-700 leading-relaxed">
                 你小心翼翼地下山，走到一个小坑底就以为到了最低点，因为你没有足够的力量爬出去继续探索。
-                对应梯度下降：卡在局部最优或平台区，无法到达全局最优。
+                对应梯度下降：可能卡在局部最优或平台区，不一定能到达全局最优。
               </p>
             </div>
             <div className="bg-white/80 border border-teal-200 rounded-lg p-4">
               <h4 className="font-semibold text-teal-800 text-sm mb-2">中学习率：越过小坡</h4>
               <p className="text-xs text-teal-700 leading-relaxed">
                 你有足够的动能爬过小坑的边缘，继续向更低的地方探索。配合动量的"惯性"，
-                你能顺利通过平缓区域和小障碍，最终到达真正的最低点。
+                你能顺利通过平缓区域和小障碍，可能到达一个更低的谷地，但这不保证是全局最低点。
               </p>
             </div>
             <div className="bg-white/80 border border-red-200 rounded-lg p-4">
@@ -748,7 +753,7 @@ export default function GradientDescentPage() {
                       <span className="text-orange-600 font-medium">陷入局部平台，无法到达全局最小值</span>
                     )}
                     {p.alpha === 1.0 && (
-                      <span className="text-teal-600 font-medium">成功收敛到全局最小值 θ≈6</span>
+                      <span className="text-teal-600 font-medium">收敛到该初始点可达的最低谷 θ≈6</span>
                     )}
                     {p.alpha === 2.0 && (
                       <span className="text-red-600 font-medium">在最优解附近震荡，无法稳定收敛</span>

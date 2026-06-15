@@ -252,7 +252,8 @@ export default function ProbabilisticPage() {
           }
           description={
             <>
-              噪声项 <KaTeX math={String.raw`\epsilon^{(i)}`} /> 服从均值为 0、方差为 σ² 的高斯分布，且各样本间相互独立。
+              噪声项 <KaTeX math={String.raw`\epsilon^{(i)}`} /> 服从均值为 0、方差为 σ² 的独立同分布高斯分布。
+              在本页讨论中，σ 是一个固定的已知（或待估计）常数；只要 σ 为常数，最大似然估计得到的 θ 就与最小二乘解相同。
             </>
           }
         />
@@ -324,14 +325,14 @@ export default function ProbabilisticPage() {
                 <h4 className="font-semibold text-green-800 text-sm mb-2">σ 小 = 神枪手</h4>
                 <p className="text-xs text-green-700 leading-relaxed">
                   σ 很小 → 数据高度集中在均值附近 → 预测很准。
-                  就像神枪手，每一枪都几乎命中靶心。模型的预测误差很小。
+                  就像神枪手，每一枪都几乎命中靶心。σ 越小，似然函数越陡峭。
                 </p>
               </div>
               <div className="bg-white/80 border border-green-200 rounded-lg p-4">
                 <h4 className="font-semibold text-green-800 text-sm mb-2">σ 大 = 新手</h4>
                 <p className="text-xs text-green-700 leading-relaxed">
                   σ 很大 → 数据分散 → 预测困难。
-                  就像新手打靶，子弹满天飞舞，很难预测下一枪会打在哪里。
+                  就像新手打靶，子弹满天飞舞。σ 越大，似然函数越平缓，但最优 θ 的位置不变。
                 </p>
               </div>
             </div>
@@ -366,13 +367,14 @@ export default function ProbabilisticPage() {
           title="对数似然"
           formula={
             <KaTeX
-              math={String.raw`\ell(\theta) = m\log\frac{1}{\sqrt{2\pi}\sigma} - \frac{1}{\sigma^2} J(\theta)`}
+              math={String.raw`\ell(\theta) = m\log\frac{1}{\sqrt{2\pi}\sigma} - \frac{m}{\sigma^2} J(\theta)`}
               display
             />
           }
           description={
             <>
-              其中 <KaTeX math={String.raw`J(\theta) = \frac{1}{2}\sum_{i=1}^m (h_\theta(x^{(i)}) - y^{(i)})^2`} /> 正是最小二乘代价函数。
+              其中 <KaTeX math={String.raw`J(\theta) = \frac{1}{2m}\sum_{i=1}^m (h_\theta(x^{(i)}) - y^{(i)})^2`} /> 是 half-MSE 代价函数。
+              由于 m/σ² 是正的常数，最大化 log L(θ) 等价于最小化 J(θ)。
             </>
           }
         />
@@ -411,7 +413,7 @@ export default function ProbabilisticPage() {
                 <h4 className="font-semibold text-amber-800 text-sm mb-2">为什么 MLE = 最小二乘？</h4>
                 <p className="text-sm text-amber-700 leading-relaxed">
                   直观地说：<strong>"最可能的情况就是误差最小的"</strong>。数学上看，
-                  对数似然函数中只有一个与 θ 相关的项：-1/σ² · J(θ)。最大化似然等价于最小化 J(θ)，
+                  对数似然函数中只有一个与 θ 相关的项：-(m/σ²) · J(θ)。最大化似然等价于最小化 J(θ)，
                   这正是最小二乘法的目标。
                 </p>
               </div>
@@ -497,7 +499,9 @@ export default function ProbabilisticPage() {
                   <div className="bg-gray-50 border border-border-gray rounded-lg p-3 text-sm text-dark-gray">
                     <p className="font-medium mb-1">关键理解</p>
                     <p className="text-med-gray">
-                      增大 σ 会使数据点更加分散，似然函数值减小；减小 σ 则数据更集中，最大似然解更接近最小二乘解。
+                      增大 σ 会使数据点更加分散，似然函数变得更平缓；减小 σ 则数据更集中，似然函数更陡峭。
+                      在固定 σ 的同方差高斯噪声假设下，最大似然估计得到的 θ 与最小二乘解完全一致，
+                      σ 只影响似然函数的尺度和陡峭程度，不改变最优 θ 的位置。
                     </p>
                   </div>
                 </div>
