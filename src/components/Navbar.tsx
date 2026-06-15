@@ -123,7 +123,14 @@ const rlItems = [
   { to: '/ch15/s05', label: '算法关系', icon: Sigma },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' | 'em' | 'pca' | 'ica' | 'foundation' | 'rl' {
+const lqrItems = [
+  { to: '/ch16/s01', label: '有限时域 MDP', icon: Activity },
+  { to: '/ch16/s02', label: 'LQR', icon: SlidersHorizontal },
+  { to: '/ch16/s03', label: '非线性到 LQR', icon: GitBranch },
+  { to: '/ch16/s04', label: 'LQG', icon: BarChart2 },
+];
+
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' | 'em' | 'pca' | 'ica' | 'foundation' | 'rl' | 'lqr' {
   if (path === '/') return 'home';
   const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
   if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
@@ -153,6 +160,8 @@ function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm'
   if (foundationPaths.has(path) || path.startsWith('/ch14/')) return 'foundation';
   const rlPaths = new Set(rlItems.map((i) => i.to));
   if (rlPaths.has(path) || path.startsWith('/ch15/')) return 'rl';
+  const lqrPaths = new Set(lqrItems.map((i) => i.to));
+  if (lqrPaths.has(path) || path.startsWith('/ch16/')) return 'lqr';
   return 'linear';
 }
 
@@ -606,6 +615,35 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {rlItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {chapter === 'lqr' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <SlidersHorizontal className="w-4 h-4" />
+                  线性二次调节
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {lqrItems.map((item) => {
                     const isActive = currentPath === item.to;
                     return (
                       <DropdownMenuItem key={item.to} asChild>
