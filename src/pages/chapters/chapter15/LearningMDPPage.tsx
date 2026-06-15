@@ -165,12 +165,6 @@ function ModelLearningDemo() {
     setStateActionCounts(newStateActionCounts);
     setTrajectories((t) => t + 1);
 
-    // 用估计模型运行值迭代
-    const estimatedConfig = {
-      ...config,
-      // 注入估计的转移和奖励？
-      // 这里为了简化，仍用真实模型做规划，但显示估计的转移计数
-    };
     // 为了演示效果，用真实模型运行一步值迭代
     setV((current) => valueIterationStep(current, config));
   };

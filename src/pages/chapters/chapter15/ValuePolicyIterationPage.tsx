@@ -125,16 +125,13 @@ function IterationDemo() {
   const doStep = () => {
     if (mode === 'value') {
       setV((current) => valueIterationStep(current, config));
-      setIterations((it) => it + 1);
     } else {
-      setV((currentV) => {
-        const newV = policyEvaluationStep(currentV, policy, config);
-        const newPolicy = extractPolicy(newV, config);
-        setPolicy(newPolicy);
-        setIterations((it) => it + 1);
-        return newV;
-      });
+      const newV = policyEvaluationStep(V, policy, config);
+      const newPolicy = extractPolicy(newV, config);
+      setV(newV);
+      setPolicy(newPolicy);
     }
+    setIterations((it) => it + 1);
   };
 
   const reset = () => {

@@ -63,7 +63,7 @@ export function rewardOf(idx: number, config: GridWorldConfig): number {
   return 0;
 }
 
-function clampMove(pos: Pos, action: typeof ACTIONS[number], config: GridWorldConfig): Pos {
+function clampMove(pos: Pos, action: { dr: number; dc: number }, config: GridWorldConfig): Pos {
   const next = { r: pos.r + action.dr, c: pos.c + action.dc };
   if (next.r < 0 || next.r >= config.rows || next.c < 0 || next.c >= config.cols) {
     return pos;
