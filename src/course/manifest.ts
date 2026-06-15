@@ -651,7 +651,7 @@ export const courseManifest: Part[] = [
             id: "ch17-s01",
             title: "17.1 策略梯度与 REINFORCE",
             path: "/ch17/s01",
-            completed: false,
+            completed: true,
             description: "直接优化参数化策略。",
           },
         ],
