@@ -70,68 +70,68 @@ const deepLearningItems = [
 
 const generalizationItems = [
   { to: '/ch08/overview', label: '课程概览', icon: BookOpen },
-  { to: '/ch08/s01', label: '偏差-方差权衡', icon: Scale },
-  { to: '/ch08/s02', label: '双下降现象', icon: Activity },
-  { to: '/ch08/s03', label: '样本复杂度上界', icon: BarChart2 },
+  { to: '/ch08/bias-variance', label: '偏差-方差权衡', icon: Scale },
+  { to: '/ch08/double-descent', label: '双下降现象', icon: Activity },
+  { to: '/ch08/sample-complexity', label: '样本复杂度上界', icon: BarChart2 },
 ];
 
 const regularizationItems = [
   { to: '/ch09/overview', label: '课程概览', icon: BookOpen },
-  { to: '/ch09/s01', label: '正则化', icon: SlidersHorizontal },
-  { to: '/ch09/s02', label: '隐式正则化', icon: Brain },
-  { to: '/ch09/s03', label: '交叉验证', icon: SplitSquareHorizontal },
-  { to: '/ch09/s04', label: '贝叶斯正则化', icon: Sigma },
+  { to: '/ch09/regularization', label: '正则化', icon: SlidersHorizontal },
+  { to: '/ch09/implicit-regularization', label: '隐式正则化', icon: Brain },
+  { to: '/ch09/cross-validation', label: '交叉验证', icon: SplitSquareHorizontal },
+  { to: '/ch09/bayesian-regularization', label: '贝叶斯正则化', icon: Sigma },
 ];
 
 const clusteringItems = [
   { to: '/ch10/overview', label: '课程概览', icon: BookOpen },
-  { to: '/ch10/s01', label: 'K-means 聚类', icon: CircleDot },
+  { to: '/ch10/k-means', label: 'K-means 聚类', icon: CircleDot },
 ];
 
 const emItems = [
   { to: '/ch11/overview', label: '课程概览', icon: BookOpen },
-  { to: '/ch11/s01', label: '高斯混合模型的 EM', icon: Calculator },
-  { to: '/ch11/s02', label: 'Jensen 不等式', icon: Sigma },
-  { to: '/ch11/s03', label: '一般 EM 算法', icon: Brain },
-  { to: '/ch11/s04', label: '高斯混合模型再探', icon: GitMerge },
-  { to: '/ch11/s05', label: '变分推断与 VAE', icon: Network },
+  { to: '/ch11/gaussian-mixture-em', label: '高斯混合模型的 EM', icon: Calculator },
+  { to: '/ch11/jensen-inequality', label: 'Jensen 不等式', icon: Sigma },
+  { to: '/ch11/general-em', label: '一般 EM 算法', icon: Brain },
+  { to: '/ch11/gmm-revisited', label: '高斯混合模型再探', icon: GitMerge },
+  { to: '/ch11/variational-inference', label: '变分推断与 VAE', icon: Network },
 ];
 
 const pcaItems = [
   { to: '/ch12/overview', label: '课程概览', icon: BookOpen },
-  { to: '/ch12/s01', label: '主成分分析', icon: BarChart2 },
+  { to: '/ch12/pca', label: '主成分分析', icon: BarChart2 },
 ];
 
 const icaItems = [
   { to: '/ch13/overview', label: '课程概览', icon: BookOpen },
-  { to: '/ch13/s01', label: '独立成分分析', icon: GitMerge },
+  { to: '/ch13/ica', label: '独立成分分析', icon: GitMerge },
 ];
 
 const foundationItems = [
   { to: '/ch14/overview', label: '课程概览', icon: BookOpen },
-  { to: '/ch14/s01', label: '预训练与适配', icon: Activity },
-  { to: '/ch14/s02', label: '视觉预训练', icon: BarChart2 },
-  { to: '/ch14/s03', label: '大语言模型', icon: Sparkles },
+  { to: '/ch14/pretraining-adaptation', label: '预训练与适配', icon: Activity },
+  { to: '/ch14/computer-vision-pretraining', label: '视觉预训练', icon: BarChart2 },
+  { to: '/ch14/large-language-models', label: '大语言模型', icon: Sparkles },
 ];
 
 const rlItems = [
   { to: '/ch15/overview', label: '课程概览', icon: BookOpen },
-  { to: '/ch15/s01', label: 'MDP', icon: Activity },
-  { to: '/ch15/s02', label: '值/策略迭代', icon: Zap },
-  { to: '/ch15/s03', label: '学习 MDP 模型', icon: GitMerge },
-  { to: '/ch15/s04', label: '连续状态 MDP', icon: BarChart2 },
-  { to: '/ch15/s05', label: '算法关系', icon: Sigma },
+  { to: '/ch15/mdp', label: 'MDP', icon: Activity },
+  { to: '/ch15/value-policy-iteration', label: '值/策略迭代', icon: Zap },
+  { to: '/ch15/learning-mdp', label: '学习 MDP 模型', icon: GitMerge },
+  { to: '/ch15/continuous-state-mdp', label: '连续状态 MDP', icon: BarChart2 },
+  { to: '/ch15/value-policy-connection', label: '算法关系', icon: Sigma },
 ];
 
 const lqrItems = [
-  { to: '/ch16/s01', label: '有限时域 MDP', icon: Activity },
-  { to: '/ch16/s02', label: 'LQR', icon: SlidersHorizontal },
-  { to: '/ch16/s03', label: '非线性到 LQR', icon: GitBranch },
-  { to: '/ch16/s04', label: 'LQG', icon: BarChart2 },
+  { to: '/ch16/finite-horizon-mdp', label: '有限时域 MDP', icon: Activity },
+  { to: '/ch16/lqr', label: 'LQR', icon: SlidersHorizontal },
+  { to: '/ch16/nonlinear-to-lqr', label: '非线性到 LQR', icon: GitBranch },
+  { to: '/ch16/lqg', label: 'LQG', icon: BarChart2 },
 ];
 
 const pgItems = [
-  { to: '/ch17/s01', label: 'REINFORCE', icon: Activity },
+  { to: '/ch17/policy-gradient', label: 'REINFORCE', icon: Activity },
 ];
 
 function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' | 'em' | 'pca' | 'ica' | 'foundation' | 'rl' | 'lqr' | 'pg' {

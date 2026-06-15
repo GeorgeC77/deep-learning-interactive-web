@@ -1,18 +1,27 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, GraduationCap, ChevronRight, ShieldAlert } from 'lucide-react';
+import { BookOpen, GraduationCap, ChevronRight, ShieldAlert, CheckCircle2, FlaskConical, Construction } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { courseManifest, type Chapter } from '@/course/manifest';
+import { courseManifest, getChapterStatus, statusLabel, type Chapter, type SectionStatus } from '@/course/manifest';
 
 function getChapterEntryPath(chapter: Chapter): string {
-  // The first chapter's legacy content lives at /overview
-  if (chapter.id === 'ch01') return '/overview';
-  if (chapter.id === 'ch02') return '/ch02/overview';
   return chapter.sections[0]?.path || '/';
+}
+
+function ChapterStatusIcon({ status }: { status: SectionStatus }) {
+  switch (status) {
+    case 'completed':
+      return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
+    case 'beta':
+      return <FlaskConical className="w-4 h-4 text-amber-600" />;
+    case 'draft':
+    default:
+      return <Construction className="w-4 h-4 text-blue-600" />;
+  }
 }
 
 export default function HomePage() {
@@ -35,7 +44,7 @@ export default function HomePage() {
 
         {/* Copyright banner */}
         <p className="mt-6 text-sm text-amber-800">
-          本网站内容仅供教学与学习使用，转载请注明来源。
+          仅供教学与非商业学习使用，转载请注明来源。完整授权说明见 LICENSE。
         </p>
       </section>
 
@@ -64,6 +73,7 @@ export default function HomePage() {
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 pb-2">
                     {part.chapters.map((chapter) => {
                       const entryPath = getChapterEntryPath(chapter);
+                      const chapterStatus = getChapterStatus(chapter);
 
                       return (
                         <Link
@@ -74,6 +84,10 @@ export default function HomePage() {
                           <div className="flex-grow min-w-0">
                             <div className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
                               {chapter.number}. {chapter.title}
+                            </div>
+                            <div className="mt-1 inline-flex items-center gap-1 text-xs text-gray-500">
+                              <ChapterStatusIcon status={chapterStatus} />
+                              <span>{statusLabel(chapterStatus)}</span>
                             </div>
                           </div>
                           <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-400 flex-shrink-0 mt-1" />

@@ -2,7 +2,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 
-// Legacy linear-regression sub-topic pages (Chapter 1, Section 1.1 content)
+// Legacy linear-regression sub-topic pages (Chapter 1)
 import OverviewPage from './pages/OverviewPage';
 import ModelPage from './pages/ModelPage';
 import CostFunctionPage from './pages/CostFunctionPage';
@@ -55,64 +55,61 @@ import Chapter07ModernNNModulesPage from './pages/chapters/chapter07/ModernNNMod
 import Chapter07BackpropagationPage from './pages/chapters/chapter07/BackpropagationPage';
 import Chapter07VectorizationPage from './pages/chapters/chapter07/VectorizationPage';
 
-// Chapter / Section pages
-import Chapter01Section01Page from './pages/chapters/chapter01/section-01-lms';
-import Chapter01Section02Page from './pages/chapters/chapter01/section-02';
-import Chapter01Section03Page from './pages/chapters/chapter01/section-03';
-import Chapter01Section04Page from './pages/chapters/chapter01/section-04';
-import Chapter02Section01Page from './pages/chapters/chapter02/section-01';
-import Chapter02Section02Page from './pages/chapters/chapter02/section-02';
-import Chapter02Section03Page from './pages/chapters/chapter02/section-03';
-import Chapter02Section04Page from './pages/chapters/chapter02/section-04';
-import Chapter04Section01Page from './pages/chapters/chapter04/section-01';
-import Chapter04Section02Page from './pages/chapters/chapter04/section-02';
-import Chapter05Section01Page from './pages/chapters/chapter05/section-01';
-import Chapter05Section02Page from './pages/chapters/chapter05/section-02';
-import Chapter05Section03Page from './pages/chapters/chapter05/section-03';
-import Chapter05Section04Page from './pages/chapters/chapter05/section-04';
-import Chapter06Section01Page from './pages/chapters/chapter06/section-01';
-import Chapter06Section02Page from './pages/chapters/chapter06/section-02';
-import Chapter07Section01Page from './pages/chapters/chapter07/section-01';
-import Chapter07Section02Page from './pages/chapters/chapter07/section-02';
-import Chapter07Section03Page from './pages/chapters/chapter07/section-03';
-import Chapter07Section04Page from './pages/chapters/chapter07/section-04';
-import Chapter07Section05Page from './pages/chapters/chapter07/section-05';
+// Chapter 8 pages
 import Chapter08OverviewPage from './pages/chapters/chapter08/OverviewPage';
-import Chapter08Section01Page from './pages/chapters/chapter08/section-01';
-import Chapter08Section02Page from './pages/chapters/chapter08/section-02';
-import Chapter08Section03Page from './pages/chapters/chapter08/section-03';
+import Chapter08BiasVariancePage from './pages/chapters/chapter08/BiasVariancePage';
+import Chapter08DoubleDescentPage from './pages/chapters/chapter08/DoubleDescentPage';
+import Chapter08SampleComplexityPage from './pages/chapters/chapter08/SampleComplexityPage';
+
+// Chapter 9 pages
 import Chapter09OverviewPage from './pages/chapters/chapter09/OverviewPage';
-import Chapter09Section01Page from './pages/chapters/chapter09/section-01';
-import Chapter09Section02Page from './pages/chapters/chapter09/section-02';
-import Chapter09Section03Page from './pages/chapters/chapter09/section-03';
-import Chapter09Section04Page from './pages/chapters/chapter09/section-04';
+import Chapter09RegularizationPage from './pages/chapters/chapter09/RegularizationPage';
+import Chapter09ImplicitRegularizationPage from './pages/chapters/chapter09/ImplicitRegularizationPage';
+import Chapter09CrossValidationPage from './pages/chapters/chapter09/CrossValidationPage';
+import Chapter09BayesianRegularizationPage from './pages/chapters/chapter09/BayesianRegularizationPage';
+
+// Chapter 10 pages
 import Chapter10OverviewPage from './pages/chapters/chapter10/OverviewPage';
-import Chapter10Section01Page from './pages/chapters/chapter10/section-01';
+import Chapter10KMeansPage from './pages/chapters/chapter10/KMeansPage';
+
+// Chapter 11 pages
 import Chapter11OverviewPage from './pages/chapters/chapter11/OverviewPage';
-import Chapter11Section01Page from './pages/chapters/chapter11/section-01';
-import Chapter11Section02Page from './pages/chapters/chapter11/section-02';
-import Chapter11Section03Page from './pages/chapters/chapter11/section-03';
-import Chapter11Section04Page from './pages/chapters/chapter11/section-04';
-import Chapter11Section05Page from './pages/chapters/chapter11/section-05';
+import Chapter11GaussianMixtureEMPage from './pages/chapters/chapter11/GaussianMixtureEMPage';
+import Chapter11JensenInequalityPage from './pages/chapters/chapter11/JensenInequalityPage';
+import Chapter11GeneralEMPage from './pages/chapters/chapter11/GeneralEMPage';
+import Chapter11GMMRevisitedPage from './pages/chapters/chapter11/GMMRevisitedPage';
+import Chapter11VariationalInferencePage from './pages/chapters/chapter11/VariationalInferencePage';
+
+// Chapter 12 pages
 import Chapter12OverviewPage from './pages/chapters/chapter12/OverviewPage';
-import Chapter12Section01Page from './pages/chapters/chapter12/section-01';
+import Chapter12PCAPage from './pages/chapters/chapter12/PCAPage';
+
+// Chapter 13 pages
 import Chapter13OverviewPage from './pages/chapters/chapter13/OverviewPage';
-import Chapter13Section01Page from './pages/chapters/chapter13/section-01';
+import Chapter13ICAPage from './pages/chapters/chapter13/ICAPage';
+
+// Chapter 14 pages
 import Chapter14OverviewPage from './pages/chapters/chapter14/OverviewPage';
-import Chapter14Section01Page from './pages/chapters/chapter14/section-01';
-import Chapter14Section02Page from './pages/chapters/chapter14/section-02';
-import Chapter14Section03Page from './pages/chapters/chapter14/section-03';
+import Chapter14PretrainingAdaptationPage from './pages/chapters/chapter14/PretrainingAdaptationPage';
+import Chapter14ComputerVisionPretrainingPage from './pages/chapters/chapter14/ComputerVisionPretrainingPage';
+import Chapter14LargeLanguageModelsPage from './pages/chapters/chapter14/LargeLanguageModelsPage';
+
+// Chapter 15 pages
 import Chapter15OverviewPage from './pages/chapters/chapter15/OverviewPage';
-import Chapter15Section01Page from './pages/chapters/chapter15/section-01';
-import Chapter15Section02Page from './pages/chapters/chapter15/section-02';
-import Chapter15Section03Page from './pages/chapters/chapter15/section-03';
-import Chapter15Section04Page from './pages/chapters/chapter15/section-04';
-import Chapter15Section05Page from './pages/chapters/chapter15/section-05';
-import Chapter16Section01Page from './pages/chapters/chapter16/section-01';
-import Chapter16Section02Page from './pages/chapters/chapter16/section-02';
-import Chapter16Section03Page from './pages/chapters/chapter16/section-03';
-import Chapter16Section04Page from './pages/chapters/chapter16/section-04';
-import Chapter17Section01Page from './pages/chapters/chapter17/section-01';
+import Chapter15MDPPage from './pages/chapters/chapter15/MDPPage';
+import Chapter15ValuePolicyIterationPage from './pages/chapters/chapter15/ValuePolicyIterationPage';
+import Chapter15LearningMDPPage from './pages/chapters/chapter15/LearningMDPPage';
+import Chapter15ContinuousStateMDPPage from './pages/chapters/chapter15/ContinuousStateMDPPage';
+import Chapter15ValuePolicyConnectionPage from './pages/chapters/chapter15/ValuePolicyConnectionPage';
+
+// Chapter 16 pages
+import Chapter16FiniteHorizonMDPPage from './pages/chapters/chapter16/FiniteHorizonMDPPage';
+import Chapter16LQRPage from './pages/chapters/chapter16/LQRPage';
+import Chapter16NonlinearToLQRPage from './pages/chapters/chapter16/NonlinearToLQRPage';
+import Chapter16LQGPage from './pages/chapters/chapter16/LQGPage';
+
+// Chapter 17 pages
+import Chapter17PolicyGradientPage from './pages/chapters/chapter17/PolicyGradientPage';
 
 function App() {
   return (
@@ -121,7 +118,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
 
-          {/* Legacy linear-regression deep-dive pages (Chapter 1.1) */}
+          {/* Chapter 1: linear regression deep-dive pages */}
           <Route path="/overview" element={<OverviewPage />} />
           <Route path="/model" element={<ModelPage />} />
           <Route path="/cost-function" element={<CostFunctionPage />} />
@@ -174,64 +171,61 @@ function App() {
           <Route path="/ch07/backpropagation" element={<Chapter07BackpropagationPage />} />
           <Route path="/ch07/vectorization" element={<Chapter07VectorizationPage />} />
 
-          {/* Chapter / Section routes */}
-          <Route path="/ch01/s01" element={<Chapter01Section01Page />} />
-          <Route path="/ch01/s02" element={<Chapter01Section02Page />} />
-          <Route path="/ch01/s03" element={<Chapter01Section03Page />} />
-          <Route path="/ch01/s04" element={<Chapter01Section04Page />} />
-          <Route path="/ch02/s01" element={<Chapter02Section01Page />} />
-          <Route path="/ch02/s02" element={<Chapter02Section02Page />} />
-          <Route path="/ch02/s03" element={<Chapter02Section03Page />} />
-          <Route path="/ch02/s04" element={<Chapter02Section04Page />} />
-          <Route path="/ch04/s01" element={<Chapter04Section01Page />} />
-          <Route path="/ch04/s02" element={<Chapter04Section02Page />} />
-          <Route path="/ch05/s01" element={<Chapter05Section01Page />} />
-          <Route path="/ch05/s02" element={<Chapter05Section02Page />} />
-          <Route path="/ch05/s03" element={<Chapter05Section03Page />} />
-          <Route path="/ch05/s04" element={<Chapter05Section04Page />} />
-          <Route path="/ch06/s01" element={<Chapter06Section01Page />} />
-          <Route path="/ch06/s02" element={<Chapter06Section02Page />} />
-          <Route path="/ch07/s01" element={<Chapter07Section01Page />} />
-          <Route path="/ch07/s02" element={<Chapter07Section02Page />} />
-          <Route path="/ch07/s03" element={<Chapter07Section03Page />} />
-          <Route path="/ch07/s04" element={<Chapter07Section04Page />} />
-          <Route path="/ch07/s05" element={<Chapter07Section05Page />} />
+          {/* Chapter 8 routes */}
           <Route path="/ch08/overview" element={<Chapter08OverviewPage />} />
-          <Route path="/ch08/s01" element={<Chapter08Section01Page />} />
-          <Route path="/ch08/s02" element={<Chapter08Section02Page />} />
-          <Route path="/ch08/s03" element={<Chapter08Section03Page />} />
+          <Route path="/ch08/bias-variance" element={<Chapter08BiasVariancePage />} />
+          <Route path="/ch08/double-descent" element={<Chapter08DoubleDescentPage />} />
+          <Route path="/ch08/sample-complexity" element={<Chapter08SampleComplexityPage />} />
+
+          {/* Chapter 9 routes */}
           <Route path="/ch09/overview" element={<Chapter09OverviewPage />} />
-          <Route path="/ch09/s01" element={<Chapter09Section01Page />} />
-          <Route path="/ch09/s02" element={<Chapter09Section02Page />} />
-          <Route path="/ch09/s03" element={<Chapter09Section03Page />} />
-          <Route path="/ch09/s04" element={<Chapter09Section04Page />} />
+          <Route path="/ch09/regularization" element={<Chapter09RegularizationPage />} />
+          <Route path="/ch09/implicit-regularization" element={<Chapter09ImplicitRegularizationPage />} />
+          <Route path="/ch09/cross-validation" element={<Chapter09CrossValidationPage />} />
+          <Route path="/ch09/bayesian-regularization" element={<Chapter09BayesianRegularizationPage />} />
+
+          {/* Chapter 10 routes */}
           <Route path="/ch10/overview" element={<Chapter10OverviewPage />} />
-          <Route path="/ch10/s01" element={<Chapter10Section01Page />} />
+          <Route path="/ch10/k-means" element={<Chapter10KMeansPage />} />
+
+          {/* Chapter 11 routes */}
           <Route path="/ch11/overview" element={<Chapter11OverviewPage />} />
-          <Route path="/ch11/s01" element={<Chapter11Section01Page />} />
-          <Route path="/ch11/s02" element={<Chapter11Section02Page />} />
-          <Route path="/ch11/s03" element={<Chapter11Section03Page />} />
-          <Route path="/ch11/s04" element={<Chapter11Section04Page />} />
-          <Route path="/ch11/s05" element={<Chapter11Section05Page />} />
+          <Route path="/ch11/gaussian-mixture-em" element={<Chapter11GaussianMixtureEMPage />} />
+          <Route path="/ch11/jensen-inequality" element={<Chapter11JensenInequalityPage />} />
+          <Route path="/ch11/general-em" element={<Chapter11GeneralEMPage />} />
+          <Route path="/ch11/gmm-revisited" element={<Chapter11GMMRevisitedPage />} />
+          <Route path="/ch11/variational-inference" element={<Chapter11VariationalInferencePage />} />
+
+          {/* Chapter 12 routes */}
           <Route path="/ch12/overview" element={<Chapter12OverviewPage />} />
-          <Route path="/ch12/s01" element={<Chapter12Section01Page />} />
+          <Route path="/ch12/pca" element={<Chapter12PCAPage />} />
+
+          {/* Chapter 13 routes */}
           <Route path="/ch13/overview" element={<Chapter13OverviewPage />} />
-          <Route path="/ch13/s01" element={<Chapter13Section01Page />} />
+          <Route path="/ch13/ica" element={<Chapter13ICAPage />} />
+
+          {/* Chapter 14 routes */}
           <Route path="/ch14/overview" element={<Chapter14OverviewPage />} />
-          <Route path="/ch14/s01" element={<Chapter14Section01Page />} />
-          <Route path="/ch14/s02" element={<Chapter14Section02Page />} />
-          <Route path="/ch14/s03" element={<Chapter14Section03Page />} />
+          <Route path="/ch14/pretraining-adaptation" element={<Chapter14PretrainingAdaptationPage />} />
+          <Route path="/ch14/computer-vision-pretraining" element={<Chapter14ComputerVisionPretrainingPage />} />
+          <Route path="/ch14/large-language-models" element={<Chapter14LargeLanguageModelsPage />} />
+
+          {/* Chapter 15 routes */}
           <Route path="/ch15/overview" element={<Chapter15OverviewPage />} />
-          <Route path="/ch15/s01" element={<Chapter15Section01Page />} />
-          <Route path="/ch15/s02" element={<Chapter15Section02Page />} />
-          <Route path="/ch15/s03" element={<Chapter15Section03Page />} />
-          <Route path="/ch15/s04" element={<Chapter15Section04Page />} />
-          <Route path="/ch15/s05" element={<Chapter15Section05Page />} />
-          <Route path="/ch16/s01" element={<Chapter16Section01Page />} />
-          <Route path="/ch16/s02" element={<Chapter16Section02Page />} />
-          <Route path="/ch16/s03" element={<Chapter16Section03Page />} />
-          <Route path="/ch16/s04" element={<Chapter16Section04Page />} />
-          <Route path="/ch17/s01" element={<Chapter17Section01Page />} />
+          <Route path="/ch15/mdp" element={<Chapter15MDPPage />} />
+          <Route path="/ch15/value-policy-iteration" element={<Chapter15ValuePolicyIterationPage />} />
+          <Route path="/ch15/learning-mdp" element={<Chapter15LearningMDPPage />} />
+          <Route path="/ch15/continuous-state-mdp" element={<Chapter15ContinuousStateMDPPage />} />
+          <Route path="/ch15/value-policy-connection" element={<Chapter15ValuePolicyConnectionPage />} />
+
+          {/* Chapter 16 routes */}
+          <Route path="/ch16/finite-horizon-mdp" element={<Chapter16FiniteHorizonMDPPage />} />
+          <Route path="/ch16/lqr" element={<Chapter16LQRPage />} />
+          <Route path="/ch16/nonlinear-to-lqr" element={<Chapter16NonlinearToLQRPage />} />
+          <Route path="/ch16/lqg" element={<Chapter16LQGPage />} />
+
+          {/* Chapter 17 routes */}
+          <Route path="/ch17/policy-gradient" element={<Chapter17PolicyGradientPage />} />
         </Route>
       </Routes>
     </HashRouter>

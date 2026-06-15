@@ -1,10 +1,22 @@
-import { BookOpen, Construction, Home, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { BookOpen, Construction, Home, ChevronLeft, ChevronRight, AlertTriangle, CheckCircle2, FlaskConical } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getAllSections, getSectionByPath, type Section } from '@/course/manifest';
+import { getAllSections, getSectionByPath, statusLabel, type Section, type SectionStatus } from '@/course/manifest';
 
 type SectionPlaceholderProps = {
   sectionPath: string;
 };
+
+function StatusIcon({ status }: { status: SectionStatus }) {
+  switch (status) {
+    case 'completed':
+      return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
+    case 'beta':
+      return <FlaskConical className="w-4 h-4 text-amber-600" />;
+    case 'draft':
+    default:
+      return <Construction className="w-4 h-4 text-blue-600" />;
+  }
+}
 
 export default function SectionPlaceholder({ sectionPath }: SectionPlaceholderProps) {
   const section = getSectionByPath(sectionPath);
@@ -88,8 +100,9 @@ export default function SectionPlaceholder({ sectionPath }: SectionPlaceholderPr
           </div>
           <div className="bg-white/60 rounded-lg p-4">
             <span className="text-blue-700 font-semibold">完成状态：</span>
-            <span className="text-gray-700">
-              {section.completed ? '已完成 ✅' : '制作中 🚧'}
+            <span className="text-gray-700 inline-flex items-center gap-1">
+              <StatusIcon status={section.status} />
+              {statusLabel(section.status)}
             </span>
           </div>
         </div>
