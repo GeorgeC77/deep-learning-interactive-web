@@ -43,9 +43,12 @@ export default function LearningMDPPage() {
           假设我们已经知道状态空间 S、动作空间 A 和折扣因子 γ，但不知道转移概率 P<sub>sa</sub> 和奖励函数 R。
           我们可以通过让智能体执行若干条轨迹（trials）来收集经验：
         </p>
-        <p className="text-gray-700 mb-4">
-          {`s_0^(j) \xrightarrow{a_0^(j)} s_1^(j) \xrightarrow{a_1^(j)} s_2^(j) \xrightarrow{a_2^(j)} \cdots`}
-        </p>
+        <div className="my-4">
+          <KaTeX
+            math={String.raw`s_0^{(j)} \xrightarrow{a_0^{(j)}} s_1^{(j)} \xrightarrow{a_1^{(j)}} s_2^{(j)} \xrightarrow{a_2^{(j)}} \cdots`}
+            display
+          />
+        </div>
         <p className="text-gray-700 mb-4">
           基于这些经验，可以用最大似然估计转移概率。对于每个 (s, a, s') 三元组，统计在状态 s 采取动作 a 后到达 s' 的次数：
         </p>
