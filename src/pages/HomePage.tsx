@@ -1,21 +1,12 @@
 import { Link } from 'react-router-dom';
-import {
-  BookOpen,
-  GraduationCap,
-  AlertTriangle,
-  CheckCircle2,
-  Circle,
-  ChevronRight,
-  BarChart3,
-  ShieldAlert,
-} from 'lucide-react';
+import { BookOpen, GraduationCap, AlertTriangle, ChevronRight, ShieldAlert } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { courseManifest, getCompletedCount, getTotalSectionCount, type Chapter } from '@/course/manifest';
+import { courseManifest, type Chapter } from '@/course/manifest';
 
 function getChapterEntryPath(chapter: Chapter): string {
   // The first chapter's legacy content lives at /overview
@@ -25,10 +16,6 @@ function getChapterEntryPath(chapter: Chapter): string {
 }
 
 export default function HomePage() {
-  const completed = getCompletedCount();
-  const total = getTotalSectionCount();
-  const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-10">
       {/* Hero */}
@@ -45,22 +32,6 @@ export default function HomePage() {
           一套面向机器学习初学者的交互式学习网站。
           从监督学习到强化学习，逐章深入理解机器学习的核心思想与算法。
         </p>
-
-        {/* Progress */}
-        <div className="max-w-xl mx-auto mb-6">
-          <div className="flex justify-between text-sm font-medium text-gray-700 mb-2">
-            <span>课程完成进度</span>
-            <span>
-              {completed}/{total} 小节 ({progress}%)
-            </span>
-          </div>
-          <div className="h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
-            <div
-              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
 
         {/* Copyright banner */}
         <div className="mt-6 inline-flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-xl px-6 py-4 max-w-3xl mx-auto text-left">
@@ -92,12 +63,6 @@ export default function HomePage() {
 
         <Accordion type="multiple" defaultValue={['part-i']} className="w-full">
           {courseManifest.map((part) => {
-            const partCompleted = part.chapters.reduce(
-              (acc, ch) => acc + ch.sections.filter((s) => s.completed).length,
-              0
-            );
-            const partTotal = part.chapters.reduce((acc, ch) => acc + ch.sections.length, 0);
-
             return (
               <AccordionItem key={part.id} value={part.id} className="border border-gray-200 rounded-xl mb-4 px-5 data-[state=open]:shadow-sm">
                 <AccordionTrigger className="text-lg font-bold text-gray-900 hover:no-underline py-5">
@@ -107,18 +72,12 @@ export default function HomePage() {
                     </span>
                     <div>
                       <div className="text-base md:text-lg">{part.title}</div>
-                      <div className="text-xs font-normal text-gray-500 mt-0.5">
-                        {part.chapters.length} 章 · {partCompleted}/{partTotal} 小节已完成
-                      </div>
                     </div>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 pb-2">
                     {part.chapters.map((chapter) => {
-                      const chapterCompleted = chapter.sections.filter((s) => s.completed).length;
-                      const chapterTotal = chapter.sections.length;
-                      const isFullyCompleted = chapterCompleted === chapterTotal && chapterTotal > 0;
                       const entryPath = getChapterEntryPath(chapter);
 
                       return (
@@ -127,23 +86,9 @@ export default function HomePage() {
                           to={entryPath}
                           className="group flex items-start gap-3 p-5 rounded-xl border border-gray-200 bg-white hover:border-blue-300 hover:shadow-sm transition-all"
                         >
-                          <div className="mt-0.5 flex-shrink-0">
-                            {isFullyCompleted ? (
-                              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                            ) : (
-                              <Circle className={`w-5 h-5 ${chapterCompleted > 0 ? 'text-blue-400' : 'text-gray-300'} group-hover:text-blue-400`} />
-                            )}
-                          </div>
                           <div className="flex-grow min-w-0">
                             <div className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
                               {chapter.number}. {chapter.title}
-                            </div>
-                            <div className="text-xs text-gray-500 mt-1.5">
-                              {chapterCompleted === chapterTotal ? (
-                                <span className="text-emerald-600 font-medium">已完成</span>
-                              ) : (
-                                `${chapterCompleted}/${chapterTotal} 小节已完成`
-                              )}
                             </div>
                           </div>
                           <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-400 flex-shrink-0 mt-1" />
@@ -158,29 +103,16 @@ export default function HomePage() {
         </Accordion>
       </section>
 
-      {/* Stats & License footer block */}
-      <section className="grid md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <BarChart3 className="w-6 h-6 text-blue-600" />
-            <h3 className="text-lg font-bold text-blue-900">学习进度</h3>
-          </div>
-          <p className="text-blue-800 text-sm leading-relaxed mb-4">
-            已完成 {completed} 个小节，还有 {total - completed} 个小节正在制作中。点击上方目录开始学习。
-          </p>
-          <div className="text-2xl font-bold text-blue-700">{progress}%</div>
+      {/* License footer block */}
+      <section className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-6">
+        <div className="flex items-center gap-3 mb-3">
+          <ShieldAlert className="w-6 h-6 text-amber-600" />
+          <h3 className="text-lg font-bold text-amber-900">非商业用途</h3>
         </div>
-
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <ShieldAlert className="w-6 h-6 text-amber-600" />
-            <h3 className="text-lg font-bold text-amber-900">非商业用途</h3>
-          </div>
-          <p className="text-amber-800 text-sm leading-relaxed">
-            本站所有原创内容版权归作者所有。你可以自由阅读、分享和用于个人学习，但禁止未经授权的商业使用。
-            转载或引用请注明出处并遵守 CC BY-NC 4.0 许可协议。
-          </p>
-        </div>
+        <p className="text-amber-800 text-sm leading-relaxed">
+          本站所有原创内容版权归作者所有。你可以自由阅读、分享和用于个人学习，但禁止未经授权的商业使用。
+          转载或引用请注明出处并遵守 CC BY-NC 4.0 许可协议。
+        </p>
       </section>
     </div>
   );
