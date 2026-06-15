@@ -1,5 +1,5 @@
 import { useState, useMemo, type ReactNode } from 'react';
-import { ShieldAlert, SlidersHorizontal, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, SlidersHorizontal, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -263,15 +263,15 @@ export default function RegularizationPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>正则化通过惩罚模型复杂度来防止过拟合。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>L2 正则化让参数变小但通常不为零，对应权重衰减。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>L1 正则化可以产生精确为零的参数，实现特征选择。</span>
           </li>
         </ul>

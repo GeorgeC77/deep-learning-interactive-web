@@ -1,5 +1,5 @@
 import { useState, useMemo, type ReactNode } from 'react';
-import { ShieldAlert, SplitSquareHorizontal, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, SplitSquareHorizontal, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -197,15 +197,15 @@ export default function CrossValidationPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>训练误差不能用于选择模型复杂度，因为它总是偏向复杂模型。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>留出法简单但浪费数据；k 折交叉验证更充分地利用数据。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>验证误差最小的模型通常最接近真实泛化误差。</span>
           </li>
         </ul>

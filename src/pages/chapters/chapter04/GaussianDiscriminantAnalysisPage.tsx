@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Calculator, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Calculator, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -150,15 +150,15 @@ export default function GaussianDiscriminantAnalysisPage() {
         </h3>
         <ul className="space-y-2 text-sm text-emerald-800">
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>GDA 假设每类数据服从高斯分布，且协方差矩阵相同。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>在该假设下，决策边界是线性的，后验概率形式与逻辑回归一致。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>参数可以通过最大似然估计得到。</span>
           </li>
         </ul>

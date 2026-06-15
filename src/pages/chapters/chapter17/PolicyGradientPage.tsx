@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { ShieldAlert, Activity, CheckCircle2, RefreshCw, Play } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2, RefreshCw, Play , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -166,15 +166,15 @@ export default function PolicyGradientPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>REINFORCE 直接对策略参数做梯度上升，无需学习转移模型。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>对数导数技巧把分布梯度转化为对数概率梯度，转移概率项自动消失。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>引入基线能降低方差而不改变梯度期望；常见基线是状态价值函数。</span>
           </li>
         </ul>

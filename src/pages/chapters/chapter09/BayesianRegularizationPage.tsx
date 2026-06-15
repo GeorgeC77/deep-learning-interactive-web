@@ -1,5 +1,5 @@
 import { useState, useMemo, type ReactNode } from 'react';
-import { ShieldAlert, Sigma, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Sigma, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -225,15 +225,15 @@ export default function BayesianRegularizationPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>贝叶斯方法把参数看作随机变量，通过先验表达我们的信念。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>MAP 估计在似然基础上加入先验，等价于正则化。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>零均值高斯先验对应 L2 正则化（权重衰减）。</span>
           </li>
         </ul>

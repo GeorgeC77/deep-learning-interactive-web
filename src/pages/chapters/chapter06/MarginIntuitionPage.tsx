@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Ruler, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Ruler, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -161,15 +161,15 @@ export default function MarginIntuitionPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>函数间隔随参数缩放变化，几何间隔才是真实的距离。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>SVM 的目标是最大化最小几何间隔。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>只有距离边界最近的点（支持向量）决定最终的决策边界。</span>
           </li>
         </ul>

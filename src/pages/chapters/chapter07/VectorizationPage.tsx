@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Zap, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Zap, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -96,15 +96,15 @@ export default function VectorizationPage() {
         </h3>
         <ul className="space-y-2 text-sm text-amber-800">
           <li className="flex items-start gap-2">
-            <span className="text-amber-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-amber-500 mt-0.5 mt-1" />
             <span>向量化把多个样本组织成矩阵，避免显式循环。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-amber-500 mt-0.5 mt-1" />
             <span>矩阵运算可以利用高度优化的线性代数库和 GPU 并行能力。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-amber-500 mt-0.5 mt-1" />
             <span>向量化是高效训练神经网络的基础。</span>
           </li>
         </ul>

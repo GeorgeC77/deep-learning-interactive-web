@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, type ReactNode } from 'react';
-import { ShieldAlert, Activity, CheckCircle2, Play, SkipForward, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2, Play, SkipForward, RefreshCw , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -139,15 +139,15 @@ export default function GaussianMixtureEMPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>E-step 用当前参数计算隐变量的后验分布。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>M-step 用这些后验概率作为权重更新参数。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>与 K-means 类似，EM 也可能陷入局部最优。</span>
           </li>
         </ul>

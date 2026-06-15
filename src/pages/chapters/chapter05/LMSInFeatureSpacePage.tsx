@@ -1,4 +1,4 @@
-import { ShieldAlert, TrendingDown, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, TrendingDown, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -126,15 +126,15 @@ export default function LMSInFeatureSpacePage() {
         </h3>
         <ul className="space-y-2 text-sm text-emerald-800">
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>特征空间中的 LMS 与原始空间形式相同，只是把 x 替换为 φ(x)。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>特征映射可能带来维度爆炸问题。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>核技巧可以在不显式计算高维特征的情况下完成训练。</span>
           </li>
         </ul>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldAlert, Activity, CheckCircle2, RefreshCw, SkipForward } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2, RefreshCw, SkipForward , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import {
@@ -96,15 +96,15 @@ export default function ValuePolicyIterationPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>值迭代通过反复应用 Bellman 最优算子收敛到 V*。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>策略迭代交替进行策略评估和策略改进。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>小状态空间可用策略迭代精确求解；大状态空间常用值迭代。</span>
           </li>
         </ul>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { FunctionSquare, ShieldAlert, BookOpen, ChevronRight } from 'lucide-react';
+import { FunctionSquare, ShieldAlert, BookOpen, ChevronRight , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -212,15 +212,15 @@ export default function ExponentialFamilyPage() {
         </h3>
         <ul className="space-y-2 text-sm text-emerald-800">
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>指数族分布统一了多种常见概率分布的表示形式。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>自然参数 η、充分统计量 T(y)、对数配分函数 a(η) 是三个关键角色。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>伯努利分布对应 Sigmoid，高斯分布对应恒等函数，这为 GLM 推导埋下伏笔。</span>
           </li>
         </ul>

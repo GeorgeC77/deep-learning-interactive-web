@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { ShieldAlert, Activity, CheckCircle2, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2, RefreshCw , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -113,15 +113,15 @@ export default function LQRPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>LQR 假设线性动态与二次代价，是连续状态控制问题的可解析求解特例。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>反向递推 Riccati 方程得到状态反馈增益 K_t，最优控制为 a_t = −K_t s_t。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>只要噪声零均值，最优控制律就不依赖于噪声方差。</span>
           </li>
         </ul>

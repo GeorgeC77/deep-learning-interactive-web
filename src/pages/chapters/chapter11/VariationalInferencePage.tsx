@@ -1,4 +1,4 @@
-import { ShieldAlert, Cpu, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Cpu, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -88,15 +88,15 @@ export default function VariationalInferencePage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>变分推断用可计算的近似后验代替复杂模型的真实后验。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>VAE 用神经网络参数化编码器和解码器。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>重参数化技巧使 VAE 可以通过反向传播端到端训练。</span>
           </li>
         </ul>

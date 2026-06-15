@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { TrendingDown, AlertTriangle, BarChart3, Target, Info } from 'lucide-react';
+import { TrendingDown, AlertTriangle, BarChart3, Target, Info, CheckCircle2, HelpCircle, XCircle } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -386,7 +386,7 @@ export default function CostFunctionPage() {
 
         <div className="grid md:grid-cols-3 gap-4 mb-5">
           <div className="bg-white rounded-lg p-4 border border-emerald-200 text-center">
-            <div className="text-2xl mb-2">✅</div>
+            <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-600 mb-2" />
             <span className="text-sm font-semibold text-emerald-700 block mb-1">正确且自信</span>
             <span className="text-xs text-gray-600">
               真实 <KaTeX math={String.raw`y=1`} />，预测 <KaTeX math={String.raw`h \approx 1`} />，
@@ -394,14 +394,14 @@ export default function CostFunctionPage() {
             </span>
           </div>
           <div className="bg-white rounded-lg p-4 border border-amber-200 text-center">
-            <div className="text-2xl mb-2">🤔</div>
+            <HelpCircle className="w-8 h-8 mx-auto text-amber-600 mb-2" />
             <span className="text-sm font-semibold text-amber-700 block mb-1">不确定</span>
             <span className="text-xs text-gray-600">
               预测接近 0.5，无论标签是什么，代价都是中等大小
             </span>
           </div>
           <div className="bg-white rounded-lg p-4 border border-rose-200 text-center">
-            <div className="text-2xl mb-2">❌</div>
+            <XCircle className="w-8 h-8 mx-auto text-rose-600 mb-2" />
             <span className="text-sm font-semibold text-rose-700 block mb-1">错误且自信</span>
             <span className="text-xs text-gray-600">
               真实 <KaTeX math={String.raw`y=1`} />，预测 <KaTeX math={String.raw`h \approx 0`} />，

@@ -1,4 +1,4 @@
-import { ShieldAlert, BookOpen, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, BookOpen, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -77,15 +77,15 @@ export default function OverviewPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>聚类是无监督学习，目标是把相似样本分到同一组。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>K-means 通过分配和更新两个步骤迭代优化失真函数。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>算法可能收敛到局部最优，多次初始化可改善结果。</span>
           </li>
         </ul>

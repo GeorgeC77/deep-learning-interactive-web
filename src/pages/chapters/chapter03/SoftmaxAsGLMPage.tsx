@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldAlert, Layers, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ShieldAlert, Layers, CheckCircle2, ArrowRight , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -189,15 +189,15 @@ export default function SoftmaxAsGLMPage() {
         </h3>
         <ul className="space-y-2 text-sm text-amber-800">
           <li className="flex items-start gap-2">
-            <span className="text-amber-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-amber-500 mt-0.5 mt-1" />
             <span>Softmax 回归对应 GLM 中的多项分布假设。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-amber-500 mt-0.5 mt-1" />
             <span>自然参数 ηⱼ 是相对于参照类别的 log-odds。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-amber-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-amber-500 mt-0.5 mt-1" />
             <span>Softmax 函数是多项分布的响应函数，把线性得分转换为类别概率。</span>
           </li>
         </ul>

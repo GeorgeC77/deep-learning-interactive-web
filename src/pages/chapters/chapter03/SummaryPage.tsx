@@ -119,10 +119,10 @@ export default function SummaryPage() {
           然后通过贝叶斯定理进行分类。我们将学习高斯判别分析（GDA）和朴素贝叶斯算法。
         </p>
         <Link
-          to="/"
+          to="/ch04/overview"
           className="inline-flex items-center gap-1 text-sm font-medium text-blue-700 hover:text-blue-900"
         >
-          返回目录 <ArrowRight className="w-4 h-4" />
+          进入第四章 <ArrowRight className="w-4 h-4" />
         </Link>
       </section>
     </div>

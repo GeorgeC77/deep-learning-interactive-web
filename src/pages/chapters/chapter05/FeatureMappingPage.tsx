@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { MouseEvent, Dispatch, SetStateAction } from 'react';
-import { ShieldAlert, Map, CheckCircle2, Lightbulb } from 'lucide-react';
+import { ShieldAlert, Map, CheckCircle2, Lightbulb , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -134,15 +134,15 @@ export default function FeatureMappingPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>特征映射把原始输入变换到更高维的特征空间。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>在特征空间中，原本线性不可分的数据可能变得线性可分。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>多项式映射是最直观的例子，RBF 映射则更为强大。</span>
           </li>
         </ul>

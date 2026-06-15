@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Sparkles, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -102,15 +102,15 @@ export default function KernelTrickPage() {
         </h3>
         <ul className="space-y-2 text-sm text-violet-800">
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>核函数 K(x, z) 等于特征映射后的内积。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>通过核函数可以隐式使用高维特征空间，避免显式计算 φ(x)。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>核技巧适用于任何只依赖样本内积的算法。</span>
           </li>
         </ul>

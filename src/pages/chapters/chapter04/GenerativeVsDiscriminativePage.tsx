@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldAlert, Scale, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Scale, CheckCircle2, Circle, Check, X } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -146,15 +146,15 @@ export default function GenerativeVsDiscriminativePage() {
             <h3 className="font-bold text-blue-800 mb-3">判别式方法</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-emerald-500">✓</span>
+                <Check className="w-4 h-4 text-emerald-500" />
                 <span>通常分类准确率更高，尤其在大数据上。</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-500">✓</span>
+                <Check className="w-4 h-4 text-emerald-500" />
                 <span>模型更直接，训练和调参相对简单。</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-rose-500">✗</span>
+                <X className="w-4 h-4 text-rose-500" />
                 <span>无法生成数据或处理缺失特征。</span>
               </li>
             </ul>
@@ -163,15 +163,15 @@ export default function GenerativeVsDiscriminativePage() {
             <h3 className="font-bold text-emerald-800 mb-3">生成式方法</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-emerald-500">✓</span>
+                <Check className="w-4 h-4 text-emerald-500" />
                 <span>可以生成新样本，解释性更强。</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-emerald-500">✓</span>
+                <Check className="w-4 h-4 text-emerald-500" />
                 <span>小数据或半监督场景下可能更有优势。</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-rose-500">✗</span>
+                <X className="w-4 h-4 text-rose-500" />
                 <span>需要正确假设数据分布，否则效果不佳。</span>
               </li>
             </ul>
@@ -187,15 +187,15 @@ export default function GenerativeVsDiscriminativePage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>判别式直接学习 p(y|x)，生成式通过 p(x|y)p(y) 间接得到 p(y|x)。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>贝叶斯定理是连接生成式假设与最终分类决策的桥梁。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>接下来两节将分别介绍连续特征上的 GDA 和离散特征上的朴素贝叶斯。</span>
           </li>
         </ul>

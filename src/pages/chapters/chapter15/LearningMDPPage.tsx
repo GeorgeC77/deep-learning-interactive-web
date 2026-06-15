@@ -1,16 +1,17 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Activity, CheckCircle2, RefreshCw, Play } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2, RefreshCw, Play , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import {
   defaultConfig,
-  valueIterationStep,
   extractPolicy,
   simulateTrajectory,
   indexToState,
   isTerminal,
+  isObstacle,
   rewardOf,
   ACTIONS,
+  type GridWorldConfig,
 } from './GridWorld';
 
 export default function LearningMDPPage() {
@@ -112,21 +113,65 @@ export default function LearningMDPPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>当模型未知时，可以从交互经验中估计转移概率和奖励。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>模型学习与值迭代可以交替进行，逐步改进策略。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>连续状态 MDP 需要离散化或值函数近似。</span>
           </li>
         </ul>
       </section>
     </div>
   );
+}
+
+function valueIterationFromEstimate(
+  V: number[],
+  counts: number[][][],
+  stateActionCounts: number[][],
+  rewardSums: number[],
+  config: GridWorldConfig,
+): number[] {
+  const n = config.rows * config.cols;
+  const nextV = new Array(n).fill(0);
+  for (let s = 0; s < n; s++) {
+    if (isObstacle(s, config)) {
+      nextV[s] = 0;
+      continue;
+    }
+    if (isTerminal(s, config)) {
+      nextV[s] = rewardOf(s, config);
+      continue;
+    }
+    const totalVisits = stateActionCounts[s].reduce((sum, c) => sum + c, 0);
+    const rHat = totalVisits > 0 ? rewardSums[s] / totalVisits : 0;
+    let best = -Infinity;
+    for (let a = 0; a < ACTIONS.length; a++) {
+      const saCount = stateActionCounts[s][a];
+      let q: number;
+      if (saCount === 0) {
+        // 没有经验时保守估计：保持原地
+        q = rHat + config.gamma * V[s];
+      } else {
+        let exp = 0;
+        for (let sNext = 0; sNext < n; sNext++) {
+          const c = counts[s][a][sNext];
+          if (c > 0) {
+            exp += (c / saCount) * V[sNext];
+          }
+        }
+        q = rHat + config.gamma * exp;
+      }
+      if (q > best) best = q;
+    }
+    nextV[s] = best === -Infinity ? 0 : best;
+  }
+  return nextV;
 }
 
 function ModelLearningDemo() {
@@ -168,8 +213,8 @@ function ModelLearningDemo() {
     setStateActionCounts(newStateActionCounts);
     setTrajectories((t) => t + 1);
 
-    // 为了演示效果，用真实模型运行一步值迭代
-    setV((current) => valueIterationStep(current, config));
+    // 用估计的模型运行一步值迭代
+    setV((current) => valueIterationFromEstimate(current, newCounts, newStateActionCounts, newRewardSums, config));
   };
 
   const reset = () => {

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, GitBranch, CheckCircle2, Play, RotateCcw } from 'lucide-react';
+import { ShieldAlert, GitBranch, CheckCircle2, Play, RotateCcw , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -103,15 +103,15 @@ export default function BackpropagationPage() {
         </h3>
         <ul className="space-y-2 text-sm text-violet-800">
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>反向传播利用链式法则计算梯度。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>先前向传播保存中间结果，再反向传递梯度。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>它是神经网络能够高效训练的关键。</span>
           </li>
         </ul>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Brain, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Brain, CheckCircle2, Circle, Ban, Mail } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -223,7 +223,7 @@ export default function NaiveBayesPage() {
                 onClick={() => setInput(ex.text)}
                 className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded text-xs text-gray-700 transition-colors"
               >
-                {ex.label === '垃圾邮件' ? '🚫' : '✉️'} {ex.text.slice(0, 12)}...
+                {ex.label === '垃圾邮件' ? <Ban className="w-3 h-3 inline-block align-text-bottom" /> : <Mail className="w-3 h-3 inline-block align-text-bottom" />} {ex.text.slice(0, 12)}...
               </button>
             ))}
           </div>
@@ -293,15 +293,15 @@ export default function NaiveBayesPage() {
         </h3>
         <ul className="space-y-2 text-sm text-violet-800">
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>朴素贝叶斯假设给定类别后特征条件独立。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>拉普拉斯平滑避免零概率问题。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>文本分类是朴素贝叶斯最经典的应用场景之一。</span>
           </li>
         </ul>
@@ -316,7 +316,7 @@ function TrainingDataDisplay() {
     <div className="grid md:grid-cols-2 gap-5">
       <div className="bg-rose-50 rounded-xl p-4 border border-rose-200">
         <h3 className="font-semibold text-rose-800 mb-3 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-rose-200 text-rose-700 flex items-center justify-center text-xs">🚫</span>
+          <Ban className="w-5 h-5 text-rose-700" />
           垃圾邮件（10 封）
         </h3>
         <ul className="space-y-2 text-sm text-gray-700">
@@ -331,7 +331,7 @@ function TrainingDataDisplay() {
 
       <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
         <h3 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center text-xs">✉️</span>
+          <Mail className="w-5 h-5 text-emerald-700" />
           正常邮件（10 封）
         </h3>
         <ul className="space-y-2 text-sm text-gray-700">

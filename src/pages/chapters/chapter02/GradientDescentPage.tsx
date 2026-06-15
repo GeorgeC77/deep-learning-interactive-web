@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Circle, Mountain, Sparkles, Map, Play, Pause, RotateCcw } from 'lucide-react';
 import KaTeX from '../../../components/KaTeX';
 
 // ─── 2D Logistic Regression Dataset ────────────────────────────────────
@@ -547,7 +547,7 @@ export default function GradientDescentPage() {
       <section className="mb-8">
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🏔️</span>
+            <Mountain className="w-6 h-6 text-blue-700" />
             核心类比：蒙眼下山
           </h3>
           <p className="text-blue-700 leading-relaxed mb-4">
@@ -630,7 +630,7 @@ export default function GradientDescentPage() {
         {/* ─── Why the Gradient Looks the Same ─────────────────────── */}
         <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-5 mt-4 mb-4">
           <h3 className="text-lg font-bold text-amber-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">✨</span>
+            <Sparkles className="w-6 h-6 text-amber-700" />
             为什么梯度形式和线性回归相同？
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -711,19 +711,19 @@ export default function GradientDescentPage() {
             disabled={isPlaying}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            ▶ 播放
+            <Play className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 播放
           </button>
           <button
             onClick={pauseAnimation}
             className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium text-sm hover:bg-amber-600 transition-colors"
           >
-            ⏸ 暂停
+            <Pause className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 暂停
           </button>
           <button
             onClick={resetAnimation}
             className="px-4 py-2 bg-gray-500 text-white rounded-lg font-medium text-sm hover:bg-gray-600 transition-colors"
           >
-            ↺ 重置
+            <RotateCcw className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 重置
           </button>
 
           <div className="flex items-center gap-2 ml-2">
@@ -835,19 +835,19 @@ export default function GradientDescentPage() {
           <div className="bg-white rounded-xl shadow-card border border-gray-200 p-4">
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
                 <span>
                   <strong>θ = 0</strong> 时 h_θ(x) = 0.5，所有样本的损失均为 ln 2，J(θ) ≈ 0.693
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-orange-500 mt-0.5 mt-1" />
                 <span>
                   学习率过小时，参数在初始平台区移动极慢，100 步后仍无法分开两类样本
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-teal-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-teal-500 mt-0.5 mt-1" />
                 <span>
                   动量 β = 0.92 累积历史梯度，帮助批量 GD 更快穿越平缓区域
                 </span>
@@ -857,19 +857,19 @@ export default function GradientDescentPage() {
           <div className="bg-white rounded-xl shadow-card border border-gray-200 p-4">
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-purple-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-purple-500 mt-0.5 mt-1" />
                 <span>
                   对数损失无闭式解，必须借助梯度下降等迭代优化算法求解
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-red-500 mt-0.5 mt-1" />
                 <span>
                   SGD 单步噪声大，但在大数据集上每次迭代计算量小，收敛更快
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
                 <span>
                   由于函数凸，理论上不存在局部最优陷阱，但数值上仍可能因学习率不当而停滞或震荡
                 </span>
@@ -883,7 +883,7 @@ export default function GradientDescentPage() {
       <section className="mb-8">
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🗺️</span>
+            <Map className="w-6 h-6 text-purple-700" />
             凸地形中的最低点
           </h3>
           <p className="text-purple-700 leading-relaxed mb-4">

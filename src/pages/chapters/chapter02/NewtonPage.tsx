@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
-import { ShieldAlert, Zap, TrendingUp, Activity } from 'lucide-react';
+import { ShieldAlert, Zap, TrendingUp, Activity, Circle, Target, Rocket, Pin, Play, Pause, RotateCcw } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import InteractiveDemo from '@/components/InteractiveDemo';
@@ -558,7 +558,7 @@ export default function NewtonPage() {
       <section className="mb-10">
         <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-orange-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🎯</span>
+            <Target className="w-6 h-6 text-orange-700" />
             核心类比：用"地形曲率"爬山
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -714,7 +714,7 @@ export default function NewtonPage() {
 
         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🚀</span>
+            <Rocket className="w-6 h-6 text-emerald-700" />
             二次收敛的直观理解
           </h3>
           <p className="text-sm text-emerald-800 leading-relaxed">
@@ -837,19 +837,19 @@ export default function NewtonPage() {
                     disabled={isPlaying}
                     className="px-4 py-2 bg-med-blue text-white rounded-lg font-medium text-sm hover:bg-deep-blue disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    ▶ 播放
+                    <Play className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 播放
                   </button>
                   <button
                     onClick={pauseAnimation}
                     className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium text-sm hover:bg-amber-600 transition-colors"
                   >
-                    ⏸ 暂停
+                    <Pause className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 暂停
                   </button>
                   <button
                     onClick={resetAnimation}
                     className="px-4 py-2 bg-gray-500 text-white rounded-lg font-medium text-sm hover:bg-gray-600 transition-colors"
                   >
-                    ↺ 重置
+                    <RotateCcw className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 重置
                   </button>
                 </div>
 
@@ -916,31 +916,31 @@ export default function NewtonPage() {
       <section className="mb-10">
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">📌</span>
+            <Pin className="w-6 h-6 text-blue-700" />
             小结
           </h3>
           <ul className="space-y-2 text-sm text-blue-800">
             <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-0.5">●</span>
+              <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
               <span>
                 牛顿法通过 <KaTeX math={String.raw`\theta := \theta - H^{-1}\nabla\ell(\theta)`} /> 同时利用梯度和曲率信息优化参数。
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-0.5">●</span>
+              <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
               <span>
                 逻辑回归的 Hessian 为 <KaTeX math={String.raw`H = -X^T W X`} />，
                 其中 <KaTeX math={String.raw`W`} /> 是对角权重矩阵。
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-0.5">●</span>
+              <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
               <span>
                 牛顿法具有<strong>二次收敛</strong>特性，通常比梯度下降的线性收敛快得多。
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-0.5">●</span>
+              <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
               <span>
                 代价是每次迭代需要计算并求逆 Hessian，O(n³) 复杂度，因此适用于特征维度不是特别大的场景。
               </span>

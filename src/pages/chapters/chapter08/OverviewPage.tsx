@@ -1,4 +1,4 @@
-import { ShieldAlert, BookOpen, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, BookOpen, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -77,15 +77,15 @@ export default function OverviewPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>泛化能力指模型在未见过数据上的表现。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>过拟合：训练误差小，测试误差大；欠拟合：训练误差也大。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>偏差-方差权衡帮助我们理解并选择合适的模型复杂度。</span>
           </li>
         </ul>

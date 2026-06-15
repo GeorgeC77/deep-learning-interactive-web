@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ShieldAlert, GitBranch, Activity, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ShieldAlert, GitBranch, Activity, CheckCircle2, ArrowRight , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -207,15 +207,15 @@ export default function LogisticAsGLMPage() {
         </h3>
         <ul className="space-y-2 text-sm text-rose-800">
           <li className="flex items-start gap-2">
-            <span className="text-rose-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-rose-500 mt-0.5 mt-1" />
             <span>逻辑回归对应 GLM 中的伯努利分布假设。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-rose-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-rose-500 mt-0.5 mt-1" />
             <span>伯努利分布的对数配分函数求导后自然得到 Sigmoid 函数。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-rose-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-rose-500 mt-0.5 mt-1" />
             <span>最大似然估计导出交叉熵损失，与第二章完全一致。</span>
           </li>
         </ul>

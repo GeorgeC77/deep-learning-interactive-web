@@ -1,4 +1,4 @@
-import { ShieldAlert, BookOpen, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, BookOpen, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -65,15 +65,15 @@ export default function OverviewPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>ICA 用于盲源分离，目标是恢复统计独立的源信号。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>ICA 对高斯源不可识别，要求源信号是非高斯的。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>通过最大化似然，可以得到解混矩阵 W 的梯度上升更新规则。</span>
           </li>
         </ul>

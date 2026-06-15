@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Activity, CheckCircle2, SkipForward, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2, SkipForward, RefreshCw , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -112,6 +112,10 @@ export default function ComputerVisionPretrainingPage() {
           下图将三类二维数据视为三个「图像类」。每个原始点经过一次随机增强得到正样本（同色小圆点）。
           点击「对比学习一步」，模型会把正样本对拉近、负样本对推远。观察嵌入空间如何逐渐按类别分离。
         </p>
+        <p className="text-xs text-gray-500 mb-4">
+          教学简化：本演示只生成一个增强视图，并把其他图像的增强视图作为负样本；
+          完整的 SIMCLR 还会包含同批次中其他原始视图作为负样本，负样本总数为 2(B-1)。
+        </p>
         <ContrastiveDemo />
       </section>
 
@@ -122,15 +126,15 @@ export default function ComputerVisionPretrainingPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>监督预训练在有标签数据上训练深度网络，然后迁移其特征。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>对比学习通过正/负样本对对无标注数据进行自监督训练。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>SIMCLR 是视觉对比学习的代表性算法之一。</span>
           </li>
         </ul>

@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import { ShieldAlert, Activity, CheckCircle2, RefreshCw } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2, RefreshCw , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -136,15 +136,15 @@ export default function FiniteHorizonMDPPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>有限时域 MDP 用有限累积回报描述决策问题，最优策略可能非平稳。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>终点价值只由即时奖励决定；更早时刻通过反向 Bellman 方程递推。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>动态规划把多阶段决策问题拆成一系列单步优化，是 LQR、DDP 等算法的基础。</span>
           </li>
         </ul>

@@ -1,4 +1,4 @@
-import { ShieldAlert, BookOpen, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, BookOpen, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -65,15 +65,15 @@ export default function OverviewPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>基础模型通过预训练获得通用表示，再适配到下游任务。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>视觉中常用监督预训练或对比学习。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>语言模型通过 next-token 预测进行自回归预训练。</span>
           </li>
         </ul>

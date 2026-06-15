@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Network, CheckCircle2, ArrowRight, Lightbulb, Sigma } from 'lucide-react';
+import { ShieldAlert, Network, CheckCircle2, ArrowRight, Lightbulb, Sigma , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -157,19 +157,19 @@ export default function NeuralNetworksPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>单个神经元通过激活函数产生非线性，例如 ReLU 会在房价曲线中制造“拐点”。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>把神经元堆叠成层，网络可以组合简单特征得到复杂函数；全连接让数据自己学习连接方式。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>去掉非线性激活，多层网络会坍塌为单层线性模型，失去表达能力。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>深度学习可视为自动学习特征映射，最终层是在学习到的特征上做线性预测。</span>
           </li>
         </ul>

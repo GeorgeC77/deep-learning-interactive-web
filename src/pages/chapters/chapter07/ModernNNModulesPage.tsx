@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldAlert, Layers, CheckCircle2, GitBranch, Gauge } from 'lucide-react';
+import { ShieldAlert, Layers, CheckCircle2, GitBranch, Gauge , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -191,19 +191,19 @@ export default function ModernNNModulesPage() {
         </h3>
         <ul className="space-y-2 text-sm text-emerald-800">
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>全连接层适合向量输入，但参数量大。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>残差连接让网络学习残差映射，缓解深层梯度消失。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>层归一化稳定中间层数值尺度，是现代大语言模型的基础模块。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-emerald-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-emerald-500 mt-0.5 mt-1" />
             <span>卷积层通过局部连接和权重共享高效处理图像等网格数据。</span>
           </li>
         </ul>

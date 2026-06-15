@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ShieldAlert, Activity, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Activity, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -109,15 +109,15 @@ export default function NonlinearSupervisedLearningPage() {
         </h3>
         <ul className="space-y-2 text-sm text-rose-800">
           <li className="flex items-start gap-2">
-            <span className="text-rose-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-rose-500 mt-0.5 mt-1" />
             <span>现实问题通常需要非线性模型。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-rose-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-rose-500 mt-0.5 mt-1" />
             <span>非线性激活函数让模型能够学习复杂映射。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-rose-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-rose-500 mt-0.5 mt-1" />
             <span>XOR 问题是线性模型无法解决的典型例子。</span>
           </li>
         </ul>

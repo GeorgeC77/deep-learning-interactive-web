@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { ShieldAlert, Sigma, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Sigma, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -195,15 +195,15 @@ export default function JensenInequalityPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>凸函数满足 E[f(X)] ≥ f(E[X])，凹函数满足 E[f(X)] ≤ f(E[X])。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>对数函数是凹函数，这是 EM 算法构造下界的关键。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>EM 通过 Jensen 不等式得到观测似然的下界 ELBO。</span>
           </li>
         </ul>

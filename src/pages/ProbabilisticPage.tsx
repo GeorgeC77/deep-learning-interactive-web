@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useMemo } from 'react';
 import * as d3 from 'd3';
+import { Dices, Target, Search } from 'lucide-react';
 import KaTeX from '../components/KaTeX';
 import FormulaCard from '../components/FormulaCard';
 import InteractiveDemo from '../components/InteractiveDemo';
@@ -263,7 +264,7 @@ export default function ProbabilisticPage() {
       <section className="mb-10">
         <div className="bg-gradient-to-r from-sky-50 to-cyan-50 border border-sky-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-sky-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🎲</span>
+            <Dices className="w-6 h-6 text-sky-700" />
             噪声的直觉：考试成绩与真实水平
           </h3>
           <div className="space-y-3">
@@ -309,7 +310,7 @@ export default function ProbabilisticPage() {
         {/* Gaussian Distribution Intuition */}
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-5 mt-4 mb-4">
           <h3 className="text-lg font-bold text-green-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🎯</span>
+            <Target className="w-6 h-6 text-green-700" />
             高斯分布的直觉：射击靶子
           </h3>
           <div className="space-y-3">
@@ -396,7 +397,7 @@ export default function ProbabilisticPage() {
         {/* MLE Intuition */}
         <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-5 mt-4 mb-4">
           <h3 className="text-lg font-bold text-amber-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🔍</span>
+            <Search className="w-6 h-6 text-amber-700" />
             最大似然的直觉："什么参数最可能产生我的数据？"
           </h3>
           <div className="space-y-3">

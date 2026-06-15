@@ -1,4 +1,4 @@
-import { ShieldAlert, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, RotateCcw, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -108,15 +108,15 @@ export default function GMMRevisitedPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>高斯混合模型的 EM 公式是一般 EM 框架的特例。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>E-step 计算后验权重 w_j^(i)。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>M-step 对加权对数似然求导，得到 φ、μ、σ 的闭式更新。</span>
           </li>
         </ul>

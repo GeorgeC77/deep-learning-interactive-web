@@ -1,4 +1,4 @@
-import { ShieldAlert, LineChart, GitBranch, CheckCircle2, ArrowRight } from 'lucide-react';
+import { ShieldAlert, LineChart, GitBranch, CheckCircle2, ArrowRight , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -187,15 +187,15 @@ export default function OLSasGLMPage() {
         </h3>
         <ul className="space-y-2 text-sm text-violet-800">
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>线性回归对应 GLM 中的高斯分布假设。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>高斯分布的响应函数是恒等函数，因此 h(x) = θᵀx。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-violet-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-violet-500 mt-0.5 mt-1" />
             <span>最大似然估计自然导出最小二乘代价函数。</span>
           </li>
         </ul>

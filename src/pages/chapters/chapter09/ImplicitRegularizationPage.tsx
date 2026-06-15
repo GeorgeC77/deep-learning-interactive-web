@@ -1,4 +1,4 @@
-import { ShieldAlert, Brain, CheckCircle2 } from 'lucide-react';
+import { ShieldAlert, Brain, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 
@@ -108,15 +108,15 @@ export default function ImplicitRegularizationPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>优化器的选择不仅影响训练速度，还会影响最终解的性质。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>大学习率、小批量、小初始化等因素往往有助于找到更平坦的最小值。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>隐式正则化是深度学习理论研究的前沿课题。</span>
           </li>
         </ul>

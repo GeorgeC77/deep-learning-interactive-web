@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
+import { Target, Footprints, Calculator, BarChart3, HelpCircle, User, Car } from 'lucide-react';
 import KaTeX from '../components/KaTeX';
 import FormulaCard from '../components/FormulaCard';
 import InteractiveDemo from '../components/InteractiveDemo';
@@ -199,13 +200,13 @@ export default function NormalEquationPage() {
       <section className="mb-10">
         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-emerald-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🎯</span>
+            <Target className="w-6 h-6 text-emerald-700" />
             核心对比："一步登天" vs "步步为营"
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-white/80 border border-amber-200 rounded-lg p-4">
               <h4 className="font-semibold text-amber-800 text-sm mb-2 flex items-center gap-2">
-                <span>👣</span> 梯度下降：步步为营
+                <Footprints className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 梯度下降：步步为营
               </h4>
               <p className="text-sm text-amber-700 leading-relaxed">
                 像盲人走迷宫，一步一步试探方向。不知道终点在哪里，每步只看脚下的坡度，
@@ -214,7 +215,7 @@ export default function NormalEquationPage() {
             </div>
             <div className="bg-white/80 border border-emerald-200 rounded-lg p-4">
               <h4 className="font-semibold text-emerald-800 text-sm mb-2 flex items-center gap-2">
-                <span>🧮</span> 正规方程：一步登天
+                <Calculator className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 正规方程：一步登天
               </h4>
               <p className="text-sm text-emerald-700 leading-relaxed">
                 像解方程 x + 3 = 7，直接算出 x = 4。不需要猜测和迭代，
@@ -284,7 +285,7 @@ export default function NormalEquationPage() {
       <section className="mb-10">
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">📊</span>
+            <BarChart3 className="w-6 h-6 text-blue-700" />
             矩阵视角的直觉：寻找最佳线性映射
           </h3>
           <div className="space-y-3">
@@ -352,13 +353,13 @@ export default function NormalEquationPage() {
       <section className="mb-10">
         <div className="bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-violet-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🤔</span>
+            <HelpCircle className="w-6 h-6 text-violet-700" />
             何时用哪种方法？
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-white/80 border border-emerald-200 rounded-lg p-4">
               <h4 className="font-semibold text-emerald-800 text-sm mb-2 flex items-center gap-2">
-                <span>🚶</span> 小特征数：正规方程通常更快
+                <User className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 小特征数：正规方程通常更快
               </h4>
               <p className="text-sm text-emerald-700 leading-relaxed">
                 就像短距离去便利店，走路比开车更快。构造 XᵀX 并求解线性系统的计算量在特征数少时完全可控，
@@ -367,7 +368,7 @@ export default function NormalEquationPage() {
             </div>
             <div className="bg-white/80 border border-blue-200 rounded-lg p-4">
               <h4 className="font-semibold text-blue-800 text-sm mb-2 flex items-center gap-2">
-                <span>🚗</span> 大特征数：梯度下降更实用
+                <Car className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 大特征数：梯度下降更实用
               </h4>
               <p className="text-sm text-blue-700 leading-relaxed">
                 就像跨省旅行，开车比走路更实际。当特征数巨大时，构造 XᵀX 的 O(mn²) 成本和求解线性系统的 O(n³) 成本会快速上升，

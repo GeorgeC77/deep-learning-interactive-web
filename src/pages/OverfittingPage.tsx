@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useMemo } from 'react';
 import * as d3 from 'd3';
+import { BookOpen, Frown, Glasses, Brain, SlidersHorizontal, Scale, Square, Leaf } from 'lucide-react';
 import KaTeX from '../components/KaTeX';
 import FormulaCard from '../components/FormulaCard';
 import InteractiveDemo from '../components/InteractiveDemo';
@@ -322,7 +323,7 @@ export default function OverfittingPage() {
       <section className="mb-10">
         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-indigo-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">📚</span>
+            <BookOpen className="w-6 h-6 text-indigo-700" />
             核心类比：考试备考的三种状态
           </h3>
           <p className="text-indigo-700 leading-relaxed mb-4">
@@ -332,7 +333,7 @@ export default function OverfittingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="bg-white/80 border border-orange-200 rounded-lg p-4">
               <h4 className="font-semibold text-orange-800 text-sm mb-2 flex items-center gap-2">
-                <span>😴</span> 欠拟合 = 根本没学习
+                <Frown className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 欠拟合 = 根本没学习
               </h4>
               <p className="text-xs text-orange-700 leading-relaxed">
                 你连数学公式都没看过，直接去考试。练习题不会做，考试更是一塌糊涂。
@@ -341,7 +342,7 @@ export default function OverfittingPage() {
             </div>
             <div className="bg-white/80 border border-blue-200 rounded-lg p-4">
               <h4 className="font-semibold text-blue-800 text-sm mb-2 flex items-center gap-2">
-                <span>🤓</span> 好拟合 = 理解原理，举一反三
+                <Glasses className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 好拟合 = 理解原理，举一反三
               </h4>
               <p className="text-xs text-blue-700 leading-relaxed">
                 你认真学习了数学原理，理解了公式推导。练习题做得不错，
@@ -351,7 +352,7 @@ export default function OverfittingPage() {
             </div>
             <div className="bg-white/80 border border-red-200 rounded-lg p-4">
               <h4 className="font-semibold text-red-800 text-sm mb-2 flex items-center gap-2">
-                <span>🤯</span> 过拟合 = 死记硬背练习题
+                <Brain className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 过拟合 = 死记硬背练习题
               </h4>
               <p className="text-xs text-red-700 leading-relaxed">
                 你把 100 道练习题连同答案背得滚瓜烂熟，每道题都记得数字，
@@ -405,7 +406,7 @@ export default function OverfittingPage() {
       <section className="mb-10">
         <div className="bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-teal-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🎛️</span>
+            <SlidersHorizontal className="w-6 h-6 text-teal-700" />
             模型复杂度的直觉：用多少个数字描述一个人？
           </h3>
           <div className="space-y-3">
@@ -452,14 +453,14 @@ export default function OverfittingPage() {
         {/* Bias-Variance Intuition */}
         <div className="bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200 rounded-xl p-5 mb-4">
           <h3 className="text-lg font-bold text-rose-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">⚖️</span>
+            <Scale className="w-6 h-6 text-rose-700" />
             偏差-方差 tradeoff 的直觉：固执的人 vs 墙头草
           </h3>
           <div className="space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div className="bg-white/80 border border-orange-200 rounded-lg p-4">
                 <h4 className="font-semibold text-orange-800 text-sm mb-2 flex items-center gap-2">
-                  <span>🪨</span> 高偏差 = 固执的人
+                  <Square className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 高偏差 = 固执的人
                 </h4>
                 <p className="text-sm text-orange-700 leading-relaxed">
                   偏差高意味着模型有"偏见"——无论看到什么数据，它总是朝某个方向错。
@@ -469,7 +470,7 @@ export default function OverfittingPage() {
               </div>
               <div className="bg-white/80 border border-red-200 rounded-lg p-4">
                 <h4 className="font-semibold text-red-800 text-sm mb-2 flex items-center gap-2">
-                  <span>🍃</span> 高方差 = 墙头草
+                  <Leaf className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 高方差 = 墙头草
                 </h4>
                 <p className="text-sm text-red-700 leading-relaxed">
                   方差高意味着模型"敏感"——换个训练集，模型参数就大变。

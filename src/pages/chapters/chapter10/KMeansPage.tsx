@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import type React from 'react';
-import { ShieldAlert, Target, CheckCircle2, RefreshCw, Play, SkipForward, MousePointer2 } from 'lucide-react';
+import { ShieldAlert, Target, CheckCircle2, RefreshCw, Play, SkipForward, MousePointer2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
@@ -128,15 +128,15 @@ export default function KMeansPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>K-means 交替执行分配与更新两步，最小化失真函数。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>算法保证收敛，但结果依赖于初始质心。</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-blue-500 mt-0.5">●</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>多次随机初始化并选择失真函数最小的结果是常用策略。</span>
           </li>
         </ul>
