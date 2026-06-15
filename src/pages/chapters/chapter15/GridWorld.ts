@@ -93,8 +93,8 @@ export function getTransitions(
   const leftDc = -intended.dr;
   const rightDr = -intended.dc;
   const rightDc = intended.dr;
-  const left = clampMove(pos, { name: '左', dr: leftDr, dc: leftDc }, config);
-  const right = clampMove(pos, { name: '右', dr: rightDr, dc: rightDc }, config);
+  const left = clampMove(pos, { dr: leftDr, dc: leftDc }, config);
+  const right = clampMove(pos, { dr: rightDr, dc: rightDc }, config);
 
   const leftIdx = stateIndex(left, config.cols);
   const rightIdx = stateIndex(right, config.cols);

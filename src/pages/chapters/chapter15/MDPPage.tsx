@@ -9,7 +9,6 @@ import {
   extractPolicy,
   indexToState,
   isTerminal,
-  isObstacle,
   ACTIONS,
 } from './GridWorld';
 
