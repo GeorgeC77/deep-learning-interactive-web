@@ -119,6 +119,8 @@ const rlItems = [
   { to: '/ch15/s01', label: 'MDP', icon: Activity },
   { to: '/ch15/s02', label: '值/策略迭代', icon: Zap },
   { to: '/ch15/s03', label: '学习 MDP 模型', icon: GitMerge },
+  { to: '/ch15/s04', label: '连续状态 MDP', icon: BarChart2 },
+  { to: '/ch15/s05', label: '算法关系', icon: Sigma },
 ];
 
 function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' | 'em' | 'pca' | 'ica' | 'foundation' | 'rl' {
