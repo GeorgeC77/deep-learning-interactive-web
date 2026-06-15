@@ -28,7 +28,7 @@ export default function OverviewPage() {
 
         {/* Copyright Notice */}
         <p className="mt-6 text-sm text-amber-800">
-          本网站内容仅供教学与学习使用，转载请注明来源。
+          仅供教学与非商业学习使用，转载请注明来源。完整授权说明见 LICENSE。
         </p>
       </section>
 
@@ -319,7 +319,7 @@ export default function OverviewPage() {
               <div className="w-10 h-10 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm shrink-0">5</div>
               <div className="flex-1 bg-white rounded-lg border-2 border-amber-300 p-3">
                 <span className="font-semibold text-amber-800">正规方程</span>
-                <span className="text-gray-600 text-sm ml-2">直接求解最优 θ = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y</span>
+                <span className="text-gray-600 text-sm ml-2">θ = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y（X<sup>T</sup>X 可逆时）</span>
               </div>
             </div>
             <div className="w-0.5 h-4 bg-amber-300" />

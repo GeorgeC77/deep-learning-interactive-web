@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useMemo } from 'react';
-import { TrendingDown, Target, Mountain } from 'lucide-react';
+import { TrendingDown, Target, Mountain, Map, MapPin, Ruler, BarChart3 } from 'lucide-react';
 import KaTeX from '../components/KaTeX';
 import FormulaCard from '../components/FormulaCard';
 
@@ -77,19 +77,14 @@ function drawContour(
   // compute cost grid
   const GRID = 80;
   const gridVals: number[][] = [];
-  let maxJ = -Infinity;
   for (let r = 0; r < GRID; r++) {
     gridVals[r] = [];
     for (let c = 0; c < GRID; c++) {
       const t0 = t0Min + (c / (GRID - 1)) * (t0Max - t0Min);
       const t1 = t1Min + ((GRID - 1 - r) / (GRID - 1)) * (t1Max - t1Min);
-      const j = costAt(t0, t1);
-      gridVals[r][c] = j;
-      if (j > maxJ) maxJ = j;
+      gridVals[r][c] = costAt(t0, t1);
     }
   }
-
-  // maxJ available if needed for viz scaling
 
   // color bands
   const bands = [
@@ -124,33 +119,6 @@ function drawContour(
       }
     }
   }
-
-  // contour lines (trace constant-J paths)
-  const contourLevels = [0.5, 1, 2, 4, 8, 16];
-  const lineColors = ['#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6', '#2563eb', '#1e40af'];
-
-  contourLevels.forEach((_level, li) => {
-    // simplified: draw ellipses approximating contours
-    // center on the OLS solution for the current sample
-    const cx = toX(olsT0);
-    const cy = toY(olsT1);
-
-    // approximate radius based on level
-    const rx = 8 + li * 18;
-    const ry = 4 + li * 9;
-
-    const ellipse = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-    ellipse.setAttribute('cx', String(cx));
-    ellipse.setAttribute('cy', String(cy));
-    ellipse.setAttribute('rx', String(rx));
-    ellipse.setAttribute('ry', String(ry));
-    ellipse.setAttribute('fill', 'none');
-    ellipse.setAttribute('stroke', lineColors[li]);
-    ellipse.setAttribute('stroke-width', '1.5');
-    ellipse.setAttribute('opacity', '0.6');
-    ellipse.setAttribute('stroke-dasharray', '4,3');
-    svg.appendChild(ellipse);
-  });
 
   // axes
   const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -494,22 +462,22 @@ export default function CostFunctionPage() {
 
           <div className="grid md:grid-cols-3 gap-4 mb-5">
             <div className="bg-white rounded-lg p-4 border border-rose-200 text-center">
-              <div className="text-2xl mb-2">🎯</div>
+              <Target className="w-8 h-8 mx-auto text-rose-600 mb-2" />
               <span className="text-sm font-semibold text-rose-700 block mb-1">预测误差</span>
               <span className="text-xs text-gray-600">
-                每个点到直线的垂直距离 ={" "}
+                沿 y 轴方向的预测残差 ={" "}
                 <KaTeX math={"h_\\theta(x^{(i)}) - y^{(i)}"} />
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 border border-rose-200 text-center">
-              <div className="text-2xl mb-2">📏</div>
+              <Ruler className="w-8 h-8 mx-auto text-rose-600 mb-2" />
               <span className="text-sm font-semibold text-rose-700 block mb-1">平方和</span>
               <span className="text-xs text-gray-600">
                 把所有误差的距离<strong>平方</strong>后加总
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 border border-rose-200 text-center">
-              <div className="text-2xl mb-2">📊</div>
+              <BarChart3 className="w-8 h-8 mx-auto text-rose-600 mb-2" />
               <span className="text-sm font-semibold text-rose-700 block mb-1">取平均并乘 1/2</span>
               <span className="text-xs text-gray-600">
                 除以 {" "}
@@ -604,9 +572,9 @@ export default function CostFunctionPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">残差可视化</h2>
         <p className="text-gray-700 mb-4">
-          从几何角度看，代价函数衡量的是预测直线与数据点之间的&quot;垂直距离&quot;。
-          每个样本的误差 <KaTeX math={"h_\\theta(x^{(i)}) - y^{(i)}"} /> 就是预测点到真实点在 y 轴方向的距离（残差）。
-          代价函数是所有残差平方的平均值再乘以 1/2（half-MSE）。
+          从几何角度看，代价函数衡量的是预测值与真实值之间沿 y 轴方向的差异。
+          每个样本的误差 <KaTeX math={"h_\\theta(x^{(i)}) - y^{(i)}"} /> 就是该样本的预测残差（prediction residual），
+          也称预测误差。代价函数是所有残差平方的平均值再乘以 1/2（half-MSE）。
         </p>
 
         {/* Enhanced residual explanation */}
@@ -628,7 +596,7 @@ export default function CostFunctionPage() {
               <p className="text-gray-700 text-sm">
                 左侧图中，<strong style={{ color: '#2563eb' }}>蓝色实线</strong>是当前的预测直线，
                 <strong style={{ color: '#3b82f6' }}>蓝色圆点</strong>是训练数据，
-                <strong style={{ color: '#ef4444' }}>红色虚线</strong>是每个点到直线的残差（垂直距离）。
+                <strong style={{ color: '#ef4444' }}>红色虚线</strong>是每个样本的预测残差（沿 y 轴方向的预测误差）。
               </p>
               <p className="text-gray-700 text-sm">
                 代价函数 J(θ) 就是这些红色线段长度的<strong>平方和的平均值</strong>（乘以 1/2）。
@@ -664,13 +632,13 @@ export default function CostFunctionPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">代价函数的可视化：碗形曲面</h2>
         <p className="text-gray-700 mb-4">
           对于单变量线性回归，代价函数 <KaTeX math={"J(\\theta_0, \\theta_1)"} /> 是两个参数的函数，
-          其图像是一个三维的&quot;碗形&quot;曲面（抛物面）。在二维平面上，我们用<strong>等高线图</strong>来表示这个曲面——
-          同一条线上的点具有相同的代价值。
+          其图像是一个三维的&quot;碗形&quot;曲面（抛物面）。在二维平面上，我们用<strong>代价值热力图/色带图</strong>来表示这个曲面——
+          颜色越深代表代价值越大。
         </p>
         <p className="text-gray-700 mb-4">
-          等高线呈同心椭圆状，中心点就是当前样本上代价函数的<strong>最小值</strong>，对应最小二乘（OLS）参数。
+          热力图的中心附近颜色最浅，中心点（绿色点）就是当前样本上代价函数的<strong>最小值</strong>，对应最小二乘（OLS）参数。
           注意：真实生成参数是 (1, 2)，但当前样本的 OLS 解通常与它不同。
-          在右侧控制面板中调整参数，观察红色点在等高线图中的移动。
+          在右侧控制面板中调整参数，观察红色点在热力图中的移动。
         </p>
 
         <div className="flex flex-col lg:flex-row gap-6">
@@ -756,26 +724,26 @@ export default function CostFunctionPage() {
         <div className="mt-6 bg-gradient-to-br from-sky-50 to-cyan-50 rounded-xl border border-sky-200 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Mountain className="w-6 h-6 text-sky-600" />
-            <h3 className="text-lg font-bold text-sky-800">等高线图的地理类比：寻找山谷最低点</h3>
+            <h3 className="text-lg font-bold text-sky-800">热力图的地理类比：寻找山谷最低点</h3>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4 mb-5">
             <div className="bg-white rounded-lg p-4 border border-sky-200 text-center">
-              <div className="text-2xl mb-2">🏔️</div>
+              <Mountain className="w-8 h-8 mx-auto text-sky-600 mb-2" />
               <span className="text-sm font-semibold text-sky-700 block mb-1">碗形曲面 = 山谷地形</span>
               <span className="text-xs text-gray-600">
                 代价函数的图像就像一座碗状的山谷，四周高中间低
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 border border-sky-200 text-center">
-              <div className="text-2xl mb-2">🗺️</div>
-              <span className="text-sm font-semibold text-sky-700 block mb-1">同心椭圆 = 等高线</span>
+              <Map className="w-8 h-8 mx-auto text-sky-600 mb-2" />
+              <span className="text-sm font-semibold text-sky-700 block mb-1">颜色深浅 = 代价值大小</span>
               <span className="text-xs text-gray-600">
-                同一条等高线上的所有点，代价值相同，就像海拔相同
+                热力图颜色越深，代价值越大，就像海拔越高
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 border border-sky-200 text-center">
-              <div className="text-2xl mb-2">📍</div>
+              <MapPin className="w-8 h-8 mx-auto text-sky-600 mb-2" />
               <span className="text-sm font-semibold text-sky-700 block mb-1">中心点 = OLS解</span>
               <span className="text-xs text-gray-600">
                 山谷最低处就是当前样本代价最小的地方，对应最小二乘参数
@@ -793,7 +761,7 @@ export default function CostFunctionPage() {
             <p className="text-gray-700 text-sm">
               在这个类比中，<strong>梯度</strong>就是山坡的坡度（指向上升最快的方向），
               而我们每次都往<strong>梯度的反方向</strong>走（下坡），所以叫&quot;梯度下降&quot;。
-              等高线越密集的地方，坡度越陡；等高线越稀疏的地方，坡度越缓。
+              热力图中颜色变化越快的地方，坡度越陡；颜色变化越慢的地方，坡度越缓。
             </p>
           </div>
         </div>

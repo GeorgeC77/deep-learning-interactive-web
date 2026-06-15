@@ -1,6 +1,14 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
+import { Play, Pause, RotateCcw, Mountain, Snowflake, Map, Circle } from 'lucide-react';
 import KaTeX from '../components/KaTeX';
+import LinearRegressionGD from '../components/LinearRegressionGD';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 
 // ─── Cost Function (8th degree polynomial) ───────────────────────────
 const COEFFS = [3.5, -0.5, 2.1416005787, -4.9159963233, 3.8283561222, -1.4186265257, 0.2747269485, -0.0269551228, 0.0010611334];
@@ -432,16 +440,28 @@ export default function GradientDescentPage() {
       <h1 className="text-3xl font-bold mb-2">梯度下降算法</h1>
       <p className="text-gray-600 mb-2">Gradient Descent with Momentum</p>
       <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-        <strong>注意：</strong>本页使用一个 8 次多项式构造的非凸函数来展示梯度下降在复杂地形中的行为。
-        线性回归的平方误差代价函数是凸函数（设计矩阵满列秩时有唯一全局最优解），
-        其行为与本页的演示函数不同。
+        <strong>注意：</strong>本页包含两个独立模块。
+        模块 A 展示线性回归的<strong>凸二次损失</strong>（设计矩阵满列秩时有唯一全局最优解）；
+        模块 B 使用一个 8 次多项式构造的<strong>非凸函数</strong>来展示复杂地形中的行为，两者不要混淆。
       </div>
+
+      <Tabs defaultValue="linear" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="linear">模块 A：线性回归（凸损失）</TabsTrigger>
+          <TabsTrigger value="nonconvex">模块 B：非凸函数与动量</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="linear">
+          <LinearRegressionGD />
+        </TabsContent>
+
+        <TabsContent value="nonconvex">
 
       {/* ─── Mountain Descent Analogy ────────────────────────────── */}
       <section className="mb-8">
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🏔️</span>
+            <Mountain className="w-6 h-6 text-blue-700" />
             核心类比：蒙眼下山
           </h3>
           <p className="text-blue-700 leading-relaxed mb-4">
@@ -455,7 +475,7 @@ export default function GradientDescentPage() {
                 <h4 className="font-semibold text-orange-800 text-sm">小步下山</h4>
               </div>
               <p className="text-xs text-orange-700 leading-relaxed">
-                学习率太小 = 小心翼翼地迈步。你可能卡在半山腰的一个小坑里，以为到了最低点，实际上真正的山谷还在前方。
+                学习率太小 = 小心翼翼地迈步。在当前非凸演示函数和当前初始点下，你可能卡在半山腰的一个小坑里，以为到了最低点，实际上真正的山谷还在前方。
               </p>
             </div>
             <div className="bg-white/80 border border-teal-200 rounded-lg p-4">
@@ -502,7 +522,7 @@ export default function GradientDescentPage() {
         {/* ─── Momentum Intuition ─────────────────────────────── */}
         <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-5 mt-4 mb-4">
           <h3 className="text-lg font-bold text-amber-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">❄️</span>
+            <Snowflake className="w-6 h-6 text-amber-700" />
             动量的直觉：滚雪球下山
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -585,19 +605,19 @@ export default function GradientDescentPage() {
             disabled={isPlaying}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            ▶ 播放
+            <Play className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 播放
           </button>
           <button
             onClick={pauseAnimation}
             className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium text-sm hover:bg-amber-600 transition-colors"
           >
-            ⏸ 暂停
+            <Pause className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 暂停
           </button>
           <button
             onClick={resetAnimation}
             className="px-4 py-2 bg-gray-500 text-white rounded-lg font-medium text-sm hover:bg-gray-600 transition-colors"
           >
-            ↺ 重置
+            <RotateCcw className="w-4 h-4 inline-block mr-1 align-text-bottom" /> 重置
           </button>
 
           <div className="flex items-center gap-2 ml-2">
@@ -652,15 +672,15 @@ export default function GradientDescentPage() {
           <div className="bg-white rounded-xl shadow-card border border-gray-200 p-4">
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-blue-500 mt-1" />
                 <span><strong>J(0) = 3.5</strong> — 初始点，代价较高</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-orange-500 mt-1" />
                 <span><strong>J(2) ≈ 2.0</strong> — 局部平台区，梯度 J'(2) = -0.15 很小</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-red-500 mt-1" />
                 <span><strong>J(3) ≈ 2.2</strong> — 障碍峰值，需要足够大的学习率才能越过</span>
               </li>
             </ul>
@@ -668,15 +688,15 @@ export default function GradientDescentPage() {
           <div className="bg-white rounded-xl shadow-card border border-gray-200 p-4">
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-teal-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-teal-500 mt-1" />
                 <span><strong>J(6) = 0.3</strong> — 全局最小值，J'(6) = 0</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-gray-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-gray-500 mt-1" />
                 <span><strong>θ &gt; 6</strong> — 代价函数急剧上升，过大的学习率会导致震荡</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">●</span>
+                <Circle className="w-2 h-2 fill-current text-blue-500 mt-1" />
                 <span>动量系数 <strong>β = 0.92</strong> 帮助累积梯度信息，加速穿越平台</span>
               </li>
             </ul>
@@ -688,8 +708,8 @@ export default function GradientDescentPage() {
       <section className="mb-8">
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center gap-2">
-            <span className="text-xl">🗺️</span>
-            局部最优 vs 全局最优：在山脉中找最低点
+            <Map className="w-6 h-6 text-purple-700" />
+            局部最优 vs 全局最优：在当前非凸演示函数中找最低点
           </h3>
           <p className="text-purple-700 leading-relaxed mb-4">
             想象你站在一片连绵起伏的山脉中，目标是找到海拔最低的点。但这片山脉有很多小坑和深谷——
@@ -699,14 +719,14 @@ export default function GradientDescentPage() {
             <div className="bg-white/80 border border-orange-200 rounded-lg p-4">
               <h4 className="font-semibold text-orange-800 text-sm mb-2">小学习率：困在小坑</h4>
               <p className="text-xs text-orange-700 leading-relaxed">
-                你小心翼翼地下山，走到一个小坑底就以为到了最低点，因为你没有足够的力量爬出去继续探索。
+                在当前非凸演示函数和当前初始点下，你小心翼翼地下山，走到一个小坑底就以为到了最低点，因为你没有足够的力量爬出去继续探索。
                 对应梯度下降：可能卡在局部最优或平台区，不一定能到达全局最优。
               </p>
             </div>
             <div className="bg-white/80 border border-teal-200 rounded-lg p-4">
               <h4 className="font-semibold text-teal-800 text-sm mb-2">中学习率：越过小坡</h4>
               <p className="text-xs text-teal-700 leading-relaxed">
-                你有足够的动能爬过小坑的边缘，继续向更低的地方探索。配合动量的"惯性"，
+                在当前非凸演示函数和当前初始点下，你有足够的动能爬过小坑的边缘，继续向更低的地方探索。配合动量的"惯性"，
                 你能顺利通过平缓区域和小障碍，可能到达一个更低的谷地，但这不保证是全局最低点。
               </p>
             </div>
@@ -750,7 +770,7 @@ export default function GradientDescentPage() {
                   <td className="px-4 py-3 text-sm text-gray-600">{p.behavior}</td>
                   <td className="px-4 py-3 text-sm">
                     {p.alpha === 0.05 && (
-                      <span className="text-orange-600 font-medium">陷入局部平台，无法到达全局最小值</span>
+                      <span className="text-orange-600 font-medium">在当前非凸演示函数和当前初始点下陷入局部平台，无法到达全局最小值</span>
                     )}
                     {p.alpha === 1.0 && (
                       <span className="text-teal-600 font-medium">收敛到该初始点可达的最低谷 θ≈6</span>
@@ -773,7 +793,7 @@ export default function GradientDescentPage() {
               <h3 className="font-semibold text-orange-800 text-sm">学习率过小</h3>
             </div>
             <p className="text-sm text-orange-700 leading-relaxed">
-              步长太小导致收敛极慢，尤其是在梯度较小的平台区域。算法可能在局部次优点附近停滞，无法探索更优的解空间。
+              步长太小导致收敛极慢，尤其是在梯度较小的平台区域。在当前非凸演示函数和当前初始点下，算法可能在局部次优点附近停滞，无法探索更优的解空间。
             </p>
           </div>
 
@@ -783,7 +803,7 @@ export default function GradientDescentPage() {
               <h3 className="font-semibold text-teal-800 text-sm">学习率适中</h3>
             </div>
             <p className="text-sm text-teal-700 leading-relaxed">
-              步长恰到好处，既能有效降低代价函数，又不会越过最优解。配合动量机制，可以平稳地收敛到全局最小值。
+              步长恰到好处，既能有效降低代价函数，又不会越过最优解。在当前非凸演示函数和当前初始点下，配合动量机制通常能收敛到该初始点可达的最低谷。
             </p>
           </div>
 
@@ -800,7 +820,7 @@ export default function GradientDescentPage() {
 
         {/* Formula summary */}
         <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-xl">
-          <p className="text-sm text-gray-600 mb-2">代价函数多项式：</p>
+          <p className="text-sm text-gray-600 mb-2">当前非凸演示函数的代价函数多项式：</p>
           <div className="overflow-x-auto">
             <code className="text-xs text-gray-700 font-mono block">
               J(θ) = 3.5 - 0.5θ + 2.14θ² - 4.92θ³ + 3.83θ⁴ - 1.42θ⁵ + 0.27θ⁶ - 0.027θ⁷ + 0.0011θ⁸
@@ -808,6 +828,8 @@ export default function GradientDescentPage() {
           </div>
         </div>
       </section>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
