@@ -165,7 +165,6 @@ function LQRDemo() {
       const AtP = matMul(transpose(A), P);
       const AtPA = matMul(AtP, A);
       const AtPB = matMul(AtP, B);
-      const BtPA = matMul(transpose(B), matMul(P, A));
       const update = matMul(AtPB, K);
       P = matAdd(U, matSub(AtPA, update));
     }

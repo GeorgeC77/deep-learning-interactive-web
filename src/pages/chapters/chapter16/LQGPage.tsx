@@ -218,7 +218,6 @@ function KalmanDemo() {
 
           {trueStates.map((v, t) => {
             const cx = x(t);
-            const cy = y(v);
             const sigma = Math.sqrt(variances[t]);
             const top = y(v + 2 * sigma);
             const bottom = y(v - 2 * sigma);
