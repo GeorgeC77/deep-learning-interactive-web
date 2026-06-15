@@ -564,24 +564,31 @@ export const courseManifest: Part[] = [
         title: "强化学习",
         sections: [
           {
+            id: "ch15-overview",
+            title: "15.0 课程概览",
+            path: "/ch15/overview",
+            completed: true,
+            description: "强化学习的学习路线。",
+          },
+          {
             id: "ch15-s01",
             title: "15.1 马尔可夫决策过程",
             path: "/ch15/s01",
-            completed: false,
+            completed: true,
             description: "强化学习的形式化问题设定。",
           },
           {
             id: "ch15-s02",
             title: "15.2 值迭代与策略迭代",
             path: "/ch15/s02",
-            completed: false,
+            completed: true,
             description: "MDP 的动态规划算法。",
           },
           {
             id: "ch15-s03",
             title: "15.3 学习 MDP 模型",
             path: "/ch15/s03",
-            completed: false,
+            completed: true,
             description: "基于模型的强化学习。",
           },
           {

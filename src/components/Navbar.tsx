@@ -114,7 +114,14 @@ const foundationItems = [
   { to: '/ch14/s03', label: '大语言模型', icon: Sparkles },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' | 'em' | 'pca' | 'ica' | 'foundation' {
+const rlItems = [
+  { to: '/ch15/overview', label: '课程概览', icon: BookOpen },
+  { to: '/ch15/s01', label: 'MDP', icon: Activity },
+  { to: '/ch15/s02', label: '值/策略迭代', icon: Zap },
+  { to: '/ch15/s03', label: '学习 MDP 模型', icon: GitMerge },
+];
+
+function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' | 'em' | 'pca' | 'ica' | 'foundation' | 'rl' {
   if (path === '/') return 'home';
   const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
   if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
@@ -142,6 +149,8 @@ function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm'
   if (icaPaths.has(path) || path.startsWith('/ch13/')) return 'ica';
   const foundationPaths = new Set(foundationItems.map((i) => i.to));
   if (foundationPaths.has(path) || path.startsWith('/ch14/')) return 'foundation';
+  const rlPaths = new Set(rlItems.map((i) => i.to));
+  if (rlPaths.has(path) || path.startsWith('/ch15/')) return 'rl';
   return 'linear';
 }
 
@@ -566,6 +575,35 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   {foundationItems.map((item) => {
+                    const isActive = currentPath === item.to;
+                    return (
+                      <DropdownMenuItem key={item.to} asChild>
+                        <Link
+                          to={item.to}
+                          className={cn(
+                            'flex items-center gap-2 cursor-pointer',
+                            isActive && 'bg-blue-50 text-blue-700'
+                          )}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          {item.label}
+                        </Link>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {chapter === 'rl' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+                  <Zap className="w-4 h-4" />
+                  强化学习
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {rlItems.map((item) => {
                     const isActive = currentPath === item.to;
                     return (
                       <DropdownMenuItem key={item.to} asChild>
