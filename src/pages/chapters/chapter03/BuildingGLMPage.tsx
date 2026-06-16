@@ -123,6 +123,12 @@ export default function BuildingGLMPage() {
             </p>
           </div>
         </div>
+
+        <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200 text-sm text-amber-800">
+          <strong>记号说明：</strong>这里沿用本课程中的记号，把 <KaTeX math={String.raw`g`} /> 称为响应函数、
+          <KaTeX math={String.raw`g^{-1}`} /> 称为连接函数。在很多统计学教材中，
+          link function 通常定义为 <KaTeX math={String.raw`g(\mu) = \eta`} />，方向相反，阅读其他资料时请注意记号差异。
+        </div>
       </section>
 
       {/* Interactive response function demo */}

@@ -544,7 +544,7 @@ export default function GradientDescentPage() {
           </h3>
           <p className="text-blue-700 leading-relaxed mb-4">
             想象你站在山顶，蒙着眼睛，目标是走到山谷的最低点。你每步只能感觉脚下哪个方向最陡，然后朝那个方向迈一步。
-            这就是梯度下降！对逻辑回归而言，虽然代价函数从平方误差换成了对数似然，但山坡的形状仍然是凸的，沿着梯度反方向走就能到达谷底。
+            这就是梯度下降！对逻辑回归而言，虽然代价函数从平方误差换成了对数似然，但山坡的形状仍然是凸的；当有限最优解存在或加入正则化时，沿着梯度反方向走就能到达谷底。
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="bg-white/80 border border-orange-200 rounded-lg p-4">
@@ -562,7 +562,7 @@ export default function GradientDescentPage() {
                 <h4 className="font-semibold text-teal-800 text-sm">中步下山</h4>
               </div>
               <p className="text-xs text-teal-700 leading-relaxed">
-                学习率适中 = 稳步前进。批量梯度下降配合动量，能沿着主要方向快速滑向全局最优，决策边界平滑收敛。
+                学习率适中 = 稳步前进。批量梯度下降配合动量，能沿着主要方向快速滑向全局最优（当有限最优解存在或加入正则化时），决策边界平滑收敛。
               </p>
             </div>
             <div className="bg-white/80 border border-red-200 rounded-lg p-4">
@@ -820,7 +820,7 @@ export default function GradientDescentPage() {
       <section className="mb-8">
         <h2 className="text-xl font-semibold mb-3">代价函数特性</h2>
         <p className="text-gray-700 mb-4 leading-relaxed">
-          逻辑回归的对数损失函数是凸函数，这意味着只要学习率选择得当，梯度下降最终会收敛到全局最优。但它不是二次函数，
+          逻辑回归的对数损失函数是凸函数；这意味着当有限最优解存在或加入正则化时，只要学习率选择得当，梯度下降最终会收敛到全局最优。但它不是二次函数，
           不同区域的曲率差异很大，因此学习率的影响比线性回归更微妙。
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -879,7 +879,7 @@ export default function GradientDescentPage() {
             凸地形中的最低点
           </h3>
           <p className="text-purple-700 leading-relaxed mb-4">
-            逻辑回归的对数损失是一个凸函数，就像只有一个山谷的盆地。只要不停朝梯度反方向走，最终一定能到达全局最低点。
+            逻辑回归的对数损失是一个凸函数，就像只有一个山谷的盆地。当有限最优解存在或加入正则化时，只要不停朝梯度反方向走，最终一定能到达全局最低点。
             但走法不同，体验也不同：
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -892,7 +892,7 @@ export default function GradientDescentPage() {
             <div className="bg-white/80 border border-teal-200 rounded-lg p-4">
               <h4 className="font-semibold text-teal-800 text-sm mb-2">中学习率：直达谷底</h4>
               <p className="text-xs text-teal-700 leading-relaxed">
-                学习率适中并配合动量，参数沿着损失下降最快的方向稳定移动，最终决策边界准确分开两类样本。
+                学习率适中并配合动量，参数沿着损失下降最快的方向稳定移动；当有限最优解存在或加入正则化时，最终决策边界准确分开两类样本。
               </p>
             </div>
             <div className="bg-white/80 border border-red-200 rounded-lg p-4">
@@ -970,7 +970,7 @@ export default function GradientDescentPage() {
               <h3 className="font-semibold text-teal-800 text-sm">批量适中 + 动量</h3>
             </div>
             <p className="text-sm text-teal-700 leading-relaxed">
-              学习率恰到好处，配合动量累积历史梯度，参数能稳定滑向全局最优。批量 GD 方向准确，决策边界平滑收敛。
+              学习率恰到好处，配合动量累积历史梯度，参数能稳定滑向全局最优（当有限最优解存在或加入正则化时）。批量 GD 方向准确，决策边界平滑收敛。
             </p>
           </div>
 

@@ -214,8 +214,8 @@ export default function CostFunctionPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-3">代价函数</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
           在逻辑回归中，代价函数用于衡量预测概率与真实标签之间的差异。
-          当 logits 是输入的线性函数时，交叉熵负对数似然关于参数是凸函数，
-          若有限最优解存在，或加入适当正则化，梯度下降可以收敛到全局最优解附近。
+          当 logits 是输入的线性函数时，交叉熵负对数似然关于参数是凸函数；
+          当有限最优解存在或加入适当正则化时，梯度下降可以收敛到全局最优解。
           需要注意：如果数据线性可分且没有正则化，最大似然估计可能没有有限的最优解。
         </p>
 
@@ -227,7 +227,7 @@ export default function CostFunctionPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么不用均方误差？</h2>
         <p className="text-gray-700 mb-4">
           线性回归的假设函数是线性的，当设计矩阵满列秩时，均方误差（MSE）代价函数是一个漂亮的<strong>凸函数</strong>，
-          只有一个全局最小值。但逻辑回归的假设函数是 Sigmoid：
+          有唯一全局最小值。但逻辑回归的假设函数是 Sigmoid：
         </p>
 
         <FormulaCard
@@ -548,7 +548,7 @@ export default function CostFunctionPage() {
               <span className="text-emerald-600 font-bold mt-0.5">3.</span>
               <span>
                 因此，逻辑回归通常选择<strong>对数损失 / 交叉熵</strong>作为代价函数；
-                在线性 logits 假设下，它关于参数是凸函数，梯度下降可以稳定收敛。
+                在线性 logits 假设下，它关于参数是凸函数；当有限最优解存在或加入正则化时，梯度下降可以稳定收敛到全局最优解。
               </span>
             </li>
           </ul>
@@ -583,7 +583,8 @@ export default function CostFunctionPage() {
             <span className="text-blue-600 font-bold">4.</span>
             <p className="text-gray-700">
               对数损失对“自信的错误”惩罚极大，从而鼓励模型输出校准良好的概率；
-              在线性 logits 假设下，<KaTeX math={String.raw`J(\theta)`} /> 关于参数是凸函数。
+              在线性 logits 假设下，<KaTeX math={String.raw`J(\theta)`} /> 关于参数是凸函数；
+              当有限最优解存在或加入正则化时，梯度下降可以稳定收敛到全局最优解。
             </p>
           </div>
         </div>

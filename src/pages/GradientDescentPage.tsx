@@ -149,7 +149,7 @@ export default function GradientDescentPage() {
       .attr('stroke', '#00b4a6').attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '6,4').attr('opacity', 0.6);
     svg.append('text').attr('x', xScale(6.2)).attr('y', yScale(0.3) - 6)
-      .attr('fill', '#00b4a6').attr('font-size', '11px').text('J=0.3 (当前构造函数中的目标低谷)');
+      .attr('fill', '#00b4a6').attr('font-size', '11px').text('J≈0.3 (当前构造函数中的目标低谷)');
 
     // θ = 2 (plateau)
     svg.append('line')
@@ -305,7 +305,7 @@ export default function GradientDescentPage() {
       .attr('stroke', '#00b4a6').attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '6,4').attr('opacity', 0.5);
     svg.append('text').attr('x', WIDTH - 70).attr('y', yScale(6) - 6)
-      .attr('fill', '#00b4a6').attr('font-size', '11px').text('θ=6 (当前构造函数中的目标低谷)');
+      .attr('fill', '#00b4a6').attr('font-size', '11px').text('θ≈6 (当前演示低谷)');
 
     // GD trajectory line
     const preset = PRESETS.find(p => p.alpha === alpha) || PRESETS[1];
@@ -688,7 +688,7 @@ export default function GradientDescentPage() {
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
                 <Circle className="w-2 h-2 fill-current text-teal-500 mt-1" />
-                <span><strong>J(6) = 0.3</strong> — 当前显示区间内的最低点，J'(6) = 0</span>
+                <span><strong>J(6) ≈ 0.3</strong> — 当前显示区间内的目标低谷，J'(6) ≈ 0</span>
               </li>
               <li className="flex items-start gap-2">
                 <Circle className="w-2 h-2 fill-current text-gray-500 mt-1" />

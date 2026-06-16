@@ -80,7 +80,7 @@ export default function GaussianDiscriminantAnalysisPage() {
           <h3 className="font-semibold text-emerald-800 mb-2">与逻辑回归的联系</h3>
           <p className="text-sm text-gray-700">
             当 GDA 的高斯假设成立时，由 GDA 导出的 p(y=1|x) 恰好具有逻辑回归的形式——Sigmoid 的输入是 x 的线性函数。
-            但逻辑回归不对 p(x|y) 做任何分布假设，因此更鲁棒。
+            当高斯生成假设不成立时，逻辑回归通常对 p(x|y) 的分布错设更不敏感；但当 GDA 假设近似成立时，GDA 可能有更高的数据效率。
           </p>
         </div>
       </section>
