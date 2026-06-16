@@ -39,13 +39,7 @@ export default function MulticlassPage() {
           为每个类别输出一个归一化的概率。
         </p>
 
-        {/* Copyright Notice */}
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
-          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><AlertTriangle className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       {/* One-vs-all vs Softmax */}
@@ -80,20 +74,25 @@ export default function MulticlassPage() {
               Softmax 回归
             </h3>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li>直接建模 K 个类别的联合概率分布。</li>
+              <li>直接建模条件类别分布 <KaTeX math={String.raw`p(y=k \mid x)`} />。</li>
               <li>所有类别的概率天然相加为 1。</li>
-              <li>通过一次优化得到全局最优的参数集合。</li>
+              <li>在线性 logits 假设下，交叉熵损失关于参数是凸函数。</li>
             </ul>
           </div>
         </div>
 
         <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
           <p className="text-gray-700 text-sm">
-            <strong>为什么 Softmax 通常更优？</strong>
+            <strong>什么时候适合用 Softmax？</strong>
             One-vs-All 把每个分类器独立训练，多个二分类器的输出并不保证能拼成一个合法的概率分布；
             而且它在决策时可能忽略类别之间的相互竞争关系。Softmax 把所有类别放在一起比较，
-            输出的概率之和恒为 1，更符合“多选一”的直观。
+            输出的概率之和恒为 1，更适合类别互斥的“多选一”任务。具体效果仍取决于数据与任务。
           </p>
+        </div>
+
+        <div className="mt-4 p-3 bg-rose-50 rounded-lg border border-rose-200 text-sm text-rose-800">
+          <strong>注意：</strong>如果数据线性可分且没有正则化，Softmax 的最大似然估计同样可能不存在有限最优解。
+          加入正则化或提前停止可以缓解这一问题。
         </div>
       </section>
 
@@ -383,7 +382,7 @@ export default function MulticlassPage() {
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">1.</span>
             <p className="text-gray-700">
-              Softmax 回归是逻辑回归在多分类问题上的自然推广，直接输出 K 个类别的联合概率分布。
+              Softmax 回归是逻辑回归在多分类问题上的自然推广，直接输出条件类别分布 <KaTeX math={String.raw`p(y=k \mid x)`} />。
             </p>
           </div>
           <div className="flex items-start gap-3">
@@ -402,7 +401,7 @@ export default function MulticlassPage() {
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">4.</span>
             <p className="text-gray-700">
-              相比 One-vs-All，Softmax 把 K 个类别放在一起建模，输出的概率更具可比性，通常在实际中表现更好。
+              相比 One-vs-All，Softmax 把 K 个类别放在一起建模，输出的概率更具可比性；在类别互斥的多分类任务中通常是更自然的选择。
             </p>
           </div>
         </div>

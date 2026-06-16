@@ -437,12 +437,11 @@ export default function GradientDescentPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">梯度下降算法</h1>
-      <p className="text-gray-600 mb-2">Gradient Descent with Momentum</p>
+      <h1 className="text-3xl font-bold mb-2">梯度下降：从线性回归到非凸优化</h1>
+      <p className="text-gray-600 mb-2">线性回归的凸二次损失是理解梯度下降最干净的起点。</p>
       <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
-        <strong>注意：</strong>本页包含两个独立模块。
-        模块 A 展示线性回归的<strong>凸二次损失</strong>（设计矩阵满列秩时有唯一全局最优解）；
-        模块 B 使用一个 8 次多项式构造的<strong>非凸函数</strong>来展示复杂地形中的行为，两者不要混淆。
+        <strong>注意：</strong>本页先通过模块 A 展示线性回归的<strong>凸二次损失</strong>（设计矩阵满列秩时有唯一全局最优解）；
+        模块 B 再用一个 8 次多项式构造的<strong>非凸函数</strong>展示复杂地形中的行为。非凸演示中的“小坑”“越过小坡”等类比只适用于模块 B，不要把它们套用到线性回归上。
       </div>
 
       <Tabs defaultValue="linear" className="space-y-6">

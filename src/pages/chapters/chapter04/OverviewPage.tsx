@@ -23,13 +23,7 @@ export default function OverviewPage() {
           然后通过贝叶斯定理推断类别。我们将学习高斯判别分析（GDA）和朴素贝叶斯。
         </p>
 
-        {/* Copyright Notice */}
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本教程仅供个人学习交流使用。未经授权，严禁以任何形式用于商业用途。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       {/* Generative vs Discriminative */}

@@ -27,13 +27,7 @@ export default function OverviewPage() {
           通过指数族分布和三个简单假设，我们能系统理解这些模型之间的联系。
         </p>
 
-        {/* Copyright Notice */}
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本教程仅供个人学习交流使用。未经授权，严禁以任何形式用于商业用途，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       {/* What is GLM */}

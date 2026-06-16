@@ -15,12 +15,7 @@ export default function OverviewPage() {
           找到数据变化最大的方向，把高维数据压缩到低维子空间。
         </p>
 
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

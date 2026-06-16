@@ -214,17 +214,12 @@ export default function CostFunctionPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-3">代价函数</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
           在逻辑回归中，代价函数用于衡量预测概率与真实标签之间的差异。
-          与线性回归不同，这里使用对数损失（Log Loss）来保证代价函数是凸函数，
-          从而可以用梯度下降可靠地找到全局最优解。
+          当 logits 是输入的线性函数时，交叉熵负对数似然关于参数是凸函数，
+          因此梯度下降可以找到全局最优解。需要注意：如果数据线性可分且没有正则化，
+          最大似然估计可能没有有限的最优解。
         </p>
 
-        {/* Copyright Notice */}
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
-          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><AlertTriangle className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       {/* Why not squared error */}
@@ -247,8 +242,8 @@ export default function CostFunctionPage() {
         />
 
         <p className="text-gray-700 mt-4 mb-4">
-          如果直接把 Sigmoid 代入均方误差，代价函数会变成参数 <KaTeX math={String.raw`\theta`} /> 的<strong>非凸函数</strong>。
-          这意味着代价曲面可能出现多个局部最小值，梯度下降算法很容易被困住，无法保证找到全局最优。
+          如果直接把 Sigmoid 代入均方误差，代价函数关于参数 <KaTeX math={String.raw`\theta`} /> 通常<strong>不再具有凸性保证</strong>。
+          这意味着梯度下降可能遇到多个局部极小或鞍点，无法保证收敛到全局最优。
         </p>
 
         <div className="bg-gradient-to-br from-rose-50 to-orange-50 rounded-xl border border-rose-200 p-5">
@@ -288,11 +283,11 @@ export default function CostFunctionPage() {
             <div className="w-full md:w-1/2 space-y-3 text-sm text-gray-700">
               <p>
                 <strong style={{ color: '#10b981' }}>绿色曲线</strong>代表对数损失：
-                它像一条平滑的碗，只有一个最低点，梯度下降无论从哪出发都能到达谷底。
+                在线性 logits 假设下，它关于参数是凸函数。
               </p>
               <p>
                 <strong style={{ color: '#ef4444' }}>红色曲线</strong>代表把 Sigmoid 套进均方误差后的代价：
-                曲面出现起伏，存在多个局部最低点，优化算法可能会“走错山谷”。
+                通常不再具有凸性保证，曲面可能出现起伏。
               </p>
             </div>
           </div>
@@ -303,10 +298,16 @@ export default function CostFunctionPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">单个样本的代价：对数损失</h2>
         <p className="text-gray-700 mb-4">
-          为了让逻辑回归的代价函数保持凸性，我们采用<strong>对数损失</strong>（Log Loss），
+          在线性 logits 假设下，为了让优化问题保持凸性，我们采用<strong>对数损失</strong>（Log Loss），
           也称为<strong>交叉熵损失</strong>（Cross-Entropy Loss）。
           对于单个训练样本，代价定义为：
         </p>
+
+        <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200 text-sm text-amber-800">
+          <strong>注意：</strong>如果数据线性可分且没有正则化，为了把正例概率推到 1，
+          参数可以沿某个方向无限增大，此时最大似然估计可能没有有限的最优解。
+          加入正则化或早停可以避免这种情况。
+        </div>
 
         <FormulaCard
           title="单个样本的对数损失"
@@ -546,8 +547,8 @@ export default function CostFunctionPage() {
             <li className="flex items-start gap-2">
               <span className="text-emerald-600 font-bold mt-0.5">3.</span>
               <span>
-                因此，逻辑回归选择<strong>对数损失 / 交叉熵</strong>作为代价函数，
-                保证优化问题的凸性，让梯度下降可以稳定收敛。
+                因此，逻辑回归通常选择<strong>对数损失 / 交叉熵</strong>作为代价函数；
+                在线性 logits 假设下，它关于参数是凸函数，梯度下降可以稳定收敛。
               </span>
             </li>
           </ul>
@@ -561,8 +562,8 @@ export default function CostFunctionPage() {
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">1.</span>
             <p className="text-gray-700">
-              逻辑回归不能用线性回归的均方误差，因为 Sigmoid 会让代价函数变成<strong>非凸函数</strong>，
-              梯度下降可能陷入局部最优。
+              逻辑回归通常不用线性回归的均方误差，因为把 Sigmoid 套进 MSE 后，
+              代价函数关于参数通常<strong>不再具有凸性保证</strong>。
             </p>
           </div>
           <div className="flex items-start gap-3">
@@ -581,8 +582,8 @@ export default function CostFunctionPage() {
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">4.</span>
             <p className="text-gray-700">
-              对数损失对“自信的错误”惩罚极大，从而鼓励模型输出校准良好的概率，
-              并保证 <KaTeX math={String.raw`J(\theta)`} /> 是凸函数。
+              对数损失对“自信的错误”惩罚极大，从而鼓励模型输出校准良好的概率；
+              在线性 logits 假设下，<KaTeX math={String.raw`J(\theta)`} /> 关于参数是凸函数。
             </p>
           </div>
         </div>

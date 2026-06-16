@@ -14,12 +14,7 @@ export default function GMMRevisitedPage() {
           现在用一般 EM 框架重新推导高斯混合模型。我们看到，11.1 节中的具体更新公式正是 E-step 和 M-step 的必然结果。
         </p>
 
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

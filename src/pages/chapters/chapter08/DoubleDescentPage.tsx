@@ -42,12 +42,7 @@ export default function DoubleDescentPage() {
           这一现象被称为双下降（Double Descent）。
         </p>
 
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -89,8 +84,9 @@ export default function DoubleDescentPage() {
             但在高维空间中，最小范数插值解往往具有较好的隐式正则化效果。
           </p>
           <p>
-            <strong>2. 更多的特征带来更多信息</strong>：即使真实信号只依赖少数几个特征，
-            增加额外的随机特征也扩展了模型的表达能力，而最小范数约束让模型倾向于使用与真实信号对齐的方向。
+            <strong>2. 更多自由度与隐式正则化</strong>：过参数化为模型提供了更多自由度；
+            在最小范数解或梯度下降等隐式正则化作用下，模型可能选择更稳定、与真实信号更对齐的解，
+            而不是简单地“记忆噪声”。
           </p>
           <p>
             <strong>3. 插值阈值附近最危险</strong>：当模型参数数量刚好接近样本数时，

@@ -17,13 +17,7 @@ export default function KernelPropertiesPage() {
           并且满足一些封闭性质，这让我们能够从简单核函数构造出复杂核函数。
         </p>
 
-        {/* Copyright Notice */}
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       {/* Valid kernels */}
@@ -49,7 +43,9 @@ export default function KernelPropertiesPage() {
         />
 
         <p className="text-gray-700 mb-4">
-          这个条件也被称为 Mercer 条件。直观上，它保证核函数计算的是一种合法的“相似度”。
+          对所有有限样本集，核矩阵（Gram matrix）都半正定，是“该函数能写成某个特征空间内积”的有限样本判据；
+          Mercer 定理则在更强的连续性、对称性条件下给出经典的无限维结论。直观上，
+          有效核函数计算的是某个特征空间中的合法内积，而不是任意的“相似度”。
         </p>
       </section>
 
@@ -125,7 +121,7 @@ export default function KernelPropertiesPage() {
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>有效核函数必须对应某个特征映射后的内积（Mercer 条件）。</span>
+            <span>有效核函数必须对应某个特征映射后的内积；对所有有限样本 Gram 矩阵半正定是有限样本判据。</span>
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />

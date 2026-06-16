@@ -17,13 +17,7 @@ export default function SVMTheoryPage() {
           并展示核技巧如何自然融入 SVM 框架。
         </p>
 
-        {/* Copyright Notice */}
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       {/* Primal problem */}
@@ -259,6 +253,10 @@ function SoftMarginDemo() {
           <span>C 小：允许误分类，间隔宽</span>
           <span>C 大：惩罚更重，间隔窄</span>
         </div>
+      </div>
+
+      <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+        该图为简化示意图，用于直观展示 C 参数对间隔宽度与误分类的影响，并非真实 SVM 优化器的实时求解结果。
       </div>
 
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto bg-white rounded-lg border border-gray-200" style={{ maxHeight: 420 }}>

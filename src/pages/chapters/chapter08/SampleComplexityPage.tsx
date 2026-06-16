@@ -10,7 +10,7 @@ export default function SampleComplexityPage() {
   const [delta, setDelta] = useState(0.05);
 
   const bound = useMemo(() => {
-    return Math.sqrt((2 * Math.log((2 * hSize) / delta)) / n);
+    return Math.sqrt(Math.log((2 * hSize) / delta) / (2 * n));
   }, [n, hSize, delta]);
 
   return (
@@ -25,12 +25,7 @@ export default function SampleComplexityPage() {
           究竟需要多少训练样本，才能保证测试误差接近训练误差？
         </p>
 
-        <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0" />
-          <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途。
-          </span>
-        </div>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -80,11 +75,11 @@ export default function SampleComplexityPage() {
           title="泛化误差上界"
           formula={
             <KaTeX
-              math={String.raw`|L(h) - \hat{L}(h)| \le \sqrt{\frac{2\log\frac{2|\mathcal{H}|}{\delta}}{n}}`}
+              math={String.raw`|L(h) - \hat{L}(h)| \le \sqrt{\frac{\log\frac{2|\mathcal{H}|}{\delta}}{2n}}`}
               display
             />
           }
-          description="该式表明：要获得更紧的界，可以增加样本数 n、减小假设空间 |H|，或接受更低的置信 1-δ。"
+          description="这是 0-1 有界损失下 Hoeffding 不等式与联合界得到的标准形式。要获得更紧的界，可以增加样本数 n、减小假设空间 |H|，或接受更低的置信 δ。"
         />
       </section>
 

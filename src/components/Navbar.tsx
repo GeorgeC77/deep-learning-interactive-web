@@ -1,14 +1,74 @@
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { GraduationCap, Home, ShieldAlert, ChevronDown, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, BookOpen, Layers, Zap, Binary, Sparkles, LineChart, GitBranch, CheckCircle2, Scale, Calculator, Map, Boxes, Ruler, Activity, Network, BarChart2, SlidersHorizontal, SplitSquareHorizontal, Sigma, CircleDot, GitMerge } from 'lucide-react';
+import {
+  GraduationCap,
+  Home,
+  ShieldAlert,
+  ChevronDown,
+  Menu,
+  FunctionSquare,
+  TrendingDown,
+  FileSpreadsheet,
+  BarChart3,
+  Brain,
+  BookOpen,
+  Layers,
+  Zap,
+  Binary,
+  Sparkles,
+  LineChart,
+  GitBranch,
+  CheckCircle2,
+  Scale,
+  Calculator,
+  Map,
+  Boxes,
+  Ruler,
+  Activity,
+  Network,
+  BarChart2,
+  SlidersHorizontal,
+  SplitSquareHorizontal,
+  Sigma,
+  CircleDot,
+  GitMerge,
+} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 
-const linearRegressionItems = [
+type NavItem = { to: string; label: string; icon: React.ElementType };
+type ChapterKey =
+  | 'home'
+  | 'linear'
+  | 'logistic'
+  | 'glm'
+  | 'generative'
+  | 'kernel'
+  | 'svm'
+  | 'deep'
+  | 'generalization'
+  | 'regularization'
+  | 'clustering'
+  | 'em'
+  | 'pca'
+  | 'ica'
+  | 'foundation'
+  | 'rl'
+  | 'lqr'
+  | 'pg';
+
+const linearRegressionItems: NavItem[] = [
   { to: '/overview', label: '课程概览', icon: BookOpen },
   { to: '/model', label: '模型表示', icon: FunctionSquare },
   { to: '/cost-function', label: '代价函数', icon: TrendingDown },
@@ -18,7 +78,7 @@ const linearRegressionItems = [
   { to: '/overfitting', label: '过拟合', icon: ShieldAlert },
 ];
 
-const logisticRegressionItems = [
+const logisticRegressionItems: NavItem[] = [
   { to: '/ch02/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch02/model', label: '模型表示', icon: FunctionSquare },
   { to: '/ch02/cost-function', label: '代价函数', icon: TrendingDown },
@@ -28,7 +88,7 @@ const logisticRegressionItems = [
   { to: '/ch02/newton', label: '牛顿法', icon: Zap },
 ];
 
-const generalizedLinearModelItems = [
+const generalizedLinearModelItems: NavItem[] = [
   { to: '/ch03/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch03/exponential-family', label: '指数族分布', icon: FunctionSquare },
   { to: '/ch03/building-glm', label: '构建 GLM', icon: Sparkles },
@@ -38,14 +98,14 @@ const generalizedLinearModelItems = [
   { to: '/ch03/summary', label: '本章总结', icon: CheckCircle2 },
 ];
 
-const generativeLearningItems = [
+const generativeLearningItems: NavItem[] = [
   { to: '/ch04/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch04/generative-vs-discriminative', label: '生成式 vs 判别式', icon: Scale },
   { to: '/ch04/gaussian-discriminant-analysis', label: '高斯判别分析', icon: Calculator },
   { to: '/ch04/naive-bayes', label: '朴素贝叶斯', icon: Brain },
 ];
 
-const kernelMethodsItems = [
+const kernelMethodsItems: NavItem[] = [
   { to: '/ch05/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch05/feature-mapping', label: '特征映射', icon: Map },
   { to: '/ch05/lms-in-feature-space', label: '特征空间 LMS', icon: TrendingDown },
@@ -53,13 +113,13 @@ const kernelMethodsItems = [
   { to: '/ch05/kernel-properties', label: '核函数性质', icon: Boxes },
 ];
 
-const svmItems = [
+const svmItems: NavItem[] = [
   { to: '/ch06/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch06/margin-intuition', label: '间隔直观理解', icon: Ruler },
   { to: '/ch06/svm-theory', label: 'SVM 理论与算法', icon: BookOpen },
 ];
 
-const deepLearningItems = [
+const deepLearningItems: NavItem[] = [
   { to: '/ch07/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch07/nonlinear-supervised-learning', label: '非线性模型', icon: Activity },
   { to: '/ch07/neural-networks', label: '神经网络', icon: Network },
@@ -68,14 +128,14 @@ const deepLearningItems = [
   { to: '/ch07/vectorization', label: '向量化', icon: Zap },
 ];
 
-const generalizationItems = [
+const generalizationItems: NavItem[] = [
   { to: '/ch08/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch08/bias-variance', label: '偏差-方差权衡', icon: Scale },
   { to: '/ch08/double-descent', label: '双下降现象', icon: Activity },
   { to: '/ch08/sample-complexity', label: '样本复杂度上界', icon: BarChart2 },
 ];
 
-const regularizationItems = [
+const regularizationItems: NavItem[] = [
   { to: '/ch09/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch09/regularization', label: '正则化', icon: SlidersHorizontal },
   { to: '/ch09/implicit-regularization', label: '隐式正则化', icon: Brain },
@@ -83,12 +143,12 @@ const regularizationItems = [
   { to: '/ch09/bayesian-regularization', label: '贝叶斯正则化', icon: Sigma },
 ];
 
-const clusteringItems = [
+const clusteringItems: NavItem[] = [
   { to: '/ch10/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch10/k-means', label: 'K-means 聚类', icon: CircleDot },
 ];
 
-const emItems = [
+const emItems: NavItem[] = [
   { to: '/ch11/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch11/gaussian-mixture-em', label: '高斯混合模型的 EM', icon: Calculator },
   { to: '/ch11/jensen-inequality', label: 'Jensen 不等式', icon: Sigma },
@@ -97,24 +157,24 @@ const emItems = [
   { to: '/ch11/variational-inference', label: '变分推断与 VAE', icon: Network },
 ];
 
-const pcaItems = [
+const pcaItems: NavItem[] = [
   { to: '/ch12/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch12/pca', label: '主成分分析', icon: BarChart2 },
 ];
 
-const icaItems = [
+const icaItems: NavItem[] = [
   { to: '/ch13/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch13/ica', label: '独立成分分析', icon: GitMerge },
 ];
 
-const foundationItems = [
+const foundationItems: NavItem[] = [
   { to: '/ch14/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch14/pretraining-adaptation', label: '预训练与适配', icon: Activity },
   { to: '/ch14/computer-vision-pretraining', label: '视觉预训练', icon: BarChart2 },
   { to: '/ch14/large-language-models', label: '大语言模型', icon: Sparkles },
 ];
 
-const rlItems = [
+const rlItems: NavItem[] = [
   { to: '/ch15/overview', label: '课程概览', icon: BookOpen },
   { to: '/ch15/mdp', label: 'MDP', icon: Activity },
   { to: '/ch15/value-policy-iteration', label: '值/策略迭代', icon: Zap },
@@ -123,52 +183,135 @@ const rlItems = [
   { to: '/ch15/value-policy-connection', label: '算法关系', icon: Sigma },
 ];
 
-const lqrItems = [
+const lqrItems: NavItem[] = [
   { to: '/ch16/finite-horizon-mdp', label: '有限时域 MDP', icon: Activity },
   { to: '/ch16/lqr', label: 'LQR', icon: SlidersHorizontal },
   { to: '/ch16/nonlinear-to-lqr', label: '非线性到 LQR', icon: GitBranch },
   { to: '/ch16/lqg', label: 'LQG', icon: BarChart2 },
 ];
 
-const pgItems = [
+const pgItems: NavItem[] = [
   { to: '/ch17/policy-gradient', label: 'REINFORCE', icon: Activity },
 ];
 
-function getCurrentChapter(path: string): 'home' | 'linear' | 'logistic' | 'glm' | 'generative' | 'kernel' | 'svm' | 'deep' | 'generalization' | 'regularization' | 'clustering' | 'em' | 'pca' | 'ica' | 'foundation' | 'rl' | 'lqr' | 'pg' {
+const chapterConfig: Record<
+  Exclude<ChapterKey, 'home'>,
+  { label: string; icon: React.ElementType; items: NavItem[]; pathPrefix?: string }
+> = {
+  linear: { label: '线性回归', icon: BookOpen, items: linearRegressionItems },
+  logistic: { label: '分类与逻辑回归', icon: Binary, items: logisticRegressionItems, pathPrefix: '/ch02/' },
+  glm: { label: '广义线性模型', icon: Sparkles, items: generalizedLinearModelItems, pathPrefix: '/ch03/' },
+  generative: { label: '生成学习算法', icon: Scale, items: generativeLearningItems, pathPrefix: '/ch04/' },
+  kernel: { label: '核方法', icon: Boxes, items: kernelMethodsItems, pathPrefix: '/ch05/' },
+  svm: { label: '支持向量机', icon: Ruler, items: svmItems, pathPrefix: '/ch06/' },
+  deep: { label: '深度学习', icon: Network, items: deepLearningItems, pathPrefix: '/ch07/' },
+  generalization: { label: '泛化', icon: BarChart2, items: generalizationItems, pathPrefix: '/ch08/' },
+  regularization: { label: '正则化', icon: SlidersHorizontal, items: regularizationItems, pathPrefix: '/ch09/' },
+  clustering: { label: '聚类', icon: CircleDot, items: clusteringItems, pathPrefix: '/ch10/' },
+  em: { label: 'EM 算法', icon: Brain, items: emItems, pathPrefix: '/ch11/' },
+  pca: { label: '主成分分析', icon: BarChart2, items: pcaItems, pathPrefix: '/ch12/' },
+  ica: { label: '独立成分分析', icon: GitMerge, items: icaItems, pathPrefix: '/ch13/' },
+  foundation: { label: '自监督学习', icon: Sparkles, items: foundationItems, pathPrefix: '/ch14/' },
+  rl: { label: '强化学习', icon: Zap, items: rlItems, pathPrefix: '/ch15/' },
+  lqr: { label: '线性二次调节', icon: SlidersHorizontal, items: lqrItems, pathPrefix: '/ch16/' },
+  pg: { label: '策略梯度', icon: Zap, items: pgItems, pathPrefix: '/ch17/' },
+};
+
+function getCurrentChapter(path: string): ChapterKey {
   if (path === '/') return 'home';
-  const logisticPaths = new Set(logisticRegressionItems.map((i) => i.to));
-  if (logisticPaths.has(path) || path.startsWith('/ch02/')) return 'logistic';
-  const glmPaths = new Set(generalizedLinearModelItems.map((i) => i.to));
-  if (glmPaths.has(path) || path.startsWith('/ch03/')) return 'glm';
-  const generativePaths = new Set(generativeLearningItems.map((i) => i.to));
-  if (generativePaths.has(path) || path.startsWith('/ch04/')) return 'generative';
-  const kernelPaths = new Set(kernelMethodsItems.map((i) => i.to));
-  if (kernelPaths.has(path) || path.startsWith('/ch05/')) return 'kernel';
-  const svmPaths = new Set(svmItems.map((i) => i.to));
-  if (svmPaths.has(path) || path.startsWith('/ch06/')) return 'svm';
-  const deepPaths = new Set(deepLearningItems.map((i) => i.to));
-  if (deepPaths.has(path) || path.startsWith('/ch07/')) return 'deep';
-  const generalizationPaths = new Set(generalizationItems.map((i) => i.to));
-  if (generalizationPaths.has(path) || path.startsWith('/ch08/')) return 'generalization';
-  const regularizationPaths = new Set(regularizationItems.map((i) => i.to));
-  if (regularizationPaths.has(path) || path.startsWith('/ch09/')) return 'regularization';
-  const clusteringPaths = new Set(clusteringItems.map((i) => i.to));
-  if (clusteringPaths.has(path) || path.startsWith('/ch10/')) return 'clustering';
-  const emPaths = new Set(emItems.map((i) => i.to));
-  if (emPaths.has(path) || path.startsWith('/ch11/')) return 'em';
-  const pcaPaths = new Set(pcaItems.map((i) => i.to));
-  if (pcaPaths.has(path) || path.startsWith('/ch12/')) return 'pca';
-  const icaPaths = new Set(icaItems.map((i) => i.to));
-  if (icaPaths.has(path) || path.startsWith('/ch13/')) return 'ica';
-  const foundationPaths = new Set(foundationItems.map((i) => i.to));
-  if (foundationPaths.has(path) || path.startsWith('/ch14/')) return 'foundation';
-  const rlPaths = new Set(rlItems.map((i) => i.to));
-  if (rlPaths.has(path) || path.startsWith('/ch15/')) return 'rl';
-  const lqrPaths = new Set(lqrItems.map((i) => i.to));
-  if (lqrPaths.has(path) || path.startsWith('/ch16/')) return 'lqr';
-  const pgPaths = new Set(pgItems.map((i) => i.to));
-  if (pgPaths.has(path) || path.startsWith('/ch17/')) return 'pg';
+  const entries = Object.entries(chapterConfig) as [
+    Exclude<ChapterKey, 'home'>,
+    { items: NavItem[]; pathPrefix?: string }
+  ][];
+  for (const [key, { items, pathPrefix }] of entries) {
+    const paths = new Set(items.map((i) => i.to));
+    if (paths.has(path) || (pathPrefix && path.startsWith(pathPrefix))) {
+      return key;
+    }
+  }
   return 'linear';
+}
+
+function ChapterNav({ chapter, currentPath }: { chapter: Exclude<ChapterKey, 'home'>; currentPath: string }) {
+  const { label, icon: ChapterIcon, items } = chapterConfig[chapter];
+
+  const renderItem = (item: NavItem) => {
+    const isActive = currentPath === item.to;
+    return (
+      <Link
+        key={item.to}
+        to={item.to}
+        className={cn(
+          'flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+          isActive
+            ? 'bg-blue-50 text-blue-700'
+            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+        )}
+      >
+        <item.icon className="w-4 h-4" />
+        {item.label}
+      </Link>
+    );
+  };
+
+  return (
+    <>
+      {/* Desktop dropdown */}
+      <div className="hidden lg:block">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
+            <ChapterIcon className="w-4 h-4" />
+            {label}
+            <ChevronDown className="w-3.5 h-3.5" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {items.map((item) => {
+              const isActive = currentPath === item.to;
+              return (
+                <DropdownMenuItem key={item.to} asChild>
+                  <Link
+                    to={item.to}
+                    className={cn(
+                      'flex items-center gap-2 cursor-pointer',
+                      isActive && 'bg-blue-50 text-blue-700'
+                    )}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.label}
+                  </Link>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Mobile sheet */}
+      <div className="lg:hidden">
+        <Sheet>
+          <SheetTrigger asChild>
+            <button
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none"
+              aria-label="打开章节菜单"
+            >
+              <Menu className="w-4 h-4" />
+              <span className="hidden sm:inline">章节</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[280px] sm:w-80">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-2 text-base">
+                <ChapterIcon className="w-5 h-5 text-blue-600" />
+                {label}
+              </SheetTitle>
+            </SheetHeader>
+            <nav className="flex flex-col gap-1 py-4">{items.map(renderItem)}</nav>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </>
+  );
 }
 
 export default function Navbar() {
@@ -206,498 +349,7 @@ export default function Navbar() {
               目录
             </NavLink>
 
-            {chapter === 'linear' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <BookOpen className="w-4 h-4" />
-                  线性回归
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {linearRegressionItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'logistic' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Binary className="w-4 h-4" />
-                  分类与逻辑回归
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {logisticRegressionItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'glm' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Sparkles className="w-4 h-4" />
-                  广义线性模型
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {generalizedLinearModelItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'generative' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Scale className="w-4 h-4" />
-                  生成学习算法
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {generativeLearningItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'kernel' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Sparkles className="w-4 h-4" />
-                  核方法
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {kernelMethodsItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'svm' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Ruler className="w-4 h-4" />
-                  支持向量机
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {svmItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'deep' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Network className="w-4 h-4" />
-                  深度学习
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {deepLearningItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'generalization' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <BarChart2 className="w-4 h-4" />
-                  泛化
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {generalizationItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'regularization' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <SlidersHorizontal className="w-4 h-4" />
-                  正则化
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {regularizationItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'clustering' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <CircleDot className="w-4 h-4" />
-                  聚类
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {clusteringItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'em' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Brain className="w-4 h-4" />
-                  EM 算法
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {emItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'pca' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <BarChart2 className="w-4 h-4" />
-                  主成分分析
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {pcaItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'ica' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <GitMerge className="w-4 h-4" />
-                  独立成分分析
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {icaItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'foundation' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Sparkles className="w-4 h-4" />
-                  自监督学习
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {foundationItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'rl' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Zap className="w-4 h-4" />
-                  强化学习
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {rlItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'lqr' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <SlidersHorizontal className="w-4 h-4" />
-                  线性二次调节
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {lqrItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
-            {chapter === 'pg' && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors outline-none">
-                  <Zap className="w-4 h-4" />
-                  策略梯度
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {pgItems.map((item) => {
-                    const isActive = currentPath === item.to;
-                    return (
-                      <DropdownMenuItem key={item.to} asChild>
-                        <Link
-                          to={item.to}
-                          className={cn(
-                            'flex items-center gap-2 cursor-pointer',
-                            isActive && 'bg-blue-50 text-blue-700'
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          {item.label}
-                        </Link>
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            {chapter !== 'home' && <ChapterNav chapter={chapter} currentPath={currentPath} />}
 
             <a
               href="https://github.com/GeorgeC77/machine-learning-interactive-web/blob/main/LICENSE"
