@@ -54,7 +54,7 @@ export default function ExponentialFamilyPage() {
           <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
             <h3 className="font-semibold text-indigo-800 mb-2">对数配分函数 a(η) 的作用</h3>
             <p className="text-sm text-gray-700">
-              它保证分布归一化（概率之和为 1）。同时对 η 求导可以得到充分统计量的期望：
+              它保证分布归一化：离散情形下概率质量之和为 1，连续情形下概率密度积分为 1。同时对 η 求导可以得到充分统计量的期望：
               <KaTeX math={String.raw`\frac{\partial a}{\partial \eta} = \mathbb{E}[T(y)]`} />。
             </p>
           </div>

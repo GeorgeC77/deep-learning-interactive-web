@@ -176,7 +176,7 @@ export default function BiasVariancePage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">偏差-方差权衡曲线</h2>
         <p className="text-gray-700 mb-4">
           对不同次数的多项式重复多次实验，绘制训练误差、测试误差随模型复杂度的变化。
-          测试误差通常呈现 U 型：左侧欠拟合（偏差大），右侧过拟合（方差大）。
+          在经典有限模型复杂度情形下，测试误差常呈现 U 型：左侧欠拟合（偏差大），右侧过拟合（方差大）；现代过参数化模型中还可能出现双下降现象，后续章节会进一步讨论。
         </p>
         <TradeoffCurveDemo />
       </section>

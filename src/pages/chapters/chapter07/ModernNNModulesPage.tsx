@@ -109,7 +109,7 @@ export default function ModernNNModulesPage() {
               display
             />
           }
-          description="注意：这里除以 m 而非 m-1，目的是让输出平方和为 1。"
+          description="注意：这里除以 m 而非 m-1，是因为 LayerNorm 使用当前特征维度上的归一化统计量，使标准化后的向量具有约 0 均值和 1 方差；它并不是为了让输出平方和为 1。"
         />
 
         <div className="mt-6">

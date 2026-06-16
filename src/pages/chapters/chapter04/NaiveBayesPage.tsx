@@ -201,6 +201,10 @@ export default function NaiveBayesPage() {
           再用拉普拉斯平滑的朴素贝叶斯计算后验概率。
         </p>
 
+        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+          注意：这里显示的是该玩具朴素贝叶斯模型的归一化后验分数，可用于比较类别倾向，但不应理解为真实世界中严格校准的概率。
+        </div>
+
         <div className="space-y-3 mb-4">
           <label className="block text-sm font-medium text-gray-700">输入邮件内容</label>
           <textarea
