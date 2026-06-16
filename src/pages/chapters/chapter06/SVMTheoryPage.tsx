@@ -84,7 +84,7 @@ export default function SVMTheoryPage() {
               display
             />
           }
-          description="只有 α_i > 0 的样本才是支持向量。"
+          description="只有 α_i > 0 的样本才是支持向量。在软间隔 SVM 中，0 < α_i < C 的点通常位于间隔边界上，α_i = C 的点往往是间隔内或被误分类的样本；它们都可能影响最终决策边界。"
         />
       </section>
 

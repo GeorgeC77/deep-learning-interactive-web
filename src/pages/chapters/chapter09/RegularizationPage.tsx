@@ -230,7 +230,7 @@ export default function RegularizationPage() {
             <h3 className="font-semibold text-blue-800 mb-2">L2 正则化 / 权重衰减</h3>
             <KaTeX math={String.raw`R(\theta) = \frac{1}{2}\|\theta\|_2^2`} />
             <p className="text-sm text-gray-700 mt-2">
-              倾向于让所有参数均匀变小。在深度学习中通常称为 weight decay。
+              倾向于让所有参数均匀变小。在普通 SGD 下，L2 正则化与 weight decay 形式等价；在 AdamW 等优化器中，weight decay 通常采用解耦实现，与直接加入 L2 penalty 不完全相同。
             </p>
           </div>
           <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
@@ -248,6 +248,11 @@ export default function RegularizationPage() {
         <p className="text-gray-700 mb-4">
           真实函数是二次曲线。我们用一个较高次的多项式拟合，比较无正则化、L2 和 L1 正则化的效果。
         </p>
+
+        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+          这里的 L1/L2 拟合是教学用的简化数值实现，用于展示正则化趋势；实际应用中通常使用更稳定的优化器或机器学习库。
+        </div>
+
         <RegularizationDemo />
       </section>
 
@@ -263,7 +268,7 @@ export default function RegularizationPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>L2 正则化让参数变小但通常不为零，对应权重衰减。</span>
+            <span>L2 正则化让参数变小但通常不为零；在普通 SGD 下它与权重衰减形式等价。</span>
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />

@@ -203,6 +203,10 @@ export default function CrossValidationPage() {
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
             <span>验证误差最小的模型通常最接近真实泛化误差。</span>
           </li>
+          <li className="flex items-start gap-2">
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
+            <span>验证误差用于选择模型复杂度；最终性能应在未参与训练和模型选择的独立测试集上评估。不要用测试集反复调参。</span>
+          </li>
         </ul>
       </section>
     </div>
@@ -223,10 +227,10 @@ function CrossValidationDemo() {
     const data = generateData(nTrain, noise, seed);
     const testData = generateData(100, noise, seed + 2000);
 
-    // 按顺序分成 k 份（示例数据已随机打乱，这里按索引顺序分即可）
-    const foldSize = Math.floor(data.x.length / k);
+    // 按索引模 k 分配到 k 个折，确保每个样本都进入某个验证折
+    const indices = data.x.map((_, i) => i);
     const folds = Array.from({ length: k }, (_, f) => ({
-      indices: Array.from({ length: foldSize }, (_, i) => f * foldSize + i),
+      indices: indices.filter((_, i) => i % k === f),
     }));
 
     const results = folds.map((fold) => {

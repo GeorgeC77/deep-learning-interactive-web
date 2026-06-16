@@ -50,6 +50,10 @@ export default function NeuralNetworksPage() {
           description="ReLU(rectified linear unit) 是最简单的非线性激活函数之一，负责产生曲线中的“拐点”。"
         />
 
+        <p className="text-gray-700 mt-4 text-sm">
+          对于 ReLU 网络，多个 ReLU 单元组合后通常形成分段线性的非线性函数或决策边界。
+        </p>
+
         <div className="mt-6">
           <SingleNeuronDemo />
         </div>
