@@ -89,8 +89,9 @@ export default function GaussianDiscriminantAnalysisPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：一维 GDA 决策边界</h2>
         <p className="text-gray-700 mb-4">
-          拖动滑块调整两类高斯分布的均值和方差，观察决策边界（灰色虚线）如何变化。
-          决策边界是两类概率密度相等的位置。
+          拖动滑块调整两类高斯分布的均值、方差和类别先验 φ，观察决策边界（灰色虚线）如何变化。
+          决策边界是两类后验概率相等的位置；等价地，它满足 <KaTeX math={String.raw`p(x \mid y=1)\phi = p(x \mid y=0)(1-\phi)`} />。
+          只有当两类先验相等时，才退化为两类概率密度相等的位置。
         </p>
         <GDA1DDemo />
       </section>

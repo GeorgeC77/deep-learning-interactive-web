@@ -75,7 +75,7 @@ export default function KernelTrickPage() {
             <h3 className="font-semibold text-violet-800 mb-2">避免维度爆炸</h3>
             <p className="text-sm text-gray-700">
               高斯核对应的特征映射是无限维的，但核函数计算只需要原始空间中的距离，
-              计算复杂度不依赖隐式特征空间维度，但仍依赖原始输入维度。
+              避免了显式构造无限维特征映射；计算复杂度不依赖隐式特征空间维度，但仍依赖原始输入维度 d（通常需要 O(d)）。
             </p>
           </div>
           <div className="bg-violet-50 rounded-lg p-4 border border-violet-200">

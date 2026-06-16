@@ -548,7 +548,7 @@ export default function CostFunctionPage() {
               <span className="text-emerald-600 font-bold mt-0.5">3.</span>
               <span>
                 因此，逻辑回归通常选择<strong>对数损失 / 交叉熵</strong>作为代价函数；
-                在线性 logits 假设下，它关于参数是凸函数；当有限最优解存在或加入正则化时，梯度下降可以稳定收敛到全局最优解。
+                在线性 logits 假设下，它关于参数是凸函数；当有限最优解存在或加入适当正则化时，梯度下降可以稳定收敛。
               </span>
             </li>
           </ul>

@@ -274,7 +274,7 @@ export default function NaiveBayesPage() {
           </div>
           <div className="bg-violet-50 rounded-lg p-4 border border-violet-200">
             <h3 className="font-semibold text-violet-800 mb-2">小数据集</h3>
-            <p className="text-sm text-gray-700">参数少、训练快，在数据量不大时也能给出合理的概率估计。</p>
+            <p className="text-sm text-gray-700">参数少、训练快，在数据量不大时也能给出有用的分类基线；但由于条件独立假设较强，输出概率未必校准良好。</p>
           </div>
         </div>
       </section>
