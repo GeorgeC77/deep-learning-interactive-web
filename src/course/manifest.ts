@@ -716,12 +716,28 @@ export function getCompletedSections(): Section[] {
   return getAllSections().filter((section) => section.status === "completed");
 }
 
+export function getBetaSections(): Section[] {
+  return getAllSections().filter((section) => section.status === "beta");
+}
+
+export function getDraftSections(): Section[] {
+  return getAllSections().filter((section) => section.status === "draft");
+}
+
 export function getTotalSectionCount(): number {
   return getAllSections().length;
 }
 
 export function getCompletedCount(): number {
   return getCompletedSections().length;
+}
+
+export function getBetaCount(): number {
+  return getBetaSections().length;
+}
+
+export function getDraftCount(): number {
+  return getDraftSections().length;
 }
 
 export function getChapterStatus(chapter: Chapter): SectionStatus {

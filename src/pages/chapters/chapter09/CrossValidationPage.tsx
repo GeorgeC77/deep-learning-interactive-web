@@ -201,7 +201,7 @@ export default function CrossValidationPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>验证误差最小的模型通常最接近真实泛化误差。</span>
+            <span>验证误差可用于比较不同模型复杂度，但模型选择本身会带来一定偏差；最终性能仍应在独立测试集上评估。</span>
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />

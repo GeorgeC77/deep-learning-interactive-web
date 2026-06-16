@@ -6,7 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { courseManifest, getChapterStatus, statusLabel, type Chapter, type SectionStatus } from '@/course/manifest';
+import { courseManifest, getChapterStatus, getCompletedCount, getBetaCount, getDraftCount, statusLabel, type Chapter, type SectionStatus } from '@/course/manifest';
 
 function getChapterEntryPath(chapter: Chapter): string {
   return chapter.sections[0]?.path || '/';
@@ -43,9 +43,26 @@ export default function HomePage() {
         </p>
 
         {/* Copyright banner */}
-        <p className="mt-6 text-sm text-amber-800">
-          仅供教学与非商业学习使用，转载请注明来源。完整授权说明见 LICENSE。
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2">
+          <ShieldAlert className="w-4 h-4" />
+          本内容仅供教学与非商业学习使用，完整授权说明见页脚。
         </p>
+
+        {/* Progress stats */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <CheckCircle2 className="w-4 h-4" />
+            已完成 {getCompletedCount()}
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+            <FlaskConical className="w-4 h-4" />
+            预览版 {getBetaCount()}
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+            <Construction className="w-4 h-4" />
+            制作中 {getDraftCount()}
+          </div>
+        </div>
       </section>
 
       {/* Course Directory */}
