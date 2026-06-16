@@ -33,7 +33,7 @@ export default function MulticlassPage() {
         <div className="text-sm font-medium text-blue-600 mb-2 tracking-wide uppercase">
           第二章 · 多分类
         </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">多分类分类与 Softmax 回归</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">多分类与 Softmax 回归</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
           当标签不再只有 0/1，而是可以取 K 个离散类别时，Softmax 回归把逻辑回归推广到多分类场景，
           为每个类别输出一个归一化的概率。
@@ -192,7 +192,8 @@ export default function MulticlassPage() {
           <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
             <h4 className="font-semibold text-emerald-800 mb-2">凸性保证</h4>
             <p className="text-gray-700 text-sm">
-              与二分类逻辑回归类似，Softmax 的交叉熵代价函数是凸函数，梯度下降可以稳定收敛到全局最优解。
+              与二分类逻辑回归类似，在线性 logits 假设下，Softmax 的交叉熵代价函数关于参数是凸函数；
+              当有限最优解存在或加入正则化时，梯度下降可以稳定收敛到全局最优解。
             </p>
           </div>
         </div>
@@ -395,7 +396,7 @@ export default function MulticlassPage() {
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">3.</span>
             <p className="text-gray-700">
-              Softmax 使用多类交叉熵作为代价函数，等价于多项分布的最大似然估计，且代价函数是凸函数。
+              Softmax 使用多类交叉熵作为代价函数，等价于多项分布的最大似然估计；在线性 logits 假设下，代价函数关于参数是凸函数，当有限最优解存在或加入正则化时，梯度下降可以稳定收敛到全局最优解。
             </p>
           </div>
           <div className="flex items-start gap-3">

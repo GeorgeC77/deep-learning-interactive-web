@@ -533,15 +533,7 @@ export default function GradientDescentPage() {
       <h1 className="text-3xl font-bold mb-2">逻辑回归的梯度下降</h1>
       <p className="text-gray-600 mb-4">Gradient Descent for Logistic Regression</p>
 
-      {/* ─── Copyright Notice ────────────────────────────────────────── */}
-      <section className="mb-8">
-        <div className="inline-flex w-full items-start gap-3 bg-amber-50 border border-amber-300 rounded-lg px-5 py-4">
-          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <span className="text-sm font-medium text-amber-800 leading-relaxed">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
-          </span>
-        </div>
-      </section>
+      <p className="mb-8 text-sm text-amber-700 flex items-center justify-center gap-2"><AlertTriangle className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
 
       {/* ─── Mountain Descent Analogy ────────────────────────────────── */}
       <section className="mb-8">

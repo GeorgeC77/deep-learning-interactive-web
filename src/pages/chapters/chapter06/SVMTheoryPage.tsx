@@ -110,6 +110,9 @@ export default function SVMTheoryPage() {
       {/* Interactive demo */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：C 参数与间隔宽度</h2>
+        <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mb-4">
+          该图不是实时求解 SVM，而是为了直观展示 C 参数作用而构造的简化示意图。
+        </p>
         <p className="text-gray-700 mb-4">
           下面用一个简化的二维数据集演示软间隔 SVM 中 C 参数的作用。
           C 控制对误分类的惩罚强度：C 越大，间隔越窄，越不允许误分类；C 越小，间隔越宽，允许更多样本穿过间隔边界。

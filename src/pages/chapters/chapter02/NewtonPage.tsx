@@ -529,27 +529,7 @@ export default function NewtonPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* ─── Copyright Notice ───────────────────────────────────────── */}
-      <section className="mb-8">
-        <div className="inline-flex items-start gap-3 bg-amber-50 border border-amber-300 rounded-lg px-5 py-4 w-full">
-          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm font-semibold text-amber-900 mb-1">版权声明</p>
-            <p className="text-sm text-amber-800 leading-relaxed">
-              本课程内容仅供个人学习交流使用，采用{' '}
-              <a
-                href="https://creativecommons.org/licenses/by-nc/4.0/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-amber-900"
-              >
-                CC BY-NC 4.0
-              </a>{' '}
-              许可。未经授权，严禁以任何形式用于商业用途，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
-            </p>
-          </div>
-        </div>
-      </section>
+      <p className="mb-8 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
 
       <h1 className="text-3xl font-bold text-deep-blue mb-2">牛顿法</h1>
       <p className="text-med-gray mb-6">Newton's Method for Logistic Regression</p>

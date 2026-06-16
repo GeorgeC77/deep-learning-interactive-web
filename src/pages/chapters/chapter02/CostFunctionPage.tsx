@@ -215,8 +215,8 @@ export default function CostFunctionPage() {
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
           在逻辑回归中，代价函数用于衡量预测概率与真实标签之间的差异。
           当 logits 是输入的线性函数时，交叉熵负对数似然关于参数是凸函数，
-          因此梯度下降可以找到全局最优解。需要注意：如果数据线性可分且没有正则化，
-          最大似然估计可能没有有限的最优解。
+          若有限最优解存在，或加入适当正则化，梯度下降可以收敛到全局最优解附近。
+          需要注意：如果数据线性可分且没有正则化，最大似然估计可能没有有限的最优解。
         </p>
 
         <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><AlertTriangle className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
@@ -226,7 +226,7 @@ export default function CostFunctionPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么不用均方误差？</h2>
         <p className="text-gray-700 mb-4">
-          线性回归的假设函数是线性的，均方误差（MSE）代价函数是一个漂亮的<strong>凸函数</strong>，
+          线性回归的假设函数是线性的，当设计矩阵满列秩时，均方误差（MSE）代价函数是一个漂亮的<strong>凸函数</strong>，
           只有一个全局最小值。但逻辑回归的假设函数是 Sigmoid：
         </p>
 

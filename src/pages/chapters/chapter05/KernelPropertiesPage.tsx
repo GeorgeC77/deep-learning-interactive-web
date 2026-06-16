@@ -32,14 +32,14 @@ export default function KernelPropertiesPage() {
         </p>
 
         <FormulaCard
-          title="有效核函数条件"
+          title="PSD kernel 的有限样本判据"
           formula={
             <KaTeX
               math={String.raw`K(x, z) = \phi(x)^T \phi(z)`}
               display
             />
           }
-          description="等价地，核矩阵（Gram matrix）必须对所有样本集都是半正定的。"
+          description="等价地，对任意有限样本集，核矩阵（Gram matrix）都是半正定的。"
         />
 
         <p className="text-gray-700 mb-4">

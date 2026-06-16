@@ -47,9 +47,9 @@ function runGD(alpha: number, beta: number = 0.92, numSteps: number = 150, theta
 
 // ─── Learning Rate Presets ───────────────────────────────────────────
 const PRESETS = [
-  { label: 'α = 0.05', desc: '太小', alpha: 0.05, behavior: '收敛极慢，在平台区 θ≈2 附近停滞', color: '#f08a5d' },
-  { label: 'α = 1.0', desc: '适中', alpha: 1.0, behavior: '越过障碍，收敛到该初始点可达的最低谷 θ≈6', color: '#00b4a6' },
-  { label: 'α = 2.0', desc: '太大', alpha: 2.0, behavior: '越过最小值，在 θ≈6 附近震荡', color: '#e25b5b' },
+  { label: 'α = 0.05', desc: '太小', alpha: 0.05, behavior: '移动缓慢，容易停留在平台区或当前构造函数的局部低谷附近', color: '#f08a5d' },
+  { label: 'α = 1.0', desc: '适中', alpha: 1.0, behavior: '越过当前构造函数中的平台/小坡，收敛到该初始点可达的目标低谷 θ≈6', color: '#00b4a6' },
+  { label: 'α = 2.0', desc: '太大', alpha: 2.0, behavior: '越过目标低谷，在 θ≈6 附近震荡', color: '#e25b5b' },
 ];
 
 // ─── D3 Chart Constants ──────────────────────────────────────────────
@@ -149,7 +149,7 @@ export default function GradientDescentPage() {
       .attr('stroke', '#00b4a6').attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '6,4').attr('opacity', 0.6);
     svg.append('text').attr('x', xScale(6.2)).attr('y', yScale(0.3) - 6)
-      .attr('fill', '#00b4a6').attr('font-size', '11px').text('J=0.3 (全局最小)');
+      .attr('fill', '#00b4a6').attr('font-size', '11px').text('J=0.3 (当前构造函数中的目标低谷)');
 
     // θ = 2 (plateau)
     svg.append('line')
@@ -305,7 +305,7 @@ export default function GradientDescentPage() {
       .attr('stroke', '#00b4a6').attr('stroke-width', 1.5)
       .attr('stroke-dasharray', '6,4').attr('opacity', 0.5);
     svg.append('text').attr('x', WIDTH - 70).attr('y', yScale(6) - 6)
-      .attr('fill', '#00b4a6').attr('font-size', '11px').text('θ=6 (全局最小)');
+      .attr('fill', '#00b4a6').attr('font-size', '11px').text('θ=6 (当前构造函数中的目标低谷)');
 
     // GD trajectory line
     const preset = PRESETS.find(p => p.alpha === alpha) || PRESETS[1];
@@ -474,7 +474,7 @@ export default function GradientDescentPage() {
                 <h4 className="font-semibold text-orange-800 text-sm">小步下山</h4>
               </div>
               <p className="text-xs text-orange-700 leading-relaxed">
-                学习率太小 = 小心翼翼地迈步。在当前非凸演示函数和当前初始点下，你可能卡在半山腰的一个小坑里，以为到了最低点，实际上真正的山谷还在前方。
+                学习率太小 = 小心翼翼地迈步。在当前非凸演示函数和当前初始点下，你移动缓慢，容易停留在平台区或局部低谷附近，无法到达更远处的目标低谷。
               </p>
             </div>
             <div className="bg-white/80 border border-teal-200 rounded-lg p-4">
@@ -536,7 +536,7 @@ export default function GradientDescentPage() {
               <h4 className="font-semibold text-amber-700 text-sm mb-2">有动量（β = 0.92）</h4>
               <p className="text-sm text-amber-700 leading-relaxed">
                 就像滚雪球下山。雪球越滚越快，方向越来越稳定，因为惯性让它沿着主要趋势前进。即使遇到小坡也能冲过去，
-                不会被小坑卡住。β = 0.92 表示保留了 92% 的前进惯性。
+                不容易被局部低谷或平台区困住。β = 0.92 表示保留了 92% 的前进惯性。
               </p>
             </div>
           </div>
@@ -688,7 +688,7 @@ export default function GradientDescentPage() {
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
                 <Circle className="w-2 h-2 fill-current text-teal-500 mt-1" />
-                <span><strong>J(6) = 0.3</strong> — 全局最小值，J'(6) = 0</span>
+                <span><strong>J(6) = 0.3</strong> — 当前显示区间内的最低点，J'(6) = 0</span>
               </li>
               <li className="flex items-start gap-2">
                 <Circle className="w-2 h-2 fill-current text-gray-500 mt-1" />
@@ -708,25 +708,25 @@ export default function GradientDescentPage() {
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-5">
           <h3 className="text-lg font-bold text-purple-800 mb-3 flex items-center gap-2">
             <Map className="w-6 h-6 text-purple-700" />
-            局部最优 vs 全局最优：在当前非凸演示函数中找最低点
+            局部低谷 vs 当前显示区间内的最低点：在当前非凸演示函数中探索
           </h3>
           <p className="text-purple-700 leading-relaxed mb-4">
-            想象你站在一片连绵起伏的山脉中，目标是找到海拔最低的点。但这片山脉有很多小坑和深谷——
-            你如何确保自己到达的是真正的最低点，而不是某个小坑底？
+            想象你站在一片连绵起伏的山脉中，目标是找到当前可见区域内的最低点。但这片山脉有很多起伏——
+            在当前非凸演示函数中，你如何确保自己到达的是目标低谷，而不是某个局部低谷？
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="bg-white/80 border border-orange-200 rounded-lg p-4">
-              <h4 className="font-semibold text-orange-800 text-sm mb-2">小学习率：困在小坑</h4>
+              <h4 className="font-semibold text-orange-800 text-sm mb-2">小学习率：移动缓慢 / 容易停留在平台区附近</h4>
               <p className="text-xs text-orange-700 leading-relaxed">
-                在当前非凸演示函数和当前初始点下，你小心翼翼地下山，走到一个小坑底就以为到了最低点，因为你没有足够的力量爬出去继续探索。
-                对应梯度下降：可能卡在局部最优或平台区，不一定能到达全局最优。
+                在当前非凸演示函数和当前初始点下，你小心翼翼地下山，移动缓慢，容易停留在平台区或局部低谷附近。
+                对应梯度下降：可能无法离开当前平台区，不一定能到达当前显示区间内的目标低谷。
               </p>
             </div>
             <div className="bg-white/80 border border-teal-200 rounded-lg p-4">
               <h4 className="font-semibold text-teal-800 text-sm mb-2">中学习率：越过小坡</h4>
               <p className="text-xs text-teal-700 leading-relaxed">
-                在当前非凸演示函数和当前初始点下，你有足够的动能爬过小坑的边缘，继续向更低的地方探索。配合动量的"惯性"，
-                你能顺利通过平缓区域和小障碍，可能到达一个更低的谷地，但这不保证是全局最低点。
+                在当前非凸演示函数和当前初始点下，你有足够的动能爬过当前的小坡，继续向更低的地方探索。配合动量的"惯性"，
+                你能顺利通过平缓区域和小障碍，可能到达当前显示区间内一个更低的谷地；但这只是当前构造演示中的行为，不意味着在非凸问题里学习率大就能普遍逃脱局部最优。
               </p>
             </div>
             <div className="bg-white/80 border border-red-200 rounded-lg p-4">
@@ -769,10 +769,10 @@ export default function GradientDescentPage() {
                   <td className="px-4 py-3 text-sm text-gray-600">{p.behavior}</td>
                   <td className="px-4 py-3 text-sm">
                     {p.alpha === 0.05 && (
-                      <span className="text-orange-600 font-medium">在当前非凸演示函数和当前初始点下陷入局部平台，无法到达全局最小值</span>
+                      <span className="text-orange-600 font-medium">在当前非凸演示函数和当前初始点下移动缓慢，无法到达当前显示区间内的目标低谷</span>
                     )}
                     {p.alpha === 1.0 && (
-                      <span className="text-teal-600 font-medium">收敛到该初始点可达的最低谷 θ≈6</span>
+                      <span className="text-teal-600 font-medium">收敛到该初始点在当前构造函数中可达的最低谷 θ≈6</span>
                     )}
                     {p.alpha === 2.0 && (
                       <span className="text-red-600 font-medium">在最优解附近震荡，无法稳定收敛</span>
