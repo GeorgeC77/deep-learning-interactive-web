@@ -127,7 +127,7 @@ export default function PCAPage() {
               display
             />
           }
-          description="其中 μ_j 和 σ_j 分别是第 j 个特征的样本均值和标准差。中心化是必须步骤；除以 σ_j 是可选的，取决于是否希望消除量纲影响。"
+          description="其中 μ_j 和 σ_j 分别是第 j 个特征的样本均值和标准差。若已知特征均值为零，则可不再中心化；是否缩放仍取决于是否希望各特征具有相同尺度。"
         />
       </section>
 

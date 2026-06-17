@@ -142,8 +142,7 @@ export default function ICAPage() {
           <li><strong>尺度不确定性：</strong>若 A 的某一列乘以非零常数，对应源除以同一常数，观测 x 不变。对声音而言，这只影响音量或符号。</li>
         </ul>
         <p className="text-gray-700">
-          此外，如果源信号是高斯分布，ICA 原则上无法恢复源。因为多元标准正态分布具有旋转对称性，
-          任意正交旋转后的混合都会产生同样的观测协方差，无法区分。因此，ICA 要求源信号是非高斯的。
+          此外，ICA 的可识别性通常要求独立源中至多一个是高斯分布；若多个源都是高斯，旋转不确定性会使源无法区分。因为多元标准正态分布具有旋转对称性，任意正交旋转后的混合都会产生同样的观测协方差。
         </p>
       </section>
 
@@ -203,7 +202,7 @@ export default function ICAPage() {
               display
             />
           }
-          description="对数据不断应用此更新，W 会收敛到一个能把混合信号分离的解混矩阵。"
+          description="在合适的源分布假设、预处理、步长和初始化下，算法可能收敛到一个分离效果较好的解；但 ICA 优化非凸，不保证全局最优。"
         />
       </section>
 
@@ -237,7 +236,7 @@ export default function ICAPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>ICA 存在排列和尺度不确定性；高斯源不可识别。</span>
+            <span>ICA 存在排列和尺度不确定性；通常要求独立源中至多一个是高斯分布。</span>
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />

@@ -94,7 +94,7 @@ export default function PolicyGradientPage() {
           description="整个轨迹的回报 f(τ) 作为权重，调整每个访问过的状态-动作对的出现概率。"
         />
         <p className="text-gray-700 mt-4">
-          直观解释：如果某条轨迹回报很高，就沿着能增加该轨迹概率的方向更新参数；回报越低，更新幅度越小。
+          直观解释：如果轨迹回报或优势函数为正，就增加对应动作序列的概率；如果为负，就降低其概率。使用 baseline 后，更新方向由 G_t − B(s_t) 的符号决定。
         </p>
       </section>
 
@@ -133,11 +133,11 @@ export default function PolicyGradientPage() {
           title="带基线的策略梯度"
           formula={
             <KaTeX
-              math={String.raw`\nabla_\theta J(\theta) = \mathbb{E}_\tau\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t \mid s_t) \bigl(R_t - B(s_t)\bigr)\right]`}
+              math={String.raw`\nabla_\theta J(\theta) = \mathbb{E}_\tau\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t \mid s_t) \bigl(G_t - B(s_t)\bigr)\right]`}
               display
             />
           }
-          description="其中 R_t 表示从 t 时刻起打折后的未来回报。合适的基线能显著降低梯度估计方差。"
+          description="其中 G_t = Σ_{k=t}^{T} γ^{k−t} r_k 表示从 t 时刻起打折后的未来回报。合适的基线能显著降低梯度估计方差。"
         />
         <p className="text-gray-700 mt-4">
           实践中常用价值函数 <KaTeX math={String.raw`V^\pi(s)`} /> 作为基线，并通过最小化

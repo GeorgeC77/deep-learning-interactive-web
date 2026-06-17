@@ -53,7 +53,7 @@ export default function LQRPage() {
         />
         <p className="text-gray-700 mt-4">
           等价于把课程中的负奖励 <KaTeX math={String.raw`R_t = -s^\top U_t s - a^\top W_t a`} /> 改写为最小化总代价。
-          当噪声为零均值时，最优控制律与噪声方差无关——这是 LQR 的优美性质之一。
+          在标准加性、控制无关、零均值噪声且目标为期望二次代价的 LQG/LQR 设定下，最优线性反馈增益不依赖噪声方差；噪声方差只影响最优期望代价中的常数项——这是 LQR 的优美性质之一。
         </p>
       </section>
 
@@ -117,7 +117,7 @@ export default function LQRPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>只要噪声零均值，最优控制律就不依赖于噪声方差。</span>
+            <span>在标准加性、控制无关、零均值噪声且目标为期望二次代价的 LQG/LQR 设定下，最优线性反馈增益不依赖噪声方差；噪声方差只影响最优期望代价中的常数项。</span>
           </li>
         </ul>
       </section>

@@ -128,7 +128,7 @@ export default function GeneralEMPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>EM 保证观测似然单调不减；在适当条件下收敛到 stationary point，但不保证全局最优。</span>
+            <span>EM 保证观测似然单调不减；在适当条件下收敛到 stationary point。</span>
           </li>
         </ul>
       </section>

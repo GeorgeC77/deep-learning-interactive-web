@@ -14,7 +14,7 @@ export default function LargeLanguageModelsPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-3">预训练大语言模型</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
           自然语言处理是基础模型最成功的领域之一。通过自回归方式预训练 Transformer，
-          语言模型能够捕捉丰富的语言结构和世界知识，并用于零样本和上下文学习。
+          语言模型能够捕捉丰富的语言结构和世界知识，并用于零样本和上下文学习。这些知识来自文本统计规律，可能不完整或不可靠，因此生成结果仍需要校验。
         </p>
 
         <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
@@ -40,7 +40,7 @@ export default function LargeLanguageModelsPage() {
           description="这样每次只需要建模词汇表大小为 V 的条件分布。"
         />
         <p className="text-gray-700 mt-4">
-          {'Transformer 把词嵌入序列 (e_{x_0}, e_{x_1}, ..., e_{x_T}) 映射为一组 logit 向量 (u_1, ..., u_{T+1})，其中 u_t 只依赖于前面的词 x_1, ..., x_{t-1}。条件概率由 softmax 给出：'}
+          通常把输入序列右移一位：输入 (x_0, x_1, ..., x_{T-1})，模型输出 logits (u_1, ..., u_T)，其中 u_t 用来预测 x_t，并且只依赖 x_0, ..., x_{t-1}。条件概率由 softmax 给出：
         </p>
         <FormulaCard
           title="条件分布"

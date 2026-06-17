@@ -83,7 +83,7 @@ export default function ComputerVisionPretrainingPage() {
         </p>
         <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
           <li><strong>正样本对：</strong>同一张图像的两个不同增强视图应该在表示空间中相近。</li>
-          <li><strong>负样本对：</strong>不同图像的增强视图应该在表示空间中远离。</li>
+          <li><strong>负样本对：</strong>在 instance discrimination 中，不同原始图像的增强视图通常被当作负样本推远；但它们未必语义不相关，同类图像也可能成为 false negatives。</li>
         </ul>
         <p className="text-gray-700 mb-4">
           以 SIMCLR 为例，对于一个大小为 B 的批次，每个样本生成两个增强视图，得到一个 2B 个样本的增强批次。
@@ -110,6 +110,7 @@ export default function ComputerVisionPretrainingPage() {
         <p className="text-xs text-gray-500 mb-4">
           教学简化：本演示只生成一个增强视图，并把其他图像的增强视图作为负样本；
           完整的 SIMCLR 还会包含同批次中其他原始视图作为负样本，负样本总数为 2(B-1)。
+          类别分离是该玩具数据和增强方式下的可视化现象，不是纯对比学习必然保证的结果。
         </p>
         <ContrastiveDemo />
       </section>
