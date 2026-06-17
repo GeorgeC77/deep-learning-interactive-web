@@ -27,7 +27,7 @@ export default function PolicyGradientPage() {
         </div>
         <p className="text-gray-700 mb-4">
           REINFORCE 只假设我们能从环境中采样轨迹，并能观测到奖励；它不需要建立环境模型。
-          我们用带参数 <em>θ</em> 的随机策略 <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 描述动作分布。
+          我们用带参数 <em>θ</em> 的随机策略 π_θ(a|s)（<KaTeX math={String.raw`\pi_\theta(a \mid s)`} />）描述动作分布。
         </p>
         <p className="text-gray-700 mb-4">
           在有限时域设定下，一条轨迹由状态、动作和奖励交替组成。关键记号如下：
@@ -36,7 +36,7 @@ export default function PolicyGradientPage() {
           title="关键记号"
           formula={
             <KaTeX
-              math={String.raw`\begin{aligned} \pi_\theta(a \mid s) &: \text{参数化随机策略} \\ \tau &= (s_0, a_0, r_0, \dots, s_T) \\ G(\tau) &= \sum_{t=0}^{T-1} \gamma^t r_t \\ J(\theta) &= \mathbb{E}_{\tau \sim \pi_\theta}\bigl[G(\tau)\bigr] \end{aligned}`}
+              math={String.raw`\begin{aligned} \pi_\theta(a \mid s) &: \text{随机策略} \\ \tau &= (s_0, a_0, r_0, \dots, s_T) \\ G(\tau) &= \sum_{t=0}^{T-1} \gamma^t r_t \\ J(\theta) &= \mathbb{E}_{\tau \sim \pi_\theta}\bigl[G(\tau)\bigr] \\ \nabla_\theta J(\theta) &= \mathbb{E}_{\tau \sim \pi_\theta}\bigl[G(\tau) \, \nabla_\theta \log p_\theta(\tau)\bigr] \\ G_t &= \sum_{k=t}^{T} \gamma^{k-t} r_k \end{aligned}`}
               display
             />
           }
@@ -95,10 +95,10 @@ export default function PolicyGradientPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">REINFORCE 算法</h2>
         <ol className="list-decimal list-inside space-y-2 text-gray-700 mb-4">
-          <li>用当前策略 <KaTeX math={String.raw`\pi_\theta`} /> 采样若干条轨迹。</li>
-          <li>对每条轨迹计算累积回报 <KaTeX math={String.raw`G(\tau)`} />。</li>
-          <li>用蒙特卡洛估计梯度 <KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) f(\tau^{(i)})`} />。</li>
-          <li>沿梯度方向更新参数 <KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />。</li>
+          <li>用当前策略 π_θ（<KaTeX math={String.raw`\pi_\theta`} />）采样若干条轨迹。</li>
+          <li>对每条轨迹计算累积回报 G(τ)（<KaTeX math={String.raw`G(\tau)`} />）。</li>
+          <li>用蒙特卡洛估计梯度 ∇̂J = (1/n) Σ_i (Σ_t ∇_θ log π_θ(a_t^(i)|s_t^(i))) G(τ^(i))（<KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) G(\tau^{(i)})`} />）。</li>
+          <li>沿梯度方向更新参数 θ := θ + α ∇̂J（<KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />）。</li>
         </ol>
         <p className="text-gray-700">
           这是无模型、基于采样的策略优化基础；后续更高级算法（如 Actor-Critic）在此基础上引入价值函数来降低方差。

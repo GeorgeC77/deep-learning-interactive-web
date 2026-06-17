@@ -99,7 +99,7 @@ export default function ValuePolicyIterationPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>小状态空间可用策略迭代精确求解；大状态空间常用值迭代。</span>
+            <span>小状态空间可用精确动态规划；大状态空间通常需要近似动态规划或基于采样的强化学习方法。</span>
           </li>
         </ul>
       </section>

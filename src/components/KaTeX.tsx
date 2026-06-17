@@ -24,6 +24,8 @@ export default function KaTeX({ math, display = false, className = '' }: KaTeXPr
   return (
     <span
       className={className}
+      aria-label={math}
+      title={math}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

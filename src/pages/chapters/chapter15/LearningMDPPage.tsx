@@ -197,7 +197,7 @@ function ModelLearningDemo() {
       const s = traj[i];
       const a = policy[s];
       const sNext = traj[i + 1];
-      const r = i === traj.length - 2 ? rewardOf(s, config) : rewardOf(s, config);
+      const r = rewardOf(s, config);
       newCounts[s][a][sNext] += 1;
       newStateActionCounts[s][a] += 1;
       newRewardSums[s] += r;

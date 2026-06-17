@@ -111,6 +111,7 @@ export default function ComputerVisionPretrainingPage() {
           教学简化：本演示只生成一个增强视图，并把其他图像的增强视图作为负样本；
           完整的 SIMCLR 还会包含同批次中其他原始视图作为负样本，负样本总数为 2(B-1)。
           类别分离是该玩具数据和增强方式下的可视化现象，不是纯对比学习必然保证的结果。
+          本演示直接移动二维嵌入点，而不是训练图像编码器；目的是可视化对比损失的吸引/排斥趋势。
         </p>
         <ContrastiveDemo />
       </section>
