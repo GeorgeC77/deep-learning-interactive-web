@@ -14,7 +14,7 @@ export default function NonlinearToLQRPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-3">从非线性动力学到 LQR</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
           真实系统大多是非线性的。本节介绍如何把非线性动力学在平衡点或参考轨迹附近局部线性化，
-          从而继续使用 LQR 求解——这也是微分动态规划（DDP）的核心思想。
+          从而继续使用 LQR 求解——这也是 iLQR / DDP 类方法的基本思想；其中 iLQR 主要使用一阶动力学线性化和二阶代价近似，而完整 DDP 还可包含动力学的二阶项。
         </p>
 
         <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
@@ -26,19 +26,22 @@ export default function NonlinearToLQRPage() {
           <h2 className="text-2xl font-bold text-gray-900">动力学线性化</h2>
         </div>
         <p className="text-gray-700 mb-4">
-          假设真实转移方程为 <KaTeX math={String.raw`s_{t+1} = F(s_t, a_t)`} />，并且系统经常运行在某一工作点
-          <KaTeX math={String.raw`(\bar{s}, \bar{a})`} /> 附近。对该点做一阶泰勒展开：
+          假设真实转移方程为 {'s_{t+1} = f(s_t, a_t)'} <KaTeX math={String.raw`s_{t+1} = f(s_t, a_t)`} />，并且系统经常运行在某一工作点
+          (s_0, a_0) <KaTeX math={String.raw`(s_0, a_0)`} /> 附近。对该点做一阶泰勒展开：
         </p>
         <FormulaCard
           title="一阶泰勒展开"
           formula={
             <KaTeX
-              math={String.raw`F(s,a) \approx F(\bar{s},\bar{a}) + \nabla_s F(\bar{s},\bar{a}) (s-\bar{s}) + \nabla_a F(\bar{s},\bar{a}) (a-\bar{a})`}
+              math={String.raw`f(s,a) \approx f(s_0,a_0) + A (s-s_0) + B (a-a_0)`}
               display
             />
           }
           description="右边关于 s 与 a 都是线性的。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：s_{t+1} ≈ f(s_0,a_0) + A(s_t−s_0) + B(a_t−a_0)'}
+        </p>
         <p className="text-gray-700 mt-4 mb-4">
           整理后得到带常数项的线性系统：
         </p>
@@ -52,9 +55,12 @@ export default function NonlinearToLQRPage() {
           }
           description="常数项 c 可以通过增加一个恒为 1 的状态分量被吸收，于是回到标准 LQR 形式。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：s_{t+1} ≈ A s_t + B a_t + c'}
+        </p>
         <p className="text-gray-700 mt-4">
-          例如在倒立摆中，重力矩与 <KaTeX math={String.raw`\sin\theta`} /> 成正比；在竖直位置附近用
-          <KaTeX math={String.raw`\sin\theta \approx \theta`} /> 就得到了线性化模型。
+          例如在倒立摆中，重力矩与 sin θ <KaTeX math={String.raw`\sin\theta`} /> 成正比；在竖直位置附近用
+          sin θ ≈ θ <KaTeX math={String.raw`\sin\theta \approx \theta`} /> 就得到了线性化模型。
         </p>
       </section>
 
@@ -65,13 +71,13 @@ export default function NonlinearToLQRPage() {
           把整条轨迹拆成若干局部 LQR 问题。DDP 的主要步骤如下：
         </p>
         <ol className="list-decimal list-inside space-y-2 text-gray-700 mb-4">
-          <li>用一个简单控制器生成一条名义轨迹 <KaTeX math={String.raw`\bar{s}_0,\bar{a}_0,\bar{s}_1,\bar{a}_1,\dots`} />。</li>
+          <li>用一个简单控制器生成一条名义轨迹 τ = (s_0,a_0,s_1,a_1,...) <KaTeX math={String.raw`\tau = (s_0,a_0,s_1,a_1,\dots)`} />。</li>
           <li>在轨迹每一点附近对动力学做一阶展开，对代价函数做二阶展开，得到局部 LQR。</li>
           <li>用 LQR 求解局部反馈增益，得到新的控制器。</li>
           <li>用新的控制器和<strong>真实</strong>非线性动力学重新生成轨迹，回到第 2 步迭代。</li>
         </ol>
         <p className="text-gray-700">
-          如果轨迹偏离线性化区域太远，可以通过奖励整形（reward shaping）或缩短步长来改善。
+          如果轨迹偏离线性化区域太远，可以通过 line search、trust region、regularization 或重新线性化来改善。
         </p>
       </section>
 

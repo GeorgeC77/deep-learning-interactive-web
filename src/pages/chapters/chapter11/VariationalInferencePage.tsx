@@ -25,19 +25,22 @@ export default function VariationalInferencePage() {
         </div>
         <p className="text-gray-700 mb-4">
           在经典 EM 中，E-step 要求能精确计算后验 p(z|x;θ)。对于很多复杂模型（尤其是由神经网络参数化的模型），
-          这个后验是无法解析计算的。变分推断引入一个近似分布 Q(z)，并最小化 Q 与真实后验之间的 KL 散度。
+          这个后验是无法解析计算的。变分推断引入一个近似分布 q_φ(z|x)，并最小化 q_φ(z|x) 与真实后验之间的 KL 散度。
         </p>
 
         <FormulaCard
           title="ELBO 的另一种形式"
           formula={
             <KaTeX
-              math={String.raw`\text{ELBO}(x; Q, \theta) = \log p(x;\theta) - D_{KL}\bigl(Q(z) \| p(z|x;\theta)\bigr)`}
+              math={String.raw`\text{ELBO}(x; q, \theta) = \log p_\theta(x) - D_{KL}\bigl(q(z) \| p_\theta(z|x)\bigr)`}
               display
             />
           }
-          description="最大化 ELBO 相当于同时提高模型似然，并让近似后验 Q 接近真实后验。"
+          description="最大化 ELBO 相当于同时提高模型似然，并让近似后验 q 接近真实后验。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：log p_θ(x) ≥ E_{q(z)}[log p_θ(x,z) − log q(z)]'}
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -46,7 +49,7 @@ export default function VariationalInferencePage() {
           变分自编码器是变分推断与深度学习的结合。它用神经网络参数化：
         </p>
         <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
-          <li><strong>编码器（推断网络）</strong>：输入 x，输出近似后验 Q(z|x) 的均值和方差。</li>
+          <li><strong>编码器（推断网络）</strong>：输入 x，输出近似后验 q_φ(z|x) 的均值和方差。</li>
           <li><strong>解码器（生成网络）</strong>：输入 z，输出数据分布 p(x|z) 的参数。</li>
         </ul>
 
@@ -60,6 +63,9 @@ export default function VariationalInferencePage() {
           }
           description="第一项是重构似然，第二项让近似后验接近先验。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：E_{q_φ(z|x)}[log p_θ(x|z)] − KL(q_φ(z|x) || p(z))'}
+        </p>
 
         <p className="text-gray-700 mt-4">
           为了让梯度能够穿过采样过程，VAE 使用<strong>重参数化技巧</strong>：
@@ -68,12 +74,15 @@ export default function VariationalInferencePage() {
           title="重参数化技巧"
           formula={
             <KaTeX
-              math={String.raw`z = \mu(x) + \sigma(x) \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)`}
+              math={String.raw`z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)`}
               display
             />
           }
           description="这样 z 对参数的依赖变成确定性变换，随机性来自与参数无关的 ε，从而可以使用标准反向传播。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：z = μ_φ(x) + σ_φ(x) ⊙ ε, ε ~ N(0,I)'}
+        </p>
       </section>
 
       <section className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">

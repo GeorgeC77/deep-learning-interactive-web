@@ -38,12 +38,15 @@ export default function ValuePolicyConnectionPage() {
           title="迭代式策略评估"
           formula={
             <KaTeX
-              math={String.raw`V(s) := R(s) + \gamma \sum_{s' \in S} P_{s\pi(s)}(s') V(s')`}
+              math={String.raw`V(s) := R(s) + \gamma \sum_{s'} P(s'|s,\pi(s)) V(s')`}
               display
             />
           }
           description="这里固定使用当前策略 π 的动作，而不是取 max。重复此更新 k 次，就得到 V^π 的一个近似。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：V(s) := R(s) + γ Σ_{s\'} P(s\'|s,π(s)) V(s\')'}
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -57,7 +60,7 @@ export default function ValuePolicyConnectionPage() {
           <li>重复直到收敛：
             <ul className="list-disc list-inside ml-6 mt-1 space-y-1 text-gray-700">
               <li>V := VE(π, k)（对 π 做 k 次 Bellman 更新）。</li>
-              <li>π(s) := argmax_a Σ_s' P_sa(s') V(s')（贪婪策略改进）。</li>
+              <li>{"π(s) := argmax_a Σ_{s'} P(s'|s,a)[R(s,a,s') + γV(s')]"} <KaTeX math={String.raw`\pi(s) := \arg\max_a \sum_{s'} P(s'|s,a)\bigl[R(s,a,s') + \gamma V(s')\bigr]`} />（贪婪策略改进）。</li>
             </ul>
           </li>
         </ol>
@@ -72,7 +75,7 @@ export default function ValuePolicyConnectionPage() {
           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
             <h3 className="font-semibold text-blue-800 mb-2">k = 1：值迭代</h3>
             <p className="text-sm text-gray-700">
-              当 k = 1 时，Algorithm 6 每次只做一次策略评估更新，然后就做策略改进。这与值迭代完全等价：
+              当 k = 1 时，Algorithm 6 每次只做一次策略评估更新，然后就做策略改进。在常见同步 Bellman backup 和贪婪策略提取设定下，k=1 与值迭代非常接近，可视为值迭代的特例或等价实现；
               两者都在交替执行一次 Bellman 备份和一次贪婪策略提取。
             </p>
           </div>
@@ -111,7 +114,7 @@ export default function ValuePolicyConnectionPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>小状态空间用策略迭代，大状态空间用值迭代。</span>
+            <span>小状态空间可用精确动态规划；大状态空间通常需要近似动态规划或基于采样的强化学习方法。</span>
           </li>
         </ul>
       </section>

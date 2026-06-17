@@ -147,8 +147,8 @@ export default function PolicyGradientPage() {
         />
         <p className="text-gray-700 mt-4">
           注意：基线只能依赖状态，不能依赖当前采样的动作；这样不会改变策略梯度的期望，只会降低方差。
-          实践中常用价值函数 <KaTeX math={String.raw`V^\pi(s)`} /> 作为基线，并通过最小化
-          <KaTeX math={String.raw`(\hat{R}_t - B(s_t))^2`} /> 来拟合它。
+          实践中常用价值函数 V_φ(s_t) <KaTeX math={String.raw`V_\phi(s_t)`} /> 作为基线，并通过最小化
+          (G_t − V_φ(s_t))² <KaTeX math={String.raw`(G_t - V_\phi(s_t))^2`} /> 来拟合它。
         </p>
       </section>
 

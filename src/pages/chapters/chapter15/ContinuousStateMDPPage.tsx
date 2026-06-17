@@ -49,8 +49,11 @@ export default function ContinuousStateMDPPage() {
           }
           description="例如 10 维状态，每维 100 个区间，将产生 100^10 = 10^{20} 个离散状态，远超现代计算机的存储能力。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：|S_discrete| = k^d'}
+        </p>
         <p className="text-gray-700 mt-4">
-          因此，离散化只适用于 1–4 维的低维问题，对高维问题必须寻找更聪明的方法。
+          因此，离散化通常只适用于低维或结构简单的问题；维度稍高时需要函数近似、采样方法或问题结构利用。
         </p>
       </section>
 
@@ -69,6 +72,9 @@ export default function ContinuousStateMDPPage() {
           }
           description="φ(s) 是状态的特征映射。这样无论状态维度多高，价值函数都由参数向量 θ 表示。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：V_θ(s) = θ^T φ(s)，或更一般地由神经网络 V_θ(s) 表示'}
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -84,12 +90,15 @@ export default function ContinuousStateMDPPage() {
           title="目标值"
           formula={
             <KaTeX
-              math={String.raw`y^{(i)} = R(s^{(i)}) + \gamma \max_a \mathbb{E}_{s' \sim P_{s^{(i)}a}}\left[V_\theta(s')\right]`}
+              math={String.raw`y^{(i)} = \max_a \left[ R(s^{(i)}, a) + \gamma \, \mathbb{E}_{s' \sim P(\cdot|s^{(i)},a)}\bigl[V_\theta(s')\bigr] \right]`}
               display
             />
           }
           description="期望通常通过从模型中采样 k 个下一状态来近似。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：y^(i) = max_a [ R(s^(i),a) + γ E[V_θ(s\') | s^(i),a] ]'}
+        </p>
         <p className="text-gray-700 mt-4 mb-4">
           然后，通过监督学习（如线性回归）更新参数 θ，使 V_θ(s^(i)) 尽可能接近 y^(i)：
         </p>
@@ -97,12 +106,15 @@ export default function ContinuousStateMDPPage() {
           title="监督学习更新"
           formula={
             <KaTeX
-              math={String.raw`\theta := \arg\min_\theta \frac{1}{2}\sum_{i=1}^n \bigl(V_\theta(s^{(i)}) - y^{(i)}\bigr)^2`}
+              math={String.raw`\min_\theta \sum_{i=1}^n \bigl(V_\theta(s^{(i)}) - y^{(i)}\bigr)^2`}
               display
             />
           }
           description="这一步完全等价于标准的回归问题，只是输入是状态 s，标签是 y。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：min_θ Σ_i (V_θ(s^(i)) − y^(i))²'}
+        </p>
         <p className="text-gray-700 mt-4">
           Fitted value iteration 不能被证明一定收敛，但在实践中对很多问题都有效。如果模型是确定性的，可令 k=1 来简化期望计算。
         </p>
