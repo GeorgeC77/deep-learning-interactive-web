@@ -40,7 +40,7 @@ export default function LargeLanguageModelsPage() {
           description="这样每次只需要建模词汇表大小为 V 的条件分布。"
         />
         <p className="text-gray-700 mt-4">
-          通常把输入序列右移一位：输入 (x_0, x_1, ..., x_{T-1})，模型输出 logits (u_1, ..., u_T)，其中 u_t 用来预测 x_t，并且只依赖 x_0, ..., x_{t-1}。条件概率由 softmax 给出：
+          {'通常把输入序列右移一位：输入 (x_0, x_1, ..., x_{T-1})，模型输出 logits (u_1, ..., u_T)，其中 u_t 用来预测 x_t，并且只依赖 x_0, ..., x_{t-1}。条件概率由 softmax 给出：'}
         </p>
         <FormulaCard
           title="条件分布"
