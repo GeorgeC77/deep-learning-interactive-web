@@ -27,7 +27,7 @@ export default function PolicyGradientPage() {
         </div>
         <p className="text-gray-700 mb-4">
           REINFORCE 只假设我们能从环境中采样轨迹，并能观测到奖励；它不需要建立环境模型。
-          我们用带参数 <em>θ</em> 的随机策略 <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 描述动作分布。
+          我们用带参数 <em>θ</em> 的随机策略 π_θ(a|s) <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 描述动作分布。
         </p>
         <p className="text-gray-700 mb-4">
           在有限时域设定下，一条轨迹由状态、动作和奖励交替组成。关键记号如下：
@@ -42,13 +42,16 @@ export default function PolicyGradientPage() {
           }
           description="r_t 是时刻 t 的即时奖励，γ 是折扣因子；在简化讨论中也可取 γ = 1。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：G_t = Σ_{k=t}^{T} γ^{k−t} r_k'}
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">对数似然梯度技巧</h2>
         <p className="text-gray-700 mb-4">
           由于期望内部含有依赖于 <em>θ</em> 的分布，直接求梯度会遇到困难。利用恒等式
-          <KaTeX math={String.raw`\nabla_\theta p_\theta(\tau) = p_\theta(\tau) \nabla_\theta \log p_\theta(\tau)`} />
+          ∇θ pθ(τ) = pθ(τ) ∇θ log pθ(τ) <KaTeX math={String.raw`\nabla_\theta p_\theta(\tau) = p_\theta(\tau) \nabla_\theta \log p_\theta(\tau)`} />
           可把梯度移到期望内部：
         </p>
         <FormulaCard
@@ -61,6 +64,9 @@ export default function PolicyGradientPage() {
           }
           description="回报 G(τ) 作为权重；这就是对数导数技巧（log-derivative trick）。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：∇θ J(θ) = E_{τ~πθ}[ G(τ) ∇θ log pθ(τ) ]'}
+        </p>
         <p className="text-gray-700 mt-4 mb-4">
           轨迹概率可分解为初始状态、策略选择与转移概率的乘积：
         </p>
@@ -74,6 +80,9 @@ export default function PolicyGradientPage() {
           }
           description="取对数后，转移概率项与 θ 无关，求梯度时会消失。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：pθ(τ) = μ(s0) ∏_{t=0}^{T-1} πθ(at|st) P(st+1|st,at)'}
+        </p>
         <p className="text-gray-700 mt-4 mb-4">
           因此梯度可写成仅含策略对数似然的形式：
         </p>
@@ -87,6 +96,9 @@ export default function PolicyGradientPage() {
           }
           description="整个轨迹的回报 G(τ) 作为权重，调整每个访问过的状态-动作对的出现概率。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：∇θ J(θ) = E_{τ}[ Σ_{t=0}^{T-1} ∇θ log πθ(at|st) G(τ) ]'}
+        </p>
         <p className="text-gray-700 mt-4">
           直观解释：如果轨迹回报或优势函数为正，就增加对应动作序列的概率；如果为负，就降低其概率。使用 baseline 后，更新方向由 G_t − B(s_t) 的符号决定。
         </p>
@@ -95,10 +107,10 @@ export default function PolicyGradientPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">REINFORCE 算法</h2>
         <ol className="list-decimal list-inside space-y-2 text-gray-700 mb-4">
-          <li>用当前策略 <KaTeX math={String.raw`\pi_\theta`} /> 采样若干条轨迹。</li>
-          <li>对每条轨迹计算累积回报 <KaTeX math={String.raw`G(\tau)`} />。</li>
-          <li>用蒙特卡洛估计梯度 <KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) G(\tau^{(i)})`} />。</li>
-          <li>沿梯度方向更新参数 <KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />。</li>
+          <li>用当前策略 π_θ(a|s) <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 采样若干条轨迹。</li>
+          <li>对每条轨迹计算累积回报 G(τ) <KaTeX math={String.raw`G(\tau)`} />。</li>
+          <li>用蒙特卡洛估计梯度 ∇J(θ) <KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) G(\tau^{(i)})`} />。</li>
+          <li>沿梯度方向更新参数 θ := θ + α∇̂J <KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />。</li>
         </ol>
         <p className="text-gray-700">
           这是无模型、基于采样的策略优化基础；后续更高级算法（如 Actor-Critic）在此基础上引入价值函数来降低方差。
