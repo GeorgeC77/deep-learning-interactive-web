@@ -27,7 +27,7 @@ export default function PolicyGradientPage() {
         </div>
         <p className="text-gray-700 mb-4">
           REINFORCE 只假设我们能从环境中采样轨迹，并能观测到奖励；它不需要建立环境模型。
-          我们用带参数 <em>θ</em> 的随机策略 π_θ(a|s)（<KaTeX math={String.raw`\pi_\theta(a \mid s)`} />）描述动作分布。
+          我们用带参数 <em>θ</em> 的随机策略 <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 描述动作分布。
         </p>
         <p className="text-gray-700 mb-4">
           在有限时域设定下，一条轨迹由状态、动作和奖励交替组成。关键记号如下：
@@ -95,10 +95,10 @@ export default function PolicyGradientPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">REINFORCE 算法</h2>
         <ol className="list-decimal list-inside space-y-2 text-gray-700 mb-4">
-          <li>用当前策略 π_θ（<KaTeX math={String.raw`\pi_\theta`} />）采样若干条轨迹。</li>
-          <li>对每条轨迹计算累积回报 G(τ)（<KaTeX math={String.raw`G(\tau)`} />）。</li>
-          <li>用蒙特卡洛估计梯度 ∇̂J = (1/n) Σ_i (Σ_t ∇_θ log π_θ(a_t^(i)|s_t^(i))) G(τ^(i))（<KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) G(\tau^{(i)})`} />）。</li>
-          <li>沿梯度方向更新参数 θ := θ + α ∇̂J（<KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />）。</li>
+          <li>用当前策略 <KaTeX math={String.raw`\pi_\theta`} /> 采样若干条轨迹。</li>
+          <li>对每条轨迹计算累积回报 <KaTeX math={String.raw`G(\tau)`} />。</li>
+          <li>用蒙特卡洛估计梯度 <KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) G(\tau^{(i)})`} />。</li>
+          <li>沿梯度方向更新参数 <KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />。</li>
         </ol>
         <p className="text-gray-700">
           这是无模型、基于采样的策略优化基础；后续更高级算法（如 Actor-Critic）在此基础上引入价值函数来降低方差。
@@ -134,6 +134,7 @@ export default function PolicyGradientPage() {
           description="其中 G_t = Σ_{k=t}^{T} γ^{k−t} r_k 表示从 t 时刻起打折后的未来回报。合适的基线能显著降低梯度估计方差。"
         />
         <p className="text-gray-700 mt-4">
+          注意：基线只能依赖状态，不能依赖当前采样的动作；这样不会改变策略梯度的期望，只会降低方差。
           实践中常用价值函数 <KaTeX math={String.raw`V^\pi(s)`} /> 作为基线，并通过最小化
           <KaTeX math={String.raw`(\hat{R}_t - B(s_t))^2`} /> 来拟合它。
         </p>
