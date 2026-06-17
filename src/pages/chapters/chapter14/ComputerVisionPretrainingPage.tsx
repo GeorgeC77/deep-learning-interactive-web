@@ -54,8 +54,8 @@ export default function ComputerVisionPretrainingPage() {
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">计算机视觉中的预训练</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
-          计算机视觉中常用的预训练方法包括监督预训练和对比学习。对比学习利用数据增强生成正样本对，
-          把语义相似的图像在表示空间中拉近，把不相关的图像推远。
+          计算机视觉中常用的预训练方法包括监督预训练和对比学习。对比学习通常通过数据增强构造正样本对，
+          把同一图像的不同视图拉近，并在 instance discrimination 目标下把其他图像视图作为负样本推远；这种训练可能诱导语义结构，但并不直接使用类别标签。
         </p>
 
         <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>

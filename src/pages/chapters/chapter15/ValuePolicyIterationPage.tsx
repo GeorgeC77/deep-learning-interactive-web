@@ -39,7 +39,7 @@ export default function ValuePolicyIterationPage() {
           title="值迭代更新"
           formula={
             <KaTeX
-              math={String.raw`V(s) := R(s) + \gamma \max_{a \in A} \sum_{s' \in S} P_{sa}(s') V(s')`}
+              math={String.raw`V(s) := R(s) + \gamma \max_{a \in A} \sum_{s' \in S} P(s'|s,a) V(s')`}
               display
             />
           }
@@ -63,15 +63,14 @@ export default function ValuePolicyIterationPage() {
           title="策略迭代"
           formula={
             <KaTeX
-              math={String.raw`\pi(s) := \arg\max_{a \in A} \sum_{s' \in S} P_{sa}(s') V^\pi(s')`}
+              math={String.raw`\pi(s) := \arg\max_{a \in A} \sum_{s' \in S} P(s'|s,a) V^\pi(s')`}
               display
             />
           }
           description="当策略不再改变时，即已找到最优策略。"
         />
         <p className="text-gray-700 mt-4">
-          策略迭代通常比值迭代更快收敛到精确最优策略，但每次迭代需要求解一个线性方程组，状态空间很大时计算代价高。
-          因此，实际中值迭代往往更常用。
+          策略迭代往往用较少轮数达到最优策略，但每轮策略评估可能较贵；值迭代每步较便宜、实现简单。在大规模问题中，实际方法常采用近似值迭代、修改策略迭代或基于采样的强化学习算法。
         </p>
       </section>
 

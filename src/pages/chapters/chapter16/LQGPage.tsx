@@ -211,7 +211,7 @@ function KalmanDemo() {
           <line x1={pad.left} y1={pad.top} x2={pad.left} y2={height - pad.bottom} stroke="#d1d5db" strokeWidth={1} />
           <line x1={pad.left} y1={y(0)} x2={width - pad.right} y2={y(0)} stroke="#e5e7eb" strokeWidth={1} />
 
-          {trueStates.map((v, t) => {
+          {estimates.map((v, t) => {
             const cx = x(t);
             const sigma = Math.sqrt(variances[t]);
             const top = y(v + 2 * sigma);
@@ -240,7 +240,7 @@ function KalmanDemo() {
           <span className="flex items-center gap-2"><span className="w-4 h-0.5 bg-green-600" />真实状态</span>
           <span className="flex items-center gap-2"><span className="w-4 h-0.5 bg-blue-600" />卡尔曼估计</span>
           <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-gray-500" />观测</span>
-          <span className="flex items-center gap-2"><span className="w-4 h-2 bg-blue-200" />±2σ 置信带</span>
+          <span className="flex items-center gap-2"><span className="w-4 h-2 bg-blue-200" />估计 ±2σ 不确定性带</span>
         </div>
       </div>
     </div>

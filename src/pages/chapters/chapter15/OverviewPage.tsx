@@ -45,7 +45,7 @@ export default function OverviewPage() {
           title="Bellman 最优方程"
           formula={
             <KaTeX
-              math={String.raw`V^*(s) = R(s) + \gamma \max_{a \in A} \sum_{s' \in S} P_{sa}(s') V^*(s')`}
+              math={String.raw`V^*(s) = R(s) + \gamma \max_{a \in A} \sum_{s' \in S} P(s'|s,a) V^*(s')`}
               display
             />
           }

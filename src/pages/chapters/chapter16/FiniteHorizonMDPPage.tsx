@@ -39,7 +39,7 @@ export default function FiniteHorizonMDPPage() {
           description="折扣因子 γ 保证无穷求和收敛，并让近期奖励更重要。"
         />
         <p className="text-gray-700 mt-4 mb-4">
-          有限时域 MDP 只考虑前 <em>T</em> 个时间步，回报变成有限和，因此不再需要折扣因子：
+          有限时域 MDP 只考虑前 <em>T</em> 个时间步，回报变成有限和，因此不需要依靠折扣因子来保证收敛；但在某些任务中，仍可以保留折扣因子来表达对近期奖励的偏好：
         </p>
         <FormulaCard
           title="有限时域回报"
@@ -66,7 +66,7 @@ export default function FiniteHorizonMDPPage() {
           title="动作价值形式的 Bellman 最优方程"
           formula={
             <KaTeX
-              math={String.raw`V^*(s) = \max_{a\in A} \Bigl[ R(s,a) + \gamma \, \mathbb{E}_{s'\sim P_{sa}}\bigl[V^*(s')\bigr] \Bigr]`}
+              math={String.raw`V^*(s) = \max_{a\in A} \Bigl[ R(s,a) + \gamma \, \mathbb{E}_{s'\sim P(\cdot|s,a)}\bigl[V^*(s')\bigr] \Bigr]`}
               display
             />
           }
@@ -92,7 +92,7 @@ export default function FiniteHorizonMDPPage() {
           title="反向递推"
           formula={
             <KaTeX
-              math={String.raw`V_t(s) = \max_{a\in A} \Bigl[ R^{(t)}(s,a) + \mathbb{E}_{s'\sim P^{(t)}_{sa}}\bigl[V_{t+1}(s')\bigr] \Bigr]`}
+              math={String.raw`V_t(s) = \max_{a\in A} \Bigl[ R^{(t)}(s,a) + \mathbb{E}_{s'\sim P^{(t)}(\cdot|s,a)}\bigl[V_{t+1}(s')\bigr] \Bigr]`}
               display
             />
           }

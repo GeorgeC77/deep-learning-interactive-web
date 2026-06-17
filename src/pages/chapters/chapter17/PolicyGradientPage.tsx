@@ -30,24 +30,18 @@ export default function PolicyGradientPage() {
           我们用带参数 <em>θ</em> 的随机策略 <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 描述动作分布。
         </p>
         <p className="text-gray-700 mb-4">
-          在有限时域设定下，一条轨迹记为
-          <KaTeX math={String.raw`\tau = (s_0, a_0, s_1, a_1, \dots, s_T)`} />，
-          其累积回报为：
+          在有限时域设定下，一条轨迹由状态、动作和奖励交替组成。关键记号如下：
         </p>
         <FormulaCard
-          title="轨迹回报"
+          title="关键记号"
           formula={
             <KaTeX
-              math={String.raw`f(\tau) = \sum_{t=0}^{T-1} \gamma^t R(s_t, a_t)`}
+              math={String.raw`\begin{aligned} \pi_\theta(a \mid s) &: \text{参数化随机策略} \\ \tau &= (s_0, a_0, r_0, \dots, s_T) \\ G(\tau) &= \sum_{t=0}^{T-1} \gamma^t r_t \\ J(\theta) &= \mathbb{E}_{\tau \sim \pi_\theta}\bigl[G(\tau)\bigr] \end{aligned}`}
               display
             />
           }
-          description="γ 是折扣因子；在简化讨论中也可取 γ = 1。"
+          description="r_t 是时刻 t 的即时奖励，γ 是折扣因子；在简化讨论中也可取 γ = 1。"
         />
-        <p className="text-gray-700 mt-4">
-          策略目标是最大化期望回报：
-          <KaTeX math={String.raw`J(\theta) = \mathbb{E}_{\tau \sim p_\theta}[f(\tau)]`} />。
-        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -61,11 +55,11 @@ export default function PolicyGradientPage() {
           title="策略梯度基本等式"
           formula={
             <KaTeX
-              math={String.raw`\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim p_\theta}\bigl[\nabla_\theta \log p_\theta(\tau) \, f(\tau)\bigr]`}
+              math={String.raw`\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\bigl[G(\tau) \, \nabla_\theta \log p_\theta(\tau)\bigr]`}
               display
             />
           }
-          description="这就是对数导数技巧（log-derivative trick）。"
+          description="回报 G(τ) 作为权重；这就是对数导数技巧（log-derivative trick）。"
         />
         <p className="text-gray-700 mt-4 mb-4">
           轨迹概率可分解为初始状态、策略选择与转移概率的乘积：
@@ -74,7 +68,7 @@ export default function PolicyGradientPage() {
           title="轨迹概率分解"
           formula={
             <KaTeX
-              math={String.raw`p_\theta(\tau) = \mu(s_0) \prod_{t=0}^{T-1} \pi_\theta(a_t \mid s_t) \, P_{s_t a_t}(s_{t+1})`}
+              math={String.raw`p_\theta(\tau) = \mu(s_0) \prod_{t=0}^{T-1} \pi_\theta(a_t \mid s_t) \, P(s_{t+1} \mid s_t, a_t)`}
               display
             />
           }
@@ -87,11 +81,11 @@ export default function PolicyGradientPage() {
           title="REINFORCE 梯度"
           formula={
             <KaTeX
-              math={String.raw`\nabla_\theta J(\theta) = \mathbb{E}_{\tau}\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t \mid s_t) \, f(\tau)\right]`}
+              math={String.raw`\nabla_\theta J(\theta) = \mathbb{E}_{\tau}\left[\sum_{t=0}^{T-1} \nabla_\theta \log \pi_\theta(a_t \mid s_t) \, G(\tau)\right]`}
               display
             />
           }
-          description="整个轨迹的回报 f(τ) 作为权重，调整每个访问过的状态-动作对的出现概率。"
+          description="整个轨迹的回报 G(τ) 作为权重，调整每个访问过的状态-动作对的出现概率。"
         />
         <p className="text-gray-700 mt-4">
           直观解释：如果轨迹回报或优势函数为正，就增加对应动作序列的概率；如果为负，就降低其概率。使用 baseline 后，更新方向由 G_t − B(s_t) 的符号决定。
@@ -102,7 +96,7 @@ export default function PolicyGradientPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">REINFORCE 算法</h2>
         <ol className="list-decimal list-inside space-y-2 text-gray-700 mb-4">
           <li>用当前策略 <KaTeX math={String.raw`\pi_\theta`} /> 采样若干条轨迹。</li>
-          <li>对每条轨迹计算累积回报 <KaTeX math={String.raw`f(\tau)`} />。</li>
+          <li>对每条轨迹计算累积回报 <KaTeX math={String.raw`G(\tau)`} />。</li>
           <li>用蒙特卡洛估计梯度 <KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) f(\tau^{(i)})`} />。</li>
           <li>沿梯度方向更新参数 <KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />。</li>
         </ol>

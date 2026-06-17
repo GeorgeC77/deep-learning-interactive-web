@@ -39,12 +39,12 @@ export default function MDPPage() {
         <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
           <li><strong>状态集合 S：</strong>环境可能处于的所有状态。</li>
           <li><strong>动作集合 A：</strong>智能体在每个状态下可以采取的动作。</li>
-          <li><strong>转移概率 <KaTeX math={String.raw`P(s'|s,a)`} />：</strong>在状态 s 采取动作 a 后转移到下一状态 s' 的概率。</li>
+          <li><strong>转移概率 P(s'|s,a)：</strong>在状态 s 采取动作 a 后转移到下一状态 s' 的概率。</li>
           <li><strong>奖励函数 R(s,a) 或 R(s,a,s')：</strong>智能体执行动作或发生转移后获得的即时奖励。</li>
           <li><strong>折扣因子 γ ∈ [0, 1)：</strong>未来奖励的衰减系数。</li>
         </ul>
         <p className="text-gray-700">
-          在每个时间步，智能体观察当前状态 s，选择动作 a，环境根据 <KaTeX math={String.raw`P(s'|s,a)`} /> 转移到下一状态 s'，并返回奖励 R(s,a)（或更一般地 R(s,a,s')）。
+          在每个时间步，智能体观察当前状态 s，选择动作 a，环境根据 P(s'|s,a) 转移到下一状态 s'，并返回奖励 R(s,a)（或更一般地 R(s,a,s')）。
           智能体的目标是最大化累积折扣奖励的期望。
         </p>
       </section>

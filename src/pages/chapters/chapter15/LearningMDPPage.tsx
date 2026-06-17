@@ -36,7 +36,7 @@ export default function LearningMDPPage() {
           <h2 className="text-2xl font-bold text-gray-900">从经验中学习模型</h2>
         </div>
         <p className="text-gray-700 mb-4">
-          假设我们已经知道状态空间 S、动作空间 A 和折扣因子 γ，但不知道转移概率 P<sub>sa</sub> 和奖励函数 R。
+          假设我们已经知道状态空间 S、动作空间 A 和折扣因子 γ，但不知道转移概率 P(s'|s,a) 和奖励函数 R(s,a)（或更一般地 R(s,a,s')）。
           我们可以通过让智能体执行若干条轨迹（trials）来收集经验：
         </p>
         <div className="my-4">
@@ -52,14 +52,14 @@ export default function LearningMDPPage() {
           title="转移概率的最大似然估计"
           formula={
             <KaTeX
-              math={String.raw`\hat{P}_{sa}(s') = \frac{\#\{(s, a, s')\}}{\#\{(s, a)\}}`}
+              math={String.raw`\hat{P}(s'|s,a) = \frac{\#\{(s, a, s')\}}{\#\{(s, a)\}}`}
               display
             />
           }
           description="若从未在状态 s 采取过动作 a，则可将其估计为均匀分布。"
         />
         <p className="text-gray-700 mt-4">
-          同样，奖励 R(s) 可以估计为在状态 s 观察到的平均奖励。
+          一般情形下，奖励 R(s,a) 或 R(s,a,s') 可估计为对应状态-动作（或状态-动作-下一状态）上观察到的平均奖励。本演示为简化，使用状态奖励 R(s)；一般情形下奖励可依赖于状态、动作和下一状态。
         </p>
       </section>
 
