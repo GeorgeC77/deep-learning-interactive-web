@@ -39,12 +39,12 @@ export default function MDPPage() {
         <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
           <li><strong>状态集合 S：</strong>环境可能处于的所有状态。</li>
           <li><strong>动作集合 A：</strong>智能体在每个状态下可以采取的动作。</li>
-          <li><strong>转移概率 P<sub>sa</sub>：</strong>在状态 s 采取动作 a 后转移到下一状态 s' 的概率。</li>
+          <li><strong>转移概率 <KaTeX math={String.raw`P(s'|s,a)`} />：</strong>在状态 s 采取动作 a 后转移到下一状态 s' 的概率。</li>
           <li><strong>奖励函数 R：</strong>智能体在状态 s（或状态-动作对）获得的即时奖励。</li>
           <li><strong>折扣因子 γ ∈ [0, 1)：</strong>未来奖励的衰减系数。</li>
         </ul>
         <p className="text-gray-700">
-          在每个时间步，智能体观察当前状态 s，选择动作 a，环境根据 P<sub>sa</sub> 转移到下一状态 s'，并返回奖励 R(s)。
+          在每个时间步，智能体观察当前状态 s，选择动作 a，环境根据 <KaTeX math={String.raw`P(s'|s,a)`} /> 转移到下一状态 s'，并返回奖励 R(s)。
           智能体的目标是最大化累积折扣奖励的期望。
         </p>
       </section>
@@ -52,7 +52,7 @@ export default function MDPPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">策略与价值函数</h2>
         <p className="text-gray-700 mb-4">
-          策略 π 是一个从状态到动作的映射 π(s) ∈ A。给定策略 π，其价值函数 V^π(s) 表示从状态 s 出发、按 π 行动所获得的期望累积折扣奖励：
+          策略描述智能体在每个状态如何选择动作。为简化起见，可以先考虑确定性策略 π(s) ∈ A；更一般地，随机策略写作 π(a|s)，表示在状态 s 下选择动作 a 的概率。给定策略 π，其价值函数 V^π(s) 表示从状态 s 出发、按 π 行动所获得的期望累积折扣奖励：
         </p>
         <FormulaCard
           title="策略价值函数"
@@ -71,7 +71,7 @@ export default function MDPPage() {
           title="策略 Bellman 方程"
           formula={
             <KaTeX
-              math={String.raw`V^\pi(s) = R(s) + \gamma \sum_{s' \in S} P_{s\pi(s)}(s') V^\pi(s')`}
+              math={String.raw`V^\pi(s) = R(s) + \gamma \sum_{s' \in S} P\bigl(s'|s,\pi(s)\bigr) V^\pi(s')`}
               display
             />
           }
@@ -88,7 +88,7 @@ export default function MDPPage() {
           title="最优 Bellman 方程"
           formula={
             <KaTeX
-              math={String.raw`V^*(s) = R(s) + \gamma \max_{a \in A} \sum_{s' \in S} P_{sa}(s') V^*(s')`}
+              math={String.raw`V^*(s) = R(s) + \gamma \max_{a \in A} \sum_{s' \in S} P(s'|s,a) V^*(s')`}
               display
             />
           }

@@ -117,18 +117,17 @@ export default function PCAPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">数据预处理</h2>
         <p className="text-gray-700 mb-4">
-          在运行 PCA 之前，通常需要先对每个特征做标准化：减去均值并除以标准差。这样可以让不同量纲的特征处于同一尺度，
-          避免某个特征因为数值范围大而被错误地当作「主成分」。
+          PCA 通常需要先中心化，即减去每个特征的均值。是否进一步除以标准差取决于任务：若特征量纲差异很大，常使用标准化或相关矩阵 PCA；若特征量纲本身有意义，则可只中心化并基于协方差矩阵做 PCA。
         </p>
         <FormulaCard
-          title="标准化"
+          title="中心化（以及可选的标准化）"
           formula={
             <KaTeX
               math={String.raw`\tilde{x}_j^{(i)} = \frac{x_j^{(i)} - \mu_j}{\sigma_j}`}
               display
             />
           }
-          description="其中 μ_j 和 σ_j 分别是第 j 个特征的样本均值和标准差。若已知特征均值为零（如某些信号数据），可只除以标准差。"
+          description="其中 μ_j 和 σ_j 分别是第 j 个特征的样本均值和标准差。中心化是必须步骤；除以 σ_j 是可选的，取决于是否希望消除量纲影响。"
         />
       </section>
 

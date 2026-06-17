@@ -117,6 +117,11 @@ export default function GaussianMixtureEMPage() {
           }
           description="M-step 的更新与完全数据最大似然估计形式相同，只是把硬指示函数换成了软权重。"
         />
+
+        <p className="text-gray-700 mt-4 text-sm bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <strong>数值稳定性提示：</strong>
+          在真实 GMM 中，如果不限制协方差，某个分量可能塌缩到单个样本附近，导致似然无界；本演示为数值稳定设置了最小标准差。
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

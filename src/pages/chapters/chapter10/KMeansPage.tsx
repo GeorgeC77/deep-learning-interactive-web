@@ -104,7 +104,7 @@ export default function KMeansPage() {
               display
             />
           }
-          description="分配步骤和更新步骤都会使 J 不增，因此算法必然收敛（但可能只收敛到局部最优）。"
+          description="在有限样本且平局、空簇处理规则固定时，分配步骤和更新步骤都会使 J 单调不增，通常在有限次迭代后达到稳定分配；但结果依赖初始化，且只保证局部最优或固定点。"
         />
       </section>
 
@@ -128,7 +128,7 @@ export default function KMeansPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>算法保证收敛，但结果依赖于初始质心。</span>
+            <span>在规则固定时目标函数单调不增，通常在有限步后稳定；结果依赖于初始质心，只保证局部最优或固定点。</span>
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />

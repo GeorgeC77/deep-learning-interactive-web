@@ -203,7 +203,7 @@ export default function BayesianRegularizationPage() {
               display
             />
           }
-          description="高斯先验对应 L2 正则化；先验方差 τ² 越小，正则化强度 λ 越大。"
+          description="高斯先验对应 L2 penalty；先验方差 τ² 越小，正则化强度 λ 越大。在普通 SGD 下，它与 weight decay 形式等价，但在 AdamW 等解耦 weight decay 实现中，两者并不完全相同。"
         />
 
         <p className="text-gray-700 mt-4">
@@ -229,7 +229,7 @@ export default function BayesianRegularizationPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>零均值高斯先验对应 L2 正则化（权重衰减）。</span>
+            <span>零均值高斯先验对应 L2 penalty；在普通 SGD 下它与 weight decay 形式等价，但在 AdamW 等解耦实现中并不完全相同。</span>
           </li>
         </ul>
       </section>
