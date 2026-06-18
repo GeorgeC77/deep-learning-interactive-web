@@ -61,14 +61,15 @@ export default function NonlinearToLQRPage() {
         <p className="text-gray-700 mt-4">
           例如在倒立摆中，重力矩与 sin θ <KaTeX math={String.raw`\sin\theta`} /> 成正比；在竖直位置附近用
           sin θ ≈ θ <KaTeX math={String.raw`\sin\theta \approx \theta`} /> 就得到了线性化模型。
+          这里令 θ=0 表示倒立竖直向上的平衡点；若采用其他角度定义，线性化符号可能不同。
         </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">微分动态规划（DDP）</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">iLQR / DDP 类方法</h2>
         <p className="text-gray-700 mb-4">
           如果目标不是停留在某个固定点，而是跟踪一条完整轨迹（例如火箭飞行），可以在轨迹上的每一点分别线性化，
-          把整条轨迹拆成若干局部 LQR 问题。DDP 的主要步骤如下：
+          把整条轨迹拆成若干局部 LQR 问题。iLQR / DDP 类方法的主要步骤如下：
         </p>
         <ol className="list-decimal list-inside space-y-2 text-gray-700 mb-4">
           <li>用一个简单控制器生成一条名义轨迹 τ = (s_0,a_0,s_1,a_1,...) <KaTeX math={String.raw`\tau = (s_0,a_0,s_1,a_1,\dots)`} />。</li>
@@ -106,7 +107,7 @@ export default function NonlinearToLQRPage() {
           </li>
           <li className="flex items-start gap-2">
             <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>DDP 反复线性化、求解 LQR、用真实动力学仿真，适合轨迹跟踪问题。</span>
+            <span>iLQR/DDP 类方法反复局部近似动力学与代价，求解局部 LQR 子问题，再用真实非线性动力学重新 rollout；其中完整 DDP 可进一步使用动力学二阶项。</span>
           </li>
         </ul>
       </section>

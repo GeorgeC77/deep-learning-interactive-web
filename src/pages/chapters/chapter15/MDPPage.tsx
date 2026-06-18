@@ -103,7 +103,7 @@ export default function MDPPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：网格世界 MDP</h2>
         <p className="text-gray-700 mb-4">
-          下图是一个简单的网格世界。绿色目标格奖励 +1，红色陷阱格奖励 -1，黑色格子是障碍物。
+          下图是一个简单的网格世界。本章 GridWorld 演示为简化，采用状态奖励 R(s)：目标格奖励 +1，陷阱格奖励 -1，其他格为 0；一般 MDP 中奖励也可写作 R(s,a) 或 R(s,a,s')。
           调整折扣因子 γ，观察最优价值函数和贪婪策略的变化。γ 越大，智能体越看重未来奖励。
         </p>
         <MDPDemo />

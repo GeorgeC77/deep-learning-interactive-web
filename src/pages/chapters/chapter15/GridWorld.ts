@@ -215,3 +215,23 @@ export function maxAbsDiff(a: number[], b: number[]): number {
   }
   return diff;
 }
+
+export function policyIterationStep(
+  V: number[],
+  policy: number[],
+  config: GridWorldConfig,
+  tolerance = 1e-3,
+  maxEvalIters = 200,
+): { newV: number[]; newPolicy: number[] } {
+  let currentV = V.slice();
+  for (let i = 0; i < maxEvalIters; i++) {
+    const nextV = policyEvaluationStep(currentV, policy, config);
+    if (maxAbsDiff(nextV, currentV) < tolerance) {
+      currentV = nextV;
+      break;
+    }
+    currentV = nextV;
+  }
+  const newPolicy = extractPolicy(currentV, config);
+  return { newV: currentV, newPolicy };
+}

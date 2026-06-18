@@ -38,14 +38,14 @@ export default function ValuePolicyConnectionPage() {
           title="迭代式策略评估"
           formula={
             <KaTeX
-              math={String.raw`V(s) := R(s) + \gamma \sum_{s'} P(s'|s,\pi(s)) V(s')`}
+              math={String.raw`V(s) := \sum_{s'} P(s'|s,\pi(s)) \bigl[ R(s,\pi(s),s') + \gamma V(s') \bigr]`}
               display
             />
           }
           description="这里固定使用当前策略 π 的动作，而不是取 max。重复此更新 k 次，就得到 V^π 的一个近似。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：V(s) := R(s) + γ Σ_{s\'} P(s\'|s,π(s)) V(s\')'}
+          {'文本形式：V(s) := Σ_{s\'} P(s\'|s,π(s))[R(s,π(s),s\') + γV(s\')]'}
         </p>
       </section>
 
@@ -93,7 +93,7 @@ export default function ValuePolicyConnectionPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">何时选择哪种算法？</h2>
         <ul className="list-disc list-inside space-y-2 text-gray-700">
           <li><strong>策略迭代：</strong>当状态空间较小，能够高效求解线性方程组时，策略迭代通常收敛更快，并且能在有限步内得到精确最优策略。</li>
-          <li><strong>值迭代：</strong>当状态空间很大，求解线性方程组代价高昂时，值迭代更实用。每次迭代只需做一次 Bellman 备份，计算简单。</li>
+          <li><strong>值迭代：</strong>当状态空间较大但仍可枚举时，值迭代通常比精确策略评估更容易实现；当状态空间非常大或连续时，通常需要近似动态规划或基于采样的强化学习方法。</li>
           <li><strong>中间选择：</strong>理论上可以在 Algorithm 6 中取某个 k {'>'} 1，但如果 k 次 Bellman 更新不能显著快于 k 次值迭代，那么通常 k = 1 已经很好。</li>
         </ul>
       </section>

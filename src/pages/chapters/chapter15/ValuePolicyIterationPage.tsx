@@ -5,7 +5,7 @@ import FormulaCard from '@/components/FormulaCard';
 import {
   defaultConfig,
   valueIterationStep,
-  policyEvaluationStep,
+  policyIterationStep,
   extractPolicy,
   indexToState,
   isTerminal,
@@ -79,6 +79,8 @@ export default function ValuePolicyIterationPage() {
         <p className="text-gray-700 mb-4">
           在下面的网格世界中，你可以选择「值迭代」或「策略迭代」模式，点击按钮逐步观察算法如何收敛。
           绿色格子为目标，红色格子为陷阱，黑色格子为障碍。
+          本章 GridWorld 演示为简化，采用状态奖励 R(s)：目标格奖励 +1，陷阱格奖励 -1，其他格为 0；一般 MDP 中奖励也可写作 R(s,a) 或 R(s,a,s')。
+          在策略迭代模式下，每点击一次会先对当前策略迭代执行策略评估直到收敛，再做贪婪策略改进。
         </p>
         <IterationDemo />
       </section>
@@ -120,8 +122,7 @@ function IterationDemo() {
     if (mode === 'value') {
       setV((current) => valueIterationStep(current, config));
     } else {
-      const newV = policyEvaluationStep(V, policy, config);
-      const newPolicy = extractPolicy(newV, config);
+      const { newV, newPolicy } = policyIterationStep(V, policy, config);
       setV(newV);
       setPolicy(newPolicy);
     }

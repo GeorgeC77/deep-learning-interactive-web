@@ -90,14 +90,14 @@ export default function ContinuousStateMDPPage() {
           title="目标值"
           formula={
             <KaTeX
-              math={String.raw`y^{(i)} = \max_a \left[ R(s^{(i)}, a) + \gamma \, \mathbb{E}_{s' \sim P(\cdot|s^{(i)},a)}\bigl[V_\theta(s')\bigr] \right]`}
+              math={String.raw`y_i = \max_a \left[ R(s_i, a) + \gamma \, \mathbb{E}_{s' \sim P(\cdot|s_i,a)}\bigl[V_{\theta_\text{old}}(s')\bigr] \right]`}
               display
             />
           }
           description="期望通常通过从模型中采样 k 个下一状态来近似。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：y^(i) = max_a [ R(s^(i),a) + γ E[V_θ(s\') | s^(i),a] ]'}
+          {'文本形式：y_i = max_a [ R(s_i,a) + γ E[V_{θ_old}(s\') | s_i,a] ]'}
         </p>
         <p className="text-gray-700 mt-4 mb-4">
           然后，通过监督学习（如线性回归）更新参数 θ，使 V_θ(s^(i)) 尽可能接近 y^(i)：
@@ -106,17 +106,17 @@ export default function ContinuousStateMDPPage() {
           title="监督学习更新"
           formula={
             <KaTeX
-              math={String.raw`\min_\theta \sum_{i=1}^n \bigl(V_\theta(s^{(i)}) - y^{(i)}\bigr)^2`}
+              math={String.raw`\theta_\text{new} = \arg\min_\theta \sum_{i=1}^n \bigl(V_\theta(s_i) - y_i\bigr)^2`}
               display
             />
           }
           description="这一步完全等价于标准的回归问题，只是输入是状态 s，标签是 y。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：min_θ Σ_i (V_θ(s^(i)) − y^(i))²'}
+          {'文本形式：θ_new = argmin_θ Σ_i (V_θ(s_i) − y_i)²'}
         </p>
         <p className="text-gray-700 mt-4">
-          Fitted value iteration 不能被证明一定收敛，但在实践中对很多问题都有效。如果模型是确定性的，可令 k=1 来简化期望计算。
+          一般的 fitted value iteration 不保证收敛；其稳定性取决于函数近似类、采样分布、投影误差和优化方法。如果模型是确定性的，可令 k=1 来简化期望计算。
         </p>
       </section>
 

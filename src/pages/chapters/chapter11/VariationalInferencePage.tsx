@@ -32,14 +32,14 @@ export default function VariationalInferencePage() {
           title="ELBO 的另一种形式"
           formula={
             <KaTeX
-              math={String.raw`\text{ELBO}(x; q, \theta) = \log p_\theta(x) - D_{KL}\bigl(q(z) \| p_\theta(z|x)\bigr)`}
+              math={String.raw`\text{ELBO}(x; q_\phi, \theta) = \log p_\theta(x) - D_{KL}\bigl(q_\phi(z|x) \| p_\theta(z|x)\bigr)`}
               display
             />
           }
-          description="最大化 ELBO 相当于同时提高模型似然，并让近似后验 q 接近真实后验。"
+          description="最大化 ELBO 相当于同时提高模型似然，并让近似后验 q_φ(z|x) 接近真实后验。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：log p_θ(x) ≥ E_{q(z)}[log p_θ(x,z) − log q(z)]'}
+          {'文本形式：log p_θ(x) ≥ E_{q_φ(z|x)}[log p_θ(x,z) − log q_φ(z|x)]'}
         </p>
       </section>
 
@@ -50,7 +50,7 @@ export default function VariationalInferencePage() {
         </p>
         <ul className="list-disc list-inside space-y-2 text-gray-700 mb-4">
           <li><strong>编码器（推断网络）</strong>：输入 x，输出近似后验 q_φ(z|x) 的均值和方差。</li>
-          <li><strong>解码器（生成网络）</strong>：输入 z，输出数据分布 p(x|z) 的参数。</li>
+          <li><strong>解码器（生成网络）</strong>：输入 z，输出数据分布 p_θ(x|z) 的参数。</li>
         </ul>
 
         <FormulaCard

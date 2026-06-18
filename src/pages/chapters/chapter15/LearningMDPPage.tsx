@@ -95,8 +95,8 @@ export default function LearningMDPPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：从轨迹学习</h2>
         <p className="text-gray-700 mb-4">
-          下面的演示使用固定策略在网格世界中收集轨迹。每次点击「收集一条轨迹」，系统会根据已有经验估计转移概率和奖励，
-          并运行值迭代得到当前策略。观察随着经验增加，学习到的策略如何接近真实最优策略。
+          下面的演示使用固定策略在网格世界中收集轨迹。本章 GridWorld 演示为简化，采用状态奖励 R(s)：目标格奖励 +1，陷阱格奖励 -1，其他格为 0；一般 MDP 中奖励也可写作 R(s,a) 或 R(s,a,s')。
+          每次点击「收集一条轨迹」，系统会根据已有经验估计转移概率和奖励，并运行值迭代得到当前策略。观察随着经验增加，学习到的策略如何接近真实最优策略。
         </p>
         <ModelLearningDemo />
       </section>

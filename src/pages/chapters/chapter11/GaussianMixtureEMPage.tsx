@@ -106,6 +106,9 @@ export default function GaussianMixtureEMPage() {
           }
           description="w_j^(i) 表示样本 i 属于第 j 个高斯分量的软分配概率。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：w_j^(i) = φ_j N(x^(i); μ_j, σ_j²) / Σ_l φ_l N(x^(i); μ_l, σ_l²)'}
+        </p>
 
         <FormulaCard
           title="M-step：更新参数"
@@ -117,6 +120,9 @@ export default function GaussianMixtureEMPage() {
           }
           description="M-step 的更新与完全数据最大似然估计形式相同，只是把硬指示函数换成了软权重。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：φ_j = (1/m)Σ_i w_j^(i); μ_j = Σ_i w_j^(i)x^(i) / Σ_i w_j^(i); σ_j² = Σ_i w_j^(i)(x^(i)−μ_j)² / Σ_i w_j^(i)'}
+        </p>
 
         <p className="text-gray-700 mt-4 text-sm bg-amber-50 border border-amber-200 rounded-lg p-4">
           <strong>数值稳定性提示：</strong>
