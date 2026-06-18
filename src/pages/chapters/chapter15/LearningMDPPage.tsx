@@ -258,8 +258,8 @@ function GridWorld({ config, V, policy }: { config: ReturnType<typeof defaultCon
     <div className="overflow-x-auto">
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full min-w-[300px]" style={{ maxHeight: 360 }}>
         <defs>
-          <marker id="arrow-blue" markerWidth={10} markerHeight={10} refX={9} refY={3} orient="auto" markerUnits="strokeWidth">
-            <path d="M0,0 L0,6 L9,3 z" fill="#2563eb" />
+          <marker id="arrow-blue" markerWidth={6} markerHeight={6} refX={5} refY={2.5} orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,5 L5,2.5 z" fill="#2563eb" />
           </marker>
         </defs>
         {Array.from({ length: config.rows * config.cols }).map((_, idx) => {
@@ -290,7 +290,7 @@ function GridWorld({ config, V, policy }: { config: ReturnType<typeof defaultCon
                 </text>
               )}
               {!isObs && !isTerminal(idx, config) && policy[idx] >= 0 && (
-                <Arrow x={x + cellSize / 2} y={y + cellSize / 2} actionIdx={policy[idx]} size={18} />
+                <Arrow x={x + cellSize / 2} y={y + cellSize * 0.68} actionIdx={policy[idx]} size={10} />
               )}
             </g>
           );
@@ -306,12 +306,12 @@ function Arrow({ x, y, actionIdx, size }: { x: number; y: number; actionIdx: num
   const dy = action.dr * size;
   return (
     <line
-      x1={x - dx * 0.4}
-      y1={y - dy * 0.4}
-      x2={x + dx * 0.4}
-      y2={y + dy * 0.4}
+      x1={x - dx * 0.35}
+      y1={y - dy * 0.35}
+      x2={x + dx * 0.35}
+      y2={y + dy * 0.35}
       stroke="#2563eb"
-      strokeWidth={3}
+      strokeWidth={2}
       markerEnd="url(#arrow-blue)"
     />
   );
