@@ -74,6 +74,7 @@ function runGD(
 function drawFitChart(svgEl: SVGSVGElement, data: DataPoint[], t0: number, t1: number) {
   const svg = svgEl;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+  svg.setAttribute('font-family', 'Inter, sans-serif');
 
   const M = { top: 15, right: 15, bottom: 40, left: 45 };
   const W = 360;
@@ -162,6 +163,7 @@ function drawParamChart(
 ) {
   const svg = svgEl;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+  svg.setAttribute('font-family', 'Inter, sans-serif');
 
   const W = 360;
   const H = 260;
@@ -256,7 +258,7 @@ function drawParamChart(
   xTitle.setAttribute('text-anchor', 'middle');
   xTitle.setAttribute('font-size', '11');
   xTitle.setAttribute('fill', '#374151');
-  xTitle.textContent = 'θ₀';
+  xTitle.textContent = 'θ0';
   svg.appendChild(xTitle);
 
   const yTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -266,7 +268,7 @@ function drawParamChart(
   yTitle.setAttribute('font-size', '11');
   yTitle.setAttribute('fill', '#374151');
   yTitle.setAttribute('transform', `rotate(-90, 12, ${H / 2})`);
-  yTitle.textContent = 'θ₁';
+  yTitle.textContent = 'θ1';
   svg.appendChild(yTitle);
 
   // trajectory path (up to current step)
@@ -490,7 +492,7 @@ export default function LinearRegressionGD() {
         <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
           <span className="text-gray-500">OLS 解：</span>
           <span className="font-mono font-semibold text-emerald-700">
-            θ̂ = ({ols.theta0.toFixed(3)}, {ols.theta1.toFixed(3)})
+            <KaTeX math="\\hat\\theta" /> = ({ols.theta0.toFixed(3)}, {ols.theta1.toFixed(3)})
           </span>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
