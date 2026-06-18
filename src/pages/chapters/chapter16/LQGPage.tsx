@@ -91,7 +91,7 @@ export default function LQGPage() {
           description="K_t 称为卡尔曼增益，用来根据新观测修正预测。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：K_t = Σ_{t+1|t} C^T (C Σ_{t+1|t} C^T + Σ_v)^{-1}; ŝ_{t+1|t+1} = ŝ_{t+1|t} + K_t (y_{t+1} − C ŝ_{t+1|t}); Σ_{t+1|t+1} = (I − K_t C) Σ_{t+1|t}'}
+          {`文本形式：K_t = Σ_{t+1|t} C^T (C Σ_{t+1|t} C^T + Σ_v)^{-1}; ŝ_{t+1|t+1} = ŝ_{t+1|t} + K_t (y_{t+1} − C ŝ_{t+1|t}); Σ_{t+1|t+1} = (I − K_t C) Σ_{t+1|t}`}
         </p>
         <p className="text-gray-700 mt-4">
           分离原理告诉我们：对 LQG 问题，可以先独立设计卡尔曼滤波器进行状态估计，

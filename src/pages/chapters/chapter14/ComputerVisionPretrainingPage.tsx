@@ -114,7 +114,7 @@ export default function ComputerVisionPretrainingPage() {
           description="对正样本对 (i,j) 做归一化交叉熵；分母包含 batch 内所有其他样本。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：ℓ(i,j) = -log exp(sim(z_i,z_j)/τ) / Σ_{k≠i} exp(sim(z_i,z_k)/τ)'}
+          {'文本形式：ℓ(i,j) = -log [ exp(sim(z_i,z_j)/τ) / Σ_{k≠i} exp(sim(z_i,z_k)/τ) ]'}
         </p>
       </section>
 
@@ -218,6 +218,15 @@ function ContrastiveDemo() {
     setStep(0);
   };
 
+  const resample = () => {
+    const nextSeed = seed + 1;
+    setSeed(nextSeed);
+    const fresh = generateData(15, nextSeed);
+    setEmbeddings(fresh);
+    setAugSeed(100);
+    setStep(0);
+  };
+
   const colors = ['#2563eb', '#10b981', '#f59e0b'];
   const n = embeddings.length;
 
@@ -239,10 +248,7 @@ function ContrastiveDemo() {
           重置
         </button>
         <button
-          onClick={() => {
-            setSeed((s) => s + 1);
-            reset();
-          }}
+          onClick={resample}
           className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm"
         >
           重新采样
