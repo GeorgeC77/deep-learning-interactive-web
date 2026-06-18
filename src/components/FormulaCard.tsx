@@ -16,7 +16,7 @@ export default function FormulaCard({ title, formula, description, className }: 
         <CardTitle className="text-lg text-blue-800">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-center text-lg my-2">{formula}</div>
+        <div className="text-center text-lg my-2 overflow-x-auto">{formula}</div>
         {description && <div className="text-sm text-gray-600 mt-2">{description}</div>}
       </CardContent>
     </Card>
