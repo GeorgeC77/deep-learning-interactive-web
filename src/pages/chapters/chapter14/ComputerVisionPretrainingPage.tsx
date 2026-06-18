@@ -122,7 +122,7 @@ export default function ComputerVisionPretrainingPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：对比学习一步</h2>
         <p className="text-gray-700 mb-4">
           下图将三类二维数据视为三个「图像类」。每个原始点经过一次随机增强得到正样本（同色小圆点）。
-          点击「对比学习一步」，模型会把正样本对拉近、负样本对推远。观察嵌入空间如何逐渐按类别分离。
+          点击「对比学习一步」，模型会把正样本对拉近、负样本对推远。观察在这个玩具数据和当前增强设定下，嵌入空间是否逐渐呈现类别分离趋势。
         </p>
         <p className="text-xs text-gray-500 mb-4">
           教学简化：本演示只生成一个增强视图，并把其他图像的增强视图作为负样本；

@@ -40,7 +40,7 @@ export default function LQGPage() {
           description="给定真实状态后，观测按某个条件分布生成。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：y_t | s_t ~ O(y | s)'}
+          {'文本形式：p(y_t | s_t)'}
         </p>
         <p className="text-gray-700 mt-4">
           在 LQG 中，状态转移和观测都是线性的，噪声都是高斯的：
@@ -84,14 +84,14 @@ export default function LQGPage() {
           title="更新步"
           formula={
             <KaTeX
-              math={String.raw`\begin{aligned} K_t &= \Sigma_{t+1\mid t} C^\top (C \Sigma_{t+1\mid t} C^\top + \Sigma_v)^{-1} \\ \hat{s}_{t+1\mid t+1} &= \hat{s}_{t+1\mid t} + K_t (y_{t+1} - C \hat{s}_{t+1\mid t}) \\ \Sigma_{t+1\mid t+1} &= \Sigma_{t+1\mid t} - K_t C \Sigma_{t+1\mid t} \end{aligned}`}
+              math={String.raw`\begin{aligned} K_t &= \Sigma_{t+1\mid t} C^\top (C \Sigma_{t+1\mid t} C^\top + \Sigma_v)^{-1} \\ \hat{s}_{t+1\mid t+1} &= \hat{s}_{t+1\mid t} + K_t (y_{t+1} - C \hat{s}_{t+1\mid t}) \\ \Sigma_{t+1\mid t+1} &= (I - K_t C) \Sigma_{t+1\mid t} \end{aligned}`}
               display
             />
           }
           description="K_t 称为卡尔曼增益，用来根据新观测修正预测。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：K_t = Σ_{t+1|t} C^T (C Σ_{t+1|t} C^T + Σ_v)^{-1}; ŝ_{t+1|t+1} = ŝ_{t+1|t} + K_t (y_{t+1} − C ŝ_{t+1|t}); Σ_{t+1|t+1} = Σ_{t+1|t} − K_t C Σ_{t+1|t}'}
+          {'文本形式：K_t = Σ_{t+1|t} C^T (C Σ_{t+1|t} C^T + Σ_v)^{-1}; ŝ_{t+1|t+1} = ŝ_{t+1|t} + K_t (y_{t+1} − C ŝ_{t+1|t}); Σ_{t+1|t+1} = (I − K_t C) Σ_{t+1|t}'}
         </p>
         <p className="text-gray-700 mt-4">
           分离原理告诉我们：对 LQG 问题，可以先独立设计卡尔曼滤波器进行状态估计，

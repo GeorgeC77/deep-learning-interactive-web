@@ -85,7 +85,7 @@ export default function NonlinearToLQRPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示：倒立摆线性化</h2>
         <p className="text-gray-700 mb-4">
-          单摆倒立平衡点附近，非线性力矩由 sin θ <KaTeX math={String.raw`\sin\theta`} /> 描述；线性化后用 θ <KaTeX math={String.raw`\theta`} /> 近似。调整初始角度和施加力矩，比较真实非线性轨迹与线性化轨迹的差异。
+          单摆倒立平衡点附近，非线性力矩由 sin θ<KaTeX math={String.raw`\sin\theta`} /> 描述；线性化后用 θ<KaTeX math={String.raw`\theta`} /> 近似。调整初始角度和施加力矩，比较真实非线性轨迹与线性化轨迹的差异。
         </p>
         <PendulumDemo />
       </section>
