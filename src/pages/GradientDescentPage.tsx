@@ -88,6 +88,7 @@ export default function GradientDescentPage() {
       .append('svg')
       .attr('width', WIDTH + MARGIN.left + MARGIN.right)
       .attr('height', HEIGHT + MARGIN.top + MARGIN.bottom)
+      .style('font-family', 'Inter, sans-serif')
       .append('g')
       .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
@@ -246,6 +247,7 @@ export default function GradientDescentPage() {
       .append('svg')
       .attr('width', WIDTH + MARGIN.left + MARGIN.right)
       .attr('height', HEIGHT + MARGIN.top + MARGIN.bottom)
+      .style('font-family', 'Inter, sans-serif')
       .append('g')
       .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 

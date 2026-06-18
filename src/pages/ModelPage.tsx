@@ -55,6 +55,7 @@ function drawScatter(
   const svg = svgEl;
   // clear
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+  svg.setAttribute('font-family', 'Inter, sans-serif');
 
   const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   g.setAttribute('transform', `translate(${MARGIN.left},${MARGIN.top})`);
@@ -244,7 +245,7 @@ function drawScatter(
   plText.setAttribute('y', '40');
   plText.setAttribute('font-size', '10');
   plText.setAttribute('fill', '#374151');
-  plText.textContent = '预测: y = θ₀ + θ₁x';
+  plText.textContent = '预测: y = θ0 + θ1x';
   legend.appendChild(plText);
 
   g.appendChild(legend);
@@ -261,6 +262,7 @@ function drawCostPath(
 ) {
   const svg = svgEl;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+  svg.setAttribute('font-family', 'Inter, sans-serif');
 
   const W = 260;
   const H = 200;
@@ -356,7 +358,7 @@ function drawCostPath(
   xl.setAttribute('text-anchor', 'middle');
   xl.setAttribute('font-size', '10');
   xl.setAttribute('fill', '#4b5563');
-  xl.textContent = 'θ₀';
+  xl.textContent = 'θ0';
   svg.appendChild(xl);
 
   const yl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -366,7 +368,7 @@ function drawCostPath(
   yl.setAttribute('font-size', '10');
   yl.setAttribute('fill', '#4b5563');
   yl.setAttribute('transform', `rotate(-90, 6, ${H / 2})`);
-  yl.textContent = 'θ₁';
+  yl.textContent = 'θ1';
   svg.appendChild(yl);
 
   // current point
@@ -487,7 +489,7 @@ export default function ModelPage() {
               display
             />
           }
-          description="其中 x₁, x₂, ..., xₙ 是输入特征，θ₀, θ₁, ..., θₙ 是待学习的参数。"
+          description={<>其中 x<sub>1</sub>, x<sub>2</sub>, ..., x<sub>n</sub> 是输入特征，θ<sub>0</sub>, θ<sub>1</sub>, ..., θ<sub>n</sub> 是待学习的参数。</>}
         />
 
         <div className="mt-4 space-y-3">
@@ -788,9 +790,9 @@ export default function ModelPage() {
         <div className="mt-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">代价函数等高线</h3>
           <p className="text-sm text-gray-600 mb-3">
-            下图显示了在当前数据集上，代价函数 J(θ₀, θ₁) 的等高线图。
+            下图显示了在当前数据集上，代价函数 J(θ<sub>0</sub>, θ<sub>1</sub>) 的等高线图。
             红色点表示你当前选择的位置，绿色点表示当前样本的最小二乘解 θ̂（由数据动态计算得到）。
-            真实生成参数为 (θ₀=1, θ₁=2)，但当前样本的 OLS 解通常与它不同。
+            真实生成参数为 (θ<sub>0</sub>=1, θ<sub>1</sub>=2)，但当前样本的 OLS 解通常与它不同。
           </p>
           <div className="flex flex-col lg:flex-row gap-5 items-start">
             <div className="bg-white border border-gray-200 rounded-xl p-4 inline-block">

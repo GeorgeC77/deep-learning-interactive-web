@@ -50,6 +50,7 @@ function drawContour(
 ) {
   const svg = svgEl;
   while (svg.firstChild) svg.removeChild(svg.firstChild);
+  svg.setAttribute('font-family', 'Inter, sans-serif');
 
   const W = 500;
   const H = 400;
@@ -170,7 +171,7 @@ function drawContour(
   xTitle.setAttribute('font-size', '13');
   xTitle.setAttribute('font-weight', '600');
   xTitle.setAttribute('fill', '#374151');
-  xTitle.textContent = 'θ₀';
+  xTitle.textContent = 'θ0';
   svg.appendChild(xTitle);
 
   const yTitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -181,7 +182,7 @@ function drawContour(
   yTitle.setAttribute('font-weight', '600');
   yTitle.setAttribute('fill', '#374151');
   yTitle.setAttribute('transform', `rotate(-90, 14, ${H / 2})`);
-  yTitle.textContent = 'θ₁';
+  yTitle.textContent = 'θ1';
   svg.appendChild(yTitle);
 
   // OLS minimum point for the current sample

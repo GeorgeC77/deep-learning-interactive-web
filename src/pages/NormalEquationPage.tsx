@@ -418,10 +418,10 @@ export default function NormalEquationPage() {
                     <p className="text-dark-gray font-medium">计算结果：</p>
                     <div className="bg-gray-50 border border-border-gray rounded-lg p-3 space-y-1">
                       <p className="text-dark-gray">
-                        θ₀ = <span className="font-mono text-med-blue">{theta[0].toFixed(4)}</span>
+                        θ<sub>0</sub> = <span className="font-mono text-med-blue">{theta[0].toFixed(4)}</span>
                       </p>
                       <p className="text-dark-gray">
-                        θ₁ = <span className="font-mono text-med-blue">{theta[1].toFixed(4)}</span>
+                        θ<sub>1</sub> = <span className="font-mono text-med-blue">{theta[1].toFixed(4)}</span>
                       </p>
                     </div>
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
@@ -452,7 +452,7 @@ export default function NormalEquationPage() {
       <section className="mb-10">
         <h2 className="text-2xl font-bold text-dark-gray mb-4">设计矩阵 X</h2>
         <p className="text-dark-gray leading-relaxed mb-4">
-          设计矩阵 X 的每一行对应一个训练样本，每一列对应一个特征。为了引入截距项 θ₀，我们在 X 的第一列添加全为 1 的列：
+          设计矩阵 X 的每一行对应一个训练样本，每一列对应一个特征。为了引入截距项 θ<sub>0</sub>，我们在 X 的第一列添加全为 1 的列：
         </p>
         <div className="formula-block">
           <KaTeX
