@@ -392,7 +392,7 @@ export default function LinearRegressionGD() {
         <p className="text-blue-700 text-sm leading-relaxed">
           线性回归的平方误差代价函数是<strong>凸二次函数</strong>。
           只要设计矩阵 <KaTeX math="X" /> 满列秩，它就存在<strong>唯一的全局最优解</strong>，
-          也就是最小二乘解 <KaTeX math="\\hat\\theta" />。
+          也就是最小二乘解 <KaTeX math={String.raw`\hat\theta`} />。
           选择合适的学习率，批量梯度下降会稳定收敛到这个全局最优解。
         </p>
       </div>
@@ -411,7 +411,7 @@ export default function LinearRegressionGD() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            初始 <KaTeX math="\\theta_0" /> = {initT0.toFixed(1)}
+            初始 <KaTeX math={String.raw`\theta_0`} /> = {initT0.toFixed(1)}
           </label>
           <input
             type="range"
@@ -425,7 +425,7 @@ export default function LinearRegressionGD() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            初始 <KaTeX math="\\theta_1" /> = {initT1.toFixed(1)}
+            初始 <KaTeX math={String.raw`\theta_1`} /> = {initT1.toFixed(1)}
           </label>
           <input
             type="range"
@@ -492,7 +492,7 @@ export default function LinearRegressionGD() {
         <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
           <span className="text-gray-500">OLS 解：</span>
           <span className="font-mono font-semibold text-emerald-700">
-            <KaTeX math="\\hat\\theta" /> = ({ols.theta0.toFixed(3)}, {ols.theta1.toFixed(3)})
+            <KaTeX math={String.raw`\hat\theta`} /> = ({ols.theta0.toFixed(3)}, {ols.theta1.toFixed(3)})
           </span>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
