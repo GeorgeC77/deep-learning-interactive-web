@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { ShieldAlert, Activity, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
@@ -168,11 +168,18 @@ function DiscretizationDemo() {
     return 0.5 * x + 1.5;
   }
 
-  // 生成带噪声数据点
-  const dataPoints = [1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5].map((x) => ({
-    x,
-    y: trueY(x) + (Math.random() - 0.5) * 0.4,
-  }));
+  // 生成带噪声数据点（使用固定种子，避免每次渲染跳动）
+  const dataPoints = useMemo(() => {
+    let s = 12345;
+    const rand = () => {
+      s = (s * 9301 + 49297) % 233280;
+      return s / 233280;
+    };
+    return [1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5].map((x) => ({
+      x,
+      y: trueY(x) + (rand() - 0.5) * 0.4,
+    }));
+  }, []);
 
   // 线性回归
   const n = dataPoints.length;

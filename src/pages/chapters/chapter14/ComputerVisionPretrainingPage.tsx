@@ -93,12 +93,15 @@ export default function ComputerVisionPretrainingPage() {
           title="SIMCLR 损失"
           formula={
             <KaTeX
-              math={String.raw`L_{\text{pre}}(\theta) = -\sum_{i=1}^B \log \frac{\exp\bigl(\phi(x^{\wedge(i)})^T \phi(x^{\sim(i)})\bigr)}{\exp\bigl(\phi(x^{\wedge(i)})^T \phi(x^{\sim(i)})\bigr) + \sum_{j \neq i} \exp\bigl(\phi(x^{\wedge(i)})^T \phi(x^{\sim(j)})\bigr)}`}
+              math={String.raw`L_{\text{pre}}(\theta) = -\sum_{i=1}^B \log \frac{\exp\bigl(\phi(\hat{x}^{(i)})^\top \phi(\tilde{x}^{(i)})\bigr)}{\exp\bigl(\phi(\hat{x}^{(i)})^\top \phi(\tilde{x}^{(i)})\bigr) + \sum_{j \neq i} \exp\bigl(\phi(\hat{x}^{(i)})^\top \phi(\tilde{x}^{(j)})\bigr)}`}
               display
             />
           }
           description="分母中的正项使同一样本的增强视图相互吸引，负项使不同样本的视图相互排斥。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：L_pre(θ) = -Σ_i log [ exp(φ(̂x^(i))^T φ(̃x^(i))) / (exp(...) + Σ_{j≠i} exp(φ(̂x^(i))^T φ(̃x^(j)))) ]'}
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

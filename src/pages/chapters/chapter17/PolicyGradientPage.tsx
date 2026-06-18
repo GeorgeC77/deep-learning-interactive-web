@@ -150,6 +150,9 @@ export default function PolicyGradientPage() {
           实践中常用价值函数 V_φ(s_t) <KaTeX math={String.raw`V_\phi(s_t)`} /> 作为基线，并通过最小化
           (G_t − V_φ(s_t))² <KaTeX math={String.raw`(G_t - V_\phi(s_t))^2`} /> 来拟合它。
         </p>
+        <p className="text-gray-700 mt-4 text-sm bg-gray-50 border border-gray-200 rounded-lg p-3">
+          教学说明：为简化演示，下面的 REINFORCE 交互把基线实现为同一批轨迹中该状态所获回报的指数滑动平均；理论上更标准的做法是单独学习一个状态价值函数 V(s) 作为基线。
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

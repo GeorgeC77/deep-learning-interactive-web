@@ -33,12 +33,15 @@ export default function LQGPage() {
           title="观测模型"
           formula={
             <KaTeX
-              math={String.raw`o_t \mid s_t \sim O(o \mid s)`}
+              math={String.raw`y_t \mid s_t \sim O(y \mid s)`}
               display
             />
           }
           description="给定真实状态后，观测按某个条件分布生成。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：y_t | s_t ~ O(y | s)'}
+        </p>
         <p className="text-gray-700 mt-4">
           在 LQG 中，状态转移和观测都是线性的，噪声都是高斯的：
         </p>
@@ -52,6 +55,9 @@ export default function LQGPage() {
           }
           description="奖励仍是状态与控制的二次函数。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：s_{t+1} = A s_t + B a_t + w_t, w_t ~ N(0,Σ_w); y_t = C s_t + v_t, v_t ~ N(0,Σ_v)'}
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -71,6 +77,9 @@ export default function LQGPage() {
           }
           description="根据模型预测下一时刻的状态分布。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：ŝ_{t+1|t} = A ŝ_{t|t} + B a_t, Σ_{t+1|t} = A Σ_{t|t} A^T + Σ_w'}
+        </p>
         <FormulaCard
           title="更新步"
           formula={
@@ -81,6 +90,9 @@ export default function LQGPage() {
           }
           description="K_t 称为卡尔曼增益，用来根据新观测修正预测。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：K_t = Σ_{t+1|t} C^T (C Σ_{t+1|t} C^T + Σ_v)^{-1}; ŝ_{t+1|t+1} = ŝ_{t+1|t} + K_t (y_{t+1} − C ŝ_{t+1|t}); Σ_{t+1|t+1} = Σ_{t+1|t} − K_t C Σ_{t+1|t}'}
+        </p>
         <p className="text-gray-700 mt-4">
           分离原理告诉我们：对 LQG 问题，可以先独立设计卡尔曼滤波器进行状态估计，
           再独立用 LQR 计算反馈增益，最后把控制律中的真实状态替换为估计均值：
@@ -93,8 +105,11 @@ export default function LQGPage() {
               display
             />
           }
-          description="K_t 来自 LQR，\hat{s}_{t|t} 来自卡尔曼滤波。"
+          description="K_t 来自 LQR，卡尔曼估计 ŝ_{t|t} 来自滤波器。"
         />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：a_t = -K_t ŝ_{t|t}'}
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
