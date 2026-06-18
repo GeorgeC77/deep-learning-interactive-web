@@ -80,7 +80,7 @@ export default function ValuePolicyIterationPage() {
           在下面的网格世界中，你可以选择「值迭代」或「策略迭代」模式，点击按钮逐步观察算法如何收敛。
           绿色格子为目标，红色格子为陷阱，黑色格子为障碍。
           本章 GridWorld 演示为简化，采用状态奖励 R(s)：目标格奖励 +1，陷阱格奖励 -1，其他格为 0；一般 MDP 中奖励也可写作 R(s,a) 或 R(s,a,s')。
-          在策略迭代模式下，每点击一次会先对当前策略迭代执行策略评估直到收敛，再做贪婪策略改进。
+          在策略迭代模式下，每点击一次会先对当前策略反复执行 Bellman 策略评估，直到数值上近似收敛，再做贪婪策略改进。
         </p>
         <IterationDemo />
       </section>
@@ -129,6 +129,29 @@ function IterationDemo() {
     setIterations((it) => it + 1);
   };
 
+  const doManySteps = (n: number) => {
+    if (mode === 'value') {
+      setV((current) => {
+        let next = current;
+        for (let i = 0; i < n; i++) {
+          next = valueIterationStep(next, config);
+        }
+        return next;
+      });
+    } else {
+      let nextV = V;
+      let nextPolicy = policy;
+      for (let i = 0; i < n; i++) {
+        const result = policyIterationStep(nextV, nextPolicy, config);
+        nextV = result.newV;
+        nextPolicy = result.newPolicy;
+      }
+      setV(nextV);
+      setPolicy(nextPolicy);
+    }
+    setIterations((it) => it + n);
+  };
+
   const reset = () => {
     setV(new Array(config.rows * config.cols).fill(0));
     setPolicy(new Array(config.rows * config.cols).fill(0));
@@ -162,7 +185,7 @@ function IterationDemo() {
           执行一步
         </button>
         <button
-          onClick={() => { for (let i = 0; i < 20; i++) doStep(); }}
+          onClick={() => doManySteps(20)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
         >
           执行 20 步
