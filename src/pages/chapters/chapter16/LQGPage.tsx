@@ -110,6 +110,9 @@ export default function LQGPage() {
         <p className="text-gray-700 mt-2 text-sm">
           {'文本形式：a_t = -K_LQR ŝ_{t|t}'}
         </p>
+        <p className="text-gray-700 mt-4 text-sm">
+          注意：这里的 K_t 是卡尔曼增益（用于观测更新），K_LQR 是 LQR 反馈增益（用于计算控制律），二者含义不同。
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

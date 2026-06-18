@@ -108,9 +108,9 @@ export default function PolicyGradientPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">REINFORCE 算法</h2>
         <ol className="list-decimal list-inside space-y-2 text-gray-700 mb-4">
           <li>用当前策略 π_θ(a|s)<KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 采样若干条轨迹。</li>
-          <li>对每条轨迹计算累积回报 <KaTeX math={String.raw`G(\tau)`} />。</li>
-          <li>用蒙特卡洛估计梯度 <KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) G(\tau^{(i)})`} />。</li>
-          <li>沿梯度方向更新参数 θ := θ + α∇̂J <KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />。</li>
+          <li>对每条轨迹计算累积回报 G(τ)<KaTeX math={String.raw`G(\tau)`} />。</li>
+          <li>用蒙特卡洛估计梯度 ∇J(θ)<KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) G(\tau^{(i)})`} />。</li>
+          <li>沿梯度方向更新参数 θ := θ + α∇̂J(θ)<KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}(\theta)`} />。</li>
         </ol>
         <p className="text-gray-700">
           这是无模型、基于采样的策略优化基础；后续更高级算法（如 Actor-Critic）在此基础上引入价值函数来降低方差。
