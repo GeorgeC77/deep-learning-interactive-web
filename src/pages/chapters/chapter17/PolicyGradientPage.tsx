@@ -27,7 +27,7 @@ export default function PolicyGradientPage() {
         </div>
         <p className="text-gray-700 mb-4">
           REINFORCE 只假设我们能从环境中采样轨迹，并能观测到奖励；它不需要建立环境模型。
-          我们用带参数 <em>θ</em> 的随机策略 π_θ(a|s) <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 描述动作分布。
+          我们用带参数 <em>θ</em> 的随机策略 <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 描述动作分布。
         </p>
         <p className="text-gray-700 mb-4">
           在有限时域设定下，一条轨迹由状态、动作和奖励交替组成。关键记号如下：
@@ -107,7 +107,7 @@ export default function PolicyGradientPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">REINFORCE 算法</h2>
         <ol className="list-decimal list-inside space-y-2 text-gray-700 mb-4">
-          <li>用当前策略 π_θ(a|s) <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 采样若干条轨迹。</li>
+          <li>用当前策略 <KaTeX math={String.raw`\pi_\theta(a \mid s)`} /> 采样若干条轨迹。</li>
           <li>对每条轨迹计算累积回报 G(τ) <KaTeX math={String.raw`G(\tau)`} />。</li>
           <li>用蒙特卡洛估计梯度 ∇J(θ) <KaTeX math={String.raw`\widehat{\nabla J} = \frac{1}{n}\sum_i \bigl(\sum_t \nabla_\theta \log \pi_\theta(a_t^{(i)} \mid s_t^{(i)})\bigr) G(\tau^{(i)})`} />。</li>
           <li>沿梯度方向更新参数 θ := θ + α∇̂J <KaTeX math={String.raw`\theta := \theta + \alpha \, \widehat{\nabla J}`} />。</li>
@@ -147,8 +147,8 @@ export default function PolicyGradientPage() {
         />
         <p className="text-gray-700 mt-4">
           注意：基线只能依赖状态，不能依赖当前采样的动作；这样不会改变策略梯度的期望，只会降低方差。
-          实践中常用价值函数 V_φ(s_t) <KaTeX math={String.raw`V_\phi(s_t)`} /> 作为基线，并通过最小化
-          (G_t − V_φ(s_t))² <KaTeX math={String.raw`(G_t - V_\phi(s_t))^2`} /> 来拟合它。
+          实践中常用价值函数 <KaTeX math={String.raw`V_\phi(s_t)`} /> 作为基线，并通过最小化
+          <KaTeX math={String.raw`(G_t - V_\phi(s_t))^2`} /> 来拟合它。
         </p>
         <p className="text-gray-700 mt-4 text-sm bg-gray-50 border border-gray-200 rounded-lg p-3">
           教学说明：为简化演示，下面的 REINFORCE 交互把基线实现为同一批轨迹中该状态所获回报的指数滑动平均；理论上更标准的做法是单独学习一个状态价值函数 V(s) 作为基线。

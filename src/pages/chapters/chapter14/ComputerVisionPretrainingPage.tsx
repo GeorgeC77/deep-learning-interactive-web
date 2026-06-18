@@ -102,6 +102,20 @@ export default function ComputerVisionPretrainingPage() {
         <p className="text-gray-700 mt-2 text-sm">
           {'文本形式：L_pre(θ) = -Σ_i log [ exp(φ(̂x^(i))^T φ(̃x^(i))) / (exp(...) + Σ_{j≠i} exp(φ(̂x^(i))^T φ(̃x^(j)))) ]'}
         </p>
+
+        <FormulaCard
+          title="NT-Xent 损失"
+          formula={
+            <KaTeX
+              math={String.raw`\ell(i,j) = -\log \frac{\exp\bigl(\text{sim}(z_i, z_j) / \tau\bigr)}{\sum_{k \neq i} \exp\bigl(\text{sim}(z_i, z_k) / \tau\bigr)}`}
+              display
+            />
+          }
+          description="对正样本对 (i,j) 做归一化交叉熵；分母包含 batch 内所有其他样本。"
+        />
+        <p className="text-gray-700 mt-2 text-sm">
+          {'文本形式：ℓ(i,j) = -log exp(sim(z_i,z_j)/τ) / Σ_{k≠i} exp(sim(z_i,z_k)/τ)'}
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

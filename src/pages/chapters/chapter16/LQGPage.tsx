@@ -101,14 +101,14 @@ export default function LQGPage() {
           title="LQG 控制律"
           formula={
             <KaTeX
-              math={String.raw`a_t = -K_t \, \hat{s}_{t\mid t}`}
+              math={String.raw`a_t = -K_{\text{LQR}} \, \hat{s}_{t\mid t}`}
               display
             />
           }
-          description="K_t 来自 LQR，卡尔曼估计 ŝ_{t|t} 来自滤波器。"
+          description="K_LQR 来自 LQR，卡尔曼估计 ŝ_{t|t} 来自滤波器。"
         />
         <p className="text-gray-700 mt-2 text-sm">
-          {'文本形式：a_t = -K_t ŝ_{t|t}'}
+          {'文本形式：a_t = -K_LQR ŝ_{t|t}'}
         </p>
       </section>
 
