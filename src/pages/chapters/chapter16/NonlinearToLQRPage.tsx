@@ -59,8 +59,8 @@ export default function NonlinearToLQRPage() {
           {'文本形式：s_{t+1} ≈ A s_t + B a_t + c'}
         </p>
         <p className="text-gray-700 mt-4">
-          例如在倒立摆中，重力矩与 sin θ<KaTeX math={String.raw`\sin\theta`} /> 成正比；在竖直位置附近用
-          sin θ ≈ θ<KaTeX math={String.raw`\sin\theta \approx \theta`} /> 就得到了线性化模型。
+          例如在倒立摆中，重力矩与 sin θ 成正比；在竖直位置附近用
+          sin θ ≈ θ 就得到了线性化模型。
           这里令 θ=0 表示倒立竖直向上的平衡点；若采用其他角度定义，线性化符号可能不同。
         </p>
       </section>

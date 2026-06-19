@@ -51,7 +51,7 @@ export default function PolicyGradientPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">对数似然梯度技巧</h2>
         <p className="text-gray-700 mb-4">
           由于期望内部含有依赖于 <em>θ</em> 的分布，直接求梯度会遇到困难。利用恒等式
-          ∇θ pθ(τ) = pθ(τ) ∇θ log pθ(τ)<KaTeX math={String.raw`\nabla_\theta p_\theta(\tau) = p_\theta(\tau) \nabla_\theta \log p_\theta(\tau)`} /> 可把梯度移到期望内部：
+          ∇θ pθ(τ) = pθ(τ) ∇θ log pθ(τ) 可把梯度移到期望内部：
         </p>
         <FormulaCard
           title="策略梯度基本等式"
