@@ -207,7 +207,7 @@ function ContrastiveDemo() {
         label: p.label,
       }));
     });
-    setAugSeed((s) => s + n * 2 + 1);
+    setAugSeed((s) => s + sampleCount * 2 + 1);
     setStep((s) => s + 1);
   };
 
@@ -228,7 +228,7 @@ function ContrastiveDemo() {
   };
 
   const colors = ['#2563eb', '#10b981', '#f59e0b'];
-  const n = embeddings.length;
+  const sampleCount = embeddings.length;
 
   return (
     <div className="space-y-4">
