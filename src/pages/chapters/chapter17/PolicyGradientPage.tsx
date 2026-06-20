@@ -210,7 +210,8 @@ function ReinforceDemo() {
   const policy = useMemo(() => theta.map((row) => softmax(row)), [theta]);
 
   const runBatch = () => {
-    let newTheta = theta.map((row) => [...row]);
+    // 标准 batch REINFORCE：先在固定旧策略下累积梯度，再统一更新参数
+    const gradTheta = Array.from({ length: N }, () => new Array(ACTIONS.length).fill(0));
     let newBaseline = [...baseline];
     const returns: number[] = [];
     let lastTraj: number[] = [START];
@@ -231,10 +232,10 @@ function ReinforceDemo() {
         const s = states[t];
         const a = actions[t];
         const adv = Gs[t] - (useBaseline ? newBaseline[s] : 0);
-        const probs = softmax(newTheta[s]);
+        const probs = policy[s];
         for (let ai = 0; ai < ACTIONS.length; ai++) {
           const indicator = ai === a ? 1 : 0;
-          newTheta[s][ai] += (lr / batchSize) * adv * (indicator - probs[ai]);
+          gradTheta[s][ai] += (1 / batchSize) * adv * (indicator - probs[ai]);
         }
         if (useBaseline) {
           newBaseline[s] = 0.9 * newBaseline[s] + 0.1 * Gs[t];
@@ -242,7 +243,9 @@ function ReinforceDemo() {
       }
     }
 
-    setTheta(newTheta);
+    setTheta((current) =>
+      current.map((row, s) => row.map((val, ai) => val + lr * gradTheta[s][ai]))
+    );
     setBaseline(newBaseline);
     setHistory((h) => [...h, ...returns]);
     setLastTrajectory(lastTraj);

@@ -168,6 +168,7 @@ function ContrastiveDemo() {
   }, [embeddings, augSeed]);
 
   const lr = 0.05;
+  const sampleCount = embeddings.length;
 
   const doStep = () => {
     setEmbeddings((current) => {
@@ -228,7 +229,6 @@ function ContrastiveDemo() {
   };
 
   const colors = ['#2563eb', '#10b981', '#f59e0b'];
-  const sampleCount = embeddings.length;
 
   return (
     <div className="space-y-4">
