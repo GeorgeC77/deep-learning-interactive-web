@@ -63,7 +63,7 @@ export default function LQGPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">卡尔曼滤波与分离原理</h2>
         <p className="text-gray-700 mb-4">
-          因为所有分布都是高斯，信念状态（对状态的分布估计）也是高斯，例如 N(ŝ_{t|t}, Σ_{t|t})。
+          因为所有分布都是高斯，信念状态（对状态的分布估计）也是高斯，例如 {'N(ŝ_{t|t}, Σ_{t|t})'}。
           卡尔曼滤波通过两步递推高效更新信念：
         </p>
         <FormulaCard
