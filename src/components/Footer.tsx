@@ -1,4 +1,4 @@
-import { ShieldAlert, ExternalLink } from 'lucide-react';
+import { ShieldAlert, ExternalLink, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -21,6 +21,17 @@ export default function Footer() {
             <ShieldAlert className="w-4 h-4" />
             <span>© CC BY-NC 4.0 · 非商业用途</span>
             <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        </div>
+
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-gray-300">
+          <Mail className="w-4 h-4 text-amber-300" />
+          <span>如发现内容疏漏，或有合作意向，欢迎联系：</span>
+          <a
+            href="mailto:gengc25@hotmail.com"
+            className="text-amber-300 hover:text-amber-200 underline font-medium"
+          >
+            gengc25@hotmail.com
           </a>
         </div>
 
