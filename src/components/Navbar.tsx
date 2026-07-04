@@ -247,7 +247,7 @@ export default function Navbar() {
             {context && <CurrentChapterMenu context={context} currentPath={currentPath} />}
 
             <a
-              href="https://github.com/GeorgeC77/machine-learning-interactive-web/blob/main/LICENSE"
+              href="https://github.com/GeorgeC77/deep-learning-interactive-web/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors"

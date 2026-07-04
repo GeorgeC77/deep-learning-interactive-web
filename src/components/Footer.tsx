@@ -13,7 +13,7 @@ export default function Footer() {
           </div>
 
           <a
-            href="https://github.com/GeorgeC77/machine-learning-interactive-web/blob/main/LICENSE"
+            href="https://github.com/GeorgeC77/deep-learning-interactive-web/blob/main/LICENSE"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors text-sm font-medium"
