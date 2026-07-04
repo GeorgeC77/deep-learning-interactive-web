@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Ruler, TrendingUp, Mountain } from 'lucide-react';
-import KaTeX from '../components/KaTeX';
-import FormulaCard from '../components/FormulaCard';
+import KaTeX from '../../../components/KaTeX';
+import FormulaCard from '../../../components/FormulaCard';
 
 /* ── D3 scatter plot + adjustable line ── */
 interface DataPoint {
@@ -485,7 +485,7 @@ export default function ModelPage() {
           title="假设函数定义"
           formula={
             <KaTeX
-              math={"h_\\theta(x) = \\theta_0 + \\theta_1 x_1 + \\theta_2 x_2 + \\cdots + \\theta_n x_n"}
+              math={String.raw`h_\theta(x) = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \cdots + \theta_n x_n`}
               display
             />
           }
@@ -495,19 +495,19 @@ export default function ModelPage() {
         <div className="mt-4 space-y-3">
           <div className="p-3 bg-gray-50 rounded-lg">
             <strong className="text-gray-800">
-              <KaTeX math={"\\theta_0"} />
+              <KaTeX math={String.raw`\theta_0`} />
             </strong>
             <span className="text-gray-700 ml-2">偏置项（截距，intercept）。当所有特征为 0 时的预测值。</span>
           </div>
           <div className="p-3 bg-gray-50 rounded-lg">
             <strong className="text-gray-800">
-              <KaTeX math={"\\theta_j \\ (j \\geq 1)"} />
+              <KaTeX math={String.raw`\theta_j \ (j \geq 1)`} />
             </strong>
             <span className="text-gray-700 ml-2">第 j 个特征的权重（系数），表示该特征对预测结果的影响程度。</span>
           </div>
           <div className="p-3 bg-gray-50 rounded-lg">
             <strong className="text-gray-800">
-              <KaTeX math={"x_0 = 1"} />
+              <KaTeX math={String.raw`x_0 = 1`} />
             </strong>
             <span className="text-gray-700 ml-2">为了方便表示偏置项，我们总是令 x₀ = 1。</span>
           </div>
@@ -519,11 +519,11 @@ export default function ModelPage() {
             当只有一个输入特征时（n = 1），模型简化为：
           </p>
           <div className="formula-block">
-            <KaTeX math={"h_\\theta(x) = \\theta_0 + \\theta_1 x"} display />
+            <KaTeX math={String.raw`h_\theta(x) = \theta_0 + \theta_1 x`} display />
           </div>
           <p className="text-gray-700 text-sm">
-            这就是高中数学中的直线方程！<KaTeX math={"\\theta_0"} /> 是 y 轴截距，
-            <KaTeX math={"\\theta_1"} /> 是斜率。我们的目标是找到一条最能拟合训练数据的直线。
+            这就是高中数学中的直线方程！<KaTeX math={String.raw`\theta_0`} /> 是 y 轴截距，
+            <KaTeX math={String.raw`\theta_1`} /> 是斜率。我们的目标是找到一条最能拟合训练数据的直线。
           </p>
         </div>
 
@@ -592,14 +592,14 @@ export default function ModelPage() {
           <div className="bg-white rounded-lg p-4 border border-emerald-200">
             <p className="text-gray-700 text-sm mb-2">
               <strong>核心直觉：</strong>不同的{" "}
-              <KaTeX math={"(\\theta_0, \\theta_1)"} />{" "}
+              <KaTeX math={String.raw`(\theta_0, \theta_1)`} />{" "}
               组合会产生不同的直线。有的直线高高在上，离所有点都很远；有的直线穿过点的中间，
               让每个点到直线的预测残差都比较小。我们要找的是后者——那条&quot;最公平&quot;的直线。
             </p>
             <p className="text-gray-700 text-sm">
               类比：就像用一根直尺尽量靠近所有散落的点，使得每个点到直尺的垂直距离的平方和最小。
-              <KaTeX math={"\\theta_0"} /> 决定直尺的起始高度，
-              <KaTeX math={"\\theta_1"} /> 决定直尺的倾斜角度。
+              <KaTeX math={String.raw`\theta_0`} /> 决定直尺的起始高度，
+              <KaTeX math={String.raw`\theta_1`} /> 决定直尺的倾斜角度。
             </p>
           </div>
         </div>
@@ -614,11 +614,11 @@ export default function ModelPage() {
 
         <div className="grid md:grid-cols-2 gap-4 mb-4">
           <div className="formula-block">
-            <KaTeX math={"x = \\begin{bmatrix} x_0 \\\\ x_1 \\\\ \\vdots \\\\ x_n \\end{bmatrix} \\in \\mathbb{R}^{n+1}"} display />
+            <KaTeX math={String.raw`x = \begin{bmatrix} x_0 \\ x_1 \\ \vdots \\ x_n \end{bmatrix} \in \mathbb{R}^{n+1}`} display />
             <p className="text-sm text-gray-600 mt-2">输入特征向量（包含 x₀ = 1）</p>
           </div>
           <div className="formula-block">
-            <KaTeX math={"\\theta = \\begin{bmatrix} \\theta_0 \\\\ \\theta_1 \\\\ \\vdots \\\\ \\theta_n \\end{bmatrix} \\in \\mathbb{R}^{n+1}"} display />
+            <KaTeX math={String.raw`\theta = \begin{bmatrix} \theta_0 \\ \theta_1 \\ \vdots \\ \theta_n \end{bmatrix} \in \mathbb{R}^{n+1}`} display />
             <p className="text-sm text-gray-600 mt-2">参数向量</p>
           </div>
         </div>
@@ -629,7 +629,7 @@ export default function ModelPage() {
 
         <FormulaCard
           title="向量形式"
-          formula={<KaTeX math={"h_\\theta(x) = \\theta^T x"} display />}
+          formula={<KaTeX math={String.raw`h_\theta(x) = \theta^T x`} display />}
           description="其中 θᵀ 表示 θ 的转置，结果是一个标量。"
         />
 
@@ -641,7 +641,7 @@ export default function ModelPage() {
           title="设计矩阵"
           formula={
             <KaTeX
-              math={"X = \\begin{bmatrix} (x^{(1)})^T \\\\ (x^{(2)})^T \\\\ \\vdots \\\\ (x^{(m)})^T \\end{bmatrix} = \\begin{bmatrix} x_0^{(1)} & x_1^{(1)} & \\cdots & x_n^{(1)} \\\\ x_0^{(2)} & x_1^{(2)} & \\cdots & x_n^{(2)} \\\\ \\vdots & \\vdots & \\ddots & \\vdots \\\\ x_0^{(m)} & x_1^{(m)} & \\cdots & x_n^{(m)} \\end{bmatrix}"}
+              math={String.raw`X = \begin{bmatrix} (x^{(1)})^T \\ (x^{(2)})^T \\ \vdots \\ (x^{(m)})^T \end{bmatrix} = \begin{bmatrix} x_0^{(1)} & x_1^{(1)} & \cdots & x_n^{(1)} \\ x_0^{(2)} & x_1^{(2)} & \cdots & x_n^{(2)} \\ \vdots & \vdots & \ddots & \vdots \\ x_0^{(m)} & x_1^{(m)} & \cdots & x_n^{(m)} \end{bmatrix}`}
               display
             />
           }
@@ -650,7 +650,7 @@ export default function ModelPage() {
 
         <FormulaCard
           title="批量预测"
-          formula={<KaTeX math={"h = X \\theta"} display />}
+          formula={<KaTeX math={String.raw`h = X \theta`} display />}
           description="其中 h ∈ ℝᵐ 是所有 m 个样本的预测值组成的向量。"
         />
       </section>
@@ -663,7 +663,7 @@ export default function ModelPage() {
         </div>
 
         <p className="text-gray-700 mb-5">
-          在房价预测的例子中，假设函数 <KaTeX math={"h(x) = \\theta_0 + \\theta_1 x"} />{" "}
+          在房价预测的例子中，假设函数 <KaTeX math={String.raw`h(x) = \theta_0 + \theta_1 x`} />{" "}
           中的两个参数有着直观的物理意义：
         </p>
 
@@ -671,18 +671,18 @@ export default function ModelPage() {
           <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl border border-violet-200 p-5">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center font-bold text-sm">
-                <KaTeX math={"\\theta_0"} className="text-white" />
+                <KaTeX math={String.raw`\theta_0`} className="text-white" />
               </div>
               <h3 className="font-bold text-violet-800">截距 · 基础成本</h3>
             </div>
             <p className="text-gray-700 text-sm mb-3">
-              <KaTeX math={"\\theta_0"} /> 是直线的起点，也就是当面积为 0 时的&quot;基础成本&quot;。
+              <KaTeX math={String.raw`\theta_0`} /> 是直线的起点，也就是当面积为 0 时的&quot;基础成本&quot;。
               在实际中，即使房子面积为 0，一块地皮也有它的基础价值。
             </p>
             <div className="bg-white rounded-lg p-3 border border-violet-200">
               <p className="text-sm text-violet-700">
                 <strong>房价例子：</strong>
-                <KaTeX math={"\\theta_0 = 50"} /> 万元，代表基础装修费 + 土地使用权
+                <KaTeX math={String.raw`\theta_0 = 50`} /> 万元，代表基础装修费 + 土地使用权
               </p>
             </div>
           </div>
@@ -690,18 +690,18 @@ export default function ModelPage() {
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-5">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
-                <KaTeX math={"\\theta_1"} className="text-white" />
+                <KaTeX math={String.raw`\theta_1`} className="text-white" />
               </div>
               <h3 className="font-bold text-blue-800">斜率 · 增长率</h3>
             </div>
             <p className="text-gray-700 text-sm mb-3">
-              <KaTeX math={"\\theta_1"} /> 是直线的倾斜程度，表示每增加一平米面积，
+              <KaTeX math={String.raw`\theta_1`} /> 是直线的倾斜程度，表示每增加一平米面积，
               房价平均上涨多少。斜率越大，面积对房价的影响越大。
             </p>
             <div className="bg-white rounded-lg p-3 border border-blue-200">
               <p className="text-sm text-blue-700">
                 <strong>房价例子：</strong>
-                <KaTeX math={"\\theta_1 = 2"} /> 万元/平米，每多一平米面积增值 2 万
+                <KaTeX math={String.raw`\theta_1 = 2`} /> 万元/平米，每多一平米面积增值 2 万
               </p>
             </div>
           </div>
@@ -710,7 +710,7 @@ export default function ModelPage() {
         <div className="bg-amber-50 rounded-lg border border-amber-200 p-4">
           <p className="text-gray-700 text-sm">
             <strong>直观理解：</strong>假设你看到一套 80 平米的房子，如果{" "}
-            <KaTeX math={"\\theta_0 = 50, \\theta_1 = 2"} />，
+            <KaTeX math={String.raw`\theta_0 = 50, \theta_1 = 2`} />，
             那么预测价格 = 50 + 2{" "}×{" "}80 = 210 万元。
             这就是线性回归模型的预测过程——简单的乘法加法组合！
           </p>
@@ -722,8 +722,8 @@ export default function ModelPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">交互演示</h2>
         <p className="text-gray-700 mb-4">
           下面是一个单变量线性回归的交互式演示。蓝点是训练数据（围绕真实直线 y = 2x + 1 生成），
-          蓝色实线是你的预测直线。拖动滑块调整参数 <KaTeX math={"\\theta_0"} /> 和{" "}
-          <KaTeX math={"\\theta_1"} />，观察拟合效果的变化。
+          蓝色实线是你的预测直线。拖动滑块调整参数 <KaTeX math={String.raw`\theta_0`} /> 和{" "}
+          <KaTeX math={String.raw`\theta_1`} />，观察拟合效果的变化。
         </p>
 
         <div className="flex flex-col lg:flex-row gap-6">
@@ -744,7 +744,7 @@ export default function ModelPage() {
             <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  偏置项 <KaTeX math={"\\theta_0"} /> = <span className="text-blue-700 font-mono">{theta0.toFixed(1)}</span>
+                  偏置项 <KaTeX math={String.raw`\theta_0`} /> = <span className="text-blue-700 font-mono">{theta0.toFixed(1)}</span>
                 </label>
                 <Slider
                   value={[theta0]}
@@ -758,7 +758,7 @@ export default function ModelPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  斜率 <KaTeX math={"\\theta_1"} /> = <span className="text-blue-700 font-mono">{theta1.toFixed(1)}</span>
+                  斜率 <KaTeX math={String.raw`\theta_1`} /> = <span className="text-blue-700 font-mono">{theta1.toFixed(1)}</span>
                 </label>
                 <Slider
                   value={[theta1]}

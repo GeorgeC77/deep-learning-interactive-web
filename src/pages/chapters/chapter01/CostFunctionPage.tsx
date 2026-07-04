@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, useMemo } from 'react';
 import { TrendingDown, Target, Mountain, Map, MapPin, Ruler, BarChart3 } from 'lucide-react';
-import KaTeX from '../components/KaTeX';
-import FormulaCard from '../components/FormulaCard';
+import KaTeX from '../../../components/KaTeX';
+import FormulaCard from '../../../components/FormulaCard';
 
 /* ── data gen ── */
 interface DataPoint {
@@ -434,15 +434,15 @@ export default function CostFunctionPage() {
           title="代价函数定义"
           formula={
             <KaTeX
-              math={"J(\\theta) = \\frac{1}{2m} \\sum_{i=1}^{m} \\left( h_\\theta(x^{(i)}) - y^{(i)} \\right)^2"}
+              math={String.raw`J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} \left( h_\theta(x^{(i)}) - y^{(i)} \right)^2`}
               display
             />
           }
           description={
             <span>
               其中 m 是样本数量，
-              <KaTeX math={"h_\\theta(x^{(i)})"} /> 是第 i 个样本的预测值，
-              <KaTeX math={"y^{(i)}"} /> 是第 i 个样本的真实值。
+              <KaTeX math={String.raw`h_\theta(x^{(i)})`} /> 是第 i 个样本的预测值，
+              <KaTeX math={String.raw`y^{(i)}`} /> 是第 i 个样本的真实值。
               这里的 J(θ) 是 MSE 的一半；加入 1/2 不会改变最优解，只是为了让求导后的系数更简洁。
             </span>
           }
@@ -467,7 +467,7 @@ export default function CostFunctionPage() {
               <span className="text-sm font-semibold text-rose-700 block mb-1">预测误差</span>
               <span className="text-xs text-gray-600">
                 沿 y 轴方向的预测残差 ={" "}
-                <KaTeX math={"h_\\theta(x^{(i)}) - y^{(i)}"} />
+                <KaTeX math={String.raw`h_\theta(x^{(i)}) - y^{(i)}`} />
               </span>
             </div>
             <div className="bg-white rounded-lg p-4 border border-rose-200 text-center">
@@ -482,7 +482,7 @@ export default function CostFunctionPage() {
               <span className="text-sm font-semibold text-rose-700 block mb-1">取平均并乘 1/2</span>
               <span className="text-xs text-gray-600">
                 除以 {" "}
-                <KaTeX math={"2m"} /> 得到 half-MSE 代价
+                <KaTeX math={String.raw`2m`} /> 得到 half-MSE 代价
               </span>
             </div>
           </div>
@@ -518,13 +518,13 @@ export default function CostFunctionPage() {
             {/* 1/2m intuition */}
             <div className="bg-white rounded-lg p-4 border border-amber-200">
               <h4 className="font-semibold text-amber-800 mb-2">
-                <KaTeX math={"\\frac{1}{2m}"} /> 的含义
+                <KaTeX math={String.raw`\frac{1}{2m}`} /> 的含义
               </h4>
               <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
                 <div>
                   <p className="mb-1">
                     <strong>
-                      <KaTeX math={"\\frac{1}{m}"} />：取平均
+                      <KaTeX math={String.raw`\frac{1}{m}`} />：取平均
                     </strong>
                   </p>
                   <p>
@@ -535,7 +535,7 @@ export default function CostFunctionPage() {
                 <div>
                   <p className="mb-1">
                     <strong>
-                      <KaTeX math={"\\frac{1}{2}"} />：数学便利
+                      <KaTeX math={String.raw`\frac{1}{2}`} />：数学便利
                     </strong>
                   </p>
                   <p>
@@ -550,20 +550,20 @@ export default function CostFunctionPage() {
 
         <div className="mt-6 bg-amber-50 rounded-lg border border-amber-200 p-4">
           <h3 className="font-semibold text-amber-800 mb-2">
-            为什么用 <KaTeX math={"\\frac{1}{2m}"} /> 而不是 <KaTeX math={"\\frac{1}{m}"} />？
+            为什么用 <KaTeX math={String.raw`\frac{1}{2m}`} /> 而不是 <KaTeX math={String.raw`\frac{1}{m}`} />？
           </h3>
           <p className="text-gray-700 mb-2">
-            系数 <KaTeX math={"\\frac{1}{2}"} /> 是一个数学上的便利选择。当我们对 J(θ) 求导时，
+            系数 <KaTeX math={String.raw`\frac{1}{2}`} /> 是一个数学上的便利选择。当我们对 J(θ) 求导时，
             平方项会产生一个因子 2：
           </p>
           <div className="formula-block">
             <KaTeX
-              math={"\\frac{\\partial}{\\partial \\theta_j} \\left( h_\\theta(x^{(i)}) - y^{(i)} \\right)^2 = 2 \\left( h_\\theta(x^{(i)}) - y^{(i)} \\right) \\cdot x_j^{(i)}"}
+              math={String.raw`\frac{\partial}{\partial \theta_j} \left( h_\theta(x^{(i)}) - y^{(i)} \right)^2 = 2 \left( h_\theta(x^{(i)}) - y^{(i)} \right) \cdot x_j^{(i)}`}
               display
             />
           </div>
           <p className="text-gray-700 mt-2">
-            前面的 <KaTeX math={"\\frac{1}{2}"} /> 正好与这个 2 抵消，使得梯度表达式更加简洁。
+            前面的 <KaTeX math={String.raw`\frac{1}{2}`} /> 正好与这个 2 抵消，使得梯度表达式更加简洁。
             这个选择不会影响最优解的位置，因为代价函数乘以一个正的常数不会改变其极值点。
           </p>
         </div>
@@ -574,7 +574,7 @@ export default function CostFunctionPage() {
         <h2 className="text-2xl font-bold text-gray-900 mb-4">残差可视化</h2>
         <p className="text-gray-700 mb-4">
           从几何角度看，代价函数衡量的是预测值与真实值之间沿 y 轴方向的差异。
-          每个样本的误差 <KaTeX math={"h_\\theta(x^{(i)}) - y^{(i)}"} /> 就是该样本的预测残差（prediction residual），
+          每个样本的误差 <KaTeX math={String.raw`h_\theta(x^{(i)}) - y^{(i)}`} /> 就是该样本的预测残差（prediction residual），
           也称预测误差。代价函数是所有残差平方的平均值再乘以 1/2（half-MSE）。
         </p>
 
@@ -607,7 +607,7 @@ export default function CostFunctionPage() {
                 <p className="text-sm text-red-700 font-semibold mb-1">代价 = 所有红色虚线² 的平均</p>
                 <p className="text-xs text-gray-600">
                   J(θ) ={" "}
-                  <KaTeX math={"\\frac{1}{2m} \\sum (\\text{红色虚线长度})^2"} />
+                  <KaTeX math={String.raw`\frac{1}{2m} \sum (\text{红色虚线长度})^2`} />
                 </p>
               </div>
               <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -632,7 +632,7 @@ export default function CostFunctionPage() {
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">代价函数的可视化：碗形曲面</h2>
         <p className="text-gray-700 mb-4">
-          对于单变量线性回归，代价函数 <KaTeX math={"J(\\theta_0, \\theta_1)"} /> 是两个参数的函数，
+          对于单变量线性回归，代价函数 <KaTeX math={String.raw`J(\theta_0, \theta_1)`} /> 是两个参数的函数，
           其图像是一个三维的&quot;碗形&quot;曲面（抛物面）。在二维平面上，我们用<strong>代价值热力图/色带图</strong>来表示这个曲面——
           颜色越深代表代价值越大。
         </p>
@@ -661,7 +661,7 @@ export default function CostFunctionPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  <KaTeX math={"\\theta_0"} />（偏置）= <span className="text-blue-700 font-mono font-bold">{theta0.toFixed(1)}</span>
+                  <KaTeX math={String.raw`\theta_0`} />（偏置）= <span className="text-blue-700 font-mono font-bold">{theta0.toFixed(1)}</span>
                 </label>
                 <input
                   type="range"
@@ -680,7 +680,7 @@ export default function CostFunctionPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  <KaTeX math={"\\theta_1"} />（斜率）= <span className="text-blue-700 font-mono font-bold">{theta1.toFixed(1)}</span>
+                  <KaTeX math={String.raw`\theta_1`} />（斜率）= <span className="text-blue-700 font-mono font-bold">{theta1.toFixed(1)}</span>
                 </label>
                 <input
                   type="range"
@@ -785,7 +785,7 @@ export default function CostFunctionPage() {
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">1.</span>
             <p className="text-gray-700">
-              代价函数 <KaTeX math={"J(\\theta)"} /> 衡量假设函数在训练数据上的拟合程度，
+              代价函数 <KaTeX math={String.raw`J(\theta)`} /> 衡量假设函数在训练数据上的拟合程度，
               值越小表示拟合越好。
             </p>
           </div>
@@ -804,9 +804,9 @@ export default function CostFunctionPage() {
           <div className="flex items-start gap-3">
             <span className="text-blue-600 font-bold">4.</span>
             <p className="text-gray-700">
-              目标是找到 <KaTeX math={"\\theta"} /> 使得{" "}
-              <KaTeX math={"J(\\theta)"} /> 最小：{" "}
-              <KaTeX math={"\\min_\\theta J(\\theta)"} />。
+              目标是找到 <KaTeX math={String.raw`\theta`} /> 使得{" "}
+              <KaTeX math={String.raw`J(\theta)`} /> 最小：{" "}
+              <KaTeX math={String.raw`\min_\theta J(\theta)`} />。
             </p>
           </div>
         </div>

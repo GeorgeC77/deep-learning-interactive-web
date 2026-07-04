@@ -1,6 +1,6 @@
-# 机器学习交互式课程
+# 深度学习交互式课程
 
-一套面向机器学习初学者的交互式学习网站。
+一套面向深度学习初学者的交互式学习网站。
 
 🔗 **在线访问**：https://georgec77.github.io/machine-learning-interactive-web/
 

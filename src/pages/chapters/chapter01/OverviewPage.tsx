@@ -1,14 +1,14 @@
 import { BookOpen, FunctionSquare, TrendingDown, FileSpreadsheet, BarChart3, Brain, ShieldAlert, Home, GraduationCap, ArrowRight } from 'lucide-react';
-import KaTeX from '../components/KaTeX';
-import FormulaCard from '../components/FormulaCard';
+import KaTeX from '../../../components/KaTeX';
+import FormulaCard from '../../../components/FormulaCard';
 
 const roadmapItems = [
-  { label: '模型表示', path: '/model', icon: FunctionSquare, desc: '假设函数与参数', color: 'bg-blue-100 text-blue-700 border-blue-300' },
-  { label: '代价函数', path: '/cost-function', icon: TrendingDown, desc: '衡量拟合程度', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
-  { label: '梯度下降', path: '/gradient-descent', icon: BarChart3, desc: '优化参数', color: 'bg-violet-100 text-violet-700 border-violet-300' },
-  { label: '正规方程', path: '/normal-equation', icon: FileSpreadsheet, desc: '解析解', color: 'bg-amber-100 text-amber-700 border-amber-300' },
-  { label: '概率解释', path: '/probabilistic', icon: Brain, desc: '为什么最小二乘', color: 'bg-rose-100 text-rose-700 border-rose-300' },
-  { label: '过拟合', path: '/overfitting', icon: ShieldAlert, desc: '正则化', color: 'bg-orange-100 text-orange-700 border-orange-300' },
+  { label: '模型表示', path: '/ch01/model', icon: FunctionSquare, desc: '假设函数与基函数', color: 'bg-blue-100 text-blue-700 border-blue-300' },
+  { label: '代价函数', path: '/ch01/cost-function', icon: TrendingDown, desc: '衡量拟合程度', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
+  { label: '梯度下降', path: '/ch01/gradient-descent', icon: BarChart3, desc: '优化参数', color: 'bg-violet-100 text-violet-700 border-violet-300' },
+  { label: '正规方程', path: '/ch01/normal-equation', icon: FileSpreadsheet, desc: '解析解', color: 'bg-amber-100 text-amber-700 border-amber-300' },
+  { label: '概率解释', path: '/ch01/probabilistic', icon: Brain, desc: '为什么最小二乘', color: 'bg-rose-100 text-rose-700 border-rose-300' },
+  { label: '过拟合', path: '/ch01/overfitting', icon: ShieldAlert, desc: '正则化', color: 'bg-orange-100 text-orange-700 border-orange-300' },
 ];
 
 export default function OverviewPage() {
@@ -20,10 +20,10 @@ export default function OverviewPage() {
           <BookOpen className="w-12 h-12 text-blue-600" />
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          线性回归：从一元到多元回归
+          Ch 1. 单层网络：回归
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          本教程系统讲解线性回归的模型假设、代价函数、优化方法与概率解释，帮助你从直觉和数学两方面理解这一经典算法。
+          从最简单的线性回归出发，把它看作只有一层可学习参数的神经网路。学习模型表示、代价函数、优化方法、概率解释与正则化，为后续深度学习打下坚实基础。
         </p>
 
         {/* Copyright Notice */}
@@ -160,7 +160,7 @@ export default function OverviewPage() {
             <div className="bg-white rounded-lg border-2 border-indigo-300 p-4 text-center min-w-[120px]">
               <span className="text-xs text-gray-500 block mb-1">2. 模型（学生）</span>
               <span className="text-sm font-semibold text-indigo-700">
-                <KaTeX math={"h_\\theta(x)"} />
+                <KaTeX math={String.raw`h_\theta(x)`} />
               </span>
             </div>
             <ArrowRight className="w-5 h-5 text-blue-400 hidden md:block" />
@@ -227,7 +227,7 @@ export default function OverviewPage() {
           </div>
           <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
             <span className="font-mono text-blue-700 font-semibold min-w-[100px]">
-              <KaTeX math={"h_\\theta(x)"} />
+              <KaTeX math={String.raw`h_\theta(x)`} />
             </span>
             <span className="text-gray-700">假设函数（hypothesis），由参数 θ 参数化</span>
           </div>
@@ -359,14 +359,14 @@ export default function OverviewPage() {
           title="假设函数（Hypothesis）"
           formula={
             <KaTeX
-              math={"h_\\theta(x) = \\theta^T x = \\sum_{j=0}^{n} \\theta_j x_j"}
+              math={String.raw`h_\theta(x) = \theta^T x = \sum_{j=0}^{n} \theta_j x_j`}
               display
             />
           }
           description={
             <span>
-              其中 <KaTeX math={"x_0 = 1"} /> 是偏置项，
-              <KaTeX math={"\\theta = [\\theta_0, \\theta_1, \\ldots, \\theta_n]^T"} /> 是参数向量。
+              其中 <KaTeX math={String.raw`x_0 = 1`} /> 是偏置项，
+              <KaTeX math={String.raw`\theta = [\theta_0, \theta_1, \ldots, \theta_n]^T`} /> 是参数向量。
               假设函数给出了给定输入 x 时输出的预测值。
             </span>
           }
@@ -376,7 +376,7 @@ export default function OverviewPage() {
           title="代价函数（均方误差）"
           formula={
             <KaTeX
-              math={"J(\\theta) = \\frac{1}{2m} \\sum_{i=1}^{m} \\left( h_\\theta(x^{(i)}) - y^{(i)} \\right)^2"}
+              math={String.raw`J(\theta) = \frac{1}{2m} \sum_{i=1}^{m} \left( h_\theta(x^{(i)}) - y^{(i)} \right)^2`}
               display
             />
           }
@@ -387,13 +387,13 @@ export default function OverviewPage() {
           title="梯度下降更新规则"
           formula={
             <KaTeX
-              math={"\\theta_j := \\theta_j - \\alpha \\frac{\\partial}{\\partial \\theta_j} J(\\theta)"}
+              math={String.raw`\theta_j := \theta_j - \alpha \frac{\partial}{\partial \theta_j} J(\theta)`}
               display
             />
           }
           description={
             <span>
-              其中 <KaTeX math={"\\alpha"} /> 是学习率（learning rate），
+              其中 <KaTeX math={String.raw`\alpha`} /> 是学习率（learning rate），
               控制每次参数更新的步长。
             </span>
           }
@@ -403,7 +403,7 @@ export default function OverviewPage() {
           title="批量梯度下降（展开形式）"
           formula={
             <KaTeX
-              math={"\\theta_j := \\theta_j - \\alpha \\frac{1}{m} \\sum_{i=1}^{m} \\left( h_\\theta(x^{(i)}) - y^{(i)} \\right) x_j^{(i)}"}
+              math={String.raw`\theta_j := \theta_j - \alpha \frac{1}{m} \sum_{i=1}^{m} \left( h_\theta(x^{(i)}) - y^{(i)} \right) x_j^{(i)}`}
               display
             />
           }

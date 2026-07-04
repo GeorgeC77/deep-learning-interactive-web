@@ -1,10 +1,10 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
 import { Target, Footprints, Calculator, BarChart3, HelpCircle, User, Car } from 'lucide-react';
-import KaTeX from '../components/KaTeX';
-import FormulaCard from '../components/FormulaCard';
-import InteractiveDemo from '../components/InteractiveDemo';
-import InteractivePanel from '../components/InteractivePanel';
+import KaTeX from '../../../components/KaTeX';
+import FormulaCard from '../../../components/FormulaCard';
+import InteractiveDemo from '../../../components/InteractiveDemo';
+import InteractivePanel from '../../../components/InteractivePanel';
 
 /* ------------------------------------------------------------------ */
 /*  matrix helpers for 2×2 normal equation                             */

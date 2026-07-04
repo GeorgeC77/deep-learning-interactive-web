@@ -1,231 +1,269 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
+import DynamicPlaceholderPage from './pages/DynamicPlaceholderPage';
 
-// Legacy linear-regression sub-topic pages (Chapter 1)
-import OverviewPage from './pages/OverviewPage';
-import ModelPage from './pages/ModelPage';
-import CostFunctionPage from './pages/CostFunctionPage';
-import GradientDescentPage from './pages/GradientDescentPage';
-import NormalEquationPage from './pages/NormalEquationPage';
-import ProbabilisticPage from './pages/ProbabilisticPage';
-import OverfittingPage from './pages/OverfittingPage';
+// Ch 4 (manifest ch01): Single-layer Networks - Regression
+import Chapter01OverviewPage from './pages/chapters/chapter01/OverviewPage';
+import Chapter01ModelPage from './pages/chapters/chapter01/ModelPage';
+import Chapter01CostFunctionPage from './pages/chapters/chapter01/CostFunctionPage';
+import Chapter08BiasVariancePage from './pages/chapters/chapter08/BiasVariancePage';
 
-// Chapter 2 pages
+// Ch 5 (manifest ch02): Single-layer Networks - Classification
 import Chapter02OverviewPage from './pages/chapters/chapter02/OverviewPage';
 import Chapter02ModelPage from './pages/chapters/chapter02/ModelPage';
 import Chapter02CostFunctionPage from './pages/chapters/chapter02/CostFunctionPage';
-import Chapter02GradientDescentPage from './pages/chapters/chapter02/GradientDescentPage';
 import Chapter02PerceptronPage from './pages/chapters/chapter02/PerceptronPage';
-import Chapter02MulticlassPage from './pages/chapters/chapter02/MulticlassPage';
-import Chapter02NewtonPage from './pages/chapters/chapter02/NewtonPage';
-
-// Chapter 3 pages
-import Chapter03OverviewPage from './pages/chapters/chapter03/OverviewPage';
-import Chapter03ExponentialFamilyPage from './pages/chapters/chapter03/ExponentialFamilyPage';
-import Chapter03BuildingGLMPage from './pages/chapters/chapter03/BuildingGLMPage';
-import Chapter03OLSasGLMPage from './pages/chapters/chapter03/OLSasGLMPage';
-import Chapter03LogisticAsGLMPage from './pages/chapters/chapter03/LogisticAsGLMPage';
-import Chapter03SoftmaxAsGLMPage from './pages/chapters/chapter03/SoftmaxAsGLMPage';
-import Chapter03SummaryPage from './pages/chapters/chapter03/SummaryPage';
-
-// Chapter 4 pages
-import Chapter04OverviewPage from './pages/chapters/chapter04/OverviewPage';
-import Chapter04GenerativeVsDiscriminativePage from './pages/chapters/chapter04/GenerativeVsDiscriminativePage';
 import Chapter04GaussianDiscriminantAnalysisPage from './pages/chapters/chapter04/GaussianDiscriminantAnalysisPage';
-import Chapter04NaiveBayesPage from './pages/chapters/chapter04/NaiveBayesPage';
 
-// Chapter 5 pages
-import Chapter05OverviewPage from './pages/chapters/chapter05/OverviewPage';
-import Chapter05FeatureMappingPage from './pages/chapters/chapter05/FeatureMappingPage';
-import Chapter05LMSInFeatureSpacePage from './pages/chapters/chapter05/LMSInFeatureSpacePage';
-import Chapter05KernelTrickPage from './pages/chapters/chapter05/KernelTrickPage';
-import Chapter05KernelPropertiesPage from './pages/chapters/chapter05/KernelPropertiesPage';
-
-// Chapter 6 pages
-import Chapter06OverviewPage from './pages/chapters/chapter06/OverviewPage';
-import Chapter06MarginIntuitionPage from './pages/chapters/chapter06/MarginIntuitionPage';
-import Chapter06SVMTheoryPage from './pages/chapters/chapter06/SVMTheoryPage';
-
-// Chapter 7 pages
+// Ch 6 (manifest ch03): Deep Neural Networks
 import Chapter07OverviewPage from './pages/chapters/chapter07/OverviewPage';
 import Chapter07NonlinearSupervisedLearningPage from './pages/chapters/chapter07/NonlinearSupervisedLearningPage';
 import Chapter07NeuralNetworksPage from './pages/chapters/chapter07/NeuralNetworksPage';
 import Chapter07ModernNNModulesPage from './pages/chapters/chapter07/ModernNNModulesPage';
+
+// Ch 8 (manifest ch05): Backpropagation
 import Chapter07BackpropagationPage from './pages/chapters/chapter07/BackpropagationPage';
-import Chapter07VectorizationPage from './pages/chapters/chapter07/VectorizationPage';
 
-// Chapter 8 pages
-import Chapter08OverviewPage from './pages/chapters/chapter08/OverviewPage';
-import Chapter08BiasVariancePage from './pages/chapters/chapter08/BiasVariancePage';
-import Chapter08DoubleDescentPage from './pages/chapters/chapter08/DoubleDescentPage';
-import Chapter08SampleComplexityPage from './pages/chapters/chapter08/SampleComplexityPage';
-
-// Chapter 9 pages
+// Ch 9 (manifest ch06): Regularization
 import Chapter09OverviewPage from './pages/chapters/chapter09/OverviewPage';
 import Chapter09RegularizationPage from './pages/chapters/chapter09/RegularizationPage';
-import Chapter09ImplicitRegularizationPage from './pages/chapters/chapter09/ImplicitRegularizationPage';
-import Chapter09CrossValidationPage from './pages/chapters/chapter09/CrossValidationPage';
-import Chapter09BayesianRegularizationPage from './pages/chapters/chapter09/BayesianRegularizationPage';
+import Chapter08DoubleDescentPage from './pages/chapters/chapter08/DoubleDescentPage';
 
-// Chapter 10 pages
-import Chapter10OverviewPage from './pages/chapters/chapter10/OverviewPage';
-import Chapter10KMeansPage from './pages/chapters/chapter10/KMeansPage';
-
-// Chapter 11 pages
-import Chapter11OverviewPage from './pages/chapters/chapter11/OverviewPage';
-import Chapter11GaussianMixtureEMPage from './pages/chapters/chapter11/GaussianMixtureEMPage';
-import Chapter11JensenInequalityPage from './pages/chapters/chapter11/JensenInequalityPage';
-import Chapter11GeneralEMPage from './pages/chapters/chapter11/GeneralEMPage';
-import Chapter11GMMRevisitedPage from './pages/chapters/chapter11/GMMRevisitedPage';
-import Chapter11VariationalInferencePage from './pages/chapters/chapter11/VariationalInferencePage';
-
-// Chapter 12 pages
-import Chapter12OverviewPage from './pages/chapters/chapter12/OverviewPage';
-import Chapter12PCAPage from './pages/chapters/chapter12/PCAPage';
-
-// Chapter 13 pages
-import Chapter13OverviewPage from './pages/chapters/chapter13/OverviewPage';
-import Chapter13ICAPage from './pages/chapters/chapter13/ICAPage';
-
-// Chapter 14 pages
+// Ch 12 (manifest ch09): Transformers
 import Chapter14OverviewPage from './pages/chapters/chapter14/OverviewPage';
+import Chapter14LargeLanguageModelsPage from './pages/chapters/chapter14/LargeLanguageModelsPage';
 import Chapter14PretrainingAdaptationPage from './pages/chapters/chapter14/PretrainingAdaptationPage';
 import Chapter14ComputerVisionPretrainingPage from './pages/chapters/chapter14/ComputerVisionPretrainingPage';
-import Chapter14LargeLanguageModelsPage from './pages/chapters/chapter14/LargeLanguageModelsPage';
 
-// Chapter 15 pages
-import Chapter15OverviewPage from './pages/chapters/chapter15/OverviewPage';
-import Chapter15MDPPage from './pages/chapters/chapter15/MDPPage';
-import Chapter15ValuePolicyIterationPage from './pages/chapters/chapter15/ValuePolicyIterationPage';
-import Chapter15LearningMDPPage from './pages/chapters/chapter15/LearningMDPPage';
-import Chapter15ContinuousStateMDPPage from './pages/chapters/chapter15/ContinuousStateMDPPage';
-import Chapter15ValuePolicyConnectionPage from './pages/chapters/chapter15/ValuePolicyConnectionPage';
+// Ch 15 (manifest ch12): Discrete Latent Variables
+import Ch12OverviewPage from './pages/generated/Ch12OverviewPage';
+import Chapter10KMeansPage from './pages/chapters/chapter10/KMeansPage';
+import Chapter11GMMRevisitedPage from './pages/chapters/chapter11/GMMRevisitedPage';
+import Chapter11GaussianMixtureEMPage from './pages/chapters/chapter11/GaussianMixtureEMPage';
+import Chapter11VariationalInferencePage from './pages/chapters/chapter11/VariationalInferencePage';
 
-// Chapter 16 pages
-import Chapter16FiniteHorizonMDPPage from './pages/chapters/chapter16/FiniteHorizonMDPPage';
-import Chapter16LQRPage from './pages/chapters/chapter16/LQRPage';
-import Chapter16NonlinearToLQRPage from './pages/chapters/chapter16/NonlinearToLQRPage';
-import Chapter16LQGPage from './pages/chapters/chapter16/LQGPage';
+// Ch 16 (manifest ch13): Continuous Latent Variables
+import Chapter12OverviewPage from './pages/chapters/chapter12/OverviewPage';
+import Chapter12PCAPage from './pages/chapters/chapter12/PCAPage';
+import Chapter13ICAPage from './pages/chapters/chapter13/ICAPage';
 
-// Chapter 17 pages
-import Chapter17PolicyGradientPage from './pages/chapters/chapter17/PolicyGradientPage';
+// Prerequisite Ch 1–3
+import PrerequisiteChapter01OverviewPage from './pages/prerequisite/chapter01/OverviewPage';
+import PrerequisiteChapter01ImpactPage from './pages/prerequisite/chapter01/impact';
+import PrerequisiteChapter01TutorialPage from './pages/prerequisite/chapter01/tutorial';
+import PrerequisiteChapter01HistoryPage from './pages/prerequisite/chapter01/history';
+
+import PrerequisiteChapter02OverviewPage from './pages/prerequisite/chapter02/OverviewPage';
+import PrerequisiteChapter02RulesPage from './pages/prerequisite/chapter02/rules';
+import PrerequisiteChapter02DensitiesPage from './pages/prerequisite/chapter02/densities';
+import PrerequisiteChapter02GaussianPage from './pages/prerequisite/chapter02/gaussian';
+import PrerequisiteChapter02InformationPage from './pages/prerequisite/chapter02/information';
+import PrerequisiteChapter02BayesianPage from './pages/prerequisite/chapter02/bayesian';
+
+import PrerequisiteChapter03OverviewPage from './pages/prerequisite/chapter03/OverviewPage';
+import PrerequisiteChapter03DiscretePage from './pages/prerequisite/chapter03/discrete';
+import PrerequisiteChapter03MvGaussianPage from './pages/prerequisite/chapter03/mvgaussian';
+import PrerequisiteChapter03ExponentialPage from './pages/prerequisite/chapter03/exponential';
+import PrerequisiteChapter03NonparametricPage from './pages/prerequisite/chapter03/nonparametric';
+
+// Generated Bishop section pages
+import AppendixAOverviewPage from './pages/generated/AppendixAOverviewPage';
+import AppendixBOverviewPage from './pages/generated/AppendixBOverviewPage';
+import AppendixCOverviewPage from './pages/generated/AppendixCOverviewPage';
+import Ch03ErrorFunctionsPage from './pages/generated/Ch03ErrorFunctionsPage';
+import Ch03MixtureDensityNetworksPage from './pages/generated/Ch03MixtureDensityNetworksPage';
+import Ch04ConvergencePage from './pages/generated/Ch04ConvergencePage';
+import Ch04ErrorSurfacesPage from './pages/generated/Ch04ErrorSurfacesPage';
+import Ch04GradientDescentOptimizationPage from './pages/generated/Ch04GradientDescentOptimizationPage';
+import Ch04NormalizationPage from './pages/generated/Ch04NormalizationPage';
+import Ch04OverviewPage from './pages/generated/Ch04OverviewPage';
+import Ch05AutomaticDifferentiationPage from './pages/generated/Ch05AutomaticDifferentiationPage';
+import Ch05OverviewPage from './pages/generated/Ch05OverviewPage';
+import Ch06InductiveBiasPage from './pages/generated/Ch06InductiveBiasPage';
+import Ch06ModelAveragingPage from './pages/generated/Ch06ModelAveragingPage';
+import Ch06ParameterSharingPage from './pages/generated/Ch06ParameterSharingPage';
+import Ch06ResidualConnectionsPage from './pages/generated/Ch06ResidualConnectionsPage';
+import Ch07ComputerVisionPage from './pages/generated/Ch07ComputerVisionPage';
+import Ch07ConvolutionalFiltersPage from './pages/generated/Ch07ConvolutionalFiltersPage';
+import Ch07ImageSegmentationPage from './pages/generated/Ch07ImageSegmentationPage';
+import Ch07ObjectDetectionPage from './pages/generated/Ch07ObjectDetectionPage';
+import Ch07OverviewPage from './pages/generated/Ch07OverviewPage';
+import Ch07StyleTransferPage from './pages/generated/Ch07StyleTransferPage';
+import Ch07VisualizingTrainedCnnsPage from './pages/generated/Ch07VisualizingTrainedCnnsPage';
+import Ch08ConditionalIndependencePage from './pages/generated/Ch08ConditionalIndependencePage';
+import Ch08GraphicalModelsPage from './pages/generated/Ch08GraphicalModelsPage';
+import Ch08OverviewPage from './pages/generated/Ch08OverviewPage';
+import Ch08SequenceModelsPage from './pages/generated/Ch08SequenceModelsPage';
+import Ch09AttentionPage from './pages/generated/Ch09AttentionPage';
+import Ch10GeneralGraphNetworksPage from './pages/generated/Ch10GeneralGraphNetworksPage';
+import Ch10MachineLearningOnGraphsPage from './pages/generated/Ch10MachineLearningOnGraphsPage';
+import Ch10NeuralMessagePassingPage from './pages/generated/Ch10NeuralMessagePassingPage';
+import Ch10OverviewPage from './pages/generated/Ch10OverviewPage';
+import Ch11BasicSamplingAlgorithmsPage from './pages/generated/Ch11BasicSamplingAlgorithmsPage';
+import Ch11LangevinSamplingPage from './pages/generated/Ch11LangevinSamplingPage';
+import Ch11MarkovChainMonteCarloPage from './pages/generated/Ch11MarkovChainMonteCarloPage';
+import Ch11OverviewPage from './pages/generated/Ch11OverviewPage';
+import Ch13EvidenceLowerBoundPage from './pages/generated/Ch13EvidenceLowerBoundPage';
+import Ch13NonlinearLatentVariableModelsPage from './pages/generated/Ch13NonlinearLatentVariableModelsPage';
+import Ch14AdversarialTrainingPage from './pages/generated/Ch14AdversarialTrainingPage';
+import Ch14ImageGansPage from './pages/generated/Ch14ImageGansPage';
+import Ch14OverviewPage from './pages/generated/Ch14OverviewPage';
+import Ch15AutoregressiveFlowsPage from './pages/generated/Ch15AutoregressiveFlowsPage';
+import Ch15ContinuousFlowsPage from './pages/generated/Ch15ContinuousFlowsPage';
+import Ch15CouplingFlowsPage from './pages/generated/Ch15CouplingFlowsPage';
+import Ch15OverviewPage from './pages/generated/Ch15OverviewPage';
+import Ch16DeterministicAutoencodersPage from './pages/generated/Ch16DeterministicAutoencodersPage';
+import Ch16OverviewPage from './pages/generated/Ch16OverviewPage';
+import Ch16VariationalAutoencodersPage from './pages/generated/Ch16VariationalAutoencodersPage';
+import Ch17ForwardEncoderPage from './pages/generated/Ch17ForwardEncoderPage';
+import Ch17GuidedDiffusionPage from './pages/generated/Ch17GuidedDiffusionPage';
+import Ch17OverviewPage from './pages/generated/Ch17OverviewPage';
+import Ch17ReverseDecoderPage from './pages/generated/Ch17ReverseDecoderPage';
+import Ch17ScoreMatchingPage from './pages/generated/Ch17ScoreMatchingPage';
+import PrerequisiteCh02TransformationPage from './pages/generated/PrerequisiteCh02TransformationPage';
+import PrerequisiteCh03PeriodicPage from './pages/generated/PrerequisiteCh03PeriodicPage';
+
+import { getAllSections } from './course/manifest';
+
+const sectionComponents: Record<string, React.ComponentType> = {
+  // Ch 4 (manifest ch01): Single-layer Networks - Regression
+  '/ch01/overview': Chapter01OverviewPage,
+  '/ch01/linear-regression': Chapter01ModelPage,
+  '/ch01/decision-theory': Chapter01CostFunctionPage,
+  '/ch01/bias-variance': Chapter08BiasVariancePage,
+
+  // Ch 5 (manifest ch02): Single-layer Networks - Classification
+  '/ch02/overview': Chapter02OverviewPage,
+  '/ch02/discriminant-functions': Chapter02PerceptronPage,
+  '/ch02/decision-theory': Chapter02CostFunctionPage,
+  '/ch02/generative-classifiers': Chapter04GaussianDiscriminantAnalysisPage,
+  '/ch02/discriminative-classifiers': Chapter02ModelPage,
+
+  // Ch 6 (manifest ch03): Deep Neural Networks
+  '/ch03/overview': Chapter07OverviewPage,
+  '/ch03/limitations-of-fixed-basis-functions': Chapter07NonlinearSupervisedLearningPage,
+  '/ch03/multilayer-networks': Chapter07NeuralNetworksPage,
+  '/ch03/deep-networks': Chapter07ModernNNModulesPage,
+
+  // Ch 8 (manifest ch05): Backpropagation
+  '/ch05/evaluation-of-gradients': Chapter07BackpropagationPage,
+
+  // Ch 9 (manifest ch06): Regularization
+  '/ch06/overview': Chapter09OverviewPage,
+  '/ch06/weight-decay': Chapter09RegularizationPage,
+  '/ch06/learning-curves': Chapter08DoubleDescentPage,
+
+  // Ch 12 (manifest ch09): Transformers
+  '/ch09/overview': Chapter14OverviewPage,
+  '/ch09/natural-language': Chapter14LargeLanguageModelsPage,
+  '/ch09/transformer-language-models': Chapter14PretrainingAdaptationPage,
+  '/ch09/multimodal-transformers': Chapter14ComputerVisionPretrainingPage,
+
+  // Ch 15 (manifest ch12): Discrete Latent Variables
+  '/ch12/overview': Ch12OverviewPage,
+  '/ch12/k-means-clustering': Chapter10KMeansPage,
+  '/ch12/mixtures-of-gaussians': Chapter11GMMRevisitedPage,
+  '/ch12/expectation-maximization': Chapter11GaussianMixtureEMPage,
+  '/ch12/evidence-lower-bound': Chapter11VariationalInferencePage,
+
+  // Ch 16 (manifest ch13): Continuous Latent Variables
+  '/ch13/overview': Chapter12OverviewPage,
+  '/ch13/principal-component-analysis': Chapter12PCAPage,
+  '/ch13/probabilistic-latent-variables': Chapter13ICAPage,
+
+  // Prerequisite Ch 1
+  '/prerequisite/ch01/overview': PrerequisiteChapter01OverviewPage,
+  '/prerequisite/ch01/impact': PrerequisiteChapter01ImpactPage,
+  '/prerequisite/ch01/tutorial': PrerequisiteChapter01TutorialPage,
+  '/prerequisite/ch01/history': PrerequisiteChapter01HistoryPage,
+
+  // Prerequisite Ch 2
+  '/prerequisite/ch02/overview': PrerequisiteChapter02OverviewPage,
+  '/prerequisite/ch02/rules': PrerequisiteChapter02RulesPage,
+  '/prerequisite/ch02/densities': PrerequisiteChapter02DensitiesPage,
+  '/prerequisite/ch02/gaussian': PrerequisiteChapter02GaussianPage,
+  '/prerequisite/ch02/information': PrerequisiteChapter02InformationPage,
+  '/prerequisite/ch02/bayesian': PrerequisiteChapter02BayesianPage,
+
+  // Prerequisite Ch 3
+  '/prerequisite/ch03/overview': PrerequisiteChapter03OverviewPage,
+  '/prerequisite/ch03/discrete': PrerequisiteChapter03DiscretePage,
+  '/prerequisite/ch03/mvgaussian': PrerequisiteChapter03MvGaussianPage,
+  '/prerequisite/ch03/exponential': PrerequisiteChapter03ExponentialPage,
+  '/prerequisite/ch03/nonparametric': PrerequisiteChapter03NonparametricPage,
+  // Generated Bishop section routes
+  '/appendix/a/overview': AppendixAOverviewPage,
+  '/appendix/b/overview': AppendixBOverviewPage,
+  '/appendix/c/overview': AppendixCOverviewPage,
+  '/ch03/error-functions': Ch03ErrorFunctionsPage,
+  '/ch03/mixture-density-networks': Ch03MixtureDensityNetworksPage,
+  '/ch04/convergence': Ch04ConvergencePage,
+  '/ch04/error-surfaces': Ch04ErrorSurfacesPage,
+  '/ch04/gradient-descent-optimization': Ch04GradientDescentOptimizationPage,
+  '/ch04/normalization': Ch04NormalizationPage,
+  '/ch04/overview': Ch04OverviewPage,
+  '/ch05/automatic-differentiation': Ch05AutomaticDifferentiationPage,
+  '/ch05/overview': Ch05OverviewPage,
+  '/ch06/inductive-bias': Ch06InductiveBiasPage,
+  '/ch06/model-averaging': Ch06ModelAveragingPage,
+  '/ch06/parameter-sharing': Ch06ParameterSharingPage,
+  '/ch06/residual-connections': Ch06ResidualConnectionsPage,
+  '/ch07/computer-vision': Ch07ComputerVisionPage,
+  '/ch07/convolutional-filters': Ch07ConvolutionalFiltersPage,
+  '/ch07/image-segmentation': Ch07ImageSegmentationPage,
+  '/ch07/object-detection': Ch07ObjectDetectionPage,
+  '/ch07/overview': Ch07OverviewPage,
+  '/ch07/style-transfer': Ch07StyleTransferPage,
+  '/ch07/visualizing-trained-cnns': Ch07VisualizingTrainedCnnsPage,
+  '/ch08/conditional-independence': Ch08ConditionalIndependencePage,
+  '/ch08/graphical-models': Ch08GraphicalModelsPage,
+  '/ch08/overview': Ch08OverviewPage,
+  '/ch08/sequence-models': Ch08SequenceModelsPage,
+  '/ch09/attention': Ch09AttentionPage,
+  '/ch10/general-graph-networks': Ch10GeneralGraphNetworksPage,
+  '/ch10/machine-learning-on-graphs': Ch10MachineLearningOnGraphsPage,
+  '/ch10/neural-message-passing': Ch10NeuralMessagePassingPage,
+  '/ch10/overview': Ch10OverviewPage,
+  '/ch11/basic-sampling-algorithms': Ch11BasicSamplingAlgorithmsPage,
+  '/ch11/langevin-sampling': Ch11LangevinSamplingPage,
+  '/ch11/markov-chain-monte-carlo': Ch11MarkovChainMonteCarloPage,
+  '/ch11/overview': Ch11OverviewPage,
+  '/ch13/evidence-lower-bound': Ch13EvidenceLowerBoundPage,
+  '/ch13/nonlinear-latent-variable-models': Ch13NonlinearLatentVariableModelsPage,
+  '/ch14/adversarial-training': Ch14AdversarialTrainingPage,
+  '/ch14/image-gans': Ch14ImageGansPage,
+  '/ch14/overview': Ch14OverviewPage,
+  '/ch15/autoregressive-flows': Ch15AutoregressiveFlowsPage,
+  '/ch15/continuous-flows': Ch15ContinuousFlowsPage,
+  '/ch15/coupling-flows': Ch15CouplingFlowsPage,
+  '/ch15/overview': Ch15OverviewPage,
+  '/ch16/deterministic-autoencoders': Ch16DeterministicAutoencodersPage,
+  '/ch16/overview': Ch16OverviewPage,
+  '/ch16/variational-autoencoders': Ch16VariationalAutoencodersPage,
+  '/ch17/forward-encoder': Ch17ForwardEncoderPage,
+  '/ch17/guided-diffusion': Ch17GuidedDiffusionPage,
+  '/ch17/overview': Ch17OverviewPage,
+  '/ch17/reverse-decoder': Ch17ReverseDecoderPage,
+  '/ch17/score-matching': Ch17ScoreMatchingPage,
+  '/prerequisite/ch02/transformation': PrerequisiteCh02TransformationPage,
+  '/prerequisite/ch03/periodic': PrerequisiteCh03PeriodicPage,
+};
 
 function App() {
+  const sections = getAllSections();
+
   return (
     <HashRouter>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
 
-          {/* Chapter 1: linear regression deep-dive pages */}
-          <Route path="/overview" element={<OverviewPage />} />
-          <Route path="/model" element={<ModelPage />} />
-          <Route path="/cost-function" element={<CostFunctionPage />} />
-          <Route path="/gradient-descent" element={<GradientDescentPage />} />
-          <Route path="/normal-equation" element={<NormalEquationPage />} />
-          <Route path="/probabilistic" element={<ProbabilisticPage />} />
-          <Route path="/overfitting" element={<OverfittingPage />} />
-
-          {/* Chapter 2 routes */}
-          <Route path="/ch02/overview" element={<Chapter02OverviewPage />} />
-          <Route path="/ch02/model" element={<Chapter02ModelPage />} />
-          <Route path="/ch02/cost-function" element={<Chapter02CostFunctionPage />} />
-          <Route path="/ch02/gradient-descent" element={<Chapter02GradientDescentPage />} />
-          <Route path="/ch02/perceptron" element={<Chapter02PerceptronPage />} />
-          <Route path="/ch02/multiclass" element={<Chapter02MulticlassPage />} />
-          <Route path="/ch02/newton" element={<Chapter02NewtonPage />} />
-
-          {/* Chapter 3 routes */}
-          <Route path="/ch03/overview" element={<Chapter03OverviewPage />} />
-          <Route path="/ch03/exponential-family" element={<Chapter03ExponentialFamilyPage />} />
-          <Route path="/ch03/building-glm" element={<Chapter03BuildingGLMPage />} />
-          <Route path="/ch03/ols-as-glm" element={<Chapter03OLSasGLMPage />} />
-          <Route path="/ch03/logistic-as-glm" element={<Chapter03LogisticAsGLMPage />} />
-          <Route path="/ch03/softmax-as-glm" element={<Chapter03SoftmaxAsGLMPage />} />
-          <Route path="/ch03/summary" element={<Chapter03SummaryPage />} />
-
-          {/* Chapter 4 routes */}
-          <Route path="/ch04/overview" element={<Chapter04OverviewPage />} />
-          <Route path="/ch04/generative-vs-discriminative" element={<Chapter04GenerativeVsDiscriminativePage />} />
-          <Route path="/ch04/gaussian-discriminant-analysis" element={<Chapter04GaussianDiscriminantAnalysisPage />} />
-          <Route path="/ch04/naive-bayes" element={<Chapter04NaiveBayesPage />} />
-
-          {/* Chapter 5 routes */}
-          <Route path="/ch05/overview" element={<Chapter05OverviewPage />} />
-          <Route path="/ch05/feature-mapping" element={<Chapter05FeatureMappingPage />} />
-          <Route path="/ch05/lms-in-feature-space" element={<Chapter05LMSInFeatureSpacePage />} />
-          <Route path="/ch05/kernel-trick" element={<Chapter05KernelTrickPage />} />
-          <Route path="/ch05/kernel-properties" element={<Chapter05KernelPropertiesPage />} />
-
-          {/* Chapter 6 routes */}
-          <Route path="/ch06/overview" element={<Chapter06OverviewPage />} />
-          <Route path="/ch06/margin-intuition" element={<Chapter06MarginIntuitionPage />} />
-          <Route path="/ch06/svm-theory" element={<Chapter06SVMTheoryPage />} />
-
-          {/* Chapter 7 routes */}
-          <Route path="/ch07/overview" element={<Chapter07OverviewPage />} />
-          <Route path="/ch07/nonlinear-supervised-learning" element={<Chapter07NonlinearSupervisedLearningPage />} />
-          <Route path="/ch07/neural-networks" element={<Chapter07NeuralNetworksPage />} />
-          <Route path="/ch07/modern-nn-modules" element={<Chapter07ModernNNModulesPage />} />
-          <Route path="/ch07/backpropagation" element={<Chapter07BackpropagationPage />} />
-          <Route path="/ch07/vectorization" element={<Chapter07VectorizationPage />} />
-
-          {/* Chapter 8 routes */}
-          <Route path="/ch08/overview" element={<Chapter08OverviewPage />} />
-          <Route path="/ch08/bias-variance" element={<Chapter08BiasVariancePage />} />
-          <Route path="/ch08/double-descent" element={<Chapter08DoubleDescentPage />} />
-          <Route path="/ch08/sample-complexity" element={<Chapter08SampleComplexityPage />} />
-
-          {/* Chapter 9 routes */}
-          <Route path="/ch09/overview" element={<Chapter09OverviewPage />} />
-          <Route path="/ch09/regularization" element={<Chapter09RegularizationPage />} />
-          <Route path="/ch09/implicit-regularization" element={<Chapter09ImplicitRegularizationPage />} />
-          <Route path="/ch09/cross-validation" element={<Chapter09CrossValidationPage />} />
-          <Route path="/ch09/bayesian-regularization" element={<Chapter09BayesianRegularizationPage />} />
-
-          {/* Chapter 10 routes */}
-          <Route path="/ch10/overview" element={<Chapter10OverviewPage />} />
-          <Route path="/ch10/k-means" element={<Chapter10KMeansPage />} />
-
-          {/* Chapter 11 routes */}
-          <Route path="/ch11/overview" element={<Chapter11OverviewPage />} />
-          <Route path="/ch11/gaussian-mixture-em" element={<Chapter11GaussianMixtureEMPage />} />
-          <Route path="/ch11/jensen-inequality" element={<Chapter11JensenInequalityPage />} />
-          <Route path="/ch11/general-em" element={<Chapter11GeneralEMPage />} />
-          <Route path="/ch11/gmm-revisited" element={<Chapter11GMMRevisitedPage />} />
-          <Route path="/ch11/variational-inference" element={<Chapter11VariationalInferencePage />} />
-
-          {/* Chapter 12 routes */}
-          <Route path="/ch12/overview" element={<Chapter12OverviewPage />} />
-          <Route path="/ch12/pca" element={<Chapter12PCAPage />} />
-
-          {/* Chapter 13 routes */}
-          <Route path="/ch13/overview" element={<Chapter13OverviewPage />} />
-          <Route path="/ch13/ica" element={<Chapter13ICAPage />} />
-
-          {/* Chapter 14 routes */}
-          <Route path="/ch14/overview" element={<Chapter14OverviewPage />} />
-          <Route path="/ch14/pretraining-adaptation" element={<Chapter14PretrainingAdaptationPage />} />
-          <Route path="/ch14/computer-vision-pretraining" element={<Chapter14ComputerVisionPretrainingPage />} />
-          <Route path="/ch14/large-language-models" element={<Chapter14LargeLanguageModelsPage />} />
-
-          {/* Chapter 15 routes */}
-          <Route path="/ch15/overview" element={<Chapter15OverviewPage />} />
-          <Route path="/ch15/mdp" element={<Chapter15MDPPage />} />
-          <Route path="/ch15/value-policy-iteration" element={<Chapter15ValuePolicyIterationPage />} />
-          <Route path="/ch15/learning-mdp" element={<Chapter15LearningMDPPage />} />
-          <Route path="/ch15/continuous-state-mdp" element={<Chapter15ContinuousStateMDPPage />} />
-          <Route path="/ch15/value-policy-connection" element={<Chapter15ValuePolicyConnectionPage />} />
-
-          {/* Chapter 16 routes */}
-          <Route path="/ch16/finite-horizon-mdp" element={<Chapter16FiniteHorizonMDPPage />} />
-          <Route path="/ch16/lqr" element={<Chapter16LQRPage />} />
-          <Route path="/ch16/nonlinear-to-lqr" element={<Chapter16NonlinearToLQRPage />} />
-          <Route path="/ch16/lqg" element={<Chapter16LQGPage />} />
-
-          {/* Chapter 17 routes */}
-          <Route path="/ch17/policy-gradient" element={<Chapter17PolicyGradientPage />} />
+          {/* All course sections */}
+          {sections.map((section) => {
+            const Component = sectionComponents[section.path] ?? DynamicPlaceholderPage;
+            return <Route key={section.path} path={section.path} element={<Component />} />;
+          })}
         </Route>
       </Routes>
     </HashRouter>

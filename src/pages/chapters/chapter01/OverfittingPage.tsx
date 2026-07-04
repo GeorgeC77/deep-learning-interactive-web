@@ -1,10 +1,10 @@
 import { useRef, useEffect, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 import { BookOpen, Frown, Glasses, Brain, SlidersHorizontal, Scale, Square, Leaf } from 'lucide-react';
-import KaTeX from '../components/KaTeX';
-import FormulaCard from '../components/FormulaCard';
-import InteractiveDemo from '../components/InteractiveDemo';
-import InteractivePanel from '../components/InteractivePanel';
+import KaTeX from '../../../components/KaTeX';
+import FormulaCard from '../../../components/FormulaCard';
+import InteractiveDemo from '../../../components/InteractiveDemo';
+import InteractivePanel from '../../../components/InteractivePanel';
 
 /* ------------------------------------------------------------------ */
 /*  多项式回归辅助函数                                                  */

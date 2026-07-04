@@ -10,22 +10,37 @@ interface KaTeXProps {
 
 export default function KaTeX({ math, display = false, className = '' }: KaTeXProps) {
   const html = useMemo(() => {
+    const source = typeof math === 'string' ? math : String(math ?? '');
+    if (source.trim() === '') return '';
     try {
-      return katex.renderToString(math, {
+      return katex.renderToString(source, {
         displayMode: display,
         throwOnError: false,
         trust: true,
       });
     } catch {
-      return math;
+      return source;
     }
   }, [math, display]);
+
+  const label = typeof math === 'string' ? math : String(math ?? '');
+
+  if (display) {
+    return (
+      <div
+        className={className}
+        aria-label={label}
+        title={label}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    );
+  }
 
   return (
     <span
       className={className}
-      aria-label={math}
-      title={math}
+      aria-label={label}
+      title={label}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import * as d3 from 'd3';
 import { Play, Pause, RotateCcw, Mountain, Snowflake, Map, Circle } from 'lucide-react';
-import KaTeX from '../components/KaTeX';
-import LinearRegressionGD from '../components/LinearRegressionGD';
+import KaTeX from '../../../components/KaTeX';
+import LinearRegressionGD from '../../../components/LinearRegressionGD';
 import {
   Tabs,
   TabsContent,

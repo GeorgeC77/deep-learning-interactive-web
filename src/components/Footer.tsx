@@ -6,9 +6,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-center md:text-left">
-            <p className="font-semibold text-white">机器学习交互式课程</p>
+            <p className="font-semibold text-white">深度学习交互式课程</p>
             <p className="text-sm text-gray-400 mt-1">
-              面向机器学习初学者的交互式学习网站
+              面向深度学习初学者的交互式学习网站
             </p>
           </div>
 
