@@ -5,7 +5,7 @@ import { inspectAttr } from 'plugin-inspect-react-code'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/machine-learning-interactive-web/',
+  base: '/deep-learning-interactive-web/',
   plugins: [inspectAttr(), react()],
   server: {
     port: 3000,
