@@ -2,6 +2,7 @@
   "name": "my-app",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://georgec77.github.io/deep-learning-interactive-web/",
   "type": "module",
   "scripts": {
     "dev": "node scripts/generate-double-descent-data.cjs && vite",
