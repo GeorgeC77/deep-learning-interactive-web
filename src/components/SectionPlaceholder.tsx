@@ -1,4 +1,4 @@
-import { BookOpen, Construction, Home, ChevronLeft, ChevronRight, AlertTriangle, CheckCircle2, FlaskConical } from 'lucide-react';
+import { BookOpen, Construction, Home, ChevronLeft, ChevronRight, AlertTriangle, CheckCircle2, FlaskConical, FileText, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getAllSections, getSectionByPath, statusLabel, type Section, type SectionStatus } from '@/course/manifest';
 
@@ -8,13 +8,17 @@ type SectionPlaceholderProps = {
 
 function StatusIcon({ status }: { status: SectionStatus }) {
   switch (status) {
-    case 'completed':
+    case 'teaching-ready':
       return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
-    case 'beta':
-      return <FlaskConical className="w-4 h-4 text-amber-600" />;
+    case 'interactive-reviewed':
+      return <Play className="w-4 h-4 text-violet-600" />;
+    case 'content-reviewed':
+      return <FileText className="w-4 h-4 text-cyan-600" />;
     case 'draft':
-    default:
       return <Construction className="w-4 h-4 text-blue-600" />;
+    case 'skeleton':
+    default:
+      return <FlaskConical className="w-4 h-4 text-amber-600" />;
   }
 }
 

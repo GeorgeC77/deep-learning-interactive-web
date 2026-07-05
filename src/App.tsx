@@ -6,14 +6,11 @@ import DynamicPlaceholderPage from './pages/DynamicPlaceholderPage';
 // Ch 4 (manifest ch01): Single-layer Networks - Regression
 import Chapter01OverviewPage from './pages/chapters/chapter01/OverviewPage';
 import Chapter01ModelPage from './pages/chapters/chapter01/ModelPage';
-import Chapter01CostFunctionPage from './pages/chapters/chapter01/CostFunctionPage';
 import Chapter08BiasVariancePage from './pages/chapters/chapter08/BiasVariancePage';
 
 // Ch 5 (manifest ch02): Single-layer Networks - Classification
 import Chapter02OverviewPage from './pages/chapters/chapter02/OverviewPage';
 import Chapter02ModelPage from './pages/chapters/chapter02/ModelPage';
-import Chapter02CostFunctionPage from './pages/chapters/chapter02/CostFunctionPage';
-import Chapter02PerceptronPage from './pages/chapters/chapter02/PerceptronPage';
 import Chapter04GaussianDiscriminantAnalysisPage from './pages/chapters/chapter04/GaussianDiscriminantAnalysisPage';
 
 // Ch 6 (manifest ch03): Deep Neural Networks
@@ -30,23 +27,17 @@ import Chapter09OverviewPage from './pages/chapters/chapter09/OverviewPage';
 import Chapter09RegularizationPage from './pages/chapters/chapter09/RegularizationPage';
 import Chapter08DoubleDescentPage from './pages/chapters/chapter08/DoubleDescentPage';
 
-// Ch 12 (manifest ch09): Transformers
-import Chapter14OverviewPage from './pages/chapters/chapter14/OverviewPage';
-import Chapter14LargeLanguageModelsPage from './pages/chapters/chapter14/LargeLanguageModelsPage';
-import Chapter14PretrainingAdaptationPage from './pages/chapters/chapter14/PretrainingAdaptationPage';
-import Chapter14ComputerVisionPretrainingPage from './pages/chapters/chapter14/ComputerVisionPretrainingPage';
+// Ch 12 (manifest ch09): Transformers — custom attention page with advanced demo
+import Ch09AttentionPage from './pages/generated/Ch09AttentionPage';
 
 // Ch 15 (manifest ch12): Discrete Latent Variables
 import Ch12OverviewPage from './pages/generated/Ch12OverviewPage';
 import Chapter10KMeansPage from './pages/chapters/chapter10/KMeansPage';
 import Chapter11GMMRevisitedPage from './pages/chapters/chapter11/GMMRevisitedPage';
 import Chapter11GaussianMixtureEMPage from './pages/chapters/chapter11/GaussianMixtureEMPage';
-import Chapter11VariationalInferencePage from './pages/chapters/chapter11/VariationalInferencePage';
 
 // Ch 16 (manifest ch13): Continuous Latent Variables
-import Chapter12OverviewPage from './pages/chapters/chapter12/OverviewPage';
 import Chapter12PCAPage from './pages/chapters/chapter12/PCAPage';
-import Chapter13ICAPage from './pages/chapters/chapter13/ICAPage';
 
 // Prerequisite Ch 1–3
 import PrerequisiteChapter01OverviewPage from './pages/prerequisite/chapter01/OverviewPage';
@@ -71,6 +62,9 @@ import PrerequisiteChapter03NonparametricPage from './pages/prerequisite/chapter
 import AppendixAOverviewPage from './pages/generated/AppendixAOverviewPage';
 import AppendixBOverviewPage from './pages/generated/AppendixBOverviewPage';
 import AppendixCOverviewPage from './pages/generated/AppendixCOverviewPage';
+import Ch01DecisionTheoryPage from './pages/generated/Ch01DecisionTheoryPage';
+import Ch02DecisionTheoryPage from './pages/generated/Ch02DecisionTheoryPage';
+import Ch02DiscriminantFunctionsPage from './pages/generated/Ch02DiscriminantFunctionsPage';
 import Ch03ErrorFunctionsPage from './pages/generated/Ch03ErrorFunctionsPage';
 import Ch03MixtureDensityNetworksPage from './pages/generated/Ch03MixtureDensityNetworksPage';
 import Ch04ConvergencePage from './pages/generated/Ch04ConvergencePage';
@@ -95,7 +89,10 @@ import Ch08ConditionalIndependencePage from './pages/generated/Ch08ConditionalIn
 import Ch08GraphicalModelsPage from './pages/generated/Ch08GraphicalModelsPage';
 import Ch08OverviewPage from './pages/generated/Ch08OverviewPage';
 import Ch08SequenceModelsPage from './pages/generated/Ch08SequenceModelsPage';
-import Ch09AttentionPage from './pages/generated/Ch09AttentionPage';
+import Ch09MultimodalTransformersPage from './pages/generated/Ch09MultimodalTransformersPage';
+import Ch09NaturalLanguagePage from './pages/generated/Ch09NaturalLanguagePage';
+import Ch09OverviewPage from './pages/generated/Ch09OverviewPage';
+import Ch09TransformerLanguageModelsPage from './pages/generated/Ch09TransformerLanguageModelsPage';
 import Ch10GeneralGraphNetworksPage from './pages/generated/Ch10GeneralGraphNetworksPage';
 import Ch10MachineLearningOnGraphsPage from './pages/generated/Ch10MachineLearningOnGraphsPage';
 import Ch10NeuralMessagePassingPage from './pages/generated/Ch10NeuralMessagePassingPage';
@@ -104,8 +101,11 @@ import Ch11BasicSamplingAlgorithmsPage from './pages/generated/Ch11BasicSampling
 import Ch11LangevinSamplingPage from './pages/generated/Ch11LangevinSamplingPage';
 import Ch11MarkovChainMonteCarloPage from './pages/generated/Ch11MarkovChainMonteCarloPage';
 import Ch11OverviewPage from './pages/generated/Ch11OverviewPage';
+import Ch12EvidenceLowerBoundPage from './pages/generated/Ch12EvidenceLowerBoundPage';
 import Ch13EvidenceLowerBoundPage from './pages/generated/Ch13EvidenceLowerBoundPage';
 import Ch13NonlinearLatentVariableModelsPage from './pages/generated/Ch13NonlinearLatentVariableModelsPage';
+import Ch13OverviewPage from './pages/generated/Ch13OverviewPage';
+import Ch13ProbabilisticLatentVariablesPage from './pages/generated/Ch13ProbabilisticLatentVariablesPage';
 import Ch14AdversarialTrainingPage from './pages/generated/Ch14AdversarialTrainingPage';
 import Ch14ImageGansPage from './pages/generated/Ch14ImageGansPage';
 import Ch14OverviewPage from './pages/generated/Ch14OverviewPage';
@@ -130,13 +130,10 @@ const sectionComponents: Record<string, React.ComponentType> = {
   // Ch 4 (manifest ch01): Single-layer Networks - Regression
   '/ch01/overview': Chapter01OverviewPage,
   '/ch01/linear-regression': Chapter01ModelPage,
-  '/ch01/decision-theory': Chapter01CostFunctionPage,
   '/ch01/bias-variance': Chapter08BiasVariancePage,
 
   // Ch 5 (manifest ch02): Single-layer Networks - Classification
   '/ch02/overview': Chapter02OverviewPage,
-  '/ch02/discriminant-functions': Chapter02PerceptronPage,
-  '/ch02/decision-theory': Chapter02CostFunctionPage,
   '/ch02/generative-classifiers': Chapter04GaussianDiscriminantAnalysisPage,
   '/ch02/discriminative-classifiers': Chapter02ModelPage,
 
@@ -155,22 +152,16 @@ const sectionComponents: Record<string, React.ComponentType> = {
   '/ch06/learning-curves': Chapter08DoubleDescentPage,
 
   // Ch 12 (manifest ch09): Transformers
-  '/ch09/overview': Chapter14OverviewPage,
-  '/ch09/natural-language': Chapter14LargeLanguageModelsPage,
-  '/ch09/transformer-language-models': Chapter14PretrainingAdaptationPage,
-  '/ch09/multimodal-transformers': Chapter14ComputerVisionPretrainingPage,
+  '/ch09/attention': Ch09AttentionPage,
 
   // Ch 15 (manifest ch12): Discrete Latent Variables
   '/ch12/overview': Ch12OverviewPage,
   '/ch12/k-means-clustering': Chapter10KMeansPage,
   '/ch12/mixtures-of-gaussians': Chapter11GMMRevisitedPage,
   '/ch12/expectation-maximization': Chapter11GaussianMixtureEMPage,
-  '/ch12/evidence-lower-bound': Chapter11VariationalInferencePage,
 
   // Ch 16 (manifest ch13): Continuous Latent Variables
-  '/ch13/overview': Chapter12OverviewPage,
   '/ch13/principal-component-analysis': Chapter12PCAPage,
-  '/ch13/probabilistic-latent-variables': Chapter13ICAPage,
 
   // Prerequisite Ch 1
   '/prerequisite/ch01/overview': PrerequisiteChapter01OverviewPage,
@@ -192,10 +183,14 @@ const sectionComponents: Record<string, React.ComponentType> = {
   '/prerequisite/ch03/mvgaussian': PrerequisiteChapter03MvGaussianPage,
   '/prerequisite/ch03/exponential': PrerequisiteChapter03ExponentialPage,
   '/prerequisite/ch03/nonparametric': PrerequisiteChapter03NonparametricPage,
+
   // Generated Bishop section routes
   '/appendix/a/overview': AppendixAOverviewPage,
   '/appendix/b/overview': AppendixBOverviewPage,
   '/appendix/c/overview': AppendixCOverviewPage,
+  '/ch01/decision-theory': Ch01DecisionTheoryPage,
+  '/ch02/decision-theory': Ch02DecisionTheoryPage,
+  '/ch02/discriminant-functions': Ch02DiscriminantFunctionsPage,
   '/ch03/error-functions': Ch03ErrorFunctionsPage,
   '/ch03/mixture-density-networks': Ch03MixtureDensityNetworksPage,
   '/ch04/convergence': Ch04ConvergencePage,
@@ -220,7 +215,10 @@ const sectionComponents: Record<string, React.ComponentType> = {
   '/ch08/graphical-models': Ch08GraphicalModelsPage,
   '/ch08/overview': Ch08OverviewPage,
   '/ch08/sequence-models': Ch08SequenceModelsPage,
-  '/ch09/attention': Ch09AttentionPage,
+  '/ch09/multimodal-transformers': Ch09MultimodalTransformersPage,
+  '/ch09/natural-language': Ch09NaturalLanguagePage,
+  '/ch09/overview': Ch09OverviewPage,
+  '/ch09/transformer-language-models': Ch09TransformerLanguageModelsPage,
   '/ch10/general-graph-networks': Ch10GeneralGraphNetworksPage,
   '/ch10/machine-learning-on-graphs': Ch10MachineLearningOnGraphsPage,
   '/ch10/neural-message-passing': Ch10NeuralMessagePassingPage,
@@ -229,8 +227,11 @@ const sectionComponents: Record<string, React.ComponentType> = {
   '/ch11/langevin-sampling': Ch11LangevinSamplingPage,
   '/ch11/markov-chain-monte-carlo': Ch11MarkovChainMonteCarloPage,
   '/ch11/overview': Ch11OverviewPage,
+  '/ch12/evidence-lower-bound': Ch12EvidenceLowerBoundPage,
   '/ch13/evidence-lower-bound': Ch13EvidenceLowerBoundPage,
   '/ch13/nonlinear-latent-variable-models': Ch13NonlinearLatentVariableModelsPage,
+  '/ch13/overview': Ch13OverviewPage,
+  '/ch13/probabilistic-latent-variables': Ch13ProbabilisticLatentVariablesPage,
   '/ch14/adversarial-training': Ch14AdversarialTrainingPage,
   '/ch14/image-gans': Ch14ImageGansPage,
   '/ch14/overview': Ch14OverviewPage,

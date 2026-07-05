@@ -7,6 +7,8 @@ import {
   CheckCircle2,
   FlaskConical,
   Construction,
+  FileText,
+  Play,
 } from 'lucide-react';
 import {
   Accordion,
@@ -17,8 +19,9 @@ import {
 import {
   courseManifest,
   getChapterStatus,
-  getCompletedCount,
-  getBetaCount,
+  getTeachingReadyCount,
+  getInteractiveReviewedCount,
+  getContentReviewedCount,
   getDraftCount,
   statusLabel,
   type Part,
@@ -28,13 +31,17 @@ import {
 
 function StatusIcon({ status }: { status: SectionStatus }) {
   switch (status) {
-    case 'completed':
+    case 'teaching-ready':
       return <CheckCircle2 className="w-4 h-4 text-emerald-600" />;
-    case 'beta':
-      return <FlaskConical className="w-4 h-4 text-amber-600" />;
+    case 'interactive-reviewed':
+      return <Play className="w-4 h-4 text-violet-600" />;
+    case 'content-reviewed':
+      return <FileText className="w-4 h-4 text-cyan-600" />;
     case 'draft':
-    default:
       return <Construction className="w-4 h-4 text-blue-600" />;
+    case 'skeleton':
+    default:
+      return <FlaskConical className="w-4 h-4 text-amber-600" />;
   }
 }
 
@@ -44,7 +51,7 @@ function ChapterLabel({ part, chapter }: { part: Part; chapter: Chapter }) {
     const label = chapter.bishopChapter?.replace('Appendix ', '') ?? String(chapter.number);
     return `附录 ${label}`;
   }
-  return `Ch ${chapter.number}`;
+  return chapter.bishopChapter ?? `Ch ${chapter.number}`;
 }
 
 function ChapterCard({ part, chapter }: { part: Part; chapter: Chapter }) {
@@ -75,11 +82,15 @@ function ChapterCard({ part, chapter }: { part: Part; chapter: Chapter }) {
 function PartAccordion({ part }: { part: Part }) {
   const status = getChapterStatus({ id: part.id, number: part.number, title: part.title, sections: [] } as Chapter);
   const badgeColor =
-    status === 'completed'
+    status === 'teaching-ready'
       ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-      : status === 'beta'
-        ? 'bg-amber-50 text-amber-700 border-amber-200'
-        : 'bg-blue-50 text-blue-700 border-blue-200';
+      : status === 'interactive-reviewed'
+        ? 'bg-violet-50 text-violet-700 border-violet-200'
+        : status === 'content-reviewed'
+          ? 'bg-cyan-50 text-cyan-700 border-cyan-200'
+          : status === 'draft'
+            ? 'bg-blue-50 text-blue-700 border-blue-200'
+            : 'bg-amber-50 text-amber-700 border-amber-200';
 
   return (
     <AccordionItem value={part.id} className="border border-gray-200 rounded-xl mb-4 px-5 data-[state=open]:shadow-sm">
@@ -146,11 +157,15 @@ export default function HomePage() {
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm">
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
             <CheckCircle2 className="w-4 h-4" />
-            已完成 {getCompletedCount()}
+            可教学 {getTeachingReadyCount()}
           </div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-            <FlaskConical className="w-4 h-4" />
-            预览版 {getBetaCount()}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 text-violet-700 border border-violet-200">
+            <Play className="w-4 h-4" />
+            交互审校 {getInteractiveReviewedCount()}
+          </div>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-50 text-cyan-700 border border-cyan-200">
+            <FileText className="w-4 h-4" />
+            内容审校 {getContentReviewedCount()}
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
             <Construction className="w-4 h-4" />

@@ -18,6 +18,60 @@ function pathToComponentName(sectionPath) {
   return parts.map(toPascal).join('') + 'Page';
 }
 
+function inferBishopMapping(sectionPath) {
+  const parts = sectionPath.replace(/^\//, '').split('/');
+  if (parts[0] === 'appendix') {
+    return { chapter: `Appendix ${parts[1].toUpperCase()}`, section: '', pages: '' };
+  }
+  if (parts[0] === 'prerequisite') {
+    return { chapter: `Ch ${Number(parts[1].replace('ch', ''))}`, section: parts[2], pages: '' };
+  }
+  // main part: /ch07/computer-vision -> manifest ch07 is Bishop Ch 10
+  const manifestNum = Number(parts[0].replace('ch', ''));
+  const bishopMap = {
+    1: 'Ch 4', 2: 'Ch 5', 3: 'Ch 6', 4: 'Ch 7', 5: 'Ch 8',
+    6: 'Ch 9', 7: 'Ch 10', 8: 'Ch 11', 9: 'Ch 12', 10: 'Ch 13',
+    11: 'Ch 14', 12: 'Ch 15', 13: 'Ch 16', 14: 'Ch 17', 15: 'Ch 18',
+    16: 'Ch 19', 17: 'Ch 20',
+  };
+  const sectionMatch = parts[1]?.match(/^\d+\.\d+$/);
+  return {
+    chapter: bishopMap[manifestNum] || `Ch ${manifestNum}`,
+    section: sectionMatch ? parts[1] : '',
+    pages: '',
+  };
+}
+
+function generateMetadata(sectionPath, concepts, summary) {
+  const learningObjectives = concepts.slice(0, 3).map((c) => `理解 ${c.title} 的含义与作用。`);
+  if (learningObjectives.length === 0) {
+    learningObjectives.push(`理解本小节的核心思想。`);
+  }
+
+  const commonMistakes = [
+    '混淆相关概念的定义与适用场景。',
+    '只记忆公式而忽略其背后的概率或优化假设。',
+  ];
+
+  const quiz = concepts.slice(0, 3).map((c, idx) => ({
+    question: `关于“${c.title}”，下列说法是否正确？`,
+    options: [c.description, '该概念与当前章节无关。', '该概念只适用于无限数据。'],
+    correctIndex: 0,
+    explanation: `正确。${c.description}`,
+  }));
+
+  if (quiz.length === 0) {
+    quiz.push({
+      question: '本小节的主要内容是什么？',
+      options: [summary, '与教材无关的内容。', '仅用于记忆的口诀。'],
+      correctIndex: 0,
+      explanation: `正确。${summary}`,
+    });
+  }
+
+  return { learningObjectives, commonMistakes, quiz };
+}
+
 function generatePage({ componentName, sectionPath, icon, summary, concepts, demo }) {
   const conceptsJsx = concepts
     .map((c) => {
@@ -32,7 +86,15 @@ function generatePage({ componentName, sectionPath, icon, summary, concepts, dem
     ? `    demo={{\n      title: ${JSON.stringify(demo.title)},\n      label: ${JSON.stringify(demo.label)},\n      param: ${demo.param},\n      min: ${demo.min},\n      max: ${demo.max},\n      step: ${demo.step},\n      compute: ${demo.compute.toString()},\n      formula: String.raw\`${demo.formula}\`,\n    }}`
     : '';
 
-  return `import BishopSectionPage from '@/components/BishopSectionPage';\nimport { ${icon} } from 'lucide-react';\n\nexport default function ${componentName}() {\n  return (\n    <BishopSectionPage\n      sectionPath="${sectionPath}"\n      heroIcon={<${icon} className="w-9 h-9 text-blue-600" />}\n      summary={${JSON.stringify(summary)}}\n      concepts={[\n${conceptsJsx}\n      ]}\n${demoJsx}\n    />\n  );\n}\n`;
+  const { learningObjectives, commonMistakes, quiz } = generateMetadata(sectionPath, concepts, summary);
+  const mapping = inferBishopMapping(sectionPath);
+
+  const learningObjectivesJsx = `learningObjectives={[\n${learningObjectives.map((o) => `      ${JSON.stringify(o)}`).join(',\n')}\n    ]}`;
+  const commonMistakesJsx = `commonMistakes={[\n${commonMistakes.map((m) => `      ${JSON.stringify(m)}`).join(',\n')}\n    ]}`;
+  const quizJsx = `quiz={[\n${quiz.map((q) => `      {\n        question: ${JSON.stringify(q.question)},\n        options: [${q.options.map((o) => JSON.stringify(o)).join(', ')}],\n        correctIndex: ${q.correctIndex},\n        explanation: ${JSON.stringify(q.explanation)},\n      }`).join(',\n')}\n    ]}`;
+  const mappingJsx = `bishopMapping={{\n      chapter: ${JSON.stringify(mapping.chapter)},\n      section: ${JSON.stringify(mapping.section)},\n      pages: ${JSON.stringify(mapping.pages)},\n    }}`;
+
+  return `import BishopSectionPage from '@/components/BishopSectionPage';\nimport { ${icon} } from 'lucide-react';\n\nexport default function ${componentName}() {\n  return (\n    <BishopSectionPage\n      sectionPath="${sectionPath}"\n      heroIcon={<${icon} className="w-9 h-9 text-blue-600" />}\n      summary={${JSON.stringify(summary)}}\n      concepts={[\n${conceptsJsx}\n      ]}\n      ${learningObjectivesJsx}\n      coreIntuition={${JSON.stringify(summary)}}\n      ${commonMistakesJsx}\n      ${quizJsx}\n      ${mappingJsx}\n${demoJsx ? '      ' + demoJsx : ''}\n    />\n  );\n}\n`;
 }
 
 // -----------------------------------------------------------------------------
@@ -117,6 +179,103 @@ const SECTIONS = {
       },
       formula: String.raw`p(\theta_0) \approx \sqrt{\frac{m}{2\pi}} \quad (m \gg 1)`,
     },
+  },
+
+  // =========================================================================
+  // Ch 1 (manifest ch01): Single-layer Networks - Regression — missed sections
+  // =========================================================================
+  '/ch01/decision-theory': {
+    icon: 'Scale',
+    summary:
+      '决策理论研究如何在不确定性下做出最优选择；损失函数、期望损失与贝叶斯最优决策是核心工具。',
+    concepts: [
+      {
+        title: '损失函数',
+        description: '量化决策与真实状态之间的差距，不同任务对应不同损失。',
+      },
+      {
+        title: '期望损失',
+        description: '对未知状态按后验概率加权，选择使期望损失最小的决策。',
+        formula: String.raw`\mathbb{E}[L] = \sum_{k} L_{kj} \, p(\mathcal{C}_k \mid \mathbf{x})`,
+      },
+      {
+        title: '贝叶斯最优决策',
+        description: '最小化总体期望损失的决策规则，是分类与回归的理论基准。',
+      },
+    ],
+    demo: {
+      title: '不同损失的权衡',
+      label: '假阳性损失 L_fp',
+      param: 1.0,
+      min: 0.1,
+      max: 5.0,
+      step: 0.1,
+      compute: (lfp) => ({
+        label: '最优决策阈值相对偏移',
+        value: Math.log(lfp) / 2,
+        display: String.raw`\\Delta=${(Math.log(lfp) / 2).toFixed(2)}`,
+      }),
+      formula: String.raw`\text{阈值偏移} \propto \ln L_{fp}`,
+    },
+  },
+
+  // =========================================================================
+  // Ch 2 (manifest ch02): Single-layer Networks - Classification — missed sections
+  // =========================================================================
+  '/ch02/discriminant-functions': {
+    icon: 'SeparatorVertical',
+    summary:
+      '判别函数直接为输入 x 分配类别标签；二分类与多分类的决策边界是理解分类器的几何起点。',
+    concepts: [
+      {
+        title: '二分类判别函数',
+        description: '用单个实值函数 y(x) 的符号决定类别，决策面 y(x)=0 划分输入空间。',
+        formula: String.raw`y(\mathbf{x}) = \mathbf{w}^{\!T}\mathbf{x} + w_0`,
+      },
+      {
+        title: '多类判别函数',
+        description: '为每个类别定义一个判别函数，选择最大值对应的类别。',
+      },
+      {
+        title: '最小二乘分类',
+        description: '用回归思路拟合 1-of-K 编码目标，但对异常值敏感。',
+      },
+    ],
+    demo: {
+      title: '决策边界随权重变化',
+      label: '偏置 w₀',
+      param: 0.0,
+      min: -3.0,
+      max: 3.0,
+      step: 0.1,
+      compute: (w0) => ({
+        label: '边界 x 截距',
+        value: -w0,
+        display: String.raw`x=-${w0.toFixed(1)}`,
+      }),
+      formula: String.raw`x = -w_0 / w_1`,
+    },
+  },
+
+  '/ch02/decision-theory': {
+    icon: 'Scale',
+    summary:
+      '分类中的决策理论将推断与决策分开：先估计后验概率，再根据损失函数选择最优类别。',
+    concepts: [
+      {
+        title: '误分类率',
+        description: '选择后验概率最大的类别可最小化误分类率。',
+      },
+      {
+        title: '期望损失',
+        description: '当不同错误代价不同时，需要按损失矩阵加权后验概率。',
+        formula: String.raw`\mathbb{E}[L] = \sum_k L_{kj} \, p(\mathcal{C}_k \mid \mathbf{x})`,
+      },
+      {
+        title: '拒绝选项',
+        description: '当最大后验概率不足够高时，拒绝决策以避免高风险错误。',
+      },
+    ],
   },
 
   // =========================================================================
@@ -869,19 +1028,14 @@ Object.assign(SECTIONS, {
   // =========================================================================
   // Ch 9 (manifest ch09): Transformers
   // =========================================================================
-  '/ch09/attention': {
+  '/ch09/overview': {
     icon: 'Focus',
     summary:
-      '注意力机制让模型根据查询动态加权键值对；自注意力与多头注意力是 Transformer 的核心构建块。',
+      'Transformer 架构用自注意力取代循环结构，使序列中任意位置都能直接交互，并成为现代大语言模型的基础。',
     concepts: [
       {
-        title: '缩放点积注意力',
-        description: '用查询与键的内积计算相似度，除以维度平方根防止 softmax 饱和。',
-        formula: String.raw`\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^{\!T}}{\sqrt{d_k}}\right)V`,
-      },
-      {
         title: '自注意力',
-        description: '查询、键、值来自同一序列，使每个位置都能 attending 到其他位置。',
+        description: '查询、键、值来自同一序列，每个位置都能关注其他位置并分配注意力权重。',
       },
       {
         title: '多头注意力',
@@ -889,26 +1043,99 @@ Object.assign(SECTIONS, {
       },
       {
         title: '位置编码',
-        description: '为序列注入位置信息，常用正弦/余弦函数或可学习嵌入。',
+        description: '为 token 注入位置信息；没有位置编码时，Transformer 层对 token 顺序是置换等变的。',
+      },
+      {
+        title: 'Encoder/Decoder',
+        description: '编码器使用双向自注意力，解码器使用掩码自注意力与交叉注意力。',
       },
     ],
     demo: {
-      title: '缩放点积注意力权重',
-      label: '查询-键相似度 s',
-      param: 1.0,
-      min: -3.0,
-      max: 3.0,
-      step: 0.1,
-      compute: (s) => {
-        const exp = Math.exp(s / Math.sqrt(8));
-        return {
-          label: '注意力权重',
-          value: exp / (exp + 1),
-          display: String.raw`\\alpha=${(exp / (exp + 1)).toFixed(3)}`,
-        };
-      },
-      formula: String.raw`\alpha = \frac{\exp(s/\sqrt{d_k})}{\sum \exp(s/\sqrt{d_k})}`,
+      title: '自注意力计算量随序列长度增长',
+      label: '序列长度 N',
+      param: 8.0,
+      min: 2.0,
+      max: 64.0,
+      step: 1.0,
+      compute: (N) => ({
+        label: 'O(N²D) 相对计算量',
+        value: N * N,
+        display: String.raw`N^2=${(N * N).toFixed(0)}`,
+      }),
+      formula: String.raw`\text{FLOPs} \propto N^2 D`,
     },
+  },
+
+  '/ch09/natural-language': {
+    icon: 'Languages',
+    summary:
+      '自然语言处理将文本表示为 token 序列；从词嵌入到 Transformer，模型逐步学会捕捉语义、语法与上下文。',
+    concepts: [
+      {
+        title: '词嵌入',
+        description: '将离散词映射到连续向量空间，语义相近的词在向量空间中彼此靠近。',
+      },
+      {
+        title: '分词',
+        description: '将文本切分为模型可处理的子词单元，平衡词表大小与表达力。',
+      },
+      {
+        title: '自回归语言模型',
+        description: '按从左到右顺序预测下一个 token，训练与生成都基于前文上下文。',
+      },
+      {
+        title: 'RNN 与 BPTT',
+        description: '循环神经网络按时间步展开，通过随时间反向传播训练，但长程依赖较弱。',
+      },
+    ],
+  },
+
+  '/ch09/transformer-language-models': {
+    icon: 'Bot',
+    summary:
+      'Transformer 语言模型通过堆叠自注意力与前馈层，在大规模文本上预训练，展现出强大的生成与迁移能力。',
+    concepts: [
+      {
+        title: '解码器-only 架构',
+        description: 'GPT 系列使用掩码自注意力，适合自回归生成。',
+      },
+      {
+        title: '编码器-解码器架构',
+        description: 'BERT 风格编码器做理解，T5 等编码器-解码器模型做序列到序列任务。',
+      },
+      {
+        title: '采样策略',
+        description: '贪心、束搜索、top-k 与 nucleus 采样控制生成多样性与质量。',
+      },
+      {
+        title: '大语言模型',
+        description: '参数量与数据量扩大带来涌现能力，也带来对齐与评估挑战。',
+      },
+    ],
+  },
+
+  '/ch09/multimodal-transformers': {
+    icon: 'ImagePlus',
+    summary:
+      'Transformer 已扩展到图像、音频、视频等多模态数据；视觉 Transformer 与视觉-语言模型展示了统一架构的潜力。',
+    concepts: [
+      {
+        title: '视觉 Transformer',
+        description: '将图像切分为 patch 序列，直接用 Transformer 建模空间关系。',
+      },
+      {
+        title: '图像生成 Transformer',
+        description: '将图像 token 化后按自回归或掩码方式生成。',
+      },
+      {
+        title: '音频与语音',
+        description: '将频谱或波形切分为 token，Transformer 学习长程声学结构。',
+      },
+      {
+        title: '视觉-语言模型',
+        description: '联合编码文本与图像，实现跨模态理解、问答与生成。',
+      },
+    ],
   },
 
   // =========================================================================
@@ -1415,8 +1642,115 @@ Object.assign(SECTIONS, {
   },
 
   // =========================================================================
+  // Ch 12 (manifest ch12): Discrete Latent Variables — missed draft sections
+  // =========================================================================
+  '/ch12/evidence-lower-bound': {
+    icon: 'Scale',
+    summary:
+      '证据下界为观测数据的对数似然提供了可优化的下界；EM 算法可视为交替优化 ELBO 的过程。',
+    concepts: [
+      {
+        title: 'ELBO',
+        description: '通过引入变分后验，将难解的边缘似然转化为可计算的期望加 KL 惩罚。',
+        formula: String.raw`\ln p(\mathbf{X}) \ge \mathcal{L}(q) = \mathbb{E}_q[\ln p(\mathbf{X},\mathbf{Z})] - \mathbb{E}_q[\ln q(\mathbf{Z})]`,
+      },
+      {
+        title: 'EM 算法',
+        description: 'E 步固定参数优化 q，M 步固定 q 优化模型参数，保证似然单调不减。',
+      },
+      {
+        title: '广义 EM',
+        description: 'M 步不必完全最大化 ELBO，只要有所提升即可。',
+      },
+    ],
+    demo: {
+      title: 'KL 项对 ELBO 的影响',
+      label: '变分后验标准差 σ',
+      param: 1.0,
+      min: 0.1,
+      max: 3.0,
+      step: 0.1,
+      compute: (sigma) => ({
+        label: '-KL(q||N(0,1))',
+        value: -0.5 * (sigma * sigma - Math.log(sigma * sigma) - 1),
+        display: String.raw`-D_{KL}=${(-0.5 * (sigma * sigma - Math.log(sigma * sigma) - 1)).toFixed(3)}`,
+      }),
+      formula: String.raw`-D_{KL}\bigl(\mathcal{N}(0,\sigma^2) \| \mathcal{N}(0,1)\bigr) = -\frac{1}{2}(\sigma^2 - \ln \sigma^2 - 1)`,
+    },
+  },
+
+  // =========================================================================
   // Ch 13 (manifest ch13): Continuous Latent Variables — missed draft sections
   // =========================================================================
+  '/ch13/overview': {
+    icon: 'Shrink',
+    summary:
+      '连续隐变量模型假设观测数据由低维连续隐变量经线性或非线性变换生成；PCA、因子分析、VAE 都属此框架。',
+    concepts: [
+      {
+        title: '隐变量动机',
+        description: '高维数据常分布于低维流形，隐变量提供紧凑表示并揭示数据结构。',
+      },
+      {
+        title: '线性模型',
+        description: 'PCA 与因子分析假设观测是隐变量的线性函数加噪声。',
+      },
+      {
+        title: '非线性扩展',
+        description: '神经网络可参数化非线性编码器与解码器，形成 VAE 等深度生成模型。',
+      },
+    ],
+    demo: {
+      title: '隐变量维度对数据压缩的影响',
+      label: '隐维度 d',
+      param: 2.0,
+      min: 1.0,
+      max: 10.0,
+      step: 1.0,
+      compute: (d) => ({
+        label: '相对压缩比（假设观测维 D=100）',
+        value: d / 100,
+        display: String.raw`\frac{d}{D}=${(d / 100).toFixed(2)}`,
+      }),
+      formula: String.raw`\text{压缩比} = \frac{d}{D}`,
+    },
+  },
+
+  '/ch13/probabilistic-latent-variables': {
+    icon: 'GitBranch',
+    summary:
+      '概率隐变量模型显式定义隐变量先验与条件似然；最大似然与 EM 算法是推断与学习的核心工具。',
+    concepts: [
+      {
+        title: '生成模型',
+        description: '先验 p(z) 与条件分布 p(x|z) 共同决定观测数据的边缘分布。',
+        formula: String.raw`p(x) = \int p(x \mid z) \, p(z) \, dz`,
+      },
+      {
+        title: '因子分析',
+        description: '线性高斯隐变量模型，用因子载荷矩阵刻画观测之间的相关性。',
+      },
+      {
+        title: '独立成分分析',
+        description: '寻找统计独立的隐变量源，常用于盲源分离。',
+      },
+    ],
+    demo: {
+      title: '隐变量先验对边缘方差的贡献',
+      label: '隐变量方差 σ_z²',
+      param: 1.0,
+      min: 0.1,
+      max: 4.0,
+      step: 0.1,
+      compute: (sz2) => ({
+        label: '观测方差（单位载荷）',
+        value: sz2 + 0.2,
+        display: String.raw`\sigma_x^2=${(sz2 + 0.2).toFixed(2)}`,
+      }),
+      formula: String.raw`\sigma_x^2 = W^2 \sigma_z^2 + \sigma_\epsilon^2`,
+    },
+  },
+
   '/ch13/evidence-lower-bound': {
     icon: 'Scale',
     summary:
@@ -1811,12 +2145,9 @@ function updateAppTsx(imports, routeEntries) {
 }
 
 function updateManifestTs() {
-  let manifestSource = fs.readFileSync(MANIFEST_TS, 'utf8');
-  const before = (manifestSource.match(/"draft"/g) || []).length;
-  manifestSource = manifestSource.replace(/status: "draft"/g, 'status: "completed"');
-  const after = (manifestSource.match(/"draft"/g) || []).length;
-  fs.writeFileSync(MANIFEST_TS, manifestSource, 'utf8');
-  console.log(`  updated ${path.relative(ROOT, MANIFEST_TS)} (${before} draft -> ${after} draft)`);
+  // Statuses are managed manually by the coverage review script.
+  // The generator no longer flips draft sections to completed.
+  console.log(`  skipped manifest status updates (manual review only)`);
 }
 
 main();

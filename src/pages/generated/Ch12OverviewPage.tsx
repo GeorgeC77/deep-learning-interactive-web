@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layers, BookOpen, ChevronLeft, ChevronRight, ShieldAlert, Target } from 'lucide-react';
+import SectionMetadata from '@/components/SectionMetadata';
 import ConceptCard from '@/components/ConceptCard';
 import FormulaCard from '@/components/FormulaCard';
 import InteractiveDemo from '@/components/InteractiveDemo';
@@ -125,6 +126,35 @@ export default function Ch12OverviewPage() {
 
       {/* Interactive demo */}
       <GMMResponsibilityDemo />
+
+      <SectionMetadata
+        bishopChapter="Ch 15"
+        bishopSection=""
+        learningObjectives={[
+          '理解离散隐变量模型的动机与应用场景。',
+          '掌握 K-means、高斯混合模型与 EM 算法的核心思想。',
+          '理解证据下界 ELBO 与 EM 算法收敛性之间的关系。',
+        ]}
+        commonMistakes={[
+          '把 K-means 的硬分配与 GMM 的软分配混淆。',
+          '忽视隐变量模型中的不可识别性问题。',
+          '认为 EM 算法一定收敛到全局最优。',
+        ]}
+        quiz={[
+          {
+            question: 'K-means 与高斯混合模型最本质的区别是什么？',
+            options: ['优化目标不同', 'K-means 是硬分配，GMM 是软分配', 'K-means 需要更多内存', 'GMM 不能处理多维数据'],
+            correctIndex: 1,
+            explanation: 'K-means 将每个样本分配到一个簇，而 GMM 通过责任度给出属于每个分量的概率。',
+          },
+          {
+            question: 'EM 算法中的 E 步做什么？',
+            options: ['更新模型参数', '计算隐变量的后验分布', '随机初始化参数', '计算梯度'],
+            correctIndex: 1,
+            explanation: 'E 步固定当前参数，计算隐变量的后验分布（责任度），为 M 步做准备。',
+          },
+        ]}
+      />
 
       {/* Navigation */}
       <section className="flex flex-wrap justify-between gap-4">

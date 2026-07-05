@@ -9,6 +9,8 @@ import {
   CheckCircle2,
   FlaskConical,
   Construction,
+  FileText,
+  Play,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -37,13 +39,17 @@ import {
 
 function StatusIcon({ status }: { status: SectionStatus }) {
   switch (status) {
-    case 'completed':
+    case 'teaching-ready':
       return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />;
-    case 'beta':
-      return <FlaskConical className="w-3.5 h-3.5 text-amber-600" />;
+    case 'interactive-reviewed':
+      return <Play className="w-3.5 h-3.5 text-violet-600" />;
+    case 'content-reviewed':
+      return <FileText className="w-3.5 h-3.5 text-cyan-600" />;
     case 'draft':
-    default:
       return <Construction className="w-3.5 h-3.5 text-blue-600" />;
+    case 'skeleton':
+    default:
+      return <FlaskConical className="w-3.5 h-3.5 text-amber-600" />;
   }
 }
 
@@ -68,7 +74,7 @@ function ChapterLabel({ part, chapter }: { part: Part; chapter: Chapter }) {
     const label = chapter.bishopChapter?.replace('Appendix ', '') ?? String(chapter.number);
     return <>附录 {label}</>;
   }
-  return <>Ch {chapter.number}</>;
+  return <>{chapter.bishopChapter ?? `Ch ${chapter.number}`}</>;
 }
 
 function SectionItem({

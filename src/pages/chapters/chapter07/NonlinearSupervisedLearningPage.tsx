@@ -1,3 +1,4 @@
+import SectionMetadata from '@/components/SectionMetadata';
 import { useState, useMemo } from 'react';
 import { ShieldAlert, Activity, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
@@ -116,7 +117,28 @@ export default function NonlinearSupervisedLearningPage() {
           </li>
         </ul>
       </section>
-    </div>
+    
+      <SectionMetadata
+        bishopChapter={"Ch 6"}
+        bishopSection={"0.5"}
+        learningObjectives={["理解 Limitations Of Fixed Basis Functions 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
+        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
+        quiz={[
+      {
+        question: "关于“Limitations Of Fixed Basis Functions”，下列说法最准确的是？",
+        options: ["它是本小节需要掌握的核心主题。", "它与当前章节完全无关。", "它只适用于无限大数据集。", "它不需要任何数学基础。"],
+        correctIndex: 0,
+        explanation: "Limitations Of Fixed Basis Functions 是本小节的核心内容，理解其动机、公式与应用场景是学习目标。",
+      },
+      {
+        question: "学习本小节时，最重要的提醒是什么？",
+        options: ["只看结论，忽略推导。", "理解概念背后的直觉与假设。", "直接套用代码，不必关心理论。", "只记忆英文术语。"],
+        correctIndex: 1,
+        explanation: "理解直觉和假设有助于在遇到新问题时正确选择与扩展方法。",
+      }
+        ]}
+      />
+</div>
   );
 }
 

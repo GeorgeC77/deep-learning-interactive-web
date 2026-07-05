@@ -1,6 +1,17 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, ChevronLeft, ChevronRight, ShieldAlert, SlidersHorizontal } from 'lucide-react';
+import {
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  ShieldAlert,
+  SlidersHorizontal,
+  Target,
+  Lightbulb,
+  AlertTriangle,
+  HelpCircle,
+  MapPin,
+} from 'lucide-react';
 import FormulaCard from './FormulaCard';
 import ConceptCard from './ConceptCard';
 import InteractiveDemo from './InteractiveDemo';
@@ -12,6 +23,19 @@ export type ConceptItem = {
   title: string;
   description: React.ReactNode;
   formula?: string;
+};
+
+export type QuizItem = {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+};
+
+export type BishopMapping = {
+  chapter: string;
+  section?: string;
+  pages?: string;
 };
 
 export type BishopSectionPageProps = {
@@ -29,6 +53,11 @@ export type BishopSectionPageProps = {
     compute: (value: number) => { label: string; value: number; display: string };
     formula: string;
   };
+  learningObjectives?: string[];
+  coreIntuition?: React.ReactNode;
+  commonMistakes?: string[];
+  quiz?: QuizItem[];
+  bishopMapping?: BishopMapping;
 };
 
 export default function BishopSectionPage({
@@ -37,6 +66,11 @@ export default function BishopSectionPage({
   summary,
   concepts,
   demo,
+  learningObjectives,
+  coreIntuition,
+  commonMistakes,
+  quiz,
+  bishopMapping,
 }: BishopSectionPageProps) {
   const section = getSectionByPath(sectionPath);
   const allSections = getAllSections();
@@ -45,6 +79,7 @@ export default function BishopSectionPage({
   const nextSection: Section | null = allSections[currentIndex + 1] ?? null;
 
   const [param, setParam] = useState(demo?.param ?? 0.5);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number | null>>({});
 
   const demoResult = useMemo(() => {
     if (!demo) return null;
@@ -64,17 +99,56 @@ export default function BishopSectionPage({
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">{section.title}</h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">{summary}</p>
+
+        {bishopMapping && (
+          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-800 rounded-full text-sm">
+            <MapPin className="w-4 h-4" />
+            教材映射：Bishop {bishopMapping.chapter}
+            {bishopMapping.section && ` §${bishopMapping.section}`}
+            {bishopMapping.pages && `（${bishopMapping.pages}）`}
+          </div>
+        )}
+
         <p className="mt-6 text-sm text-amber-800">
           <ShieldAlert className="w-4 h-4 inline-block mr-1" />
           本页内容仅供教学与非商业学习使用（CC BY-NC 4.0）。
         </p>
       </section>
 
-      {/* Concepts */}
+      {/* Learning objectives */}
+      {learningObjectives && learningObjectives.length > 0 && (
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Target className="w-6 h-6 text-emerald-600" />
+            <h2 className="text-2xl font-bold text-gray-900">学习目标</h2>
+          </div>
+          <ul className="space-y-2">
+            {learningObjectives.map((obj, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-gray-700">
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
+                <span>{obj}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Core intuition */}
+      {coreIntuition && (
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <Lightbulb className="w-6 h-6 text-amber-600" />
+            <h2 className="text-2xl font-bold text-gray-900">核心直觉</h2>
+          </div>
+          <div className="text-gray-700 leading-relaxed">{coreIntuition}</div>
+        </section>
+      )}
+
+      {/* Concepts / Formulas */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-6">
           <BookOpen className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-900">核心概念</h2>
+          <h2 className="text-2xl font-bold text-gray-900">核心概念与公式</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-4">
           {concepts.map((concept, idx) => (
@@ -135,6 +209,75 @@ export default function BishopSectionPage({
             )}
           </div>
         </InteractiveDemo>
+      )}
+
+      {/* Common mistakes */}
+      {commonMistakes && commonMistakes.length > 0 && (
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <AlertTriangle className="w-6 h-6 text-red-600" />
+            <h2 className="text-2xl font-bold text-gray-900">常见误区</h2>
+          </div>
+          <ul className="space-y-3">
+            {commonMistakes.map((mistake, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-gray-700">
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+                <span>{mistake}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Quiz */}
+      {quiz && quiz.length > 0 && (
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <HelpCircle className="w-6 h-6 text-violet-600" />
+            <h2 className="text-2xl font-bold text-gray-900">小测题</h2>
+          </div>
+          <div className="space-y-6">
+            {quiz.map((q, qIdx) => (
+              <div key={qIdx} className="border border-gray-200 rounded-lg p-4">
+                <div className="font-medium text-gray-900 mb-3">
+                  {qIdx + 1}. {q.question}
+                </div>
+                <div className="space-y-2">
+                  {q.options.map((opt, oIdx) => {
+                    const answered = quizAnswers[qIdx] !== undefined;
+                    const isSelected = quizAnswers[qIdx] === oIdx;
+                    const isCorrect = oIdx === q.correctIndex;
+                    let btnClass = 'w-full text-left px-3 py-2 rounded-md text-sm border transition-colors ';
+                    if (answered) {
+                      if (isCorrect) btnClass += 'bg-emerald-50 border-emerald-300 text-emerald-800';
+                      else if (isSelected) btnClass += 'bg-red-50 border-red-300 text-red-800';
+                      else btnClass += 'bg-gray-50 border-gray-200 text-gray-500';
+                    } else {
+                      btnClass += 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700';
+                    }
+                    return (
+                      <button
+                        key={oIdx}
+                        type="button"
+                        disabled={answered}
+                        className={btnClass}
+                        onClick={() => setQuizAnswers((prev) => ({ ...prev, [qIdx]: oIdx }))}
+                      >
+                        {String.fromCharCode(65 + oIdx)}. {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+                {quizAnswers[qIdx] !== undefined && (
+                  <div className="mt-3 text-sm text-gray-700 bg-slate-50 p-3 rounded-md">
+                    <span className="font-medium">解析：</span>
+                    {q.explanation}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Navigation */}

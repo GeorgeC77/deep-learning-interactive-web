@@ -8,7 +8,9 @@
     "dev": "node scripts/generate-double-descent-data.cjs && vite",
     "build": "node scripts/generate-double-descent-data.cjs && tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "coverage:build": "node scripts/build-coverage-matrix.cjs",
+    "coverage:check": "node scripts/check-coverage.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
