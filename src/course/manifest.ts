@@ -504,7 +504,7 @@ export const courseManifest: Part[] = [
             id: "ch07-convolutional-filters",
             title: "10.2 卷积滤波器",
             path: "/ch07/convolutional-filters",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "特征检测器、平移等变性、填充、步幅、池化与多层卷积。",
           },
           {
@@ -518,14 +518,14 @@ export const courseManifest: Part[] = [
             id: "ch07-object-detection",
             title: "10.4 目标检测",
             path: "/ch07/object-detection",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "边界框、IoU、滑动窗口、多尺度检测、非极大抑制与 Fast R-CNN。",
           },
           {
             id: "ch07-image-segmentation",
             title: "10.5 图像分割",
             path: "/ch07/image-segmentation",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "卷积分割、上采样、全卷积网络与 U-Net。",
           },
           {
@@ -597,14 +597,14 @@ export const courseManifest: Part[] = [
             id: "ch09-natural-language",
             title: "12.2 自然语言处理",
             path: "/ch09/natural-language",
-            status: "draft",
+            status: "content-reviewed",
             description: "词嵌入、分词、词袋、自回归模型、RNN 与随时间反向传播。",
           },
           {
             id: "ch09-transformer-language-models",
             title: "12.3 Transformer 语言模型",
             path: "/ch09/transformer-language-models",
-            status: "draft",
+            status: "teaching-ready",
             description: "解码器/编码器 Transformer、采样策略、序列到序列与大语言模型。",
           },
           {
@@ -640,7 +640,7 @@ export const courseManifest: Part[] = [
             id: "ch10-neural-message-passing",
             title: "13.2 神经消息传递",
             path: "/ch10/neural-message-passing",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "卷积滤波器、图卷积网络、聚合/更新算子与节点/边/图分类。",
           },
           {
@@ -678,14 +678,14 @@ export const courseManifest: Part[] = [
             id: "ch11-basic-sampling-algorithms",
             title: "14.1 基本采样算法",
             path: "/ch11/basic-sampling-algorithms",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "期望、标准分布、拒绝采样、自适应拒绝采样、重要性采样与 SIR。",
           },
           {
             id: "ch11-markov-chain-monte-carlo",
             title: "14.2 马尔可夫链蒙特卡洛",
             path: "/ch11/markov-chain-monte-carlo",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "Metropolis 算法、马尔可夫链、Metropolis-Hastings 与 Gibbs 采样。",
           },
           {
@@ -815,7 +815,7 @@ export const courseManifest: Part[] = [
       {
         id: "ch15",
         number: 15,
-        title: "标准化流",
+        title: "归一化流（Normalizing Flows）",
         bishopChapter: "Ch 18",
         sections: [
           {
@@ -829,7 +829,7 @@ export const courseManifest: Part[] = [
             id: "ch15-coupling-flows",
             title: "18.1 耦合流",
             path: "/ch15/coupling-flows",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "可逆耦合层与 RealNVP。",
           },
           {

@@ -997,7 +997,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch07-visualizing-trained-cnns",
@@ -1037,7 +1037,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch07-image-segmentation",
@@ -1057,7 +1057,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch07-style-transfer",
@@ -1217,7 +1217,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch09-transformer-language-models",
@@ -1237,7 +1237,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "draft"
+    "status": "teaching-ready"
   },
   {
     "id": "ch09-multimodal-transformers",
@@ -1317,7 +1317,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch10-general-graph-networks",
@@ -1377,7 +1377,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch11-markov-chain-monte-carlo",
@@ -1397,7 +1397,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch11-langevin-sampling",
@@ -1717,7 +1717,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch15-autoregressive-flows",

@@ -36,6 +36,10 @@ export type BishopMapping = {
   chapter: string;
   section?: string;
   pages?: string;
+  textbookSubsections?: string[];
+  formulas?: string[];
+  algorithms?: string[];
+  exercises?: string[];
 };
 
 export type BishopSectionPageProps = {
@@ -58,6 +62,7 @@ export type BishopSectionPageProps = {
   commonMistakes?: string[];
   quiz?: QuizItem[];
   bishopMapping?: BishopMapping;
+  extraContent?: React.ReactNode;
 };
 
 export default function BishopSectionPage({
@@ -71,6 +76,7 @@ export default function BishopSectionPage({
   commonMistakes,
   quiz,
   bishopMapping,
+  extraContent,
 }: BishopSectionPageProps) {
   const section = getSectionByPath(sectionPath);
   const allSections = getAllSections();
@@ -101,11 +107,29 @@ export default function BishopSectionPage({
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">{summary}</p>
 
         {bishopMapping && (
-          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-800 rounded-full text-sm">
-            <MapPin className="w-4 h-4" />
-            教材映射：Bishop {bishopMapping.chapter}
-            {bishopMapping.section && ` §${bishopMapping.section}`}
-            {bishopMapping.pages && `（${bishopMapping.pages}）`}
+          <div className="mt-6 inline-flex flex-col items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-800 rounded-full text-sm">
+              <MapPin className="w-4 h-4" />
+              教材映射：Bishop {bishopMapping.chapter}
+              {bishopMapping.section && ` §${bishopMapping.section}`}
+              {bishopMapping.pages && `（${bishopMapping.pages}）`}
+            </div>
+            {(bishopMapping.textbookSubsections || bishopMapping.formulas || bishopMapping.algorithms || bishopMapping.exercises) && (
+              <div className="text-sm text-indigo-700 bg-indigo-50/60 rounded-lg px-4 py-2 max-w-3xl">
+                {bishopMapping.textbookSubsections && (
+                  <p><span className="font-medium">教材小节：</span>{bishopMapping.textbookSubsections.join('、')}</p>
+                )}
+                {bishopMapping.formulas && (
+                  <p><span className="font-medium">核心公式：</span>{bishopMapping.formulas.join('、')}</p>
+                )}
+                {bishopMapping.algorithms && (
+                  <p><span className="font-medium">算法/方法：</span>{bishopMapping.algorithms.join('、')}</p>
+                )}
+                {bishopMapping.exercises && (
+                  <p><span className="font-medium">练习建议：</span>{bishopMapping.exercises.join('；')}</p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -279,6 +303,9 @@ export default function BishopSectionPage({
           </div>
         </section>
       )}
+
+      {/* Extra custom demos / content */}
+      {extraContent}
 
       {/* Navigation */}
       <section className="flex flex-wrap justify-between gap-4">

@@ -49,16 +49,61 @@ function generateMetadata(sectionPath, concepts, summary) {
   }
 
   const commonMistakes = [
-    '混淆相关概念的定义与适用场景。',
-    '只记忆公式而忽略其背后的概率或优化假设。',
+    '把不同小节的概念混为一谈，忽视它们的假设与适用范围。',
+    '只看公式形式而不验证推导条件或数值实例。',
   ];
 
-  const quiz = concepts.slice(0, 3).map((c, idx) => ({
-    question: `关于“${c.title}”，下列说法是否正确？`,
-    options: [c.description, '该概念与当前章节无关。', '该概念只适用于无限数据。'],
-    correctIndex: 0,
-    explanation: `正确。${c.description}`,
-  }));
+  const quiz = [];
+  if (concepts.length > 0) {
+    const c1 = concepts[0];
+    quiz.push({
+      question: `下列关于“${c1.title}”的叙述，哪一项最准确？`,
+      options: [
+        c1.description,
+        `${c1.title} 与本节讨论的问题完全无关。`,
+        `${c1.title} 在任何情况下都不需要额外假设即可使用。`,
+      ],
+      correctIndex: 0,
+      explanation: `正确。${c1.description} 这体现了本节的核心思想。`,
+    });
+  }
+  if (concepts.length > 1) {
+    const c2 = concepts[1];
+    const hasFormula = !!c2.formula;
+    quiz.push({
+      question: hasFormula
+        ? `在“${c2.title}”的公式中，若忽略其中某一项，最可能导致什么后果？`
+        : `在应用“${c2.title}”时，下列哪种做法最危险？`,
+      options: hasFormula
+        ? [
+            `得到形式上“简洁”但数值或概率意义错误的结论。`,
+            `结果只是略有不精确，不会影响最终决策。`,
+            `公式会自动退化为另一种更简单的正确形式。`,
+          ]
+        : [
+            `忽视其前提假设，直接套用到不适用的数据分布上。`,
+            `只要样本量足够大，前提假设就不重要。`,
+            `该方法只适用于连续变量，离散变量完全无法使用。`,
+          ],
+      correctIndex: 0,
+      explanation: hasFormula
+        ? `正确。${c2.title} 的每一项都有明确的数学或物理意义，随意省略会破坏等式成立的条件。`
+        : `正确。${c2.title} 的有效性依赖于特定假设，忽略前提会导致错误结论。`,
+    });
+  }
+  if (concepts.length > 2) {
+    const c3 = concepts[2];
+    quiz.push({
+      question: `在一个具体情境中，你发现“${c3.title}”的结果与直觉相反，首先应该检查什么？`,
+      options: [
+        `是否违反了该方法成立的前提条件或数据假设。`,
+        `直觉一定是错的，直接接受计算结果。`,
+        `一定是代码实现出错，与理论无关。`,
+      ],
+      correctIndex: 0,
+      explanation: `正确。${c3.title} 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。`,
+    });
+  }
 
   if (quiz.length === 0) {
     quiz.push({
@@ -72,7 +117,7 @@ function generateMetadata(sectionPath, concepts, summary) {
   return { learningObjectives, commonMistakes, quiz };
 }
 
-function generatePage({ componentName, sectionPath, icon, summary, concepts, demo }) {
+function generatePage({ componentName, sectionPath, icon, summary, concepts, demo, metadata = {}, bishopMapping = {} }) {
   const conceptsJsx = concepts
     .map((c) => {
       const formulaLine = c.formula
@@ -86,13 +131,35 @@ function generatePage({ componentName, sectionPath, icon, summary, concepts, dem
     ? `    demo={{\n      title: ${JSON.stringify(demo.title)},\n      label: ${JSON.stringify(demo.label)},\n      param: ${demo.param},\n      min: ${demo.min},\n      max: ${demo.max},\n      step: ${demo.step},\n      compute: ${demo.compute.toString()},\n      formula: String.raw\`${demo.formula}\`,\n    }}`
     : '';
 
-  const { learningObjectives, commonMistakes, quiz } = generateMetadata(sectionPath, concepts, summary);
-  const mapping = inferBishopMapping(sectionPath);
+  const defaults = generateMetadata(sectionPath, concepts, summary);
+  const learningObjectives = metadata.learningObjectives || defaults.learningObjectives;
+  const commonMistakes = metadata.commonMistakes || defaults.commonMistakes;
+  const quiz = metadata.quiz || defaults.quiz;
+
+  const baseMapping = inferBishopMapping(sectionPath);
+  const mapping = {
+    chapter: baseMapping.chapter,
+    section: baseMapping.section,
+    pages: baseMapping.pages,
+    ...bishopMapping,
+  };
 
   const learningObjectivesJsx = `learningObjectives={[\n${learningObjectives.map((o) => `      ${JSON.stringify(o)}`).join(',\n')}\n    ]}`;
   const commonMistakesJsx = `commonMistakes={[\n${commonMistakes.map((m) => `      ${JSON.stringify(m)}`).join(',\n')}\n    ]}`;
   const quizJsx = `quiz={[\n${quiz.map((q) => `      {\n        question: ${JSON.stringify(q.question)},\n        options: [${q.options.map((o) => JSON.stringify(o)).join(', ')}],\n        correctIndex: ${q.correctIndex},\n        explanation: ${JSON.stringify(q.explanation)},\n      }`).join(',\n')}\n    ]}`;
-  const mappingJsx = `bishopMapping={{\n      chapter: ${JSON.stringify(mapping.chapter)},\n      section: ${JSON.stringify(mapping.section)},\n      pages: ${JSON.stringify(mapping.pages)},\n    }}`;
+
+  const mappingFields = ['chapter', 'section', 'pages', 'textbookSubsections', 'formulas', 'algorithms', 'exercises'];
+  const mappingProps = mappingFields
+    .filter((k) => mapping[k] !== undefined && mapping[k] !== '')
+    .map((k) => {
+      const v = mapping[k];
+      if (Array.isArray(v)) {
+        return `      ${k}: [${v.map((x) => JSON.stringify(x)).join(', ')}]`;
+      }
+      return `      ${k}: ${JSON.stringify(v)}`;
+    })
+    .join(',\n');
+  const mappingJsx = `bishopMapping={{\n${mappingProps}\n    }}`;
 
   return `import BishopSectionPage from '@/components/BishopSectionPage';\nimport { ${icon} } from 'lucide-react';\n\nexport default function ${componentName}() {\n  return (\n    <BishopSectionPage\n      sectionPath="${sectionPath}"\n      heroIcon={<${icon} className="w-9 h-9 text-blue-600" />}\n      summary={${JSON.stringify(summary)}}\n      concepts={[\n${conceptsJsx}\n      ]}\n      ${learningObjectivesJsx}\n      coreIntuition={${JSON.stringify(summary)}}\n      ${commonMistakesJsx}\n      ${quizJsx}\n      ${mappingJsx}\n${demoJsx ? '      ' + demoJsx : ''}\n    />\n  );\n}\n`;
 }
@@ -1452,7 +1519,7 @@ Object.assign(SECTIONS, {
   '/ch15/overview': {
     icon: 'ArrowLeftRight',
     summary:
-      '标准化流通过可逆神经网络将简单分布变换为复杂分布，同时保持精确的似然计算。',
+      '归一化流（Normalizing Flows）通过可逆神经网络将简单分布变换为复杂分布，同时保持精确的似然计算。',
     concepts: [
       {
         title: '可逆变换',
@@ -2093,6 +2160,8 @@ function main() {
       summary: content.summary,
       concepts: content.concepts,
       demo: content.demo,
+      metadata: content.metadata,
+      bishopMapping: content.bishopMapping,
     });
 
     fs.writeFileSync(filePath, pageSource, 'utf8');
