@@ -84,7 +84,7 @@ export default function ImportanceSamplingDemo() {
             ))}
           </svg>
           <div className="text-sm text-gray-700 space-y-2">
-            <KaTeX math={String.raw`w(x)=\frac{p(x)}{q(x)}=\frac{\exp(-x^2/2)}{\exp(-(x-\mu)^2/2)}=\exp\left(\frac{2\mu x - \mu^2}{2}\right)`} />
+            <KaTeX math={String.raw`w(x)=\frac{p(x)}{q(x)}=\frac{\exp(-x^2/2)}{\exp(-(x-\mu)^2/2)}=\exp\left(\frac{\mu^2 - 2\mu x}{2}\right)`} />
             <p>在 x=0 处，权重为 exp(μ²/2)。当 μ 远离 0 时，少数样本权重极大，ESS 下降，估计方差增大。</p>
             <p>
               <strong>加权估计：</strong>用样本均值估计 E_p[f(X)] 时，应使用加权平均

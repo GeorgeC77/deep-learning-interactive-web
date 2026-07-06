@@ -10,7 +10,8 @@ export default function ConvolutionSizeDemo() {
   const [S, setS] = useState(2);
 
   const O = Math.floor((I + 2 * P - K) / S) + 1;
-  const samePad = Math.max(0, Math.ceil(((I - 1) * S + K - I) / 2));
+  const samePadS1 = (K - 1) / 2;
+  const samePadGeneral = Math.max(0, Math.ceil(((I - 1) * S + K - I) / 2));
 
   return (
     <InteractiveDemo title="卷积输出尺寸与 padding 选择">
@@ -59,7 +60,12 @@ export default function ConvolutionSizeDemo() {
               <strong>Valid convolution：</strong>不填充（P=0），输出尺寸自然缩小。当前 P={P}，{P === 0 ? '属于 valid 设置。' : '不属于 valid 设置。'}
             </p>
             <p>
-              <strong>Same convolution：</strong>选择 P 使得输出尺寸与输入相同。对当前 I={I}、K={K}、S={S}，需要 P={samePad}。
+              <strong>Same convolution：</strong>
+              {S === 1 && K % 2 === 1
+                ? `取 P=${samePadS1}（即 (K-1)/2）可保持 O=I。`
+                : S === 1
+                ? `K 为偶数时无法精确保持 O=I；强行保持需要 P=${samePadGeneral}。`
+                : `S>1 时 TensorFlow/PyTorch 的 "same" 通常保持 O=⌈I/S⌉（当前为 ${Math.ceil(I / S)}），而非 O=I。若强行保持 O=I，需要 P=${samePadGeneral}。`}
             </p>
             {O < 1 && <p className="text-red-600 font-medium">当前参数导致输出尺寸非正，请增大 I、P 或减小 K、S。</p>}
           </div>

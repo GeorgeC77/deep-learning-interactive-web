@@ -177,7 +177,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "draft"
   },
   {
     "id": "pre-ch02-information",
@@ -297,7 +297,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "draft"
   },
   {
     "id": "pre-ch03-exponential",
@@ -1037,7 +1037,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "teaching-ready"
+    "status": "draft"
   },
   {
     "id": "ch07-image-segmentation",
@@ -1377,7 +1377,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "teaching-ready"
+    "status": "draft"
   },
   {
     "id": "ch11-markov-chain-monte-carlo",
@@ -1397,7 +1397,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "teaching-ready"
+    "status": "draft"
   },
   {
     "id": "ch11-langevin-sampling",
@@ -1597,7 +1597,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "content-reviewed"
+    "status": "draft"
   },
   {
     "id": "ch13-nonlinear-latent-variable-models",

@@ -63,11 +63,13 @@ export default function IoUNMSDemo() {
     const sorted = [...boxes].sort((a, b) => b.score - a.score);
     const keep: number[] = [];
     const suppressed = new Set<number>();
-    for (const box of sorted) {
+    for (let i = 0; i < sorted.length; i++) {
+      const box = sorted[i];
       if (suppressed.has(box.id)) continue;
       keep.push(box.id);
-      for (const other of sorted) {
-        if (other.id === box.id || suppressed.has(other.id)) continue;
+      for (let j = i + 1; j < sorted.length; j++) {
+        const other = sorted[j];
+        if (suppressed.has(other.id)) continue;
         if (computeIoU(box, other) > nmsThreshold) {
           suppressed.add(other.id);
         }

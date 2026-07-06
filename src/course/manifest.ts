@@ -126,7 +126,7 @@ export const courseManifest: Part[] = [
             id: "pre-ch02-transformation",
             title: "2.4 密度变换",
             path: "/prerequisite/ch02/transformation",
-            status: "content-reviewed",
+            status: "draft",
             description: "变量替换、多元分布的密度变换。",
           },
           {
@@ -176,7 +176,7 @@ export const courseManifest: Part[] = [
             id: "pre-ch03-periodic",
             title: "3.3 周期变量",
             path: "/prerequisite/ch03/periodic",
-            status: "content-reviewed",
+            status: "draft",
             description: "Von Mises 分布与角度数据。",
           },
           {
@@ -518,7 +518,7 @@ export const courseManifest: Part[] = [
             id: "ch07-object-detection",
             title: "10.4 目标检测",
             path: "/ch07/object-detection",
-            status: "teaching-ready",
+            status: "draft",
             description: "边界框、IoU、滑动窗口、多尺度检测、非极大抑制与 Fast R-CNN。",
           },
           {
@@ -678,14 +678,14 @@ export const courseManifest: Part[] = [
             id: "ch11-basic-sampling-algorithms",
             title: "14.1 基本采样算法",
             path: "/ch11/basic-sampling-algorithms",
-            status: "teaching-ready",
+            status: "draft",
             description: "期望、标准分布、拒绝采样、自适应拒绝采样、重要性采样与 SIR。",
           },
           {
             id: "ch11-markov-chain-monte-carlo",
             title: "14.2 马尔可夫链蒙特卡洛",
             path: "/ch11/markov-chain-monte-carlo",
-            status: "teaching-ready",
+            status: "draft",
             description: "Metropolis 算法、马尔可夫链、Metropolis-Hastings 与 Gibbs 采样。",
           },
           {
@@ -771,7 +771,7 @@ export const courseManifest: Part[] = [
             id: "ch13-evidence-lower-bound",
             title: "16.3 证据下界",
             path: "/ch13/evidence-lower-bound",
-            status: "content-reviewed",
+            status: "draft",
             description: "期望最大化、PCA 的 EM、因子分析的 EM。",
           },
           {

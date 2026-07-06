@@ -17,9 +17,10 @@ export default function MetropolisHastingsDemo() {
     let x = 0;
     let accepted = 0;
     for (let i = 0; i < steps; i++) {
-      const u1 = Math.sin(i * 12.9898 + seed) * 43758.5453 % 1;
-      const u2 = Math.sin(i * 78.233 + seed) * 43758.5453 % 1;
-      const z = Math.sqrt(-2 * Math.log(Math.abs(u1) + 1e-10)) * Math.cos(2 * Math.PI * Math.abs(u2));
+      const u1 = Math.abs(Math.sin(i * 12.9898 + seed) * 43758.5453) % 1;
+      const u2 = Math.abs(Math.sin(i * 78.233 + seed) * 43758.5453) % 1;
+      const u3 = Math.abs(Math.sin(i * 37.719 + seed + 100) * 43758.5453) % 1;
+      const z = Math.sqrt(-2 * Math.log(u1 + 1e-10)) * Math.cos(2 * Math.PI * u2);
       const xp = mode === 'symmetric' ? x + proposalWidth * z : x + asymBias + proposalWidth * z;
       const pX = target(x);
       const pXp = target(xp);
@@ -27,13 +28,15 @@ export default function MetropolisHastingsDemo() {
       if (mode === 'symmetric') {
         alpha = Math.min(1, pXp / pX);
       } else {
-        // q(x'|x) ~ N(x + bias, sigma^2); q(x|x') ~ N(x' - bias, sigma^2)
-        // ratio q(x|x')/q(x'|x) = exp(-((x - (x'-bias))^2 - (xp - (x+bias))^2)/(2 sigma^2))
+        // q(x'|x) ~ N(x + b, sigma^2); q(x|x') ~ N(x' + b, sigma^2)
+        const b = asymBias;
         const sigma2 = proposalWidth * proposalWidth;
-        const logRatio = -0.5 * ((x - (xp - asymBias)) ** 2 - (xp - (x + asymBias)) ** 2) / sigma2;
+        const logForward = -0.5 * ((xp - (x + b)) ** 2) / sigma2;
+        const logReverse = -0.5 * ((x - (xp + b)) ** 2) / sigma2;
+        const logRatio = logReverse - logForward;
         alpha = Math.min(1, (pXp / pX) * Math.exp(logRatio));
       }
-      if (Math.abs(u2) < alpha) {
+      if (u3 < alpha) {
         x = xp;
         accepted++;
       }
