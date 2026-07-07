@@ -48,7 +48,7 @@ export default function KMeansPage() {
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       <section className="text-center py-8 bg-white rounded-2xl shadow-sm border border-gray-200">
         <div className="text-sm font-medium text-blue-600 mb-2 tracking-wide uppercase">
-          第十章 · 聚类
+          聚类
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">K-means 算法</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">

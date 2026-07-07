@@ -5,39 +5,39 @@ import DynamicPlaceholderPage from './pages/DynamicPlaceholderPage';
 
 // Ch 4 (manifest ch01): Single-layer Networks - Regression
 import Chapter01OverviewPage from './pages/chapters/chapter01/OverviewPage';
-import Chapter01ModelPage from './pages/chapters/chapter01/ModelPage';
-import Chapter08BiasVariancePage from './pages/chapters/chapter08/BiasVariancePage';
+import Ch01LinearRegressionPage from './pages/generated/Ch01LinearRegressionPage';
+import Ch01BiasVariancePage from './pages/generated/Ch01BiasVariancePage';
 
 // Ch 5 (manifest ch02): Single-layer Networks - Classification
 import Chapter02OverviewPage from './pages/chapters/chapter02/OverviewPage';
-import Chapter02ModelPage from './pages/chapters/chapter02/ModelPage';
-import Chapter04GaussianDiscriminantAnalysisPage from './pages/chapters/chapter04/GaussianDiscriminantAnalysisPage';
+import Ch02DiscriminativeClassifiersPage from './pages/generated/Ch02DiscriminativeClassifiersPage';
+import Ch02GenerativeClassifiersPage from './pages/generated/Ch02GenerativeClassifiersPage';
 
 // Ch 6 (manifest ch03): Deep Neural Networks
 import Chapter07OverviewPage from './pages/chapters/chapter07/OverviewPage';
-import Chapter07NonlinearSupervisedLearningPage from './pages/chapters/chapter07/NonlinearSupervisedLearningPage';
-import Chapter07NeuralNetworksPage from './pages/chapters/chapter07/NeuralNetworksPage';
-import Chapter07ModernNNModulesPage from './pages/chapters/chapter07/ModernNNModulesPage';
+import Ch03LimitationsOfFixedBasisFunctionsPage from './pages/generated/Ch03LimitationsOfFixedBasisFunctionsPage';
+import Ch03MultilayerNetworksPage from './pages/generated/Ch03MultilayerNetworksPage';
+import Ch03DeepNetworksPage from './pages/generated/Ch03DeepNetworksPage';
 
 // Ch 8 (manifest ch05): Backpropagation
-import Chapter07BackpropagationPage from './pages/chapters/chapter07/BackpropagationPage';
+import Ch05EvaluationOfGradientsPage from './pages/generated/Ch05EvaluationOfGradientsPage';
 
 // Ch 9 (manifest ch06): Regularization
 import Chapter09OverviewPage from './pages/chapters/chapter09/OverviewPage';
 import Chapter09RegularizationPage from './pages/chapters/chapter09/RegularizationPage';
-import Chapter08DoubleDescentPage from './pages/chapters/chapter08/DoubleDescentPage';
+import Ch06LearningCurvesPage from './pages/generated/Ch06LearningCurvesPage';
 
 // Ch 12 (manifest ch09): Transformers — custom attention page with advanced demo
 import Ch09AttentionPage from './pages/generated/Ch09AttentionPage';
 
 // Ch 15 (manifest ch12): Discrete Latent Variables
 import Ch12OverviewPage from './pages/generated/Ch12OverviewPage';
-import Chapter10KMeansPage from './pages/chapters/chapter10/KMeansPage';
-import Chapter11GMMRevisitedPage from './pages/chapters/chapter11/GMMRevisitedPage';
-import Chapter11GaussianMixtureEMPage from './pages/chapters/chapter11/GaussianMixtureEMPage';
+import Ch12KMeansClusteringPage from './pages/generated/Ch12KMeansClusteringPage';
+import Ch12MixturesOfGaussiansPage from './pages/generated/Ch12MixturesOfGaussiansPage';
+import Ch12ExpectationMaximizationPage from './pages/generated/Ch12ExpectationMaximizationPage';
 
 // Ch 16 (manifest ch13): Continuous Latent Variables
-import Chapter12PCAPage from './pages/chapters/chapter12/PCAPage';
+import Ch13PrincipalComponentAnalysisPage from './pages/generated/Ch13PrincipalComponentAnalysisPage';
 
 // Prerequisite Ch 1–3
 import PrerequisiteChapter01OverviewPage from './pages/prerequisite/chapter01/OverviewPage';
@@ -129,39 +129,39 @@ import { getAllSections } from './course/manifest';
 const sectionComponents: Record<string, React.ComponentType> = {
   // Ch 4 (manifest ch01): Single-layer Networks - Regression
   '/ch01/overview': Chapter01OverviewPage,
-  '/ch01/linear-regression': Chapter01ModelPage,
-  '/ch01/bias-variance': Chapter08BiasVariancePage,
+  '/ch01/linear-regression': Ch01LinearRegressionPage,
+  '/ch01/bias-variance': Ch01BiasVariancePage,
 
   // Ch 5 (manifest ch02): Single-layer Networks - Classification
   '/ch02/overview': Chapter02OverviewPage,
-  '/ch02/generative-classifiers': Chapter04GaussianDiscriminantAnalysisPage,
-  '/ch02/discriminative-classifiers': Chapter02ModelPage,
+  '/ch02/generative-classifiers': Ch02GenerativeClassifiersPage,
+  '/ch02/discriminative-classifiers': Ch02DiscriminativeClassifiersPage,
 
   // Ch 6 (manifest ch03): Deep Neural Networks
   '/ch03/overview': Chapter07OverviewPage,
-  '/ch03/limitations-of-fixed-basis-functions': Chapter07NonlinearSupervisedLearningPage,
-  '/ch03/multilayer-networks': Chapter07NeuralNetworksPage,
-  '/ch03/deep-networks': Chapter07ModernNNModulesPage,
+  '/ch03/limitations-of-fixed-basis-functions': Ch03LimitationsOfFixedBasisFunctionsPage,
+  '/ch03/multilayer-networks': Ch03MultilayerNetworksPage,
+  '/ch03/deep-networks': Ch03DeepNetworksPage,
 
   // Ch 8 (manifest ch05): Backpropagation
-  '/ch05/evaluation-of-gradients': Chapter07BackpropagationPage,
+  '/ch05/evaluation-of-gradients': Ch05EvaluationOfGradientsPage,
 
   // Ch 9 (manifest ch06): Regularization
   '/ch06/overview': Chapter09OverviewPage,
   '/ch06/weight-decay': Chapter09RegularizationPage,
-  '/ch06/learning-curves': Chapter08DoubleDescentPage,
+  '/ch06/learning-curves': Ch06LearningCurvesPage,
 
   // Ch 12 (manifest ch09): Transformers
   '/ch09/attention': Ch09AttentionPage,
 
   // Ch 15 (manifest ch12): Discrete Latent Variables
   '/ch12/overview': Ch12OverviewPage,
-  '/ch12/k-means-clustering': Chapter10KMeansPage,
-  '/ch12/mixtures-of-gaussians': Chapter11GMMRevisitedPage,
-  '/ch12/expectation-maximization': Chapter11GaussianMixtureEMPage,
+  '/ch12/k-means-clustering': Ch12KMeansClusteringPage,
+  '/ch12/mixtures-of-gaussians': Ch12MixturesOfGaussiansPage,
+  '/ch12/expectation-maximization': Ch12ExpectationMaximizationPage,
 
   // Ch 16 (manifest ch13): Continuous Latent Variables
-  '/ch13/principal-component-analysis': Chapter12PCAPage,
+  '/ch13/principal-component-analysis': Ch13PrincipalComponentAnalysisPage,
 
   // Prerequisite Ch 1
   '/prerequisite/ch01/overview': PrerequisiteChapter01OverviewPage,

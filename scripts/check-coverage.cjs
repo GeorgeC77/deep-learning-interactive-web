@@ -116,6 +116,30 @@ function pageChecks(pageSource) {
   };
 }
 
+function resolveImportPath(importPath) {
+  if (!importPath) return null;
+  let relative = importPath;
+  if (relative.startsWith('@/')) {
+    relative = relative.replace('@/', 'src/');
+  } else if (relative.startsWith('./')) {
+    return null; // relative imports are not handled here
+  }
+  const candidate = path.join(ROOT, relative) + '.tsx';
+  if (fs.existsSync(candidate)) return candidate;
+  return null;
+}
+
+function findWrappedSource(pageSource) {
+  // Detect simple wrapper files: import X from '...'; return <X />;
+  const importMatch = pageSource.match(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/);
+  if (!importMatch) return null;
+  const importedName = importMatch[1];
+  const importPath = importMatch[2];
+  const usesImport = new RegExp(`<${importedName}[^/]*/?\\s*/>`).test(pageSource);
+  if (!usesImport) return null;
+  return resolveImportPath(importPath);
+}
+
 function main() {
   const manifestSource = fs.readFileSync(MANIFEST_TS, 'utf8');
   const appSource = fs.readFileSync(APP_TSX, 'utf8');
@@ -174,7 +198,15 @@ function main() {
     const pageFile = findPageFile(componentName, importPaths);
     if (pageFile) {
       const src = fs.readFileSync(pageFile, 'utf8');
-      const checks = pageChecks(src);
+      let checks = pageChecks(src);
+      const wrapped = findWrappedSource(src);
+      if (wrapped) {
+        const wrappedSrc = fs.readFileSync(wrapped, 'utf8');
+        const wrappedChecks = pageChecks(wrappedSrc);
+        checks = Object.fromEntries(
+          Object.keys(checks).map((k) => [k, checks[k] || wrappedChecks[k]])
+        );
+      }
       const missing = Object.entries(checks)
         .filter(([, v]) => !v)
         .map(([k]) => k.replace(/has/g, ''));

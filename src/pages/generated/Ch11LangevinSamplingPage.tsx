@@ -36,7 +36,7 @@ export default function Ch11LangevinSamplingPage() {
       quiz={[
       {
         question: "下列关于“基于能量的模型”的叙述，哪一项最准确？",
-        options: ["概率密度由能量函数通过 Boltzmann 分布定义。", "基于能量的模型 与本节讨论的问题完全无关。", "基于能量的模型 在任何情况下都不需要额外假设即可使用。"],
+        options: ["概率密度由能量函数通过 Boltzmann 分布定义。", "基于能量的模型 只是术语，没有独立建模意义。", "基于能量的模型 不需要任何分布假设即可直接使用。"],
         correctIndex: 0,
         explanation: "正确。概率密度由能量函数通过 Boltzmann 分布定义。 这体现了本节的核心思想。",
       },
@@ -60,7 +60,7 @@ export default function Ch11LangevinSamplingPage() {
       textbookSubsections: ["14.3.1 基于能量的模型", "14.3.2 Langevin 更新", "14.3.3 与分数匹配的联系"],
       formulas: ["基于能量的模型公式", "Langevin 更新公式"],
       algorithms: ["Langevin 更新", "与分数匹配的联系"],
-      exercises: ["复述本节核心公式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "找出本节结论与相邻小节结论的异同。"]
+      exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}
 
     />

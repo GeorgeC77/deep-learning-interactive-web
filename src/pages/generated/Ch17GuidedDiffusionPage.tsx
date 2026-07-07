@@ -6,74 +6,97 @@ export default function Ch17GuidedDiffusionPage() {
     <BishopSectionPage
       sectionPath="/ch17/guided-diffusion"
       heroIcon={<Crosshair className="w-9 h-9 text-blue-600" />}
-      summary={"引导扩散在采样时引入类别、文本或其他条件信号，使生成结果向目标语义移动。"}
+      summary={"引导扩散在反向采样时引入条件信号，使生成结果朝向指定类别、文本或属性移动。常见方法包括分类器引导与无分类器引导。"}
       concepts={[
-    {
-      title: "分类器引导",
-      description: "利用预训练分类器的梯度调整分数，增强条件对齐但可能牺牲多样性。",
-    },
-    {
-      title: "无分类器引导",
-      description: "在训练时随机丢弃条件，采样时用条件与无条件预测的差值控制引导强度。",
-      formula: String.raw`\hat{\epsilon} = \epsilon_{\text{unc}} + w \, (\epsilon_{\text{cond}} - \epsilon_{\text{unc}})`,
-    },
-    {
-      title: "引导强度权衡",
-      description: "权重 w 越大，样本与条件越对齐，但多样性越低。",
-    }
+        {
+          title: "分类器引导",
+          description: "利用预训练分类器对带噪样本的类别梯度调整分数，增强条件对齐；可能牺牲样本多样性。",
+          formula: String.raw`\hat{s}(x_t) = s(x_t) + \gamma \nabla_{x_t} \ln p(c \mid x_t)`,
+        },
+        {
+          title: "无分类器引导",
+          description: "训练时随机丢弃条件，采样时用条件预测与无条件预测之差控制方向。",
+          formula: String.raw`\hat{\epsilon} = \epsilon_{\text{unc}} + w \, (\epsilon_{\text{cond}} - \epsilon_{\text{unc}})`,
+        },
+        {
+          title: "引导强度 w",
+          description: "权重 w 越大，生成样本与条件越一致，但多样性越低；w=1 对应普通条件采样。",
+        },
+        {
+          title: "文本与属性条件",
+          description: "条件 c 可以是类别、文本嵌入或其他属性向量，使扩散模型具备可控生成能力。",
+        },
       ]}
       learningObjectives={[
-      "理解 分类器引导 的含义与作用。",
-      "理解 无分类器引导 的含义与作用。",
-      "理解 引导强度权衡 的含义与作用。"
-    ]}
-      coreIntuition={"引导扩散在采样时引入类别、文本或其他条件信号，使生成结果向目标语义移动。"}
+        "理解分类器引导与无分类器引导的区别。",
+        "能解释无分类器引导公式中 w 的作用。",
+        "了解引导强度与多样性之间的权衡。",
+      ]}
+      coreIntuition={"无分类器引导像一个‘方向盘’：先看模型无条件时会往哪走，再把方向往条件目标多掰一点；掰得越狠，越听话，但画面也越雷同。"}
       commonMistakes={[
-      "把不同小节的概念混为一谈，忽视它们的假设与适用范围。",
-      "只看公式形式而不验证推导条件或数值实例。"
-    ]}
+        "认为 w 越大总是越好；过高 w 会导致过饱和或模式坍塌。",
+        "混淆分类器引导与无分类器引导：前者需要额外训练分类器，后者在训练时随机丢弃条件即可。",
+        "忽视 w=1 只是普通条件采样，额外引导来自 w>1 的插值。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“分类器引导”的叙述，哪一项最准确？",
-        options: ["利用预训练分类器的梯度调整分数，增强条件对齐但可能牺牲多样性。", "分类器引导 与本节讨论的问题完全无关。", "分类器引导 在任何情况下都不需要额外假设即可使用。"],
-        correctIndex: 0,
-        explanation: "正确。利用预训练分类器的梯度调整分数，增强条件对齐但可能牺牲多样性。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在“无分类器引导”的公式中，若忽略其中某一项，最可能导致什么后果？",
-        options: ["得到形式上“简洁”但数值或概率意义错误的结论。", "结果只是略有不精确，不会影响最终决策。", "公式会自动退化为另一种更简单的正确形式。"],
-        correctIndex: 0,
-        explanation: "正确。无分类器引导 的每一项都有明确的数学或物理意义，随意省略会破坏等式成立的条件。",
-      },
-      {
-        question: "在一个具体情境中，你发现“引导强度权衡”的结果与直觉相反，首先应该检查什么？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。引导强度权衡 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "无分类器引导中，若 ε_unc=0.2、ε_cond=0.5、w=2，则 ε_hat 是多少？",
+          options: [
+            "0.8",
+            "0.5",
+            "0.2",
+            "1.0",
+          ],
+          correctIndex: 0,
+          explanation: "ε_hat = ε_unc + w(ε_cond - ε_unc) = 0.2 + 2×(0.5-0.2) = 0.8。",
+        },
+        {
+          question: "增大引导权重 w 时，conditional alignment 和 sample diversity 如何变化？",
+          options: [
+            "conditional alignment 增强，diversity 下降",
+            "conditional alignment 下降，diversity 增强",
+            "两者都增强",
+            "两者都下降",
+          ],
+          correctIndex: 0,
+          explanation: "w 越大，采样方向越偏向条件预测，条件对齐越好，但分布多样性越低，过高会导致模式坍塌。",
+        },
+        {
+          question: "分类器引导与无分类器引导的主要区别是？",
+          options: [
+            "分类器引导需要额外训练分类器，无分类器引导在训练时随机丢弃条件",
+            "分类器引导只能用于文本条件",
+            "无分类器引导必须训练两个独立模型",
+            "两者在数学上完全等价",
+          ],
+          correctIndex: 0,
+          explanation: "分类器引导依赖外部分类器的梯度；无分类器引导通过单一模型同时学习条件与无条件预测。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 20",
-      section: "20.4",
-      pages: "Ch 20",
-      textbookSubsections: ["20.4.1 分类器引导", "20.4.2 无分类器引导", "20.4.3 引导强度权衡"],
-      formulas: ["无分类器引导公式"],
-      exercises: ["复述本节核心公式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "找出本节结论与相邻小节结论的异同。"]
-    }}
-          demo={{
-      title: "无分类器引导强度",
-      label: "引导权重 w",
-      param: 1,
-      min: 0,
-      max: 5,
-      step: 0.1,
-      compute: (w) => ({
-        label: '条件偏移倍数',
-        value: w,
-        display: String.raw`\\hat{\\epsilon}=\\epsilon_{\\text{unc}}+${w.toFixed(1)}(\\epsilon_{\\text{cond}}-\\epsilon_{\\text{unc}})`,
-      }),
-      formula: String.raw`\hat{\epsilon} = \epsilon_{\text{unc}} + w \, (\epsilon_{\text{cond}} - \epsilon_{\text{unc}})`,
-    }}
+        chapter: "Ch 20",
+        section: "20.4",
+        pages: "Ch 20",
+        textbookSubsections: ["20.4.1 Classifier guidance", "20.4.2 Classifier-free guidance"],
+        supplementalTopics: ["guidance strength trade-off"],
+        formulas: ["分类器引导", "无分类器引导公式"],
+        algorithms: ["Classifier guidance", "Classifier-free guidance"],
+        exercises: ["比较两种引导方式对多样性的影响。", "推导无分类器引导公式在 w=1 时的退化形式。"],
+      }}
+      demo={{
+        title: "无分类器引导强度",
+        label: "引导权重 w",
+        param: 1,
+        min: 0,
+        max: 5,
+        step: 0.1,
+        compute: (w) => ({
+          label: '条件偏移倍数',
+          value: w,
+          display: String.raw`\\hat{\\epsilon}=\\epsilon_{\\text{unc}}+${w.toFixed(1)}(\\epsilon_{\\text{cond}}-\\epsilon_{\\text{unc}})`,
+        }),
+        formula: String.raw`\hat{\epsilon} = \epsilon_{\text{unc}} + w \, (\epsilon_{\text{cond}} - \epsilon_{\text{unc}})`,
+      }}
     />
   );
 }

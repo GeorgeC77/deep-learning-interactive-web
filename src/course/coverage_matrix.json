@@ -365,7 +365,7 @@
     "bishopSection": "4.1",
     "sectionTitle": "4.1 线性回归",
     "routePath": "/ch01/linear-regression",
-    "componentName": "Chapter01ModelPage",
+    "componentName": "Ch01LinearRegressionPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -405,7 +405,7 @@
     "bishopSection": "4.3",
     "sectionTitle": "4.3 偏差–方差权衡",
     "routePath": "/ch01/bias-variance",
-    "componentName": "Chapter08BiasVariancePage",
+    "componentName": "Ch01BiasVariancePage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -485,7 +485,7 @@
     "bishopSection": "5.3",
     "sectionTitle": "5.3 生成分类器",
     "routePath": "/ch02/generative-classifiers",
-    "componentName": "Chapter04GaussianDiscriminantAnalysisPage",
+    "componentName": "Ch02GenerativeClassifiersPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -505,7 +505,7 @@
     "bishopSection": "5.4",
     "sectionTitle": "5.4 判别分类器",
     "routePath": "/ch02/discriminative-classifiers",
-    "componentName": "Chapter02ModelPage",
+    "componentName": "Ch02DiscriminativeClassifiersPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -545,7 +545,7 @@
     "bishopSection": "6.1",
     "sectionTitle": "6.1 固定基函数的局限性",
     "routePath": "/ch03/limitations-of-fixed-basis-functions",
-    "componentName": "Chapter07NonlinearSupervisedLearningPage",
+    "componentName": "Ch03LimitationsOfFixedBasisFunctionsPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -565,7 +565,7 @@
     "bishopSection": "6.2",
     "sectionTitle": "6.2 多层网络",
     "routePath": "/ch03/multilayer-networks",
-    "componentName": "Chapter07NeuralNetworksPage",
+    "componentName": "Ch03MultilayerNetworksPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -585,7 +585,7 @@
     "bishopSection": "6.3",
     "sectionTitle": "6.3 深度网络",
     "routePath": "/ch03/deep-networks",
-    "componentName": "Chapter07ModernNNModulesPage",
+    "componentName": "Ch03DeepNetworksPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -765,7 +765,7 @@
     "bishopSection": "8.1",
     "sectionTitle": "8.1 梯度求值",
     "routePath": "/ch05/evaluation-of-gradients",
-    "componentName": "Chapter07BackpropagationPage",
+    "componentName": "Ch05EvaluationOfGradientsPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -865,7 +865,7 @@
     "bishopSection": "9.3",
     "sectionTitle": "9.3 学习曲线",
     "routePath": "/ch06/learning-curves",
-    "componentName": "Chapter08DoubleDescentPage",
+    "componentName": "Ch06LearningCurvesPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -1445,7 +1445,7 @@
     "bishopSection": "15.1",
     "sectionTitle": "15.1 K-means 聚类",
     "routePath": "/ch12/k-means-clustering",
-    "componentName": "Chapter10KMeansPage",
+    "componentName": "Ch12KMeansClusteringPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -1465,7 +1465,7 @@
     "bishopSection": "15.2",
     "sectionTitle": "15.2 高斯混合",
     "routePath": "/ch12/mixtures-of-gaussians",
-    "componentName": "Chapter11GMMRevisitedPage",
+    "componentName": "Ch12MixturesOfGaussiansPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -1485,7 +1485,7 @@
     "bishopSection": "15.3",
     "sectionTitle": "15.3 期望最大化算法",
     "routePath": "/ch12/expectation-maximization",
-    "componentName": "Chapter11GaussianMixtureEMPage",
+    "componentName": "Ch12ExpectationMaximizationPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -1545,7 +1545,7 @@
     "bishopSection": "16.1",
     "sectionTitle": "16.1 主成分分析",
     "routePath": "/ch13/principal-component-analysis",
-    "componentName": "Chapter12PCAPage",
+    "componentName": "Ch13PrincipalComponentAnalysisPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -1717,7 +1717,7 @@
     "learningObjectives": [],
     "commonMistakes": [],
     "quiz": [],
-    "status": "teaching-ready"
+    "status": "draft"
   },
   {
     "id": "ch15-autoregressive-flows",

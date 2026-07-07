@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import MaskedAutoencoderDemo from '@/components/demos/MaskedAutoencoderDemo';
 import { Box } from 'lucide-react';
 
 export default function Ch16DeterministicAutoencodersPage() {
@@ -6,73 +7,81 @@ export default function Ch16DeterministicAutoencodersPage() {
     <BishopSectionPage
       sectionPath="/ch16/deterministic-autoencoders"
       heroIcon={<Box className="w-9 h-9 text-blue-600" />}
-      summary={"确定性自编码器直接学习点到点的映射；通过欠完备、稀疏、去噪等约束获得有意义的隐表示。"}
+      summary={"确定性自编码器通过编码器-解码器结构学习压缩表示。线性自编码器等价于 PCA；深层自编码器能学习非线性流形；稀疏、去噪与掩码自编码器通过不同约束获得有意义的特征。"}
       concepts={[
-    {
-      title: "线性自编码器",
-      description: "单隐层线性自编码器等价于主成分分析，学习数据的主子空间。",
-    },
-    {
-      title: "稀疏自编码器",
-      description: "在隐单元上施加稀疏惩罚，使每个输入仅激活少量特征。",
-    },
-    {
-      title: "去噪自编码器",
-      description: "从损坏输入重构干净输入，学习对输入扰动鲁棒的特征。",
-    }
+        {
+          title: "线性自编码器",
+          description: "单隐层、使用恒等目标与均方误差的线性自编码器等价于主成分分析，学习数据的主子空间。",
+        },
+        {
+          title: "深层自编码器",
+          description: "用非线性编码器-解码器捕捉数据的非线性低维流形，比线性 PCA 更具表达能力。",
+        },
+        {
+          title: "稀疏自编码器",
+          description: "在隐层激活上施加稀疏惩罚，使每个输入仅由少量隐单元表示。",
+        },
+        {
+          title: "去噪自编码器",
+          description: "从被损坏的输入重构原始输入，迫使表示对局部扰动鲁棒。",
+        },
+        {
+          title: "掩码自编码器（MAE）",
+          description: "随机遮罩输入 patch，仅从未遮罩部分重建全部输入；训练完成后通常丢弃 decoder，保留 encoder 做下游任务。",
+        },
       ]}
       learningObjectives={[
-      "理解 线性自编码器 的含义与作用。",
-      "理解 稀疏自编码器 的含义与作用。",
-      "理解 去噪自编码器 的含义与作用。"
-    ]}
-      coreIntuition={"确定性自编码器直接学习点到点的映射；通过欠完备、稀疏、去噪等约束获得有意义的隐表示。"}
+        "理解线性自编码器与 PCA 的等价性。",
+        "了解深层自编码器相比线性版本的优势。",
+        "区分稀疏、去噪与掩码自编码器的约束目标。",
+      ]}
+      coreIntuition={"自编码器像一台‘压缩-解压机’：好的隐表示不是简单复制输入，而是在压缩过程中保留重建所需的本质结构。"}
       commonMistakes={[
-      "把不同小节的概念混为一谈，忽视它们的假设与适用范围。",
-      "只看公式形式而不验证推导条件或数值实例。"
-    ]}
+        "认为自编码器一定可以学到有用特征；没有约束时可能学到恒等映射。",
+        "把欠完备隐层与过完备隐层混为一谈；后者需要额外正则化才有意义。",
+        "将 MAE 与去噪自编码器混淆：MAE 的损坏是结构化遮罩，而去噪自编码器通常加像素级噪声。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“线性自编码器”的叙述，哪一项最准确？",
-        options: ["单隐层线性自编码器等价于主成分分析，学习数据的主子空间。", "线性自编码器 与本节讨论的问题完全无关。", "线性自编码器 在任何情况下都不需要额外假设即可使用。"],
-        correctIndex: 0,
-        explanation: "正确。单隐层线性自编码器等价于主成分分析，学习数据的主子空间。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“稀疏自编码器”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要样本量足够大，前提假设就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。稀疏自编码器 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“去噪自编码器”的结果与直觉相反，首先应该检查什么？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。去噪自编码器 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "单层线性自编码器（均方误差、恒等激活）在隐层维度为 M 时等价于什么？",
+          options: [
+            "保留前 M 个主成分的 PCA。",
+            "k-means 聚类。",
+            "高斯混合模型。",
+            "随机投影。",
+          ],
+          correctIndex: 0,
+          explanation: "线性自编码器的最优解由数据协方差的前 M 个特征向量张成，即 PCA 子空间。",
+        },
+        {
+          question: "输入维度为 100、隐层维度为 20 的欠完备自编码器，其压缩比是多少？",
+          options: ["20/100 = 0.2", "100/20 = 5", "(100-20)/100 = 0.8", "20"],
+          correctIndex: 0,
+          explanation: "压缩比 = 隐层维度 / 输入维度 = 20/100 = 0.2。",
+        },
+        {
+          question: "某自编码器在测试数据上能完美重构训练见过的样本，但对相似新样本重构很差，最可能是？",
+          options: [
+            "过拟合 / 隐层过宽且缺乏约束",
+            "训练不充分",
+            "优化器学习率过高",
+            "使用了线性激活",
+          ],
+          correctIndex: 0,
+          explanation: "完美重构训练数据但泛化差是典型的过拟合；欠完备、稀疏、去噪或掩码约束可缓解。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 19",
-      section: "19.1",
-      pages: "Ch 19",
-      textbookSubsections: ["19.1.1 线性自编码器", "19.1.2 稀疏自编码器", "19.1.3 去噪自编码器"],
-      algorithms: ["线性自编码器", "稀疏自编码器", "去噪自编码器"],
-      exercises: ["复述本节核心公式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "找出本节结论与相邻小节结论的异同。"]
-    }}
-          demo={{
-      title: "去噪重构误差",
-      label: "噪声标准差 σ",
-      param: 0.2,
-      min: 0,
-      max: 1,
-      step: 0.05,
-      compute: (sigma) => ({
-        label: '期望噪声能量',
-        value: sigma * sigma,
-        display: String.raw`\\mathbb{E}[\\epsilon^2]=${(sigma * sigma).toFixed(3)}`,
-      }),
-      formula: String.raw`\mathbb{E}[\|\epsilon\|^2] = \sigma^2`,
-    }}
+        chapter: "Ch 19",
+        section: "19.1",
+        pages: "Ch 19",
+        textbookSubsections: ["19.1.1 Linear autoencoders", "19.1.2 Deep autoencoders", "19.1.3 Sparse autoencoders", "19.1.4 Denoising autoencoders", "19.1.5 Masked autoencoders"],
+        supplementalTopics: ["deep autoencoders as nonlinear PCA", "MAE pre-training"],
+        formulas: ["重构误差", "稀疏惩罚", "去噪目标"],
+        algorithms: ["线性自编码器", "深层自编码器", "稀疏自编码器", "去噪自编码器", "MAE"],
+        exercises: ["证明线性自编码器与 PCA 的关系。", "比较去噪自编码器与 MAE 的损坏方式差异。"],
+      }}
+      extraContent={<MaskedAutoencoderDemo />}
     />
   );
 }

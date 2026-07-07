@@ -328,7 +328,7 @@ export default function ModelPage() {
       {/* Header */}
       <section className="text-center py-8 bg-white rounded-2xl shadow-sm border border-gray-200">
         <div className="text-sm font-medium text-blue-600 mb-2 tracking-wide uppercase">
-          第二章 · 逻辑回归
+          逻辑回归
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">模型表示</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">

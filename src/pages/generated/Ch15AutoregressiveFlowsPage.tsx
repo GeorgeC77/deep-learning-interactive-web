@@ -6,61 +6,78 @@ export default function Ch15AutoregressiveFlowsPage() {
     <BishopSectionPage
       sectionPath="/ch15/autoregressive-flows"
       heroIcon={<ArrowRight className="w-9 h-9 text-blue-600" />}
-      summary={"自回归流按顺序对每个维度做条件变换，天然具有三角 Jacobian，是 MAF 与 IAF 等模型的基础。"}
+      summary={"自回归流将联合分布分解为有序的条件分布，每一维的变换只依赖前面维度，因此 Jacobian 是三角矩阵，行列式等于各维尺度因子的乘积。MAF 适合密度估计，IAF 适合快速采样。"}
       concepts={[
-    {
-      title: "自回归分解",
-      description: "联合分布分解为各维度的条件分布乘积。",
-      formula: String.raw`p(x) = \prod_{i} p(x_i \mid x_{<i})`,
-    },
-    {
-      title: "MAF 与 IAF",
-      description: "MAF 便于密度估计，IAF 便于快速采样，两者在自回归方向上互补。",
-    },
-    {
-      title: " masked 自回归网络",
-      description: "通过掩码保证每个输出只依赖前面维度，维持自回归结构。",
-    }
+        {
+          title: "自回归分解",
+          description: "任意联合密度可写成各维度条件分布的乘积，自回归流据此逐维构造可逆变换。",
+          formula: String.raw`p(\mathbf{x}) = \prod_{i=1}^{D} p(x_i \mid \mathbf{x}_{<i})`,
+        },
+        {
+          title: "三角 Jacobian",
+          description: "由于 x_i 只依赖于 z_{\le i}，Jacobian 矩阵 ∂x/∂z 是下三角，行列式为对角元的乘积。",
+          formula: String.raw`\ln \left|\det \frac{\partial \mathbf{x}}{\partial \mathbf{z}}\right| = \sum_{i=1}^{D} \ln \left|\frac{\partial x_i}{\partial z_i}\right|`,
+        },
+        {
+          title: "MAF 与 IAF",
+          description: "MAF 按数据维度顺序建模，密度估计只需一次前向传播；IAF 反序从基变量生成数据，采样并行高效。",
+        },
+        {
+          title: "Masked 自回归网络",
+          description: "通过掩码或因果卷积保证每个输出 x_i 不依赖后续输入维度，维持三角结构。",
+        },
       ]}
       learningObjectives={[
-      "理解 自回归分解 的含义与作用。",
-      "理解 MAF 与 IAF 的含义与作用。",
-      "理解  masked 自回归网络 的含义与作用。"
-    ]}
-      coreIntuition={"自回归流按顺序对每个维度做条件变换，天然具有三角 Jacobian，是 MAF 与 IAF 等模型的基础。"}
+        "能将联合密度写成有序条件分布的乘积。",
+        "理解为什么三角 Jacobian 的行列式容易计算。",
+        "区分 MAF 与 IAF 在密度估计和采样上的优劣。",
+      ]}
+      coreIntuition={"自回归流像逐层拧魔方：每拧一格只受前面格子的约束，所以整体变换的‘体积变化’就是每格局部伸缩的乘积。"}
       commonMistakes={[
-      "把不同小节的概念混为一谈，忽视它们的假设与适用范围。",
-      "只看公式形式而不验证推导条件或数值实例。"
-    ]}
+        "忽视顺序依赖，导致 Jacobian 不再是三角矩阵。",
+        "把 MAF 和 IAF 的适用场景混为一谈：MAF 训练时密度计算快，但采样慢；IAF 采样快，但估计训练数据密度需要按生成顺序逐个计算。",
+        "忘记行列式是对角元乘积，而不是所有偏导数之和。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“自回归分解”的叙述，哪一项最准确？",
-        options: ["联合分布分解为各维度的条件分布乘积。", "自回归分解 与本节讨论的问题完全无关。", "自回归分解 在任何情况下都不需要额外假设即可使用。"],
-        correctIndex: 0,
-        explanation: "正确。联合分布分解为各维度的条件分布乘积。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“MAF 与 IAF”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要样本量足够大，前提假设就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。MAF 与 IAF 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“ masked 自回归网络”的结果与直觉相反，首先应该检查什么？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。 masked 自回归网络 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "自回归流中 Jacobian 矩阵为什么是三角矩阵？",
+          options: [
+            "因为每个 x_i 只依赖于 z_{≤i}，不依赖后面的 z_j。",
+            "因为网络参数被强制共享。",
+            "因为所有维度使用相同的变换。",
+            "因为基分布 p(z) 是标准高斯。",
+          ],
+          correctIndex: 0,
+          explanation: "三角结构来自因果顺序：输出 x_i 的偏导对后续 z_j 为零，因此 Jacobian 下三角。",
+        },
+        {
+          question: "若二维自回归变换为 x₁=z₁, x₂=2z₂+z₁，则 ln|det J| 是多少？",
+          options: ["ln 2", "2", "ln 3", "0"],
+          correctIndex: 0,
+          explanation: "Jacobian 为 [[1,0],[1,2]]，行列式为 2，取对数得 ln 2。",
+        },
+        {
+          question: "MAF 相比 IAF 的主要优势是什么？",
+          options: [
+            "对给定数据 x 计算密度 p(x) 只需一次前向传播。",
+            "采样新数据的速度明显更快。",
+            "不需要计算 Jacobian。",
+            "可以使用任意非可逆神经网络。",
+          ],
+          correctIndex: 0,
+          explanation: "MAF 的变换方向与数据维度顺序一致，因此估计密度高效；IAF 则在采样方向上高效。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 18",
-      section: "18.2",
-      pages: "Ch 18",
-      textbookSubsections: ["18.2.1 自回归分解", "18.2.2 MAF 与 IAF", "18.2.3  masked 自回归网络"],
-      formulas: ["自回归分解公式"],
-      exercises: ["复述本节核心公式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "找出本节结论与相邻小节结论的异同。"]
-    }}
-
+        chapter: "Ch 18",
+        section: "18.2",
+        pages: "Ch 18",
+        textbookSubsections: ["18.2 Autoregressive Flows"],
+        supplementalTopics: ["autoregressive factorization", "MAF", "IAF"],
+        formulas: ["p(x)=∏ᵢ p(xᵢ|x_{<i})", "三角 Jacobian 行列式", "xᵢ=μᵢ(x_{<i})+σᵢ(x_{<i})zᵢ"],
+        algorithms: ["MAF", "IAF"],
+        exercises: ["推导二维自回归变换的 Jacobian 行列式。", "比较 MAF 与 IAF 在训练与采样时的计算复杂度。"],
+      }}
     />
   );
 }

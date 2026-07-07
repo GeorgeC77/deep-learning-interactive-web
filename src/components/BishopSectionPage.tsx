@@ -37,6 +37,7 @@ export type BishopMapping = {
   section?: string;
   pages?: string;
   textbookSubsections?: string[];
+  supplementalTopics?: string[];
   formulas?: string[];
   algorithms?: string[];
   exercises?: string[];
@@ -118,6 +119,9 @@ export default function BishopSectionPage({
               <div className="text-sm text-indigo-700 bg-indigo-50/60 rounded-lg px-4 py-2 max-w-3xl">
                 {bishopMapping.textbookSubsections && (
                   <p><span className="font-medium">教材小节：</span>{bishopMapping.textbookSubsections.join('、')}</p>
+                )}
+                {bishopMapping.supplementalTopics && (
+                  <p><span className="font-medium">补充/现代扩展：</span>{bishopMapping.supplementalTopics.join('、')}</p>
                 )}
                 {bishopMapping.formulas && (
                   <p><span className="font-medium">核心公式：</span>{bishopMapping.formulas.join('、')}</p>

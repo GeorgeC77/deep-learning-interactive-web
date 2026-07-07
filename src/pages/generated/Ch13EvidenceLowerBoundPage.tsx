@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import PPCAELBODemo from '@/components/demos/PPCAELBODemo';
 import { Scale } from 'lucide-react';
 
 export default function Ch13EvidenceLowerBoundPage() {
@@ -86,20 +87,7 @@ export default function Ch13EvidenceLowerBoundPage() {
         algorithms: ["连续隐变量 EM", "概率 PCA 的 EM", "因子分析的 EM"],
         exercises: ["推导概率 PCA 的 E-step 后验均值与协方差。", "比较概率 PCA 与因子分析的 M-step 差异。"],
       }}
-      demo={{
-        title: "KL 项对 ELBO 的影响",
-        label: "变分后验标准差 σ",
-        param: 1,
-        min: 0.1,
-        max: 3,
-        step: 0.1,
-        compute: (sigma) => ({
-          label: '-KL(q||N(0,1))',
-          value: -0.5 * (sigma * sigma - Math.log(sigma * sigma) - 1),
-          display: String.raw`-D_{KL}=${(-0.5 * (sigma * sigma - Math.log(sigma * sigma) - 1)).toFixed(3)}`,
-        }),
-        formula: String.raw`-D_{KL}\bigl(\mathcal{N}(0,\sigma^2) \| \mathcal{N}(0,1)\bigr) = -\frac{1}{2}(\sigma^2 - \ln \sigma^2 - 1)`,
-      }}
+      extraContent={<PPCAELBODemo />}
     />
   );
 }

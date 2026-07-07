@@ -829,8 +829,8 @@ export const courseManifest: Part[] = [
             id: "ch15-coupling-flows",
             title: "18.1 耦合流",
             path: "/ch15/coupling-flows",
-            status: "teaching-ready",
-            description: "可逆耦合层与 RealNVP。",
+            status: "draft",
+            description: "可逆耦合层与 RealNVP；密度变换公式已修正，待复核后升级。",
           },
           {
             id: "ch15-autoregressive-flows",

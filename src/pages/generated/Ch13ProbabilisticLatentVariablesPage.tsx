@@ -6,74 +6,104 @@ export default function Ch13ProbabilisticLatentVariablesPage() {
     <BishopSectionPage
       sectionPath="/ch13/probabilistic-latent-variables"
       heroIcon={<GitBranch className="w-9 h-9 text-blue-600" />}
-      summary={"概率隐变量模型显式定义隐变量先验与条件似然；最大似然与 EM 算法是推断与学习的核心工具。"}
+      summary={"概率隐变量模型显式定义隐变量先验 p(z) 与条件似然 p(x|z)，通过边缘化得到观测分布。EM 算法是估计这类模型参数的核心工具。"}
       concepts={[
-    {
-      title: "生成模型",
-      description: "先验 p(z) 与条件分布 p(x|z) 共同决定观测数据的边缘分布。",
-      formula: String.raw`p(x) = \int p(x \mid z) \, p(z) \, dz`,
-    },
-    {
-      title: "因子分析",
-      description: "线性高斯隐变量模型，用因子载荷矩阵刻画观测之间的相关性。",
-    },
-    {
-      title: "独立成分分析",
-      description: "寻找统计独立的隐变量源，常用于盲源分离。",
-    }
+        {
+          title: "生成模型",
+          description: "观测数据由隐变量经概率变换生成，边缘分布通过对隐变量积分得到。",
+          formula: String.raw`p(\mathbf{x}) = \int p(\mathbf{x} \mid \mathbf{z}) \, p(\mathbf{z}) \, d\mathbf{z}`,
+        },
+        {
+          title: "似然函数",
+          description: "对数似然通常包含难以直接计算的积分，需要 EM 或变分方法。",
+        },
+        {
+          title: "最大似然与 EM",
+          description: "E 步推断隐变量后验，M 步更新模型参数，迭代提升似然。",
+        },
+        {
+          title: "因子分析",
+          description: "线性高斯隐变量模型，允许各观测维度具有独立的噪声方差。",
+          formula: String.raw`\mathbf{x} = \mathbf{W}\mathbf{z} + \boldsymbol{\mu} + \boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(0, \boldsymbol{\Psi})`,
+        },
+        {
+          title: "独立成分分析",
+          description: "寻找统计独立的非高斯隐变量源，常用于盲源分离。",
+        },
+        {
+          title: "卡尔曼滤波",
+          description: "隐变量随时间演化的线性高斯状态空间模型，用于时序推断。",
+        },
       ]}
       learningObjectives={[
-      "理解 生成模型 的含义与作用。",
-      "理解 因子分析 的含义与作用。",
-      "理解 独立成分分析 的含义与作用。"
-    ]}
-      coreIntuition={"概率隐变量模型显式定义隐变量先验与条件似然；最大似然与 EM 算法是推断与学习的核心工具。"}
+        "理解概率隐变量模型的生成视角。",
+        "掌握 EM 算法在隐变量模型中的作用。",
+        "区分因子分析、ICA 与卡尔曼滤波的应用场景。",
+      ]}
+      coreIntuition={"隐变量像是数据的‘幕后导演’；概率模型假设我们看到的观测是导演按某种剧本（p(x|z)）生成的，学习就是反推导演和剧本。"}
       commonMistakes={[
-      "把不同小节的概念混为一谈，忽视它们的假设与适用范围。",
-      "只看公式形式而不验证推导条件或数值实例。"
-    ]}
+        "把隐变量模型与聚类模型混为一谈；前者通常连续，后者离散。",
+        "认为 p(x) 的积分总有闭式解；只有线性高斯等特殊情况才有。",
+        "忽视因子分析与概率 PCA 在噪声模型上的区别。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“生成模型”的叙述，哪一项最准确？",
-        options: ["先验 p(z) 与条件分布 p(x|z) 共同决定观测数据的边缘分布。", "生成模型 与本节讨论的问题完全无关。", "生成模型 在任何情况下都不需要额外假设即可使用。"],
-        correctIndex: 0,
-        explanation: "正确。先验 p(z) 与条件分布 p(x|z) 共同决定观测数据的边缘分布。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“因子分析”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要样本量足够大，前提假设就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。因子分析 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“独立成分分析”的结果与直觉相反，首先应该检查什么？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。独立成分分析 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "概率隐变量模型中，观测 x 的边缘分布如何得到？",
+          options: [
+            "对隐变量 z 积分：p(x)=∫p(x|z)p(z)dz。",
+            "直接令 z 等于 x 的均值。",
+            "对 z 求和且 z 必须是离散变量。",
+            "p(x)=p(x|z)p(z) 对任意固定 z。",
+          ],
+          correctIndex: 0,
+          explanation: "边缘分布通过对隐变量积分（或求和）得到，体现了隐变量的不确定性。",
+        },
+        {
+          question: "因子分析与概率 PCA 在噪声模型上的主要区别是？",
+          options: [
+            "因子分析允许每个观测维度有独立噪声方差，概率 PCA 使用各向同性 σ²。",
+            "因子分析没有噪声项。",
+            "概率 PCA 只能用于一维数据。",
+            "两者在数学上完全相同。",
+          ],
+          correctIndex: 0,
+          explanation: "因子分析的噪声协方差 Ψ 是对角矩阵；概率 PCA 假设 Ψ=σ²I。",
+        },
+        {
+          question: "独立成分分析（ICA）通常假设隐变量源是什么分布？",
+          options: [
+            "非高斯分布。",
+            "标准高斯分布。",
+            "均匀分布。",
+            "伯努利分布。",
+          ],
+          correctIndex: 0,
+          explanation: "ICA 利用非高斯性来分离独立源；高斯分布的旋转不可识别性使得 PCA 无法完成此任务。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 16",
-      section: "16.2",
-      pages: "Ch 16",
-      textbookSubsections: ["16.2.1 生成模型", "16.2.2 因子分析", "16.2.3 独立成分分析"],
-      formulas: ["生成模型公式"],
-      exercises: ["复述本节核心公式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "找出本节结论与相邻小节结论的异同。"]
-    }}
-          demo={{
-      title: "隐变量先验对边缘方差的贡献",
-      label: "隐变量方差 σ_z²",
-      param: 1,
-      min: 0.1,
-      max: 4,
-      step: 0.1,
-      compute: (sz2) => ({
-        label: '观测方差（单位载荷）',
-        value: sz2 + 0.2,
-        display: String.raw`\sigma_x^2=${(sz2 + 0.2).toFixed(2)}`,
-      }),
-      formula: String.raw`\sigma_x^2 = W^2 \sigma_z^2 + \sigma_\epsilon^2`,
-    }}
+        chapter: "Ch 16",
+        section: "16.2",
+        pages: "Ch 16",
+        textbookSubsections: ["16.2 Probabilistic Latent Variables", "16.2.1 Generative model", "16.2.2 Likelihood function", "16.2.3 Maximum likelihood", "16.2.4 Factor analysis", "16.2.5 Independent component analysis", "16.2.6 Kalman filters"],
+        formulas: ["p(x)=∫p(x|z)p(z)dz", "因子分析模型"],
+        algorithms: ["EM 算法", "因子分析", "ICA"],
+        exercises: ["推导线性高斯隐变量模型的边缘分布。", "比较因子分析与概率 PCA 的噪声假设。"],
+      }}
+      demo={{
+        title: "隐变量先验对边缘方差的贡献",
+        label: "隐变量方差 σ_z²",
+        param: 1,
+        min: 0.1,
+        max: 4,
+        step: 0.1,
+        compute: (sz2) => ({
+          label: '观测方差（单位载荷）',
+          value: sz2 + 0.2,
+          display: String.raw`\\sigma_x^2=${(sz2 + 0.2).toFixed(2)}`,
+        }),
+        formula: String.raw`\sigma_x^2 = W^2 \sigma_z^2 + \sigma_\epsilon^2`,
+      }}
     />
   );
 }

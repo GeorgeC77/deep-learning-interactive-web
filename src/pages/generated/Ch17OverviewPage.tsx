@@ -70,7 +70,7 @@ export default function Ch17OverviewPage() {
         chapter: "Ch 20",
         section: "20",
         pages: "Ch 20",
-        textbookSubsections: ["20.1 Forward encoder", "20.2 Reverse decoder", "20.3 Score matching", "20.4 Guided diffusion"],
+        textbookSubsections: ["20.1 Forward Encoder", "20.2 Reverse Decoder", "20.3 Score Matching", "20.4 Guided Diffusion"],
         formulas: ["扩散前向核", "噪声预测损失"],
         algorithms: ["DDPM 采样", "无分类器引导"],
         exercises: ["对比 x_t 与 z_t 两种记号在前向过程中的定义。", "讨论 β_t schedule 改变对噪声强度的影响。"],

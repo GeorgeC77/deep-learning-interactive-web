@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "coverage:build": "node scripts/build-coverage-matrix.cjs",
-    "coverage:check": "node scripts/check-coverage.cjs"
+    "coverage:check": "node scripts/check-coverage.cjs",
+    "audit:bishop": "node --experimental-strip-types scripts/audit_bishop_alignment.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
