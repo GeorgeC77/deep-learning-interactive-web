@@ -845,7 +845,7 @@
     "bishopSection": "9.2",
     "sectionTitle": "9.2 权重衰减",
     "routePath": "/ch06/weight-decay",
-    "componentName": "Chapter09RegularizationPage",
+    "componentName": "Ch06WeightDecayPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [

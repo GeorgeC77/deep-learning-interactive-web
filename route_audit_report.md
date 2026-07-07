@@ -1,6 +1,6 @@
 # Route Audit Report
 
-Generated: 2026-07-07T10:08:38.802Z
+Generated: 2026-07-07T10:54:07.717Z
 
 | routePath | manifestTitle | componentName | componentFile | usesLegacyComponent | issue |
 |-----------|---------------|---------------|---------------|---------------------|-------|
@@ -46,7 +46,7 @@ Generated: 2026-07-07T10:08:38.802Z
 | /ch05/automatic-differentiation | 8.2 自动微分 | Ch05AutomaticDifferentiationPage | src/pages/generated/Ch05AutomaticDifferentiationPage.tsx | false | OK |
 | /ch06/overview | 课程概览 | Chapter09OverviewPage | src/pages/chapters/chapter09/OverviewPage.tsx | true | OK |
 | /ch06/inductive-bias | 9.1 归纳偏置 | Ch06InductiveBiasPage | src/pages/generated/Ch06InductiveBiasPage.tsx | false | OK |
-| /ch06/weight-decay | 9.2 权重衰减 | Chapter09RegularizationPage | src/pages/chapters/chapter09/RegularizationPage.tsx | true | Bishop section route uses legacy component (Chapter09RegularizationPage) |
+| /ch06/weight-decay | 9.2 权重衰减 | Ch06WeightDecayPage | src/pages/generated/Ch06WeightDecayPage.tsx | false | OK |
 | /ch06/learning-curves | 9.3 学习曲线 | Ch06LearningCurvesPage | src/pages/generated/Ch06LearningCurvesPage.tsx | false | OK |
 | /ch06/parameter-sharing | 9.4 参数共享 | Ch06ParameterSharingPage | src/pages/generated/Ch06ParameterSharingPage.tsx | false | OK |
 | /ch06/residual-connections | 9.5 残差连接 | Ch06ResidualConnectionsPage | src/pages/generated/Ch06ResidualConnectionsPage.tsx | false | OK |
@@ -105,5 +105,5 @@ Generated: 2026-07-07T10:08:38.802Z
 | /appendix/c/overview | 约束优化 | AppendixCOverviewPage | src/pages/generated/AppendixCOverviewPage.tsx | false | OK |
 
 Total routes: 99
-Legacy components: 5
-Issues: 1
+Legacy components: 4
+Issues: 0

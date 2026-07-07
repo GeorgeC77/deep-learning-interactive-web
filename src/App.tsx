@@ -24,7 +24,7 @@ import Ch05EvaluationOfGradientsPage from './pages/generated/Ch05EvaluationOfGra
 
 // Ch 9 (manifest ch06): Regularization
 import Chapter09OverviewPage from './pages/chapters/chapter09/OverviewPage';
-import Chapter09RegularizationPage from './pages/chapters/chapter09/RegularizationPage';
+import Ch06WeightDecayPage from './pages/generated/Ch06WeightDecayPage';
 import Ch06LearningCurvesPage from './pages/generated/Ch06LearningCurvesPage';
 
 // Ch 12 (manifest ch09): Transformers — custom attention page with advanced demo
@@ -148,7 +148,7 @@ const sectionComponents: Record<string, React.ComponentType> = {
 
   // Ch 9 (manifest ch06): Regularization
   '/ch06/overview': Chapter09OverviewPage,
-  '/ch06/weight-decay': Chapter09RegularizationPage,
+  '/ch06/weight-decay': Ch06WeightDecayPage,
   '/ch06/learning-curves': Ch06LearningCurvesPage,
 
   // Ch 12 (manifest ch09): Transformers
