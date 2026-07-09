@@ -28,6 +28,18 @@ export default function Ch11BasicSamplingAlgorithmsPage() {
           description: "当 p 只能计算到归一化常数时，用权重归一化代替真实分布。",
           formula: String.raw`\hat{\mu} = \frac{\sum_i w_i f(x_i)}{\sum_i w_i}, \quad w_i = \frac{\tilde{p}(x_i)}{q(x_i)}`,
         },
+        {
+          title: "Standard distributions",
+          description: "均匀、高斯等基础分布及 Box-Muller、Cholesky 等生成方法，是复杂采样算法的基本构件。",
+        },
+        {
+          title: "Adaptive rejection sampling",
+          description: "针对 log-concave 目标分布，自动构造并收紧自适应 envelope，提高拒绝采样效率。",
+        },
+        {
+          title: "Sampling-importance-resampling",
+          description: "先从提议分布 q 采样，再按重要性权重归一化后重采样，得到近似来自目标分布 p 的样本。",
+        },
       ]}
       learningObjectives={[
         "掌握逆变换采样与拒绝采样的原理与局限。",

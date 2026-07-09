@@ -1,6 +1,6 @@
 # Invalid Bishop Subsections Report
 
-Generated: 2026-07-08T15:28:45.331Z
+Generated: 2026-07-09T05:12:22.364Z
 
 The following `textbookSubsections` entries are not in the allowed Bishop list.
 Supplemental material should be moved to `supplementalTopics`.
@@ -9,6 +9,15 @@ Supplemental material should be moved to `supplementalTopics`.
 |---------------|-----------|-------------------|
 
 Total invalid subsections: 0
+
+## Missing Expected Subsections
+
+The following routes are expected to cover these textbook subsections but do not list them in `textbookSubsections`.
+
+| componentFile | routePath | missingExpectedSubsection |
+|---------------|-----------|---------------------------|
+
+Total missing expected subsections: 0
 
 ## Other Content Issues
 
@@ -25,8 +34,4 @@ None.
 None.
 
 ### Concept coverage warnings
-| componentFile | routePath | note |
-|---------------|-----------|------|
-| src/pages/generated/Ch07ObjectDetectionPage.tsx | /ch07/object-detection | Only 5 concept cards for 6 leaf textbook subsections |
-| src/pages/generated/Ch11BasicSamplingAlgorithmsPage.tsx | /ch11/basic-sampling-algorithms | Only 4 concept cards for 6 leaf textbook subsections |
-| src/pages/generated/Ch13PrincipalComponentAnalysisPage.tsx | /ch13/principal-component-analysis | Only 4 concept cards for 5 leaf textbook subsections |
+None.

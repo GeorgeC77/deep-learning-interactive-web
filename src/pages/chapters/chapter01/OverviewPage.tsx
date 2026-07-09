@@ -21,7 +21,7 @@ export default function OverviewPage() {
           <BookOpen className="w-12 h-12 text-blue-600" />
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Ch 1. 单层网络：回归
+          单层网络：回归
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           从最简单的线性回归出发，把它看作只有一层可学习参数的神经网路。学习模型表示、代价函数、优化方法、概率解释与正则化，为后续深度学习打下坚实基础。

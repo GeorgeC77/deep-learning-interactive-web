@@ -28,7 +28,15 @@ export default function Ch07ObjectDetectionPage() {
         },
         {
           title: "Fast R-CNN",
-          description: "先用区域提议网络生成候选框，再统一提取特征进行分类与回归。",
+          description: "Fast R-CNN 使用候选区域，在共享卷积特征图上提取 RoI 特征，然后进行类别预测和边界框回归；RPN 是 Faster R-CNN 的后续扩展，不是 Fast R-CNN 本身的必要组成。",
+        },
+        {
+          title: "Detection across scales",
+          description: "通过多尺度输入、特征金字塔或不同大小的滑动窗口，检测图像中尺寸差异较大的目标。",
+        },
+        {
+          title: "Fast region CNNs",
+          description: "两阶段检测范式：先生成候选区域，再对区域特征做分类与边框精修，兼顾精度与效率。",
         },
       ]}
       learningObjectives={[

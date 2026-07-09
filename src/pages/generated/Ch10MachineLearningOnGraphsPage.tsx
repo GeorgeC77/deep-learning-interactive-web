@@ -74,7 +74,8 @@ export default function Ch10MachineLearningOnGraphsPage() {
         pages: "Ch 13",
         textbookSubsections: [
           "13.1.1 Graph properties",
-          "13.1.2 Adjacency matrix"
+          "13.1.2 Adjacency matrix",
+          "13.1.3 Permutation equivariance"
         ],
         formulas: ["置换等变 f(PAPᵀ,PX)=Pf(A,X)", "置换不变 f(PAPᵀ,PX)=f(A,X)"],
         algorithms: ["度中心性", "图特征提取"],

@@ -8,7 +8,7 @@ export default function OverviewPage() {
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       <section className="text-center py-8 bg-white rounded-2xl shadow-sm border border-gray-200">
         <div className="text-sm font-medium text-blue-600 mb-2 tracking-wide uppercase">
-          第九章 · 正则化与模型选择
+          正则化与模型选择
         </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">正则化与模型选择</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
@@ -26,25 +26,25 @@ export default function OverviewPage() {
         </div>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <h3 className="font-semibold text-blue-800 mb-2">9.1 正则化</h3>
+            <h3 className="font-semibold text-blue-800 mb-2">正则化</h3>
             <p className="text-sm text-gray-700">
               在损失函数中加入正则项，通过 L2（权重衰减）、L1（稀疏性）等方式控制模型复杂度。
             </p>
           </div>
           <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-            <h3 className="font-semibold text-emerald-800 mb-2">9.2 隐式正则化</h3>
+            <h3 className="font-semibold text-emerald-800 mb-2">隐式正则化</h3>
             <p className="text-sm text-gray-700">
               优化器、学习率、批量大小等训练超参数本身也会影响模型找到的解，带来隐式偏好。
             </p>
           </div>
           <div className="bg-violet-50 rounded-lg p-4 border border-violet-200">
-            <h3 className="font-semibold text-violet-800 mb-2">9.3 交叉验证</h3>
+            <h3 className="font-semibold text-violet-800 mb-2">交叉验证</h3>
             <p className="text-sm text-gray-700">
               用留出法、k 折交叉验证和留一法估计泛化误差，选择最佳模型复杂度。
             </p>
           </div>
           <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-            <h3 className="font-semibold text-amber-800 mb-2">9.4 贝叶斯视角</h3>
+            <h3 className="font-semibold text-amber-800 mb-2">贝叶斯视角</h3>
             <p className="text-sm text-gray-700">
               从先验分布到 MAP 估计，理解 L2 正则化等价于高斯先验。
             </p>

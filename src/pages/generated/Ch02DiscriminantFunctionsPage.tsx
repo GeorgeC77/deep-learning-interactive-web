@@ -29,8 +29,8 @@ export default function Ch02DiscriminantFunctionsPage() {
     ]}
       coreIntuition={"判别函数直接为输入 x 分配类别标签；二分类与多分类的决策边界是理解分类器的几何起点。"}
       commonMistakes={[
-      "把不同小节的概念混为一谈，忽视它们的假设与适用范围。",
-      "只看公式形式而不验证推导条件或数值实例。"
+      "混淆本节核心概念与相邻小节的前提假设，导致错误套用。",
+      "只记忆公式形式，而不验证其成立条件与具体数值。"
     ]}
       quiz={[
       {
@@ -46,7 +46,7 @@ export default function Ch02DiscriminantFunctionsPage() {
         explanation: "正确。多类判别函数 的有效性依赖于特定假设，忽略前提会导致错误结论。",
       },
       {
-        question: "在一个具体情境中，你发现“最小二乘分类”的结果与直觉相反，首先应该检查什么？",
+        question: "在一个具体情境中，你发现“最小二乘分类”的结果违背直觉，应优先排查哪些前提假设？",
         options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
         correctIndex: 0,
         explanation: "正确。最小二乘分类 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
@@ -60,7 +60,7 @@ export default function Ch02DiscriminantFunctionsPage() {
           "5.1 Discriminant Functions"
         ],
       formulas: ["二分类判别函数公式"],
-      exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
+      exercises: ["推导本节核心公式的展开形式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "对比本节结论与先前章节结论的适用条件差异。"]
     }}
           demo={{
       title: "决策边界随权重变化",

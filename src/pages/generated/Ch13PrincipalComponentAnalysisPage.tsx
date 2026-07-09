@@ -26,6 +26,10 @@ export default function Ch13PrincipalComponentAnalysisPage() {
           title: "数据白化",
           description: "将数据变换到主成分坐标并按标准差缩放，可得到零均值、单位协方差的白化数据。",
         },
+        {
+          title: "High-dimensional data",
+          description: "当维度 D 很大而样本数 N 较小时，直接求 D×D 协方差矩阵低效，可借助数据矩阵的低秩结构或 SVD/Gram matrix 视角计算主成分。",
+        },
       ]}
       learningObjectives={[
         "理解 PCA 的最大方差与最小重构误差两种视角。",

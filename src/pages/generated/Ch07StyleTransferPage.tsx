@@ -6,64 +6,98 @@ export default function Ch07StyleTransferPage() {
     <BishopSectionPage
       sectionPath="/ch07/style-transfer"
       heroIcon={<Palette className="w-9 h-9 text-blue-600" />}
-      summary={"神经风格迁移将内容图像的结构与风格图像的纹理分离并重组，通过优化或训练网络实现艺术化生成。"}
+      summary={"神经风格迁移把内容图像的结构与风格图像的纹理分离并重组。通过预训练 CNN 的高层特征表示内容、Gram 矩阵表示风格，再优化生成图像像素或训练前馈网络，实现艺术化图像生成。"}
       concepts={[
-    {
-      title: "内容表示",
-      description: "使用高层特征图捕捉图像的语义结构，忽略具体像素值。",
-    },
-    {
-      title: "风格表示",
-      description: "用 Gram 矩阵统计特征图通道间的相关性，捕捉纹理与色彩分布。",
-      formula: String.raw`G_{ij} = \sum_{k} F_{ik} F_{jk}`,
-    },
-    {
-      title: "优化目标",
-      description: "合成图像同时最小化与内容图像的特征距离和与风格图像的 Gram 距离。",
-    }
+        {
+          title: "Content representation",
+          description: "使用预训练 CNN 的高层 feature map 表示图像的语义结构，忽略具体像素值。",
+        },
+        {
+          title: "Style representation",
+          description: "用 Gram 矩阵统计特征图通道之间的相关性，捕捉纹理、色彩和局部图案的分布。",
+          formula: String.raw`G_{ij} = \sum_{k} F_{ik} F_{jk}`,
+        },
+        {
+          title: "Content loss",
+          description: "合成图像与内容图像在某一高层特征空间中的欧氏距离，约束语义结构保持一致。",
+          formula: String.raw`L_{\text{content}} = \frac{1}{2} \sum_{i,j} (F_{ij}^{\hat{x}} - F_{ij}^{x})^2`,
+        },
+        {
+          title: "Style loss",
+          description: "合成图像与风格图像在多层上的 Gram 矩阵差异之和，约束纹理统计相似。",
+          formula: String.raw`L_{\text{style}} = \sum_l \frac{1}{4 N_l^2 M_l^2} \sum_{i,j} (G_{ij}^{\hat{x},l} - G_{ij}^{s,l})^2`,
+        },
+        {
+          title: "Total objective",
+          description: "内容损失与风格损失的加权组合，通过调节权重控制生成结果。",
+          formula: String.raw`L = \alpha L_{\text{content}} + \beta L_{\text{style}}`,
+        },
+        {
+          title: "Optimization process",
+          description: "固定预训练 CNN 的权重，直接对输入图像像素进行梯度下降；也可以训练前馈网络一次性生成风格化图像。",
+        },
       ]}
       learningObjectives={[
-      "理解 内容表示 的含义与作用。",
-      "理解 风格表示 的含义与作用。",
-      "理解 优化目标 的含义与作用。"
-    ]}
-      coreIntuition={"神经风格迁移将内容图像的结构与风格图像的纹理分离并重组，通过优化或训练网络实现艺术化生成。"}
+        "理解 CNN 高层特征如何表示图像内容。",
+        "理解 Gram 矩阵为什么能捕捉风格纹理。",
+        "能写出风格迁移的总目标函数并解释 α、β 的作用。",
+      ]}
+      coreIntuition={"风格迁移像把一张照片的‘骨架’和一幅画的‘笔触’重新合成：内容损失保住骨架，风格损失引入笔触，优化过程则让像素同时满足两个约束。"}
       commonMistakes={[
-      "把不同小节的概念混为一谈，忽视它们的假设与适用范围。",
-      "只看公式形式而不验证推导条件或数值实例。"
-    ]}
+        "把风格迁移理解成简单滤镜；它实际是在特征空间约束下的优化问题。",
+        "认为 Gram 矩阵保留空间布局；它主要捕捉纹理统计，弱化空间位置信息。",
+        "忽视内容权重 α 与风格权重 β 的比例，导致结果过像风格或丢失内容。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“内容表示”的叙述，哪一项最准确？",
-        options: ["使用高层特征图捕捉图像的语义结构，忽略具体像素值。", "内容表示 只是术语，没有独立建模意义。", "内容表示 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。使用高层特征图捕捉图像的语义结构，忽略具体像素值。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在“风格表示”的公式中，若忽略其中某一项，最可能导致什么后果？",
-        options: ["得到形式上“简洁”但数值或概率意义错误的结论。", "结果只是略有不精确，不会影响最终决策。", "公式会自动退化为另一种更简单的正确形式。"],
-        correctIndex: 0,
-        explanation: "正确。风格表示 的每一项都有明确的数学或物理意义，随意省略会破坏等式成立的条件。",
-      },
-      {
-        question: "在一个具体情境中，你发现“优化目标”的结果与直觉相反，首先应该检查什么？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。优化目标 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "Gram 矩阵为什么能表示风格？",
+          options: [
+            "它统计同一层特征通道之间的相关性，反映纹理和色彩分布。",
+            "它直接记录图像中每个物体的空间位置。",
+            "它等于内容特征图本身。",
+            "它只与像素亮度有关，与纹理无关。",
+          ],
+          correctIndex: 0,
+          explanation: "Gram 矩阵通过通道间内积去掉空间信息，保留纹理统计特征，因此适合表示风格。",
+        },
+        {
+          question: "设某层风格图像 Gram 矩阵为 G^s，合成图像 Gram 矩阵为 G^\hat{x}，则该层风格损失正比于？",
+          options: [
+            "G^\hat{x} 与 G^s 对应元素差的平方和。",
+            "G^\hat{x} 与 G^s 的逐元素乘积。",
+            "合成图像与风格图像的像素差。",
+            "内容特征与风格特征的点积。",
+          ],
+          correctIndex: 0,
+          explanation: "风格损失衡量两层 Gram 矩阵之间的 Frobenius 距离，即对应元素差的平方和。",
+        },
+        {
+          question: "在风格迁移中，若 β 相对 α 过大，最可能出现什么结果？",
+          options: [
+            "风格纹理被过度强调，内容结构可能被破坏。",
+            "生成图像完全等同于内容图像。",
+            "Gram 矩阵不再影响优化。",
+            "内容损失自动降为零。",
+          ],
+          correctIndex: 0,
+          explanation: "β 过大时优化更关注风格匹配，可能牺牲内容结构，使图像更像风格画而内容难以辨认。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 10",
-      section: "10.6",
-      pages: "Ch 10",
-      textbookSubsections: [
+        chapter: "Ch 10",
+        section: "10.6",
+        pages: "Ch 10",
+        textbookSubsections: [
           "10.6 Style Transfer"
         ],
-      formulas: ["风格表示公式"],
-      algorithms: ["优化目标"],
-      exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
-    }}
-
+        formulas: ["content loss", "style loss", "total objective"],
+        algorithms: ["gradient-based style transfer", "feed-forward style transfer"],
+        exercises: [
+          "用 2×2 feature map 手算 Gram matrix。",
+          "调整 α/β 观察内容保持与风格强度的权衡。",
+          "比较浅层和深层特征用于风格/内容表示的差异。",
+        ],
+      }}
     />
   );
 }

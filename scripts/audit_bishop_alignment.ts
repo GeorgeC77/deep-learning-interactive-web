@@ -13,13 +13,15 @@ const officialSubsections: string[] = JSON.parse(
   fs.readFileSync('scripts/allowedSubsections.json', 'utf8')
 );
 
-const TEMPLATE_PHRASES = [
-  '与本节讨论的问题完全无关',
-  '在任何情况下都不需要额外假设即可使用',
-  '只要样本量足够大，前提假设就不重要',
-  '结果与直觉相反时首先应该检查假设',
-  '复述本节核心公式并说明每个符号含义',
-  '找出本节结论与相邻小节结论的异同',
+const TEMPLATE_REGEXES: RegExp[] = [
+  /与本节讨论的问题完全无关/,
+  /在任何情况下都不需要额外假设即可使用/,
+  /只要样本量足够大，前提假设就不重要/,
+  /结果与直觉相反/,
+  /写出本节.*核心公式/,
+  /比较本节.*前面.*结论/,
+  /把不同小节的概念混为一谈/,
+  /只看公式形式而不验证/,
 ];
 
 const WRONG_FORMULA_REGEXES = [
@@ -93,14 +95,51 @@ function containsChinese(s: string): boolean {
 }
 
 function hasTemplatePhrase(s: string): string | null {
-  for (const phrase of TEMPLATE_PHRASES) {
-    if (s.includes(phrase)) return phrase;
+  for (const re of TEMPLATE_REGEXES) {
+    if (re.test(s)) return re.source;
   }
   return null;
 }
 
 // ---------- Build allowed subsection set ----------
 const allowedSubsections = new Set<string>(officialSubsections);
+
+// Manual overrides for routes that must cover specific leaf subsections.
+const expectedSubsectionsByRoute: Record<string, string[]> = {
+  '/ch10/machine-learning-on-graphs': [
+    '13.1.1 Graph properties',
+    '13.1.2 Adjacency matrix',
+    '13.1.3 Permutation equivariance',
+  ],
+  '/ch07/object-detection': [
+    '10.4.1 Bounding boxes',
+    '10.4.2 Intersection-over-union',
+    '10.4.3 Sliding windows',
+    '10.4.4 Detection across scales',
+    '10.4.5 Non-max suppression',
+    '10.4.6 Fast region CNNs',
+  ],
+  '/ch11/basic-sampling-algorithms': [
+    '14.1.1 Expectations',
+    '14.1.2 Standard distributions',
+    '14.1.3 Rejection sampling',
+    '14.1.4 Adaptive rejection sampling',
+    '14.1.5 Importance sampling',
+    '14.1.6 Sampling-importance-resampling',
+  ],
+};
+
+// Legacy overview routes that are allowed to remain non-generated for now.
+const legacyOverviewAllowed = new Set<string>([
+  '/ch01/overview',
+  '/ch02/overview',
+  '/ch03/overview',
+  '/ch06/overview',
+]);
+
+function getExpectedSubsections(routePath: string, _section: string): string[] {
+  return expectedSubsectionsByRoute[routePath] ?? [];
+}
 
 // ---------- Route audit ----------
 const routeRows: {
@@ -109,6 +148,7 @@ const routeRows: {
   componentName: string;
   componentFile: string;
   usesLegacyComponent: boolean;
+  legacyOverviewAllowed: boolean;
   issue: string;
 }[] = [];
 
@@ -118,9 +158,19 @@ for (const sec of getAllSections()) {
   const importSource = importMap[componentName] ?? '';
   const componentFile = resolveComponentFile(importSource);
   const usesLegacy = componentFile.includes('src/pages/chapters/');
+  const legacyAllowed = usesLegacy && legacyOverviewAllowed.has(routePath);
   let issue = '';
   if (usesLegacy && isBishopSectionRoute(sec)) {
     issue = `Bishop section route uses legacy component (${componentName})`;
+  } else if (legacyAllowed) {
+    // Legacy overview pages are allowed, but their visible titles must not contain old course chapter numbers.
+    if (componentFile && fs.existsSync(componentFile)) {
+      const legacyText = fs.readFileSync(componentFile, 'utf8');
+      const oldRefMatch = legacyText.match(/第[一二三四五六七八九十]+章/) || legacyText.match(/第\d+章/) || legacyText.match(/Ch\s*\d+\./);
+      if (oldRefMatch) {
+        issue = `Legacy overview title contains old course chapter reference: ${oldRefMatch[0]}`;
+      }
+    }
   }
   routeRows.push({
     routePath,
@@ -128,6 +178,7 @@ for (const sec of getAllSections()) {
     componentName,
     componentFile,
     usesLegacyComponent: usesLegacy,
+    legacyOverviewAllowed: legacyAllowed,
     issue,
   });
 }
@@ -142,6 +193,7 @@ type WrongFormulaRow = { componentFile: string; routePath: string; snippet: stri
 type ConceptCoverageRow = { componentFile: string; routePath: string; note: string };
 type SupplementalTopicRow = { componentFile: string; routePath: string; topic: string; note: string };
 type OldTitleRow = { componentFile: string; routePath: string; match: string };
+type MissingExpectedRow = { componentFile: string; routePath: string; missing: string };
 
 const invalidSubsectionRows: InvalidSubsectionRow[] = [];
 const templateRows: TemplateRow[] = [];
@@ -149,6 +201,7 @@ const wrongFormulaRows: WrongFormulaRow[] = [];
 const conceptCoverageRows: ConceptCoverageRow[] = [];
 const supplementalTopicRows: SupplementalTopicRow[] = [];
 const oldTitleRows: OldTitleRow[] = [];
+const missingExpectedRows: MissingExpectedRow[] = [];
 
 for (const file of generatedFiles) {
   const fullPath = path.join(generatedDir, file);
@@ -167,6 +220,8 @@ for (const file of generatedFiles) {
 
   const subsections = extractFirstArray(mappingBlock, 'textbookSubsections');
 
+  const bishopSection = coverageByPath.get(routePath)?.bishopSection ?? '';
+
   if (enforceSubsections) {
     for (const sub of subsections) {
       if (!allowedSubsections.has(sub)) {
@@ -174,6 +229,17 @@ for (const file of generatedFiles) {
       }
       if (containsChinese(sub)) {
         invalidSubsectionRows.push({ componentFile: `src/pages/generated/${file}`, routePath, subsection: `${sub} (contains Chinese)` });
+      }
+    }
+
+    const expectedSubsections = getExpectedSubsections(routePath, bishopSection);
+    for (const expected of expectedSubsections) {
+      if (!subsections.includes(expected)) {
+        missingExpectedRows.push({
+          componentFile: `src/pages/generated/${file}`,
+          routePath,
+          missing: expected,
+        });
       }
     }
   }
@@ -247,6 +313,12 @@ for (const file of generatedFiles) {
     checkStringsForTemplates(strings, 'exercises');
   }
 
+  const learningObjectivesBlock = extractBlock(text, 'learningObjectives');
+  if (learningObjectivesBlock) {
+    const strings = extractQuotedStrings(learningObjectivesBlock);
+    checkStringsForTemplates(strings, 'learningObjectives');
+  }
+
   // Heuristic for extra parentheses in GAN loss strings.
   if (/ln\(1-D\(G\(z\)\)\)\)/.test(text)) {
     wrongFormulaRows.push({ componentFile: `src/pages/generated/${file}`, routePath, snippet: 'ln(1-D(G(z)))) extra parenthesis' });
@@ -266,15 +338,17 @@ const routeMd = [
   '',
   `Generated: ${new Date().toISOString()}`,
   '',
-  '| routePath | manifestTitle | componentName | componentFile | usesLegacyComponent | issue |',
-  '|-----------|---------------|---------------|---------------|---------------------|-------|',
+  '| routePath | manifestTitle | componentName | componentFile | usesLegacyComponent | legacyOverviewAllowed | issue |',
+  '|-----------|---------------|---------------|---------------|---------------------|----------------------|-------|',
   ...routeRows.map((r) => {
     const file = r.componentFile || '(none)';
-    return `| ${r.routePath} | ${r.manifestTitle} | ${r.componentName} | ${file} | ${r.usesLegacyComponent} | ${r.issue || 'OK'} |`;
+    const issue = r.issue || (r.legacyOverviewAllowed ? 'OK (legacy overview allowed)' : 'OK');
+    return `| ${r.routePath} | ${r.manifestTitle} | ${r.componentName} | ${file} | ${r.usesLegacyComponent} | ${r.legacyOverviewAllowed} | ${issue} |`;
   }),
   '',
   `Total routes: ${routeRows.length}`,
   `Legacy components: ${routeRows.filter((r) => r.usesLegacyComponent).length}`,
+  `Legacy overview allowed: ${routeRows.filter((r) => r.legacyOverviewAllowed).length}`,
   `Issues: ${routeRows.filter((r) => r.issue).length}`,
 ].join('\n');
 fs.writeFileSync('route_audit_report.md', routeMd, 'utf8');
@@ -293,6 +367,16 @@ const invalidMd = [
   ...invalidSubsectionRows.map((r) => `| ${r.componentFile} | ${r.routePath} | ${r.subsection} |`),
   '',
   `Total invalid subsections: ${invalidSubsectionRows.length}`,
+  '',
+  '## Missing Expected Subsections',
+  '',
+  'The following routes are expected to cover these textbook subsections but do not list them in `textbookSubsections`.',
+  '',
+  '| componentFile | routePath | missingExpectedSubsection |',
+  '|---------------|-----------|---------------------------|',
+  ...missingExpectedRows.map((r) => `| ${r.componentFile} | ${r.routePath} | ${r.missing} |`),
+  '',
+  `Total missing expected subsections: ${missingExpectedRows.length}`,
   '',
   '## Other Content Issues',
   '',
@@ -345,7 +429,7 @@ fs.writeFileSync('invalid_bishop_subsections_report.md', invalidMd, 'utf8');
 
 // ---------- Write coverage report ----------
 const legacyCount = routeRows.filter((r) => r.usesLegacyComponent).length;
-const issueCount = routeRows.filter((r) => r.issue).length;
+const seriousRouteIssues = routeRows.filter((r) => r.issue).length;
 const statusSummary: Record<string, number> = {};
 for (const sec of getAllSections()) {
   statusSummary[sec.status] = (statusSummary[sec.status] ?? 0) + 1;
@@ -353,11 +437,12 @@ for (const sec of getAllSections()) {
 
 const fatalIssues =
   invalidSubsectionRows.length +
+  missingExpectedRows.length +
   wrongFormulaRows.length +
   templateRows.length +
   supplementalTopicRows.length +
   oldTitleRows.length +
-  issueCount;
+  seriousRouteIssues;
 const allIssues = fatalIssues + conceptCoverageRows.length;
 
 const coverageMd = [
@@ -367,8 +452,9 @@ const coverageMd = [
   '',
   `Total mapped routes: ${getAllSections().length}`,
   `Routes using legacy components: ${legacyCount}`,
-  `Bishop route / legacy component issues: ${issueCount}`,
+  `Bishop route / legacy component issues: ${seriousRouteIssues}`,
   `Invalid Bishop subsections: ${invalidSubsectionRows.length}`,
+  `Missing expected subsections: ${missingExpectedRows.length}`,
   `Wrong density formulas: ${wrongFormulaRows.length}`,
   `Template phrase occurrences: ${templateRows.length}`,
   `Supplemental topic issues: ${supplementalTopicRows.length}`,
@@ -386,8 +472,9 @@ const coverageMd = [
 fs.writeFileSync('coverage_report.md', coverageMd, 'utf8');
 
 console.log(`Audit complete.`);
-console.log(`Routes: ${routeRows.length}, legacy components: ${legacyCount}, route issues: ${issueCount}`);
+console.log(`Routes: ${routeRows.length}, legacy components: ${legacyCount}, route issues: ${seriousRouteIssues}`);
 console.log(`Invalid subsections: ${invalidSubsectionRows.length}`);
+console.log(`Missing expected subsections: ${missingExpectedRows.length}`);
 console.log(`Wrong formulas: ${wrongFormulaRows.length}`);
 console.log(`Template phrases: ${templateRows.length}`);
 console.log(`Supplemental topic issues: ${supplementalTopicRows.length}`);
