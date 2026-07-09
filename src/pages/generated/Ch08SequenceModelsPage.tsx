@@ -55,7 +55,9 @@ export default function Ch08SequenceModelsPage() {
       chapter: "Ch 11",
       section: "11.3",
       pages: "Ch 11",
-      textbookSubsections: ["11.3.1 马尔可夫假设", "11.3.2 隐变量", "11.3.3 前向-后向算法"],
+      textbookSubsections: [
+          "11.3 Sequence Models"
+        ],
       algorithms: ["前向-后向算法"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

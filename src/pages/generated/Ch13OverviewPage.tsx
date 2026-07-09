@@ -74,7 +74,12 @@ export default function Ch13OverviewPage() {
       bishopMapping={{
         chapter: "Ch 16",
         pages: "Ch 16",
-        textbookSubsections: ["16.1 Principal Component Analysis", "16.2 Probabilistic Latent Variables", "16.3 Evidence Lower Bound", "16.4 Nonlinear Latent Variable Models"],
+        textbookSubsections: [
+          "16.1 Principal Component Analysis",
+          "16.2 Probabilistic Latent Variables",
+          "16.3 Evidence Lower Bound",
+          "16.4 Nonlinear Latent Variable Models"
+        ],
         exercises: ["列出本章四种隐变量模型及其主要假设。", "比较 PCA 与概率 PCA 在优化目标上的差异。"],
       }}
       demo={{

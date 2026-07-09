@@ -86,7 +86,14 @@ export default function Ch09NaturalLanguagePage() {
         chapter: "Ch 12",
         section: "12.2",
         pages: "Ch 12",
-        textbookSubsections: ["12.2.1 Word embedding", "12.2.2 Tokenization", "12.2.3 Bag of words", "12.2.4 Autoregressive models", "12.2.5 Recurrent neural networks", "12.2.6 Backpropagation through time"],
+        textbookSubsections: [
+          "12.2.1 Word embedding",
+          "12.2.2 Tokenization",
+          "12.2.3 Bag of words",
+          "12.2.4 Autoregressive models",
+          "12.2.5 Recurrent neural networks",
+          "12.2.6 Backpropagation through time"
+        ],
         formulas: ["自回归分解 p(x)=∏p(x_t|x<t)", "RNN 隐状态更新", "词嵌入查表"],
         algorithms: ["词袋", "RNN 前向与 BPTT"],
         exercises: ["用给定词表写出句子的 one-hot 与 embedding 表示。", "推导 RNN 对短序列的 BPTT 梯度。"],

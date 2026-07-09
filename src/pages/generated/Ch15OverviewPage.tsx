@@ -66,8 +66,17 @@ export default function Ch15OverviewPage() {
       bishopMapping={{
         chapter: "Ch 18",
         pages: "Ch 18",
-        textbookSubsections: ["18.1 Coupling Flows", "18.2 Autoregressive Flows", "18.3 Continuous Flows"],
-        supplementalTopics: ["RealNVP", "MAF", "IAF", "FFJORD"],
+        textbookSubsections: [
+          "18.1 Coupling Flows",
+          "18.2 Autoregressive Flows",
+          "18.3 Continuous Flows"
+        ],
+        supplementalTopics: [
+          "RealNVP",
+          "MAF",
+          "IAF",
+          "FFJORD"
+        ],
         formulas: ["变量替换公式", "p_x(x)=p_z(g(x))|det J|^{-1}"],
         algorithms: ["RealNVP", "MAF/IAF", "Neural ODE flows"],
         exercises: ["从 f(z)=2z 推导一维变量替换公式。", "比较三种流架构的采样与密度评估复杂度。"],

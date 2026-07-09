@@ -6,25 +6,20 @@ export default function Ch14ImageGansPage() {
     <BishopSectionPage
       sectionPath="/ch14/image-gans"
       heroIcon={<Image className="w-9 h-9 text-blue-600" />}
-      summary={"图像 GAN 从全连接架构发展到深度卷积网络；条件 GAN 通过类别或图像输入实现可控生成；CycleGAN 利用循环一致性在无配对数据上完成域转换。"}
+      summary={"图像 GAN 将生成对抗网络应用于图像生成与转换；CycleGAN 通过循环一致性损失，在没有成对训练数据的情况下学习两个视觉域之间的双向映射。"}
       concepts={[
         {
-          title: "DCGAN",
-          description: "将卷积、批归一化与转置卷积引入 GAN，稳定训练并生成高质量图像。",
-        },
-        {
-          title: "条件 GAN",
-          description: "向生成器和判别器提供类别、文本或图像条件，使生成结果可控。",
-          formula: String.raw`\min_G \max_D V(D,G) = \mathbb{E}_{x,c}\ln D(x,c) + \mathbb{E}_{z,c}\ln(1-D(G(z,c),c))`,
+          title: "Image GANs",
+          description: "把 GAN 框架用于图像合成与转换任务，包括深度卷积 GAN、条件 GAN 以及图像到图像翻译模型。",
         },
         {
           title: "CycleGAN",
-          description: "通过循环一致性损失学习两个域之间的双向映射，无需成对训练数据。",
-          formula: String.raw`L_{\text{cyc}} = \mathbb{E}_x[\|F(G(x))-x\|_1] + \mathbb{E}_y[\|G(F(y))-y\|_1]`,
+          description: "学习两个域之间的双向映射 G: X→Y 与 F: Y→X，通过对抗损失与循环一致性损失实现无配对数据的图像翻译。",
         },
         {
-          title: "域转换 vs 条件生成",
-          description: "条件 GAN 从噪声生成带标签样本；CycleGAN 将已有样本从一个域转换到另一个域。",
+          title: "Cycle consistency loss",
+          description: "约束转换后再转换回原域的结果接近原始输入，即 F(G(x))≈x 且 G(F(y))≈y，为无配对数据提供监督信号。",
+          formula: String.raw`L_{\text{cyc}} = \mathbb{E}_x[\|F(G(x))-x\|_1] + \mathbb{E}_y[\|G(F(y))-y\|_1]`,
         },
       ]}
       learningObjectives={[
@@ -40,48 +35,54 @@ export default function Ch14ImageGansPage() {
       ]}
       quiz={[
         {
-          question: "DCGAN 对 GAN 的主要贡献是？",
+          question: "CycleGAN 为什么能在没有成对数据的情况下学习域转换？",
           options: [
-            "引入深度卷积与转置卷积结构，使图像 GAN 训练更稳定。",
-            "首次提出条件生成。",
-            "提出循环一致性损失。",
-            "用 VAE 替代判别器。",
+            "它通过循环一致性损失把无配对样本组织成可学习的约束。",
+            "它完全不需要判别器。",
+            "它假设两个域的图像完全相同。",
+            "它使用预训练分类器生成配对数据。",
           ],
           correctIndex: 0,
-          explanation: "DCGAN 用卷积层替代全连接层，结合批归一化，显著提升了图像生成质量。",
+          explanation: "CycleGAN 同时学习双向映射并要求 F(G(x))≈x，无需输入与输出的一一对应。",
         },
         {
-          question: "条件 GAN 与 CycleGAN 的主要区别是？",
+          question: "循环一致性损失的目标是什么？",
           options: [
-            "条件 GAN 从噪声生成带条件样本，CycleGAN 把已有样本转换到另一域。",
-            "条件 GAN 只能用于离散类别，CycleGAN 只能用于连续图像。",
-            "条件 GAN 不需要判别器。",
-            "CycleGAN 需要成对训练数据，条件 GAN 不需要。",
+            "让 x 经 G 到 Y 域再经 F 回到 X 域后尽量接近原始 x。",
+            "让判别器无法区分真实图像与生成图像。",
+            "让生成器输出与输入完全相同。",
+            "让两个域的边缘分布完全相等。",
           ],
           correctIndex: 0,
-          explanation: "条件 GAN 生成新样本并控制类别/属性；CycleGAN 是图像到图像的域转换，利用循环一致性避免配对数据。",
+          explanation: "循环一致性约束 F(G(x))≈x 与 G(F(y))≈y，是无配对数据的直接监督来源。",
         },
         {
-          question: "CycleGAN 中循环一致性损失的作用是什么？",
+          question: "如果去掉 cycle consistency loss，只保留对抗损失，最可能出现什么问题？",
           options: [
-            "保证转换后再转换回来能接近原始输入，提供无配对数据下的监督信号。",
-            "让生成器输出更清晰的图像。",
-            "替代判别器进行真伪判断。",
-            "强制两个域的分布完全相同。",
+            "生成器可能把输入映射到目标域的任意图像，失去与输入的对应关系。",
+            "训练完全无法开始。",
+            "判别器会立即收敛到最优。",
+            "生成图像质量一定更高。",
           ],
           correctIndex: 0,
-          explanation: "循环一致性约束 F(G(x))≈x 和 G(F(y))≈y，使无配对样本也能学习有意义的映射。",
+          explanation: "没有循环一致性，生成器只需生成目标域中像真实图像的样本，而不必保留输入的语义内容。",
         },
       ]}
       bishopMapping={{
         chapter: "Ch 17",
         section: "17.2",
         pages: "Ch 17",
-        textbookSubsections: ["17.2 Image GANs", "17.2.1 CycleGAN"],
-        supplementalTopics: ["DCGAN", "conditional GAN"],
-        formulas: ["条件 GAN 损失", "CycleGAN 循环一致性损失"],
-        algorithms: ["DCGAN", "cGAN", "CycleGAN"],
-        exercises: ["比较 DCGAN 与原始全连接 GAN 的网络结构差异。", "说明 CycleGAN 为什么不需要成对数据。"],
+        textbookSubsections: [
+          "17.2 Image GANs",
+          "17.2.1 CycleGAN"
+        ],
+        supplementalTopics: [
+          "DCGAN",
+          "conditional GAN"
+        ],
+        formulas: ["cycle consistency loss"],
+        algorithms: ["CycleGAN"],
+        exercises: ["说明 CycleGAN 为什么不需要成对数据。"],
       }}
     />
   );

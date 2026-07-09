@@ -68,7 +68,10 @@ export default function PrerequisiteCh02TransformationPage() {
         chapter: "Ch 2",
         section: "2.4",
         pages: "Ch 2",
-        textbookSubsections: ["2.4 Transformation of Densities", "2.4.1 Multivariate distributions"],
+        textbookSubsections: [
+          "2.4 Transformation of Densities",
+          "2.4.1 Multivariate distributions"
+        ],
         formulas: ["一元变量替换公式", "多元密度变换公式"],
         algorithms: ["可逆变量替换"],
         exercises: ["验证线性变换 y=ax+b 下密度的缩放关系。", "计算二维极坐标变换的 Jacobian 行列式。"],

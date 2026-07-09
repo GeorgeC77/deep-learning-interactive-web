@@ -71,7 +71,14 @@ export default function Ch07ObjectDetectionPage() {
         chapter: "Ch 10",
         section: "10.4",
         pages: "Ch 10",
-        textbookSubsections: ["10.4.1 Bounding boxes", "10.4.2 Intersection-over-union", "10.4.3 Sliding windows", "10.4.4 Detection across scales", "10.4.5 Non-max suppression", "10.4.6 Fast region CNNs"],
+        textbookSubsections: [
+          "10.4.1 Bounding boxes",
+          "10.4.2 Intersection-over-union",
+          "10.4.3 Sliding windows",
+          "10.4.4 Detection across scales",
+          "10.4.5 Non-max suppression",
+          "10.4.6 Fast region CNNs"
+        ],
         formulas: ["IoU = |A∩B| / |A∪B|"],
         algorithms: ["滑动窗口检测", "非极大抑制"],
         exercises: ["给定两个边界框坐标，手算 IoU。", "调整 NMS 阈值观察重复检测与漏检的权衡。"],

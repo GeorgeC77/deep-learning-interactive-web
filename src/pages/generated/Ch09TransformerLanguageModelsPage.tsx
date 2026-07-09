@@ -75,7 +75,13 @@ export default function Ch09TransformerLanguageModelsPage() {
         chapter: "Ch 12",
         section: "12.3",
         pages: "Ch 12",
-        textbookSubsections: ["12.3.1 Decoder transformers", "12.3.2 Sampling strategies", "12.3.3 Encoder transformers", "12.3.4 Sequence-to-sequence transformers", "12.3.5 Large language models"],
+        textbookSubsections: [
+          "12.3.1 Decoder transformers",
+          "12.3.2 Sampling strategies",
+          "12.3.3 Encoder transformers",
+          "12.3.4 Sequence-to-sequence transformers",
+          "12.3.5 Large language models"
+        ],
         formulas: ["softmax 采样分布", "因果注意力掩码"],
         algorithms: ["Greedy decoding", "Top-k sampling", "Nucleus (top-p) sampling"],
         exercises: ["比较同一 prompt 下 greedy 与 nucleus 采样结果。", "说明 BERT 与 GPT 分别对应哪种 Transformer 结构。"],

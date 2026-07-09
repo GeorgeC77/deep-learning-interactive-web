@@ -86,7 +86,13 @@ export default function Ch17ReverseDecoderPage() {
         chapter: "Ch 20",
         section: "20.2",
         pages: "Ch 20",
-        textbookSubsections: ["20.2.1 Training the decoder", "20.2.2 Evidence lower bound", "20.2.3 Rewriting the ELBO", "20.2.4 Predicting the noise", "20.2.5 Generating new samples"],
+        textbookSubsections: [
+          "20.2.1 Training the decoder",
+          "20.2.2 Evidence lower bound",
+          "20.2.3 Rewriting the ELBO",
+          "20.2.4 Predicting the noise",
+          "20.2.5 Generating new samples"
+        ],
         formulas: ["p_w(z_{t-1}|z_t)", "噪声预测损失"],
         algorithms: ["Algorithm 20.1", "DDPM 反向采样"],
         exercises: ["从 ELBO 推导出噪声预测损失。", "说明生成时为什么从 z_T~N(0,I) 开始。"],

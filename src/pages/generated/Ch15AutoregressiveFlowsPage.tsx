@@ -72,8 +72,14 @@ export default function Ch15AutoregressiveFlowsPage() {
         chapter: "Ch 18",
         section: "18.2",
         pages: "Ch 18",
-        textbookSubsections: ["18.2 Autoregressive Flows"],
-        supplementalTopics: ["autoregressive factorization", "MAF", "IAF"],
+        textbookSubsections: [
+          "18.2 Autoregressive Flows"
+        ],
+        supplementalTopics: [
+          "autoregressive factorization",
+          "MAF",
+          "IAF"
+        ],
         formulas: ["p(x)=∏ᵢ p(xᵢ|x_{<i})", "三角 Jacobian 行列式", "xᵢ=μᵢ(x_{<i})+σᵢ(x_{<i})zᵢ"],
         algorithms: ["MAF", "IAF"],
         exercises: ["推导二维自回归变换的 Jacobian 行列式。", "比较 MAF 与 IAF 在训练与采样时的计算复杂度。"],

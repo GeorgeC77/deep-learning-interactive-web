@@ -80,8 +80,13 @@ export default function Ch17ForwardEncoderPage() {
         chapter: "Ch 20",
         section: "20.1",
         pages: "Ch 20",
-        textbookSubsections: ["20.1.1 Diffusion kernel", "20.1.2 Conditional distribution"],
-        supplementalTopics: ["noise schedule"],
+        textbookSubsections: [
+          "20.1.1 Diffusion kernel",
+          "20.1.2 Conditional distribution"
+        ],
+        supplementalTopics: [
+          "noise schedule"
+        ],
         formulas: ["q(z_t|z_{t-1})", "q(x_t|x_0) = N(√ᾱ_t x_0, (1-ᾱ_t)I)"],
         algorithms: ["前向加噪过程"],
         exercises: ["给定 β_t schedule 计算 ᾱ_t 并绘制信号比例曲线。", "证明条件分布 q(x_t|x_0) 的均值与方差。"],

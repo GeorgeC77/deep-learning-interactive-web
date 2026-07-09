@@ -56,7 +56,9 @@ export default function Ch02DecisionTheoryPage() {
       chapter: "Ch 5",
       section: "5.2",
       pages: "Ch 5",
-      textbookSubsections: ["5.2.1 误分类率", "5.2.2 期望损失", "5.2.3 拒绝选项"],
+      textbookSubsections: [
+          "5.2 Decision Theory"
+        ],
       formulas: ["期望损失公式"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

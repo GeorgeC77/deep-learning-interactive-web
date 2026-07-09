@@ -55,7 +55,9 @@ export default function Ch06ParameterSharingPage() {
       chapter: "Ch 9",
       section: "9.4",
       pages: "Ch 9",
-      textbookSubsections: ["9.4.1 软权重共享", "9.4.2 卷积中的共享", "9.4.3 参数量与统计效率"],
+      textbookSubsections: [
+          "9.4 Parameter Sharing"
+        ],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}
           demo={{

@@ -85,7 +85,18 @@ function extractBlock(text: string, propName: string): string | null {
 }
 
 function looksLikeSubsection(title: string): boolean {
-  return /^\d+\.\d+/.test(title) || /^Appendix [A-C]\.\d+/.test(title);
+  return /\d+\.\d+/.test(title) || /Appendix [A-C]\.\d+/.test(title);
+}
+
+function containsChinese(s: string): boolean {
+  return /[\u4e00-\u9fff]/.test(s);
+}
+
+function hasTemplatePhrase(s: string): string | null {
+  for (const phrase of TEMPLATE_PHRASES) {
+    if (s.includes(phrase)) return phrase;
+  }
+  return null;
 }
 
 // ---------- Build allowed subsection set ----------
@@ -156,15 +167,13 @@ for (const file of generatedFiles) {
 
   const subsections = extractFirstArray(mappingBlock, 'textbookSubsections');
 
-  // Collect existing subsections into allowed set at runtime (grandfathering).
-  for (const sub of subsections) {
-    allowedSubsections.add(sub);
-  }
-
   if (enforceSubsections) {
     for (const sub of subsections) {
       if (!allowedSubsections.has(sub)) {
         invalidSubsectionRows.push({ componentFile: `src/pages/generated/${file}`, routePath, subsection: sub });
+      }
+      if (containsChinese(sub)) {
+        invalidSubsectionRows.push({ componentFile: `src/pages/generated/${file}`, routePath, subsection: `${sub} (contains Chinese)` });
       }
     }
   }
@@ -200,9 +209,19 @@ for (const file of generatedFiles) {
     });
   }
 
+  function checkStringsForTemplates(strings: string[], source: string) {
+    for (const s of strings) {
+      const phrase = hasTemplatePhrase(s);
+      if (phrase) {
+        templateRows.push({ componentFile: `src/pages/generated/${file}`, routePath, phrase, context: `[${source}] ${s.slice(0, 120)}` });
+      }
+    }
+  }
+
   const cmBlock = extractBlock(text, 'commonMistakes');
   if (cmBlock) {
     const strings = extractQuotedStrings(cmBlock);
+    checkStringsForTemplates(strings, 'commonMistakes');
     for (const s of strings) {
       for (const re of WRONG_FORMULA_REGEXES) {
         const match = s.match(re);
@@ -219,13 +238,18 @@ for (const file of generatedFiles) {
   const quizBlock = extractBlock(text, 'quiz');
   if (quizBlock) {
     const strings = extractQuotedStrings(quizBlock);
-    for (const s of strings) {
-      for (const phrase of TEMPLATE_PHRASES) {
-        if (s.includes(phrase)) {
-          templateRows.push({ componentFile: `src/pages/generated/${file}`, routePath, phrase, context: s.slice(0, 120) });
-        }
-      }
-    }
+    checkStringsForTemplates(strings, 'quiz');
+  }
+
+  const exercisesBlock = extractBlock(text, 'exercises');
+  if (exercisesBlock) {
+    const strings = extractQuotedStrings(exercisesBlock);
+    checkStringsForTemplates(strings, 'exercises');
+  }
+
+  // Heuristic for extra parentheses in GAN loss strings.
+  if (/ln\(1-D\(G\(z\)\)\)\)/.test(text)) {
+    wrongFormulaRows.push({ componentFile: `src/pages/generated/${file}`, routePath, snippet: 'ln(1-D(G(z)))) extra parenthesis' });
   }
 
   for (const re of OLD_CHAPTER_REFS) {

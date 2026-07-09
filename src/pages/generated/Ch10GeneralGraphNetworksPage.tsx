@@ -71,7 +71,9 @@ export default function Ch10GeneralGraphNetworksPage() {
         chapter: "Ch 13",
         section: "13.3",
         pages: "Ch 13",
-        textbookSubsections: ["13.3.1 General graph networks", "13.3.2 Edge and global updates", "13.3.3 Graph attention networks", "13.3.4 Over-smoothing", "13.3.5 Geometric deep learning"],
+        textbookSubsections: [
+          "13.3.4 Over-smoothing"
+        ],
         formulas: ["GAT 注意力系数 α_uv"],
         algorithms: ["通用图网络 GN block", "GAT"],
         exercises: ["对比 GCN 与 GAT 在同一图上的聚合差异。", "分析增加 GNN 层数对节点分类精度的影响。"],

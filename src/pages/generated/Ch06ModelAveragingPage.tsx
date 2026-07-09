@@ -56,7 +56,9 @@ export default function Ch06ModelAveragingPage() {
       chapter: "Ch 9",
       section: "9.6",
       pages: "Ch 9",
-      textbookSubsections: ["9.6.1 委员会机器", "9.6.2 Dropout 作为平均", "9.6.3 贝叶斯模型平均"],
+      textbookSubsections: [
+          "9.6 Model Averaging"
+        ],
       formulas: ["委员会机器公式"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

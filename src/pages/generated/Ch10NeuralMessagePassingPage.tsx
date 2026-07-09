@@ -80,7 +80,9 @@ export default function Ch10NeuralMessagePassingPage() {
         chapter: "Ch 13",
         section: "13.2",
         pages: "Ch 13",
-        textbookSubsections: ["13.2.1 Message passing", "13.2.2 Message function", "13.2.3 Aggregate function", "13.2.4 Update function", "13.2.5 Graph convolutional networks"],
+        textbookSubsections: [
+          "13.2 Neural Message-Passing"
+        ],
         formulas: ["消息函数 m_uv=φ(h_u,h_v,e_uv)", "聚合 a_v=⊕ m_uv", "GCN 更新"],
         algorithms: ["消息传递神经网络 MPNN", "图卷积网络 GCN"],
         exercises: ["用邻接矩阵手动推导一轮 GCN 更新。", "说明聚合函数为何是置换不变的。"],

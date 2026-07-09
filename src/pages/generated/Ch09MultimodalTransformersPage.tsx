@@ -59,7 +59,9 @@ export default function Ch09MultimodalTransformersPage() {
       chapter: "Ch 12",
       section: "12.4",
       pages: "Ch 12",
-      textbookSubsections: ["12.4.1 视觉 Transformer", "12.4.2 图像生成 Transformer", "12.4.3 音频与语音", "12.4.4 视觉-语言模型"],
+      textbookSubsections: [
+          "12.4 Multimodal Transformers"
+        ],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}
 

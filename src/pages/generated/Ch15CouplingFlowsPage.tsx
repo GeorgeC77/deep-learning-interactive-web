@@ -83,8 +83,14 @@ p_x(\mathbf{x}) = p_z(\mathbf{z})\,|\det K_f(\mathbf{z})|^{-1}
         chapter: "Ch 18",
         section: "18.1",
         pages: "Ch 18",
-        textbookSubsections: ["18.1 Coupling Flows"],
-        supplementalTopics: ["coupling layers", "affine coupling", "RealNVP"],
+        textbookSubsections: [
+          "18.1 Coupling Flows"
+        ],
+        supplementalTopics: [
+          "coupling layers",
+          "affine coupling",
+          "RealNVP"
+        ],
         formulas: ["仿射耦合层", "ln|det K|=Σ_i s_i", "变量替换公式"],
         algorithms: ["RealNVP", "耦合流训练"],
         exercises: ["推导二维仿射耦合层的 Jacobian 并计算行列式。", "说明交替划分维度的必要性。"],

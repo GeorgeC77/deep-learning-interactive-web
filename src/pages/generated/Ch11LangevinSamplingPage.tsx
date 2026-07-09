@@ -57,7 +57,9 @@ export default function Ch11LangevinSamplingPage() {
       chapter: "Ch 14",
       section: "14.3",
       pages: "Ch 14",
-      textbookSubsections: ["14.3.1 基于能量的模型", "14.3.2 Langevin 更新", "14.3.3 与分数匹配的联系"],
+      textbookSubsections: [
+          "14.3 Langevin Sampling"
+        ],
       formulas: ["基于能量的模型公式", "Langevin 更新公式"],
       algorithms: ["Langevin 更新", "与分数匹配的联系"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]

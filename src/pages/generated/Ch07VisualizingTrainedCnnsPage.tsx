@@ -55,7 +55,9 @@ export default function Ch07VisualizingTrainedCnnsPage() {
       chapter: "Ch 10",
       section: "10.3",
       pages: "Ch 10",
-      textbookSubsections: ["10.3.1 滤波器可视化", "10.3.2 显著性图", "10.3.3 对抗样本"],
+      textbookSubsections: [
+          "10.3 Visualizing Trained CNNs"
+        ],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}
 

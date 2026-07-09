@@ -79,8 +79,14 @@ export default function Ch16VariationalAutoencodersPage() {
         chapter: "Ch 19",
         section: "19.2",
         pages: "Ch 19",
-        textbookSubsections: ["19.2.1 Amortized inference", "19.2.2 The reparameterization trick"],
-        supplementalTopics: ["ELBO derivation", "β-VAE"],
+        textbookSubsections: [
+          "19.2.1 Amortized inference",
+          "19.2.2 The reparameterization trick"
+        ],
+        supplementalTopics: [
+          "ELBO derivation",
+          "β-VAE"
+        ],
         formulas: ["q_φ(z|x)", "z=μ+σε", "ELBO"],
         algorithms: ["VAE", "重参数化技巧"],
         exercises: ["推导对角高斯后验与标准高斯先验的 KL 散度。", "说明为什么重参数化技巧能得到无偏梯度估计。"],

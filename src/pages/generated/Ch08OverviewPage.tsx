@@ -54,7 +54,7 @@ export default function Ch08OverviewPage() {
       bishopMapping={{
       chapter: "Ch 11",
       pages: "Ch 11",
-      textbookSubsections: ["联合分布的分解", "有向与无向图", "序列结构"],
+      textbookSubsections: [],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}
 

@@ -1,6 +1,6 @@
 # Route Audit Report
 
-Generated: 2026-07-07T10:54:07.717Z
+Generated: 2026-07-08T15:28:45.330Z
 
 | routePath | manifestTitle | componentName | componentFile | usesLegacyComponent | issue |
 |-----------|---------------|---------------|---------------|---------------------|-------|

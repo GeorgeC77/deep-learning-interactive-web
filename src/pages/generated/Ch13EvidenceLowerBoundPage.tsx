@@ -82,7 +82,12 @@ export default function Ch13EvidenceLowerBoundPage() {
         chapter: "Ch 16",
         section: "16.3",
         pages: "Ch 16",
-        textbookSubsections: ["16.3 Evidence Lower Bound", "16.3.1 Expectation maximization", "16.3.2 EM for PCA", "16.3.3 EM for factor analysis"],
+        textbookSubsections: [
+          "16.3 Evidence Lower Bound",
+          "16.3.1 Expectation maximization",
+          "16.3.2 EM for PCA",
+          "16.3.3 EM for factor analysis"
+        ],
         formulas: ["连续隐变量 ELBO", "概率 PCA E-step"],
         algorithms: ["连续隐变量 EM", "概率 PCA 的 EM", "因子分析的 EM"],
         exercises: ["推导概率 PCA 的 E-step 后验均值与协方差。", "比较概率 PCA 与因子分析的 M-step 差异。"],

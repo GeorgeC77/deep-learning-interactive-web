@@ -72,7 +72,10 @@ export default function Ch10MachineLearningOnGraphsPage() {
         chapter: "Ch 13",
         section: "13.1",
         pages: "Ch 13",
-        textbookSubsections: ["13.1.1 Graph properties", "13.1.2 Adjacency matrix", "13.1.3 Node, edge, and graph-level tasks", "13.1.4 Permutation symmetry"],
+        textbookSubsections: [
+          "13.1.1 Graph properties",
+          "13.1.2 Adjacency matrix"
+        ],
         formulas: ["置换等变 f(PAPᵀ,PX)=Pf(A,X)", "置换不变 f(PAPᵀ,PX)=f(A,X)"],
         algorithms: ["度中心性", "图特征提取"],
         exercises: ["写出 4 节点环图的邻接矩阵，并验证节点重排后的置换等价。", "判断节点分类与图分类分别需要哪种置换性质。"],

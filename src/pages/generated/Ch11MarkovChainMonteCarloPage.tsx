@@ -74,7 +74,9 @@ export default function Ch11MarkovChainMonteCarloPage() {
         chapter: "Ch 14",
         section: "14.2",
         pages: "Ch 14",
-        textbookSubsections: ["14.2.1 Markov chains", "14.2.2 Metropolis algorithm", "14.2.3 Metropolis-Hastings", "14.2.4 Gibbs sampling"],
+        textbookSubsections: [
+          "14.2.4 Gibbs sampling"
+        ],
         formulas: ["Metropolis A=min(1,exp(-ΔE))", "MH 一般接受率", "细致平衡"],
         algorithms: ["Metropolis", "Metropolis-Hastings", "Gibbs sampling"],
         exercises: ["证明对称提议下 MH 退化为 Metropolis。", "在 demo 中对比对称与非对称提议的采样结果。"],

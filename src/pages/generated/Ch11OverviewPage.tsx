@@ -55,7 +55,7 @@ export default function Ch11OverviewPage() {
       bishopMapping={{
       chapter: "Ch 14",
       pages: "Ch 14",
-      textbookSubsections: ["蒙特卡洛估计", "拒绝采样", "MCMC"],
+      textbookSubsections: [],
       formulas: ["蒙特卡洛估计公式"],
       algorithms: ["拒绝采样"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]

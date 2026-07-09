@@ -55,7 +55,9 @@ export default function Ch06InductiveBiasPage() {
       chapter: "Ch 9",
       section: "9.1",
       pages: "Ch 9",
-      textbookSubsections: ["9.1.1 逆问题与欠定性", "9.1.2 无免费午餐定理", "9.1.3 对称性、不变性与等变性"],
+      textbookSubsections: [
+          "9.1 Inductive Bias"
+        ],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}
 

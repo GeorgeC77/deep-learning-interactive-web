@@ -85,7 +85,14 @@ export default function Ch12EvidenceLowerBoundPage() {
         chapter: "Ch 15",
         section: "15.4",
         pages: "Ch 15",
-        textbookSubsections: ["15.4 Evidence Lower Bound", "15.4.1 EM revisited", "15.4.2 Independent and identically distributed data", "15.4.3 Parameter priors", "15.4.4 Generalized EM", "15.4.5 Sequential EM"],
+        textbookSubsections: [
+          "15.4 Evidence Lower Bound",
+          "15.4.1 EM revisited",
+          "15.4.2 Independent and identically distributed data",
+          "15.4.3 Parameter priors",
+          "15.4.4 Generalized EM",
+          "15.4.5 Sequential EM"
+        ],
         formulas: ["ELBO 定义", "EM 的 E-step 与 M-step"],
         algorithms: ["标准 EM", "广义 EM", "顺序 EM"],
         exercises: ["推导 GMM 的 ELBO 并写出 E/M 步。", "比较标准 EM 与广义 EM 的收敛保证。"],

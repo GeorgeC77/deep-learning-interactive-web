@@ -73,8 +73,15 @@ export default function Ch06WeightDecayPage() {
         chapter: "Ch 9",
         section: "9.2",
         pages: "Ch 9",
-        textbookSubsections: ["9.2 Weight Decay", "9.2.1 Consistent regularizers", "9.2.2 Generalized weight decay"],
-        supplementalTopics: ["L2 regularization", "AdamW"],
+        textbookSubsections: [
+          "9.2 Weight Decay",
+          "9.2.1 Consistent regularizers",
+          "9.2.2 Generalized weight decay"
+        ],
+        supplementalTopics: [
+          "L2 regularization",
+          "AdamW"
+        ],
         formulas: ["L2 penalty", "weight decay update"],
         algorithms: ["权重衰减", "AdamW"],
         exercises: ["推导 L2 正则化最小二乘的闭式解。", "比较 SGD 下 L2 正则化与权重衰减的更新公式。"],

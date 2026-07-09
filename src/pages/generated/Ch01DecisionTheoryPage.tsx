@@ -56,7 +56,9 @@ export default function Ch01DecisionTheoryPage() {
       chapter: "Ch 4",
       section: "4.2",
       pages: "Ch 4",
-      textbookSubsections: ["4.2.1 损失函数", "4.2.2 期望损失", "4.2.3 贝叶斯最优决策"],
+      textbookSubsections: [
+          "4.2 Decision theory"
+        ],
       formulas: ["期望损失公式"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

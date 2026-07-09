@@ -56,7 +56,9 @@ export default function Ch06ResidualConnectionsPage() {
       chapter: "Ch 9",
       section: "9.5",
       pages: "Ch 9",
-      textbookSubsections: ["9.5.1 残差块", "9.5.2 缓解梯度消失", "9.5.3 深层网络训练"],
+      textbookSubsections: [
+          "9.5 Residual Connections"
+        ],
       formulas: ["残差块公式"],
       algorithms: ["深层网络训练"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]

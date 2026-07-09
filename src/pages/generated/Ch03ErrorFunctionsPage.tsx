@@ -58,7 +58,9 @@ export default function Ch03ErrorFunctionsPage() {
       chapter: "Ch 6",
       section: "6.4",
       pages: "Ch 6",
-      textbookSubsections: ["6.4.1 回归：平方误差", "6.4.2 二分类：交叉熵", "6.4.3 多分类：Softmax 交叉熵"],
+      textbookSubsections: [
+          "6.4 Error Functions"
+        ],
       formulas: ["回归：平方误差公式", "二分类：交叉熵公式", "多分类：Softmax 交叉熵公式"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

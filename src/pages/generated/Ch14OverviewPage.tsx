@@ -69,7 +69,10 @@ export default function Ch14OverviewPage() {
       bishopMapping={{
         chapter: "Ch 17",
         pages: "Ch 17",
-        textbookSubsections: ["17.1 Adversarial Training", "17.2 Image GANs"],
+        textbookSubsections: [
+          "17.1 Adversarial Training",
+          "17.2 Image GANs"
+        ],
         algorithms: ["GAN"],
         exercises: ["说明 GAN 为何是隐式生成模型。", "列举 GAN 训练中的三种常见困难。"],
       }}

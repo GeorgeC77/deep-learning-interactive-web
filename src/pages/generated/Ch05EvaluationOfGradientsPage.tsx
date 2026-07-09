@@ -76,7 +76,9 @@ export default function Ch05EvaluationOfGradientsPage() {
         chapter: "Ch 8",
         section: "8.1",
         pages: "Ch 8",
-        textbookSubsections: ["8.1 Evaluation of Gradients"],
+        textbookSubsections: [
+          "8.1 Evaluation of Gradients"
+        ],
         formulas: ["链式法则", "反向传播递推"],
         exercises: ["手推两层网络的反向传播梯度。", "比较反向传播与数值差分的计算复杂度。"],
       }}

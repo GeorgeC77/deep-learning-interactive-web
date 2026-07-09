@@ -74,7 +74,10 @@ export default function Ch16OverviewPage() {
       bishopMapping={{
         chapter: "Ch 19",
         pages: "Ch 19",
-        textbookSubsections: ["19.1 Deterministic Autoencoders", "19.2 Variational Autoencoders"],
+        textbookSubsections: [
+          "19.1 Deterministic Autoencoders",
+          "19.2 Variational Autoencoders"
+        ],
         algorithms: ["编码器-解码器结构"],
         exercises: ["列出三种防止自编码器学到恒等映射的方法。", "比较自编码器与 PCA 在降维上的异同。"],
       }}

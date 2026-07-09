@@ -75,8 +75,17 @@ export default function Ch16DeterministicAutoencodersPage() {
         chapter: "Ch 19",
         section: "19.1",
         pages: "Ch 19",
-        textbookSubsections: ["19.1.1 Linear autoencoders", "19.1.2 Deep autoencoders", "19.1.3 Sparse autoencoders", "19.1.4 Denoising autoencoders", "19.1.5 Masked autoencoders"],
-        supplementalTopics: ["deep autoencoders as nonlinear PCA", "MAE pre-training"],
+        textbookSubsections: [
+          "19.1.1 Linear autoencoders",
+          "19.1.2 Deep autoencoders",
+          "19.1.3 Sparse autoencoders",
+          "19.1.4 Denoising autoencoders",
+          "19.1.5 Masked autoencoders"
+        ],
+        supplementalTopics: [
+          "deep autoencoders as nonlinear PCA",
+          "MAE pre-training"
+        ],
         formulas: ["重构误差", "稀疏惩罚", "去噪目标"],
         algorithms: ["线性自编码器", "深层自编码器", "稀疏自编码器", "去噪自编码器", "MAE"],
         exercises: ["证明线性自编码器与 PCA 的关系。", "比较去噪自编码器与 MAE 的损坏方式差异。"],

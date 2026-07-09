@@ -77,8 +77,13 @@ export default function Ch17GuidedDiffusionPage() {
         chapter: "Ch 20",
         section: "20.4",
         pages: "Ch 20",
-        textbookSubsections: ["20.4.1 Classifier guidance", "20.4.2 Classifier-free guidance"],
-        supplementalTopics: ["guidance strength trade-off"],
+        textbookSubsections: [
+          "20.4.1 Classifier guidance",
+          "20.4.2 Classifier-free guidance"
+        ],
+        supplementalTopics: [
+          "guidance strength trade-off"
+        ],
         formulas: ["分类器引导", "无分类器引导公式"],
         algorithms: ["Classifier guidance", "Classifier-free guidance"],
         exercises: ["比较两种引导方式对多样性的影响。", "推导无分类器引导公式在 w=1 时的退化形式。"],

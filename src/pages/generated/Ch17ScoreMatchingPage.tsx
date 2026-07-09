@@ -81,8 +81,16 @@ export default function Ch17ScoreMatchingPage() {
         chapter: "Ch 20",
         section: "20.3",
         pages: "Ch 20",
-        textbookSubsections: ["20.3.1 Score loss function", "20.3.2 Modified score loss", "20.3.3 Noise variance", "20.3.4 Stochastic differential equations"],
-        supplementalTopics: ["Connection to diffusion noise prediction", "annealed Langevin dynamics"],
+        textbookSubsections: [
+          "20.3.1 Score loss function",
+          "20.3.2 Modified score loss",
+          "20.3.3 Noise variance",
+          "20.3.4 Stochastic differential equations"
+        ],
+        supplementalTopics: [
+          "Connection to diffusion noise prediction",
+          "annealed Langevin dynamics"
+        ],
         formulas: ["s(x)=∇ln p(x)", "∇_{z_t} ln q(z_t) ≈ -ε_w/√(1-ᾱ_t)"],
         algorithms: ["去噪分数匹配"],
         exercises: ["推导高斯分布的分数函数。", "说明扩散噪声预测损失为何等价于去噪分数匹配。"],

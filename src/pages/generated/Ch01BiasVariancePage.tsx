@@ -73,7 +73,9 @@ export default function Ch01BiasVariancePage() {
         chapter: "Ch 4",
         section: "4.3",
         pages: "Ch 4",
-        textbookSubsections: ["4.3 The Bias-Variance Decomposition"],
+        textbookSubsections: [
+          "4.3 The Bias–Variance Trade-off"
+        ],
         formulas: ["Bias-Variance decomposition"],
         exercises: ["用多项式回归实验观察不同次数下的偏差与方差变化。"],
       }}

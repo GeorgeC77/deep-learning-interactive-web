@@ -55,7 +55,7 @@ export default function AppendixCOverviewPage() {
       bishopMapping={{
       chapter: "Appendix C",
       pages: "Appendix C",
-      textbookSubsections: ["拉格朗日函数", "KKT 条件", "约束优化示例"],
+      textbookSubsections: [],
       formulas: ["拉格朗日函数公式"],
       algorithms: ["约束优化示例"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]

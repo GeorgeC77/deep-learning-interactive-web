@@ -56,7 +56,9 @@ export default function Ch07StyleTransferPage() {
       chapter: "Ch 10",
       section: "10.6",
       pages: "Ch 10",
-      textbookSubsections: ["10.6.1 内容表示", "10.6.2 风格表示", "10.6.3 优化目标"],
+      textbookSubsections: [
+          "10.6 Style Transfer"
+        ],
       formulas: ["风格表示公式"],
       algorithms: ["优化目标"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]

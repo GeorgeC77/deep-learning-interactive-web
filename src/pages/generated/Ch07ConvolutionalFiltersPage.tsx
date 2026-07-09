@@ -73,7 +73,9 @@ export default function Ch07ConvolutionalFiltersPage() {
         chapter: "Ch 10",
         section: "10.2",
         pages: "Ch 10",
-        textbookSubsections: ["10.2.1 Convolutional layers", "10.2.2 Padding and stride", "10.2.3 Pooling"],
+        textbookSubsections: [
+          "10.2 Convolutional Filters"
+        ],
         formulas: ["输出尺寸 O = ⌊(I+2P-K)/S⌋+1", "same convolution 条件"],
         algorithms: ["二维离散卷积", "最大/平均池化"],
         exercises: ["给定 VGG 某层 I=224, K=3, P=1, S=1，逐层推导尺寸变化。", "对比 valid 与 same 在边界像素上的差异。"],

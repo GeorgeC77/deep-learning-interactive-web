@@ -77,8 +77,15 @@ export default function Ch15ContinuousFlowsPage() {
         chapter: "Ch 18",
         section: "18.3",
         pages: "Ch 18",
-        textbookSubsections: ["18.3.1 Neural differential equations", "18.3.2 Neural ODE backpropagation", "18.3.3 Neural ODE flows"],
-        supplementalTopics: ["FFJORD", "Hutchinson trace estimator"],
+        textbookSubsections: [
+          "18.3.1 Neural differential equations",
+          "18.3.2 Neural ODE backpropagation",
+          "18.3.3 Neural ODE flows"
+        ],
+        supplementalTopics: [
+          "FFJORD",
+          "Hutchinson trace estimator"
+        ],
         formulas: ["dh/dt=f(h,t,θ)", "d/dt ln p(h)=-tr(∂f/∂h)"],
         algorithms: ["Neural ODE", "Adjoint sensitivity", "FFJORD"],
         exercises: ["解释为什么 d/dt ln p 等于负散度。", "比较 FFJORD 与离散流在计算 Jacobian 上的复杂度差异。"],

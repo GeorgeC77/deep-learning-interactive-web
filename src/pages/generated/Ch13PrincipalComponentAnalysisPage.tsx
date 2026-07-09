@@ -72,7 +72,14 @@ export default function Ch13PrincipalComponentAnalysisPage() {
         chapter: "Ch 16",
         section: "16.1",
         pages: "Ch 16",
-        textbookSubsections: ["16.1 Principal Component Analysis", "16.1.1 Maximum variance formulation", "16.1.2 Minimum-error formulation", "16.1.3 Data compression", "16.1.4 Data whitening", "16.1.5 High-dimensional data"],
+        textbookSubsections: [
+          "16.1 Principal Component Analysis",
+          "16.1.1 Maximum variance formulation",
+          "16.1.2 Minimum-error formulation",
+          "16.1.3 Data compression",
+          "16.1.4 Data whitening",
+          "16.1.5 High-dimensional data"
+        ],
         formulas: ["S u_i = λ_i u_i", "J_M = Σ_{i>M} λ_i"],
         exercises: ["证明最大方差方向与最小重构误差方向一致。", "对二维相关高斯数据计算主成分。"],
       }}

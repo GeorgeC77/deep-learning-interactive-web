@@ -78,10 +78,18 @@ export default function Ch14AdversarialTrainingPage() {
         chapter: "Ch 17",
         section: "17.1",
         pages: "Ch 17",
-        textbookSubsections: ["17.1.1 Loss function", "17.1.2 GAN training in practice"],
-        supplementalTopics: ["label smoothing", "gradient penalty", "training heuristics"],
-        formulas: ["极小极大损失", "非饱和损失", "D*(x)"],
-        algorithms: ["GAN 训练", "交替梯度更新"],
+        textbookSubsections: [
+          "17.1.1 Loss function",
+          "17.1.2 GAN training in practice"
+        ],
+        supplementalTopics: [
+          "non-saturating generator loss",
+          "label smoothing",
+          "instance noise",
+          "gradient penalty"
+        ],
+        formulas: ["minimax loss", "non-saturating loss"],
+        algorithms: ["GAN training"],
         exercises: ["推导固定 G 时最优判别器 D*(x)。", "比较原始损失与非饱和损失的梯度行为。"],
       }}
       demo={{

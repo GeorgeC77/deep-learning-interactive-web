@@ -56,7 +56,9 @@ export default function Ch08GraphicalModelsPage() {
       chapter: "Ch 11",
       section: "11.1",
       pages: "Ch 11",
-      textbookSubsections: ["11.1.1 贝叶斯网络", "11.1.2 离散与高斯变量", "11.1.3 贝叶斯定理在图中的应用"],
+      textbookSubsections: [
+          "11.1 Graphical Models"
+        ],
       formulas: ["贝叶斯网络公式"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

@@ -85,7 +85,15 @@ export default function Ch13ProbabilisticLatentVariablesPage() {
         chapter: "Ch 16",
         section: "16.2",
         pages: "Ch 16",
-        textbookSubsections: ["16.2 Probabilistic Latent Variables", "16.2.1 Generative model", "16.2.2 Likelihood function", "16.2.3 Maximum likelihood", "16.2.4 Factor analysis", "16.2.5 Independent component analysis", "16.2.6 Kalman filters"],
+        textbookSubsections: [
+          "16.2 Probabilistic Latent Variables",
+          "16.2.1 Generative model",
+          "16.2.2 Likelihood function",
+          "16.2.3 Maximum likelihood",
+          "16.2.4 Factor analysis",
+          "16.2.5 Independent component analysis",
+          "16.2.6 Kalman filters"
+        ],
         formulas: ["p(x)=∫p(x|z)p(z)dz", "因子分析模型"],
         algorithms: ["EM 算法", "因子分析", "ICA"],
         exercises: ["推导线性高斯隐变量模型的边缘分布。", "比较因子分析与概率 PCA 的噪声假设。"],

@@ -56,7 +56,9 @@ export default function Ch04ConvergencePage() {
       chapter: "Ch 7",
       section: "7.3",
       pages: "Ch 7",
-      textbookSubsections: ["7.3.1 动量法", "7.3.2 RMSProp / Adam", "7.3.3 学习率衰减"],
+      textbookSubsections: [
+          "7.3 Convergence"
+        ],
       formulas: ["动量法公式"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

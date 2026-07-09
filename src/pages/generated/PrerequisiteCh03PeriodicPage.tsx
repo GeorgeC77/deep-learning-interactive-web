@@ -72,7 +72,10 @@ export default function PrerequisiteCh03PeriodicPage() {
         chapter: "Ch 3",
         section: "3.3",
         pages: "Ch 3",
-        textbookSubsections: ["3.3 Periodic Variables", "3.3.1 Von Mises distribution"],
+        textbookSubsections: [
+          "3.3 Periodic Variables",
+          "3.3.1 Von Mises distribution"
+        ],
         formulas: ["Von Mises 分布公式"],
         algorithms: ["圆周均值计算"],
         exercises: ["推导 Von Mises 在 m 很大时的高斯近似。", "用复指数计算一组角度的圆周均值。"],

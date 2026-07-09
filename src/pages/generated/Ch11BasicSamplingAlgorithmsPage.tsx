@@ -74,7 +74,14 @@ export default function Ch11BasicSamplingAlgorithmsPage() {
         chapter: "Ch 14",
         section: "14.1",
         pages: "Ch 14",
-        textbookSubsections: ["14.1.1 Expectations", "14.1.2 Standard distributions", "14.1.3 Rejection sampling", "14.1.4 Adaptive rejection sampling", "14.1.5 Importance sampling", "14.1.6 Sampling-importance-resampling"],
+        textbookSubsections: [
+          "14.1.1 Expectations",
+          "14.1.2 Standard distributions",
+          "14.1.3 Rejection sampling",
+          "14.1.4 Adaptive rejection sampling",
+          "14.1.5 Importance sampling",
+          "14.1.6 Sampling-importance-resampling"
+        ],
         formulas: ["逆变换 X=F⁻¹(U)", "重要性采样 E_p[f]=E_q[f·p/q]", "自归一化权重"],
         algorithms: ["逆变换采样", "拒绝采样", "重要性采样", "SIR"],
         exercises: ["推导 p=N(0,1), q=N(μ,1) 时 w(0) 的表达式。", "用 demo 观察 ESS 随 μ 远离 0 的变化。"],

@@ -56,7 +56,9 @@ export default function Ch02DiscriminantFunctionsPage() {
       chapter: "Ch 5",
       section: "5.1",
       pages: "Ch 5",
-      textbookSubsections: ["5.1.1 二分类判别函数", "5.1.2 多类判别函数", "5.1.3 最小二乘分类"],
+      textbookSubsections: [
+          "5.1 Discriminant Functions"
+        ],
       formulas: ["二分类判别函数公式"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

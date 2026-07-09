@@ -56,7 +56,9 @@ export default function Ch03MixtureDensityNetworksPage() {
       chapter: "Ch 6",
       section: "6.5",
       pages: "Ch 6",
-      textbookSubsections: ["6.5.1 条件混合分布", "6.5.2 机器人运动学示例", "6.5.3 似然训练"],
+      textbookSubsections: [
+          "6.5 Mixture Density Networks"
+        ],
       formulas: ["条件混合分布公式"],
       algorithms: ["似然训练"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]

@@ -56,7 +56,9 @@ export default function Ch04ErrorSurfacesPage() {
       chapter: "Ch 7",
       section: "7.1",
       pages: "Ch 7",
-      textbookSubsections: ["7.1.1 局部二次近似", "7.1.2 Hessian 与曲率", "7.1.3 鞍点与 plateau"],
+      textbookSubsections: [
+          "7.1 Error Surfaces"
+        ],
       formulas: ["局部二次近似公式"],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}

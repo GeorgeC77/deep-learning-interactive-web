@@ -72,7 +72,10 @@ export default function Ch07ImageSegmentationPage() {
         chapter: "Ch 10",
         section: "10.5",
         pages: "Ch 10",
-        textbookSubsections: ["10.5.1 Convolutional segmentation", "10.5.2 Upsampling", "10.5.3 Fully convolutional networks", "10.5.4 U-Net"],
+        textbookSubsections: [
+          "10.5.1 Convolutional segmentation",
+          "10.5.3 Fully convolutional networks"
+        ],
         formulas: ["卷积输出尺寸公式", "上采样分辨率关系"],
         algorithms: ["全卷积网络 FCN", "U-Net 编码器-解码器"],
         exercises: ["画出 U-Net 的结构框图并标注 skip connection。", "用不同输入尺寸测试 FCN 输出尺寸。"],

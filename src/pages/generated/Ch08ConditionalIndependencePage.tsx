@@ -55,7 +55,9 @@ export default function Ch08ConditionalIndependencePage() {
       chapter: "Ch 11",
       section: "11.2",
       pages: "Ch 11",
-      textbookSubsections: ["11.2.1 三种基本结构", "11.2.2 解释消除", "11.2.3 d-分离"],
+      textbookSubsections: [
+          "11.2 Conditional Independence"
+        ],
       exercises: ["写出本节一个核心公式的具体形式并解释每个符号。", "用一个小例子验证本节概念或数值结论。", "比较本节结论与前面一节结论的适用场景差异。"]
     }}
 

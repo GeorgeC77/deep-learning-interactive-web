@@ -76,7 +76,13 @@ export default function Ch13NonlinearLatentVariableModelsPage() {
         chapter: "Ch 16",
         section: "16.4",
         pages: "Ch 16",
-        textbookSubsections: ["16.4 Nonlinear Latent Variable Models", "16.4.1 Nonlinear manifolds", "16.4.2 Likelihood function", "16.4.3 Discrete data", "16.4.4 Four approaches to generative modelling"],
+        textbookSubsections: [
+          "16.4 Nonlinear Latent Variable Models",
+          "16.4.1 Nonlinear manifolds",
+          "16.4.2 Likelihood function",
+          "16.4.3 Discrete data",
+          "16.4.4 Four approaches to generative modelling"
+        ],
         formulas: ["p(x)=∫p(x|z)p(z)dz"],
         algorithms: ["VAE", "GAN", "Normalizing Flows", "Autoregressive models"],
         exercises: ["比较四类生成模型的似然可计算性。", "说明离散观测下解码器分布的选择。"],
