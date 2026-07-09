@@ -20,8 +20,25 @@ export default function Ch08GraphicalModelsPage() {
     {
       title: "贝叶斯定理在图中的应用",
       description: "观测某些节点后，依赖关系沿活跃路径传播并更新其他节点后验。",
-    }
-      ]}
+    },
+      
+    {
+      title: "Directed graphs",
+      description: "介绍 Directed graphs 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Factorization",
+      description: "介绍 Factorization 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Discrete variables",
+      description: "介绍 Discrete variables 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Gaussian variables",
+      description: "介绍 Gaussian variables 的定义、关键公式与典型应用场景。",
+    },
+  ]}
       learningObjectives={[
       "理解 贝叶斯网络 的含义与作用。",
       "理解 离散与高斯变量 的含义与作用。",
@@ -29,8 +46,8 @@ export default function Ch08GraphicalModelsPage() {
     ]}
       coreIntuition={"图模型用节点表示随机变量、边表示依赖；有向图的因子分解直观编码变量间的生成关系。"}
       commonMistakes={[
-      "混淆本节核心概念与相邻小节的前提假设，导致错误套用。",
-      "只记忆公式形式，而不验证其成立条件与具体数值。"
+      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
+      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
     ]}
       quiz={[
       {
@@ -46,7 +63,7 @@ export default function Ch08GraphicalModelsPage() {
         explanation: "正确。离散与高斯变量 的有效性依赖于特定假设，忽略前提会导致错误结论。",
       },
       {
-        question: "在一个具体情境中，你发现“贝叶斯定理在图中的应用”的结果违背直觉，应优先排查哪些前提假设？",
+        question: "在一个具体情境中，你发现“贝叶斯定理在图中的应用”的结果与预期不符，应优先排查哪些前提？",
         options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
         correctIndex: 0,
         explanation: "正确。贝叶斯定理在图中的应用 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
@@ -57,10 +74,17 @@ export default function Ch08GraphicalModelsPage() {
       section: "11.1",
       pages: "Ch 11",
       textbookSubsections: [
-          "11.1 Graphical Models"
+          "11.1 Graphical Models",
+          "11.1.1 Directed graphs",
+          "11.1.2 Factorization",
+          "11.1.3 Discrete variables",
+          "11.1.4 Gaussian variables",
+          "11.1.5 Binary classifier",
+          "11.1.6 Parameters and observations",
+          "11.1.7 Bayes' theorem"
         ],
       formulas: ["贝叶斯网络公式"],
-      exercises: ["推导本节核心公式的展开形式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "对比本节结论与先前章节结论的适用条件差异。"]
+      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
     }}
           demo={{
       title: "链式联合分布分解",

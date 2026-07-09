@@ -74,7 +74,9 @@ export default function Ch07ImageSegmentationPage() {
         pages: "Ch 10",
         textbookSubsections: [
           "10.5.1 Convolutional segmentation",
-          "10.5.3 Fully convolutional networks"
+          "10.5.3 Fully convolutional networks",
+          "10.5.2 Up-sampling",
+          "10.5.4 The U-net architecture"
         ],
         formulas: ["卷积输出尺寸公式", "上采样分辨率关系"],
         algorithms: ["全卷积网络 FCN", "U-Net 编码器-解码器"],

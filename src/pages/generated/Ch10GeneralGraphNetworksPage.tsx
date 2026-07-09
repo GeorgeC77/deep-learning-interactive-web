@@ -25,7 +25,16 @@ export default function Ch10GeneralGraphNetworksPage() {
           title: "几何深度学习",
           description: "在具有几何结构的数据上引入等变约束，如 E(n)-等变图神经网络。",
         },
-      ]}
+      
+    {
+      title: "Graph attention networks",
+      description: "介绍 Graph attention networks 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Edge embeddings",
+      description: "介绍 Edge embeddings 的定义、关键公式与典型应用场景。",
+    },
+  ]}
       learningObjectives={[
         "理解通用图网络中节点、边、全局三层更新的交互。",
         "能说明 GAT 与 GCN 在聚合权重上的区别。",
@@ -72,7 +81,12 @@ export default function Ch10GeneralGraphNetworksPage() {
         section: "13.3",
         pages: "Ch 13",
         textbookSubsections: [
-          "13.3.4 Over-smoothing"
+          "13.3.4 Over-smoothing",
+          "13.3.1 Graph attention networks",
+          "13.3.2 Edge embeddings",
+          "13.3.3 Graph embeddings",
+          "13.3.5 Regularization",
+          "13.3.6 Geometric deep learning"
         ],
         formulas: ["GAT 注意力系数 α_uv"],
         algorithms: ["通用图网络 GN block", "GAT"],

@@ -22,6 +22,14 @@ const TEMPLATE_REGEXES: RegExp[] = [
   /比较本节.*前面.*结论/,
   /把不同小节的概念混为一谈/,
   /只看公式形式而不验证/,
+  /忽略其中某一项/,
+  /违背直觉/,
+  /推导本节/,
+  /验证本节概念/,
+  /对比本节结论/,
+  /先前章节结论/,
+  /相邻小节的前提假设/,
+  /只记忆公式形式/,
 ];
 
 const WRONG_FORMULA_REGEXES = [
@@ -104,30 +112,18 @@ function hasTemplatePhrase(s: string): string | null {
 // ---------- Build allowed subsection set ----------
 const allowedSubsections = new Set<string>(officialSubsections);
 
-// Manual overrides for routes that must cover specific leaf subsections.
-const expectedSubsectionsByRoute: Record<string, string[]> = {
-  '/ch10/machine-learning-on-graphs': [
-    '13.1.1 Graph properties',
-    '13.1.2 Adjacency matrix',
-    '13.1.3 Permutation equivariance',
-  ],
-  '/ch07/object-detection': [
-    '10.4.1 Bounding boxes',
-    '10.4.2 Intersection-over-union',
-    '10.4.3 Sliding windows',
-    '10.4.4 Detection across scales',
-    '10.4.5 Non-max suppression',
-    '10.4.6 Fast region CNNs',
-  ],
-  '/ch11/basic-sampling-algorithms': [
-    '14.1.1 Expectations',
-    '14.1.2 Standard distributions',
-    '14.1.3 Rejection sampling',
-    '14.1.4 Adaptive rejection sampling',
-    '14.1.5 Importance sampling',
-    '14.1.6 Sampling-importance-resampling',
-  ],
-};
+// Automatically infer expected leaf subsections for each route from coverage_matrix.json.
+const expectedSubsectionsByRoute: Record<string, string[]> = {};
+for (const entry of coverageMatrix) {
+  const section = entry.bishopSection;
+  if (!section) continue;
+  const leaves = officialSubsections.filter(
+    (s) => s.startsWith(section) && s !== section && /^\d+\.\d+\.\d+/.test(s)
+  );
+  if (leaves.length > 0) {
+    expectedSubsectionsByRoute[entry.routePath] = leaves;
+  }
+}
 
 // Legacy overview routes that are allowed to remain non-generated for now.
 const legacyOverviewAllowed = new Set<string>([
@@ -317,6 +313,19 @@ for (const file of generatedFiles) {
   if (learningObjectivesBlock) {
     const strings = extractQuotedStrings(learningObjectivesBlock);
     checkStringsForTemplates(strings, 'learningObjectives');
+  }
+
+  const coreIntuitionMatch = text.match(/coreIntuition=\{"((?:\\.|[^"\\])*)"\}/);
+  if (coreIntuitionMatch) {
+    const phrase = hasTemplatePhrase(coreIntuitionMatch[1]);
+    if (phrase) {
+      templateRows.push({
+        componentFile: `src/pages/generated/${file}`,
+        routePath,
+        phrase,
+        context: `[coreIntuition] ${coreIntuitionMatch[1].slice(0, 120)}`,
+      });
+    }
   }
 
   // Heuristic for extra parentheses in GAN loss strings.

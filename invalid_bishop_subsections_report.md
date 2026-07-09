@@ -1,6 +1,6 @@
 # Invalid Bishop Subsections Report
 
-Generated: 2026-07-09T05:12:22.364Z
+Generated: 2026-07-09T10:28:29.849Z
 
 The following `textbookSubsections` entries are not in the allowed Bishop list.
 Supplemental material should be moved to `supplementalTopics`.

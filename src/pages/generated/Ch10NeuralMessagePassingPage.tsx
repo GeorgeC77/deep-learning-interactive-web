@@ -34,7 +34,16 @@ export default function Ch10NeuralMessagePassingPage() {
           description: "谱域图卷积的一阶近似，用归一化邻接矩阵聚合邻居特征。",
           formula: String.raw`H^{(l+1)} = \sigma\left(\tilde{D}^{-1/2} \tilde{A} \tilde{D}^{-1/2} H^{(l)} W^{(l)}\right)`,
         },
-      ]}
+      
+    {
+      title: "Convolutional filters",
+      description: "介绍 Convolutional filters 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Graph convolutional networks",
+      description: "介绍 Graph convolutional networks 的定义、关键公式与典型应用场景。",
+    },
+  ]}
       learningObjectives={[
         "能写出消息传递的 message → aggregate → update → readout 流程。",
         "理解聚合函数的置换不变性与节点表示的置换等变性。",
@@ -81,7 +90,14 @@ export default function Ch10NeuralMessagePassingPage() {
         section: "13.2",
         pages: "Ch 13",
         textbookSubsections: [
-          "13.2 Neural Message-Passing"
+          "13.2 Neural Message-Passing",
+          "13.2.1 Convolutional filters",
+          "13.2.2 Graph convolutional networks",
+          "13.2.3 Aggregation operators",
+          "13.2.4 Update operators",
+          "13.2.5 Node classification",
+          "13.2.6 Edge classification",
+          "13.2.7 Graph classification"
         ],
         formulas: ["消息函数 m_uv=φ(h_u,h_v,e_uv)", "聚合 a_v=⊕ m_uv", "GCN 更新"],
         algorithms: ["消息传递神经网络 MPNN", "图卷积网络 GCN"],

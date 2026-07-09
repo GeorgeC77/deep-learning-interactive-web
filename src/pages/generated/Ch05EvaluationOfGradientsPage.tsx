@@ -25,7 +25,16 @@ export default function Ch05EvaluationOfGradientsPage() {
           title: "计算复杂度",
           description: "反向传播的计算量与前向传播同阶，避免了逐参数数值差分的高昂代价。",
         },
-      ]}
+      
+    {
+      title: "Single-layer networks",
+      description: "介绍 Single-layer networks 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "General feed-forward networks",
+      description: "介绍 General feed-forward networks 的定义、关键公式与典型应用场景。",
+    },
+  ]}
       learningObjectives={[
         "理解链式法则在多层网络中的应用。",
         "能说明前向传播与反向传播各自保存/计算什么。",
@@ -77,7 +86,13 @@ export default function Ch05EvaluationOfGradientsPage() {
         section: "8.1",
         pages: "Ch 8",
         textbookSubsections: [
-          "8.1 Evaluation of Gradients"
+          "8.1 Evaluation of Gradients",
+          "8.1.1 Single-layer networks",
+          "8.1.2 General feed-forward networks",
+          "8.1.3 A simple example",
+          "8.1.4 Numerical differentiation",
+          "8.1.5 The Jacobian matrix",
+          "8.1.6 The Hessian matrix"
         ],
         formulas: ["链式法则", "反向传播递推"],
         exercises: ["手推两层网络的反向传播梯度。", "比较反向传播与数值差分的计算复杂度。"],

@@ -19,8 +19,17 @@ export default function Ch07VisualizingTrainedCnnsPage() {
     {
       title: "对抗样本",
       description: "对人眼不可察觉的扰动可导致网络高置信度错误分类。",
-    }
-      ]}
+    },
+      
+    {
+      title: "Visual cortex",
+      description: "介绍 Visual cortex 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Visualizing trained filters",
+      description: "介绍 Visualizing trained filters 的定义、关键公式与典型应用场景。",
+    },
+  ]}
       learningObjectives={[
       "理解 滤波器可视化 的含义与作用。",
       "理解 显著性图 的含义与作用。",
@@ -28,8 +37,8 @@ export default function Ch07VisualizingTrainedCnnsPage() {
     ]}
       coreIntuition={"可视化帮助理解 CNN 学到了什么：从低层滤波器到类激活图、显著性图与对抗样本。"}
       commonMistakes={[
-      "混淆本节核心概念与相邻小节的前提假设，导致错误套用。",
-      "只记忆公式形式，而不验证其成立条件与具体数值。"
+      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
+      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
     ]}
       quiz={[
       {
@@ -45,7 +54,7 @@ export default function Ch07VisualizingTrainedCnnsPage() {
         explanation: "正确。显著性图 的有效性依赖于特定假设，忽略前提会导致错误结论。",
       },
       {
-        question: "在一个具体情境中，你发现“对抗样本”的结果违背直觉，应优先排查哪些前提假设？",
+        question: "在一个具体情境中，你发现“对抗样本”的结果与预期不符，应优先排查哪些前提？",
         options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
         correctIndex: 0,
         explanation: "正确。对抗样本 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
@@ -56,9 +65,14 @@ export default function Ch07VisualizingTrainedCnnsPage() {
       section: "10.3",
       pages: "Ch 10",
       textbookSubsections: [
-          "10.3 Visualizing Trained CNNs"
+          "10.3 Visualizing Trained CNNs",
+          "10.3.1 Visual cortex",
+          "10.3.2 Visualizing trained filters",
+          "10.3.3 Saliency maps",
+          "10.3.4 Adversarial attacks",
+          "10.3.5 Synthetic images"
         ],
-      exercises: ["推导本节核心公式的展开形式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "对比本节结论与先前章节结论的适用条件差异。"]
+      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
     }}
 
     />

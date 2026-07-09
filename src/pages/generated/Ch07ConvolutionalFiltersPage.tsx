@@ -27,7 +27,24 @@ export default function Ch07ConvolutionalFiltersPage() {
           description: "选择 P 使得输出尺寸与输入尺寸相同；常见实现取 P = (K-1)/2（当 S=1 且 K 为奇数）。",
           formula: String.raw`O = I \quad \Longleftrightarrow \quad P = \frac{K-1}{2} \; (K \text{ 奇}, S=1)`,
         },
-      ]}
+      
+    {
+      title: "Feature detectors",
+      description: "介绍 Feature detectors 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Translation equivariance",
+      description: "介绍 Translation equivariance 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Padding",
+      description: "介绍 Padding 的定义、关键公式与典型应用场景。",
+    },
+    {
+      title: "Strided convolutions",
+      description: "介绍 Strided convolutions 的定义、关键公式与典型应用场景。",
+    },
+  ]}
       learningObjectives={[
         "理解卷积的平移等变性与权重共享。",
         "能够根据 I、K、P、S 计算输出尺寸。",
@@ -74,7 +91,15 @@ export default function Ch07ConvolutionalFiltersPage() {
         section: "10.2",
         pages: "Ch 10",
         textbookSubsections: [
-          "10.2 Convolutional Filters"
+          "10.2 Convolutional Filters",
+          "10.2.1 Feature detectors",
+          "10.2.2 Translation equivariance",
+          "10.2.3 Padding",
+          "10.2.4 Strided convolutions",
+          "10.2.5 Multi-dimensional convolutions",
+          "10.2.6 Pooling",
+          "10.2.7 Multilayer convolutions",
+          "10.2.8 Example network architectures"
         ],
         formulas: ["输出尺寸 O = ⌊(I+2P-K)/S⌋+1", "same convolution 条件"],
         algorithms: ["二维离散卷积", "最大/平均池化"],

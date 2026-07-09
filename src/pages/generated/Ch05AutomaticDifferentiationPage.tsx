@@ -28,8 +28,8 @@ export default function Ch05AutomaticDifferentiationPage() {
     ]}
       coreIntuition={"自动微分将复杂函数拆分为基本运算，通过反向模式在计算图上机械地传播梯度，是现代框架的核心。"}
       commonMistakes={[
-      "混淆本节核心概念与相邻小节的前提假设，导致错误套用。",
-      "只记忆公式形式，而不验证其成立条件与具体数值。"
+      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
+      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
     ]}
       quiz={[
       {
@@ -45,7 +45,7 @@ export default function Ch05AutomaticDifferentiationPage() {
         explanation: "正确。前向模式 的有效性依赖于特定假设，忽略前提会导致错误结论。",
       },
       {
-        question: "在一个具体情境中，你发现“计算图与拓扑序”的结果违背直觉，应优先排查哪些前提假设？",
+        question: "在一个具体情境中，你发现“计算图与拓扑序”的结果与预期不符，应优先排查哪些前提？",
         options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
         correctIndex: 0,
         explanation: "正确。计算图与拓扑序 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
@@ -56,9 +56,11 @@ export default function Ch05AutomaticDifferentiationPage() {
       section: "8.2",
       pages: "Ch 8",
       textbookSubsections: [
-          "8.2 Automatic Differentiation"
+          "8.2 Automatic Differentiation",
+          "8.2.1 Forward-mode automatic differentiation",
+          "8.2.2 Reverse-mode automatic differentiation"
         ],
-      exercises: ["推导本节核心公式的展开形式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "对比本节结论与先前章节结论的适用条件差异。"]
+      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
     }}
           demo={{
       title: "自动微分示例 f(x)=x²",

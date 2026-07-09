@@ -28,8 +28,8 @@ export default function Ch08SequenceModelsPage() {
     ]}
       coreIntuition={"序列模型捕捉时间或顺序上的依赖；隐马尔可夫模型与线性动态系统是经典代表，现代则由 RNN 与 Transformer 扩展。"}
       commonMistakes={[
-      "混淆本节核心概念与相邻小节的前提假设，导致错误套用。",
-      "只记忆公式形式，而不验证其成立条件与具体数值。"
+      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
+      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
     ]}
       quiz={[
       {
@@ -45,7 +45,7 @@ export default function Ch08SequenceModelsPage() {
         explanation: "正确。隐变量 的有效性依赖于特定假设，忽略前提会导致错误结论。",
       },
       {
-        question: "在一个具体情境中，你发现“前向-后向算法”的结果违背直觉，应优先排查哪些前提假设？",
+        question: "在一个具体情境中，你发现“前向-后向算法”的结果与预期不符，应优先排查哪些前提？",
         options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
         correctIndex: 0,
         explanation: "正确。前向-后向算法 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
@@ -56,10 +56,11 @@ export default function Ch08SequenceModelsPage() {
       section: "11.3",
       pages: "Ch 11",
       textbookSubsections: [
-          "11.3 Sequence Models"
+          "11.3 Sequence Models",
+          "11.3.1 Hidden variables"
         ],
       algorithms: ["前向-后向算法"],
-      exercises: ["推导本节核心公式的展开形式并说明每个符号含义。", "用一个小例子验证本节概念或数值结论。", "对比本节结论与先前章节结论的适用条件差异。"]
+      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
     }}
 
     />
