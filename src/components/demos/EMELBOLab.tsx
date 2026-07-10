@@ -61,7 +61,7 @@ function emStep(
 
   // M-step
   const Nk = resp.reduce((sum, r) => { for (let k = 0; k < K; k++) sum[k] += r[k]; return sum; }, Array(K).fill(0));
-  const newMeans: [number, number][] = Array.from({ length: K }, (_, k) => [0, 0]);
+  const newMeans: [number, number][] = Array.from({ length: K }, () => [0, 0]);
   for (let i = 0; i < N; i++) {
     for (let k = 0; k < K; k++) {
       newMeans[k][0] += resp[i][k] * points[i].x / Nk[k];
