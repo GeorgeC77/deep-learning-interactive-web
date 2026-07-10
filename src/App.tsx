@@ -4,14 +4,17 @@ import HomePage from './pages/HomePage';
 import DynamicPlaceholderPage from './pages/DynamicPlaceholderPage';
 
 // Ch 4 (manifest ch01): Single-layer Networks - Regression
-import Chapter01OverviewPage from './pages/chapters/chapter01/OverviewPage';
+import Ch01OverviewPage from './pages/generated/Ch01OverviewPage';
 import Ch01LinearRegressionPage from './pages/generated/Ch01LinearRegressionPage';
+import Ch01DecisionTheoryPage from './pages/generated/Ch01DecisionTheoryPage';
 import Ch01BiasVariancePage from './pages/generated/Ch01BiasVariancePage';
 
 // Ch 5 (manifest ch02): Single-layer Networks - Classification
-import Chapter02OverviewPage from './pages/chapters/chapter02/OverviewPage';
-import Ch02DiscriminativeClassifiersPage from './pages/generated/Ch02DiscriminativeClassifiersPage';
+import Ch02OverviewPage from './pages/generated/Ch02OverviewPage';
+import Ch02DiscriminantFunctionsPage from './pages/generated/Ch02DiscriminantFunctionsPage';
+import Ch02DecisionTheoryPage from './pages/generated/Ch02DecisionTheoryPage';
 import Ch02GenerativeClassifiersPage from './pages/generated/Ch02GenerativeClassifiersPage';
+import Ch02DiscriminativeClassifiersPage from './pages/generated/Ch02DiscriminativeClassifiersPage';
 
 // Ch 6 (manifest ch03): Deep Neural Networks
 import Chapter07OverviewPage from './pages/chapters/chapter07/OverviewPage';
@@ -62,9 +65,6 @@ import PrerequisiteChapter03NonparametricPage from './pages/prerequisite/chapter
 import AppendixAOverviewPage from './pages/generated/AppendixAOverviewPage';
 import AppendixBOverviewPage from './pages/generated/AppendixBOverviewPage';
 import AppendixCOverviewPage from './pages/generated/AppendixCOverviewPage';
-import Ch01DecisionTheoryPage from './pages/generated/Ch01DecisionTheoryPage';
-import Ch02DecisionTheoryPage from './pages/generated/Ch02DecisionTheoryPage';
-import Ch02DiscriminantFunctionsPage from './pages/generated/Ch02DiscriminantFunctionsPage';
 import Ch03ErrorFunctionsPage from './pages/generated/Ch03ErrorFunctionsPage';
 import Ch03MixtureDensityNetworksPage from './pages/generated/Ch03MixtureDensityNetworksPage';
 import Ch04ConvergencePage from './pages/generated/Ch04ConvergencePage';
@@ -128,12 +128,15 @@ import { getAllSections } from './course/manifest';
 
 const sectionComponents: Record<string, React.ComponentType> = {
   // Ch 4 (manifest ch01): Single-layer Networks - Regression
-  '/ch01/overview': Chapter01OverviewPage,
+  '/ch01/overview': Ch01OverviewPage,
   '/ch01/linear-regression': Ch01LinearRegressionPage,
+  '/ch01/decision-theory': Ch01DecisionTheoryPage,
   '/ch01/bias-variance': Ch01BiasVariancePage,
 
   // Ch 5 (manifest ch02): Single-layer Networks - Classification
-  '/ch02/overview': Chapter02OverviewPage,
+  '/ch02/overview': Ch02OverviewPage,
+  '/ch02/discriminant-functions': Ch02DiscriminantFunctionsPage,
+  '/ch02/decision-theory': Ch02DecisionTheoryPage,
   '/ch02/generative-classifiers': Ch02GenerativeClassifiersPage,
   '/ch02/discriminative-classifiers': Ch02DiscriminativeClassifiersPage,
 
@@ -188,9 +191,6 @@ const sectionComponents: Record<string, React.ComponentType> = {
   '/appendix/a/overview': AppendixAOverviewPage,
   '/appendix/b/overview': AppendixBOverviewPage,
   '/appendix/c/overview': AppendixCOverviewPage,
-  '/ch01/decision-theory': Ch01DecisionTheoryPage,
-  '/ch02/decision-theory': Ch02DecisionTheoryPage,
-  '/ch02/discriminant-functions': Ch02DiscriminantFunctionsPage,
   '/ch03/error-functions': Ch03ErrorFunctionsPage,
   '/ch03/mixture-density-networks': Ch03MixtureDensityNetworksPage,
   '/ch04/convergence': Ch04ConvergencePage,

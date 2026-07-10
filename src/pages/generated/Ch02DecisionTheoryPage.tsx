@@ -6,70 +6,86 @@ export default function Ch02DecisionTheoryPage() {
     <BishopSectionPage
       sectionPath="/ch02/decision-theory"
       heroIcon={<Scale className="w-9 h-9 text-blue-600" />}
-      summary={"分类中的决策理论将推断与决策分开：先估计后验概率，再根据损失函数选择最优类别。"}
+      summary={"分类中的决策理论将推断与决策分开：先估计后验概率，再按损失函数选择使期望损失最小的类别；必要时引入拒绝选项以避免高风险决策。"}
       concepts={[
-    {
-      title: "误分类率",
-      description: "选择后验概率最大的类别可最小化误分类率。",
-    },
-    {
-      title: "期望损失",
-      description: "当不同错误代价不同时，需要按损失矩阵加权后验概率。",
-      formula: String.raw`\mathbb{E}[L] = \sum_k L_{kj} \, p(\mathcal{C}_k \mid \mathbf{x})`,
-    },
-    {
-      title: "拒绝选项",
-      description: "当最大后验概率不足够高时，拒绝决策以避免高风险错误。",
-    },
-      
-    {
-      title: "Misclassification rate",
-      description: "介绍 Misclassification rate 的定义、关键公式与典型应用场景。",
-    },
-    {
-      title: "Expected loss",
-      description: "介绍 Expected loss 的定义、关键公式与典型应用场景。",
-    },
-    {
-      title: "The reject option",
-      description: "介绍 The reject option 的定义、关键公式与典型应用场景。",
-    },
-  ]}
+        {
+          title: "Misclassification rate",
+          description: "0-1 损失下的期望错误率；最小化误分类率等价于选择后验概率最大的类别。",
+        },
+        {
+          title: "Expected loss",
+          description: "当不同错误具有不同代价时，需要按损失矩阵对后验概率加权后选择决策。",
+          formula: String.raw`\mathbb{E}[L] = \sum_k \sum_j L_{kj} \, p(\mathcal{C}_k \mid \mathbf{x}) \, \mathbb{I}(\text{decision}=j)`,
+        },
+        {
+          title: "The reject option",
+          description: "当最大后验概率不足够高时拒绝决策，避免在不确定区域做出高代价判断。",
+        },
+        {
+          title: "Inference and decision",
+          description: "生成模型先推断联合分布再决策；判别模型直接学习决策边界；决策理论为二者提供统一框架。",
+        },
+        {
+          title: "Classifier accuracy",
+          description: "正确分类样本所占比例，是最常用的 0-1 损失经验估计。",
+        },
+        {
+          title: "ROC curve",
+          description: "通过变化决策阈值绘制真正例率与假正例率的关系，用于评估分类器在不同代价下的表现。",
+        },
+      ]}
       learningObjectives={[
-      "理解 误分类率 的含义与作用。",
-      "理解 期望损失 的含义与作用。",
-      "理解 拒绝选项 的含义与作用。"
-    ]}
-      coreIntuition={"分类中的决策理论将推断与决策分开：先估计后验概率，再根据损失函数选择最优类别。"}
+        "能写出分类问题中的期望损失表达式。",
+        "理解 0-1 损失下贝叶斯最优决策是最大后验类别。",
+        "能解释拒绝选项的用途与阈值选择。",
+        "会绘制并解读 ROC 曲线。",
+      ]}
+      coreIntuition={"分类决策就像在雾中辨认路标：后验概率告诉你‘它有多像某个路标’，损失矩阵告诉你‘认错路标的代价’，最优决策把两者相乘后选最小。"}
       commonMistakes={[
-      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
-      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
-    ]}
+        "假设所有错误代价相同，忽视损失矩阵对决策边界的影响。",
+        "把高准确率等同于低风险；在类别不平衡或代价不对称时可能误导。",
+        "拒绝选项阈值设置不当：过严导致大量漏判，过松则失去拒绝意义。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“误分类率”的叙述，哪一项最准确？",
-        options: ["选择后验概率最大的类别可最小化误分类率。", "误分类率 只是术语，没有独立建模意义。", "误分类率 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。选择后验概率最大的类别可最小化误分类率。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在“期望损失”的公式中，若省略其中某一项，会对结果产生什么影响？",
-        options: ["得到形式上“简洁”但数值或概率意义错误的结论。", "结果只是略有不精确，不会影响最终决策。", "公式会自动退化为另一种更简单的正确形式。"],
-        correctIndex: 0,
-        explanation: "正确。期望损失 的每一项都有明确的数学或物理意义，随意省略会破坏等式成立的条件。",
-      },
-      {
-        question: "在一个具体情境中，你发现“拒绝选项”的结果与预期不符，应优先排查哪些前提？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。拒绝选项 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "在 0-1 损失下，贝叶斯最优分类决策是什么？",
+          options: [
+            "选择后验概率最大的类别。",
+            "选择先验概率最大的类别。",
+            "随机选择一个类别。",
+            "总是选择训练样本最多的类别。",
+          ],
+          correctIndex: 0,
+          explanation: "0-1 损失下，每类错误代价相同，因此最小化期望损失等价于最大化后验概率。",
+        },
+        {
+          question: "拒绝选项通常在什么情况下使用？",
+          options: [
+            "当最大后验概率低于阈值、模型不确定时。",
+            "当训练准确率已经达到 100% 时。",
+            "当类别完全平衡时。",
+            "当损失矩阵所有元素相等时。",
+          ],
+          correctIndex: 0,
+          explanation: "拒绝选项把困难样本交给人工或其他系统，以降低错误决策的期望代价。",
+        },
+        {
+          question: "ROC 曲线的横轴和纵轴分别是什么？",
+          options: [
+            "假正例率、真正例率",
+            "准确率、召回率",
+            "精确率、召回率",
+            "真正例率、假正例率",
+          ],
+          correctIndex: 0,
+          explanation: "ROC 曲线以 FPR 为横轴、TPR 为纵轴，反映不同阈值下的灵敏度与特异性权衡。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 5",
-      section: "5.2",
-      pages: "Ch 5",
-      textbookSubsections: [
+        chapter: "Ch 5",
+        section: "5.2",
+        pages: "Ch 5",
+        textbookSubsections: [
           "5.2 Decision Theory",
           "5.2.1 Misclassification rate",
           "5.2.2 Expected loss",
@@ -78,10 +94,12 @@ export default function Ch02DecisionTheoryPage() {
           "5.2.5 Classifier accuracy",
           "5.2.6 ROC curve"
         ],
-      formulas: ["期望损失公式"],
-      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
-    }}
-
+        formulas: ["expected loss", "Bayes classifier", "ROC"],
+        exercises: [
+          "给定损失矩阵，手算最优决策。",
+          "绘制不同阈值下的 ROC 曲线并计算 AUC。",
+        ],
+      }}
     />
   );
 }

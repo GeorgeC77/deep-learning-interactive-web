@@ -1,6 +1,6 @@
 # Route Audit Report
 
-Generated: 2026-07-09T10:28:29.848Z
+Generated: 2026-07-09T11:48:58.319Z
 
 | routePath | manifestTitle | componentName | componentFile | usesLegacyComponent | legacyOverviewAllowed | issue |
 |-----------|---------------|---------------|---------------|---------------------|----------------------|-------|
@@ -21,11 +21,11 @@ Generated: 2026-07-09T10:28:29.848Z
 | /prerequisite/ch03/periodic | 3.3 周期变量 | PrerequisiteCh03PeriodicPage | src/pages/generated/PrerequisiteCh03PeriodicPage.tsx | false | false | OK |
 | /prerequisite/ch03/exponential | 3.4 指数族 | PrerequisiteChapter03ExponentialPage | src/pages/prerequisite/chapter03/exponential.tsx | false | false | OK |
 | /prerequisite/ch03/nonparametric | 3.5 非参数方法 | PrerequisiteChapter03NonparametricPage | src/pages/prerequisite/chapter03/nonparametric.tsx | false | false | OK |
-| /ch01/overview | 课程概览 | Chapter01OverviewPage | src/pages/chapters/chapter01/OverviewPage.tsx | true | true | OK (legacy overview allowed) |
+| /ch01/overview | 课程概览 | Ch01OverviewPage | src/pages/generated/Ch01OverviewPage.tsx | false | false | OK |
 | /ch01/linear-regression | 4.1 线性回归 | Ch01LinearRegressionPage | src/pages/generated/Ch01LinearRegressionPage.tsx | false | false | OK |
 | /ch01/decision-theory | 4.2 决策理论 | Ch01DecisionTheoryPage | src/pages/generated/Ch01DecisionTheoryPage.tsx | false | false | OK |
 | /ch01/bias-variance | 4.3 偏差–方差权衡 | Ch01BiasVariancePage | src/pages/generated/Ch01BiasVariancePage.tsx | false | false | OK |
-| /ch02/overview | 课程概览 | Chapter02OverviewPage | src/pages/chapters/chapter02/OverviewPage.tsx | true | true | OK (legacy overview allowed) |
+| /ch02/overview | 课程概览 | Ch02OverviewPage | src/pages/generated/Ch02OverviewPage.tsx | false | false | OK |
 | /ch02/discriminant-functions | 5.1 判别函数 | Ch02DiscriminantFunctionsPage | src/pages/generated/Ch02DiscriminantFunctionsPage.tsx | false | false | OK |
 | /ch02/decision-theory | 5.2 决策理论 | Ch02DecisionTheoryPage | src/pages/generated/Ch02DecisionTheoryPage.tsx | false | false | OK |
 | /ch02/generative-classifiers | 5.3 生成分类器 | Ch02GenerativeClassifiersPage | src/pages/generated/Ch02GenerativeClassifiersPage.tsx | false | false | OK |
@@ -105,6 +105,6 @@ Generated: 2026-07-09T10:28:29.848Z
 | /appendix/c/overview | 约束优化 | AppendixCOverviewPage | src/pages/generated/AppendixCOverviewPage.tsx | false | false | OK |
 
 Total routes: 99
-Legacy components: 4
-Legacy overview allowed: 4
+Legacy components: 2
+Legacy overview allowed: 2
 Issues: 0
