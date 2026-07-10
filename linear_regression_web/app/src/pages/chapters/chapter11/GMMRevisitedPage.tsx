@@ -1,0 +1,143 @@
+import SectionMetadata from '@/components/SectionMetadata';
+import { ShieldAlert, RotateCcw, CheckCircle2 , Circle} from 'lucide-react';
+import KaTeX from '@/components/KaTeX';
+import FormulaCard from '@/components/FormulaCard';
+
+export default function GMMRevisitedPage() {
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
+      <section className="text-center py-8 bg-white rounded-2xl shadow-sm border border-gray-200">
+        <div className="text-sm font-medium text-blue-600 mb-2 tracking-wide uppercase">
+          EM 算法
+        </div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">高斯混合模型再探</h1>
+        <p className="text-gray-600 max-w-2xl mx-auto px-4">
+          现在用一般 EM 框架重新推导高斯混合模型。我们看到，11.1 节中的具体更新公式正是 E-step 和 M-step 的必然结果。
+        </p>
+
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
+      </section>
+
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <RotateCcw className="w-6 h-6 text-blue-600" />
+          <h2 className="text-2xl font-bold text-gray-900">E-step</h2>
+        </div>
+        <p className="text-gray-700 mb-4">
+          根据一般 EM 框架，E-step 需要计算隐变量 z^(i) 在当前参数下的后验分布。对于高斯混合模型，这就是：
+        </p>
+        <FormulaCard
+          title="后验权重"
+          formula={
+            <KaTeX
+              math={String.raw`w_j^{(i)} = Q_i\bigl(z^{(i)}=j\bigr) = p\bigl(z^{(i)}=j|x^{(i)};\phi,\mu,\sigma\bigr) = \frac{\phi_j \, \mathcal{N}(x^{(i)};\mu_j,\sigma_j^2)}{\sum_{l=1}^K \phi_l \, \mathcal{N}(x^{(i)};\mu_l,\sigma_l^2)}`}
+              display
+            />
+          }
+          description="这与 11.1 节中的 E-step 完全一致。"
+        />
+      </section>
+
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">M-step</h2>
+        <p className="text-gray-700 mb-4">
+          M-step 需要最大化以下 ELBO 关于 φ, μ, σ 的表达式：
+        </p>
+        <FormulaCard
+          title="GMM 的 ELBO"
+          formula={
+            <KaTeX
+              math={String.raw`\sum_{i=1}^n \sum_{j=1}^K w_j^{(i)} \log \frac{\phi_j \, \mathcal{N}(x^{(i)};\mu_j,\sigma_j^2)}{w_j^{(i)}}`}
+              display
+            />
+          }
+          description="把高斯密度的表达式代入，然后对 μ_j、σ_j² 和 φ_j 分别求导并令导数为零。"
+        />
+
+        <p className="text-gray-700 mt-4">
+          对 μ_l 求导并令其为零，得到：
+        </p>
+        <FormulaCard
+          title="均值更新"
+          formula={
+            <KaTeX
+              math={String.raw`\mu_l = \frac{\sum_{i=1}^n w_l^{(i)} x^{(i)}}{\sum_{i=1}^n w_l^{(i)}}`}
+              display
+            />
+          }
+          description="这是加权平均，权重是样本属于第 l 个分量的后验概率。"
+        />
+
+        <p className="text-gray-700 mt-4">
+          对方差 σ_l² 求导，得到：
+        </p>
+        <FormulaCard
+          title="方差更新"
+          formula={
+            <KaTeX
+              math={String.raw`\sigma_l^2 = \frac{\sum_{i=1}^n w_l^{(i)} \bigl(x^{(i)}-\mu_l\bigr)^2}{\sum_{i=1}^n w_l^{(i)}}`}
+              display
+            />
+          }
+          description="同样是加权平均，权重相同。"
+        />
+
+        <p className="text-gray-700 mt-4">
+          对混合权重 φ_j，需要在约束 Σ_j φ_j = 1 下最大化。引入拉格朗日乘子后得到：
+        </p>
+        <FormulaCard
+          title="混合权重更新"
+          formula={
+            <KaTeX
+              math={String.raw`\phi_l = \frac{1}{n}\sum_{i=1}^n w_l^{(i)}`}
+              display
+            />
+          }
+          description="每个分量的权重等于所有样本对其后验概率的平均。"
+        />
+      </section>
+
+      <section className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
+        <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5" />
+          小结
+        </h3>
+        <ul className="space-y-2 text-sm text-blue-800">
+          <li className="flex items-start gap-2">
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
+            <span>高斯混合模型的 EM 公式是一般 EM 框架的特例。</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
+            <span>E-step 计算后验权重 w_j^(i)。</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
+            <span>M-step 对加权对数似然求导，得到 φ、μ、σ 的闭式更新。</span>
+          </li>
+        </ul>
+      </section>
+    
+      <SectionMetadata
+        bishopChapter={"Ch 15"}
+        bishopSection={"11.1"}
+        learningObjectives={["理解 Mixtures Of Gaussians 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
+        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
+        quiz={[
+      {
+        question: "关于“Mixtures Of Gaussians”，下列说法最准确的是？",
+        options: ["它是本小节需要掌握的核心主题。", "它与当前章节完全无关。", "它只适用于无限大数据集。", "它不需要任何数学基础。"],
+        correctIndex: 0,
+        explanation: "Mixtures Of Gaussians 是本小节的核心内容，理解其动机、公式与应用场景是学习目标。",
+      },
+      {
+        question: "学习本小节时，最重要的提醒是什么？",
+        options: ["只看结论，忽略推导。", "理解概念背后的直觉与假设。", "直接套用代码，不必关心理论。", "只记忆英文术语。"],
+        correctIndex: 1,
+        explanation: "理解直觉和假设有助于在遇到新问题时正确选择与扩展方法。",
+      }
+        ]}
+      />
+</div>
+  );
+}

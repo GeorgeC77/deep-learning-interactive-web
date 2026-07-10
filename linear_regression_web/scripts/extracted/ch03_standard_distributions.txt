@@ -1,0 +1,3306 @@
+
+--- Page 84 ---
+3
+Standard
+Distributions
+In this chapter we discuss some speciﬁc examples of probability distributions and
+their properties. As well as being of interest in their own right, these distributions
+can form building blocks for more complex models and will be used extensively
+throughout the book.
+One role for the distributions discussed in this chapter is to model the prob-
+ability distribution p(x) of a random variable x, given a ﬁnite set x1, . . . , xN of
+observations. This problem is known as density estimation. It should be emphasized
+that the problem of density estimation is fundamentally ill-posed, because there are
+inﬁnitely many probability distributions that could have given rise to the observed ﬁ-
+nite data set. Indeed, any distribution p(x) that is non-zero at each of the data points
+x1, . . . , xN is a potential candidate. The issue of choosing an appropriate distribu-
+tion relates to the problem of model selection, which has already been encountered
+in the context of polynomial curve ﬁtting and which is a central issue in machine
+Section 1.2
+65
+© The Author(s), under exclusive license to Springer Nature Switzerland AG 2024 
+C. M. Bishop, H. Bishop, Deep Learning, https://doi.org/10.1007/978-3-031-45468-4_3
+ 
+ 
+ 
+ 
+
+--- Page 85 ---
+66
+3. STANDARD DISTRIBUTIONS
+learning.
+We begin by considering distributions for discrete variables before exploring
+the Gaussian distribution for continuous variables. These are speciﬁc examples of
+parametric distributions, so called because they are governed by a relatively small
+number of adjustable parameters, such as the mean and variance of a Gaussian. To
+apply such models to the problem of density estimation, we need a procedure for
+determining suitable values for the parameters, given an observed data set, and our
+main focus will be on maximizing the likelihood function. In this chapter, we will
+assume that the data observations are independent and identically distributed (i.i.d.),
+whereas in future chapters we will explore more complex scenarios involving struc-
+tured data where this assumption no longer holds.
+One limitation of the parametric approach is that it assumes a speciﬁc functional
+form for the distribution, which may turn out to be inappropriate for a particular
+application. An alternative approach is given by nonparametric density estimation
+methods in which the form of the distribution typically depends on the size of the data
+set. Such models still contain parameters, but these control the model complexity
+rather than the form of the distribution. We end this chapter by brieﬂy considering
+three nonparametric methods based respectively on histograms, nearest neighbours,
+and kernels. A major limitation of nonparametric techniques such as these is that
+they involve storing all the training data. In other words, the number of parameters
+grows with the size of the data set, so that the method become very inefﬁcient for
+large data sets. Deep learning combines the efﬁciency of parametric models with the
+generality of nonparametric methods by considering ﬂexible distributions based on
+neural networks having a large, but ﬁxed, number of parameters.
+3.1. Discrete Variables
+We begin by considering simple distributions for discrete variables, starting with
+binary variables and then moving on to multi-state variables.
+3.1.1
+Bernoulli distribution
+Consider a single binary random variable x ∈{0, 1}. For example, x might
+describe the outcome of ﬂipping a coin, with x = 1 representing ‘heads’ and x = 0
+representing ‘tails’. If this were a damaged coin, such as the one shown in Figure 2.2,
+the probability of landing heads is not necessarily the same as that of landing tails.
+The probability of x = 1 will be denoted by the parameter µ so that
+p(x = 1|µ) = µ
+(3.1)
+where 0 ⩽µ ⩽1, from which it follows that p(x = 0|µ) = 1 −µ. The probability
+distribution over x can therefore be written in the form
+Bern(x|µ) = µx(1 −µ)1−x,
+(3.2)
+which is known as the Bernoulli distribution. It is easily veriﬁed that this distribution
+Exercise 3.1
+
+--- Page 86 ---
+3.1. Discrete Variables
+67
+is normalized and that it has mean and variance given by
+E[x]
+=
+µ
+(3.3)
+var[x]
+=
+µ(1 −µ).
+(3.4)
+Now suppose we have a data set D = {x1, . . . , xN} of observed values of x.
+We can construct the likelihood function, which is a function of µ, on the assumption
+that the observations are drawn independently from p(x|µ), so that
+p(D|µ) =
+N
+Y
+n=1
+p(xn|µ) =
+N
+Y
+n=1
+µxn(1 −µ)1−xn.
+(3.5)
+We can estimate a value for µ by maximizing the likelihood function or equivalently
+by maximizing the logarithm of the likelihood, since the log is a monotonic function.
+The log likelihood function of the Bernoulli distribution is given by
+ln p(D|µ) =
+N
+X
+n=1
+ln p(xn|µ) =
+N
+X
+n=1
+{xn ln µ + (1 −xn) ln(1 −µ)} .
+(3.6)
+At this point, note that the log likelihood function depends on the N observations xn
+only through their sum P
+n xn. This sum provides an example of a sufﬁcient statistic
+for the data under this distribution. If we set the derivative of ln p(D|µ) with respect
+Section 3.4
+to µ equal to zero, we obtain the maximum likelihood estimator:
+µML = 1
+N
+N
+X
+n=1
+xn,
+(3.7)
+which is also known as the sample mean. Denoting the number of observations of
+x = 1 (heads) within this data set by m, we can write (3.7) in the form
+µML = m
+N
+(3.8)
+so that the probability of landing heads is given, in this maximum likelihood frame-
+work, by the fraction of observations of heads in the data set.
+3.1.2
+Binomial distribution
+We can also work out the distribution for the binary variable x of the number
+m of observations of x = 1, given that the data set has size N. This is called the
+binomial distribution, and from (3.5) we see that it is proportional to µm(1−µ)N−m.
+To obtain the normalization coefﬁcient, note that out of N coin ﬂips, we have to add
+up all of the possible ways of obtaining m heads, so that the binomial distribution
+can be written as
+Bin(m|N, µ) =
+N
+m
+
+µm(1 −µ)N−m
+(3.9)
+
+--- Page 87 ---
+68
+3. STANDARD DISTRIBUTIONS
+Figure 3.1
+Histogram plot of the binomial
+distribution (3.9) as a function of
+m for N = 10 and µ = 0.25.
+m
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+0
+0.1
+0.2
+0.3
+where
+N
+m
+
+≡
+N!
+(N −m)!m!
+(3.10)
+is the number of ways of choosing m objects out of a total of N identical objects
+without replacement. Figure 3.1 shows a plot of the binomial distribution for N = 10
+Exercise 3.3
+and µ = 0.25.
+The mean and variance of the binomial distribution can be found by using the
+results that, for independent events, the mean of the sum is the sum of the means and
+the variance of the sum is the sum of the variances. Because m = x1 + . . . + xN
+Exercise 2.10
+and because for each observation the mean and variance are given by (3.3) and (3.4),
+respectively, we have
+E[m] ≡
+N
+X
+m=0
+m Bin(m|N, µ) = Nµ
+(3.11)
+var[m] ≡
+N
+X
+m=0
+(m −E[m])2 Bin(m|N, µ) = Nµ(1 −µ).
+(3.12)
+These results can also be proved directly by using calculus.
+Exercise 3.4
+3.1.3
+Multinomial distribution
+Binary variables can be used to describe quantities that can take one of two
+possible values. Often, however, we encounter discrete variables that can take on
+one of K possible mutually exclusive states. Although there are various alternative
+ways to express such variables, we will see shortly that a particularly convenient
+representation is the 1-of-K scheme, sometimes called ‘one-hot encoding’, in which
+the variable is represented by a K-dimensional vector x in which one of the elements
+xk equals 1 and all remaining elements equal 0. So, for instance, if we have a variable
+that can take K =6 states and a particular observation of the variable happens to
+
+--- Page 88 ---
+3.1. Discrete Variables
+69
+correspond to the state where x3 = 1, then x will be represented by
+x = (0, 0, 1, 0, 0, 0)T.
+(3.13)
+Note that such vectors satisfy PK
+k=1 xk = 1. If we denote the probability of xk = 1
+by the parameter µk, then the distribution of x is given by
+p(x|µ) =
+K
+Y
+k=1
+µxk
+k
+(3.14)
+where µ = (µ1, . . . , µK)T, and the parameters µk are constrained to satisfy µk ⩾0
+and P
+k µk = 1, because they represent probabilities. The distribution (3.14) can be
+regarded as a generalization of the Bernoulli distribution to more than two outcomes.
+It is easily seen that the distribution is normalized:
+X
+x
+p(x|µ) =
+K
+X
+k=1
+µk = 1
+(3.15)
+and that
+E[x|µ] =
+X
+x
+p(x|µ)x = µ.
+(3.16)
+Now consider a data set D of N independent observations x1, . . . , xN. The
+corresponding likelihood function takes the form
+p(D|µ) =
+N
+Y
+n=1
+K
+Y
+k=1
+µxnk
+k
+=
+K
+Y
+k=1
+µ(
+P
+n xnk)
+k
+=
+K
+Y
+k=1
+µmk
+k
+(3.17)
+where we see that the likelihood function depends on the N data points only through
+the K quantities:
+mk =
+N
+X
+n=1
+xnk,
+(3.18)
+which represent the number of observations of xk = 1. These are called the sufﬁcient
+statistics for this distribution. Note that the variables mk are subject to the constraint
+Section 3.4
+K
+X
+k=1
+mk = N.
+(3.19)
+To ﬁnd the maximum likelihood solution for µ, we need to maximize ln p(D|µ)
+with respect to µk taking account of the constraint (3.15) that the µk must sum to
+one. This can be achieved using a Lagrange multiplier λ and maximizing
+Appendix C
+K
+X
+k=1
+mk ln µk + λ
+ K
+X
+k=1
+µk −1
+!
+.
+(3.20)
+
+--- Page 89 ---
+70
+3. STANDARD DISTRIBUTIONS
+Setting the derivative of (3.20) with respect to µk to zero, we obtain
+µk = −mk/λ.
+(3.21)
+We can solve for the Lagrange multiplier λ by substituting (3.21) into the constraint
+P
+k µk = 1 to give λ = −N. Thus, we obtain the maximum likelihood solution for
+µk in the form
+µML
+k
+= mk
+N ,
+(3.22)
+which is the fraction of the N observations for which xk = 1.
+We can also consider the joint distribution of the quantities m1, . . . , mK, condi-
+tioned on the parameter vector µ and on the total number N of observations. From
+(3.17), this takes the form
+Mult(m1, m2, . . . , mK|µ, N) =
+
+N
+m1m2 . . . mK
+ K
+Y
+k=1
+µmk
+k ,
+(3.23)
+which is known as the multinomial distribution. The normalization coefﬁcient is the
+number of ways of partitioning N objects into K groups of size m1, . . . , mK and is
+given by
+
+N
+m1m2 . . . mK
+
+=
+N!
+m1!m2! . . . mK!.
+(3.24)
+Note that two-state quantities can be represented either as binary variables and
+modelled using the binomial distribution (3.9) or as 1-of-2 variables and modelled
+using the distribution (3.14) with K = 2.
+3.2. The Multivariate Gaussian
+The Gaussian, also known as the normal distribution, is a widely used model for
+the distribution of continuous variables. We have already seen that for of a single
+variable x, the Gaussian distribution can be written in the form
+Section 2.3
+N(x|µ, σ2) =
+1
+(2πσ2)1/2 exp
+
+−1
+2σ2 (x −µ)2
+
+(3.25)
+where µ is the mean and σ2 is the variance. For a D-dimensional vector x, the
+multivariate Gaussian distribution takes the form
+N(x|µ, Σ) =
+1
+(2π)D/2
+1
+|Σ|1/2 exp
+
+−1
+2(x −µ)TΣ−1(x −µ)
+
+(3.26)
+where µ is the D-dimensional mean vector, Σ is the D × D covariance matrix, and
+det Σ denotes the determinant of Σ.
+The Gaussian distribution arises in many different contexts and can be motivated
+from a variety of different perspectives. For example, we have already seen that for
+Section 2.5
+
+--- Page 90 ---
+3.2. The Multivariate Gaussian
+71
+N = 1
+0
+0.5
+1
+0
+1
+2
+3
+N = 2
+0
+0.5
+1
+0
+1
+2
+3
+N = 10
+0
+0.5
+1
+0
+1
+2
+3
+Figure 3.2
+Histogram plots of the mean of N uniformly distributed numbers for various values of N.
+We
+observe that as N increases, the distribution tends towards a Gaussian.
+a single real variable, the distribution that maximizes the entropy is the Gaussian.
+This property applies also to the multivariate Gaussian.
+Exercise 3.8
+Another situation in which the Gaussian distribution arises is when we consider
+the sum of multiple random variables. The central limit theorem tells us that, subject
+to certain mild conditions, the sum of a set of random variables, which is of course
+itself a random variable, has a distribution that becomes increasingly Gaussian as the
+number of terms in the sum increases (Walker, 1969). We can illustrate this by con-
+sidering N variables x1, . . . , xN each of which has a uniform distribution over the
+interval [0, 1] and then considering the distribution of the mean (x1 + · · · + xN)/N.
+For large N, this distribution tends to a Gaussian, as illustrated in Figure 3.2. In
+practice, the convergence to a Gaussian as N increases can be very rapid. One con-
+sequence of this result is that the binomial distribution (3.9), which is a distribution
+over m deﬁned by the sum of N observations of the random binary variable x, will
+tend to a Gaussian as N →∞(see Figure 3.1 for N = 10).
+The Gaussian distribution has many important analytical properties, and we will
+consider several of these in detail. As a result, this section will be rather more tech-
+nically involved than some of the earlier sections and will require familiarity with
+various matrix identities.
+Appendix A
+3.2.1
+Geometry of the Gaussian
+We begin by considering the geometrical form of the Gaussian distribution. The
+functional dependence of the Gaussian on x is through the quadratic form
+∆2 = (x −µ)TΣ−1(x −µ),
+(3.27)
+which appears in the exponent. The quantity ∆is called the Mahalanobis distance
+from µ to x. It reduces to the Euclidean distance when Σ is the identity matrix.
+The Gaussian distribution is constant on surfaces in x-space for which this quadratic
+form is constant.
+First, note that the matrix Σ can be taken to be symmetric, without loss of gen-
+erality, because any antisymmetric component would disappear from the exponent.
+Exercise 3.11
+Now consider the eigenvector equation for the covariance matrix
+Σui = λiui
+(3.28)
+
+--- Page 91 ---
+72
+3. STANDARD DISTRIBUTIONS
+where i = 1, . . . , D. Because Σ is a real, symmetric matrix, its eigenvalues will be
+real, and its eigenvectors can be chosen to form an orthonormal set, so that
+Exercise 3.12
+uT
+i uj = Iij
+(3.29)
+where Iij is the i, j element of the identity matrix and satisﬁes
+Iij =
+
+1,
+if i = j
+0,
+otherwise.
+(3.30)
+The covariance matrix Σ can be expressed as an expansion in terms of its eigenvec-
+tors in the form
+Exercise 3.13
+Σ =
+D
+X
+i=1
+λiuiuT
+i
+(3.31)
+and similarly the inverse covariance matrix Σ−1 can be expressed as
+Σ−1 =
+D
+X
+i=1
+1
+λi
+uiuT
+i .
+(3.32)
+Substituting (3.32) into (3.27), the quadratic form becomes
+∆2 =
+D
+X
+i=1
+y2
+i
+λi
+(3.33)
+where we have deﬁned
+yi = uT
+i (x −µ).
+(3.34)
+We can interpret {yi} as a new coordinate system deﬁned by the orthonormal vectors
+ui that are shifted and rotated with respect to the original xi coordinates. Forming
+the vector y = (y1, . . . , yD)T, we have
+y = U(x −µ)
+(3.35)
+where U is a matrix whose rows are given by uT
+i . From (3.29) it follows that U is
+an orthogonal matrix, i.e., it satisﬁes UUT = UTU = I, where I is the identity
+Appendix A
+matrix.
+The quadratic form, and hence the Gaussian density, is constant on surfaces for
+which (3.33) is constant. If all the eigenvalues λi are positive, then these surfaces
+represent ellipsoids, with their centres at µ and their axes oriented along ui, and with
+scaling factors in the directions of the axes given by λ1/2
+i
+, as illustrated in Figure 3.3.
+For the Gaussian distribution to be well deﬁned, it is necessary for all the eigen-
+values λi of the covariance matrix to be strictly positive, otherwise the distribution
+cannot be properly normalized. A matrix whose eigenvalues are strictly positive is
+said to be positive deﬁnite. When we discuss latent variable models, we will en-
+Chapter 16
+counter Gaussian distributions for which one or more of the eigenvalues are zero, in
+
+--- Page 92 ---
+3.2. The Multivariate Gaussian
+73
+Figure 3.3
+The red curve shows the ellip-
+tical surface of constant proba-
+bility density for a Gaussian in
+a two-dimensional space x =
+(x1, x2) on which the density is
+exp(−1/2) of its value at x =
+µ. The axes of the ellipse are
+deﬁned by the eigenvectors ui
+of the covariance matrix, with
+corresponding eigenvalues λi.
+x1
+x2
+λ1/2
+1
+λ1/2
+2
+y1
+y2
+u1
+u2
+µ
+which case the distribution is singular and is conﬁned to a subspace of lower dimen-
+sionality. If all the eigenvalues are non-negative, then the covariance matrix is said
+to be positive semideﬁnite.
+Now consider the form of the Gaussian distribution in the new coordinate system
+deﬁned by the yi. In going from the x to the y coordinate system, we have a Jacobian
+matrix J with elements given by
+Jij = ∂xi
+∂yj
+= Uji
+(3.36)
+where Uji are the elements of the matrix UT. Using the orthonormality property of
+the matrix U, we see that the square of the determinant of the Jacobian matrix is
+|J|2 =
+UT2 =
+UT |U| =
+UTU
+ = |I| = 1
+(3.37)
+and, hence, |J| = 1. Also, the determinant |Σ| of the covariance matrix can be
+written as the product of its eigenvalues, and hence
+|Σ|1/2 =
+D
+Y
+j=1
+λ1/2
+j
+.
+(3.38)
+Thus, in the yj coordinate system, the Gaussian distribution takes the form
+p(y) = p(x)|J| =
+D
+Y
+j=1
+1
+(2πλj)1/2 exp
+
+−y2
+j
+2λj
+
+,
+(3.39)
+which is the product of D independent univariate Gaussian distributions. The eigen-
+vectors therefore deﬁne a new set of shifted and rotated coordinates with respect
+to which the joint probability distribution factorizes into a product of independent
+distributions. The integral of the distribution in the y coordinate system is then
+Z
+p(y) dy =
+D
+Y
+j=1
+Z ∞
+−∞
+1
+(2πλj)1/2 exp
+
+−y2
+j
+2λj
+
+dyj = 1
+(3.40)
+
+--- Page 93 ---
+74
+3. STANDARD DISTRIBUTIONS
+where we have used the result (2.51) for the normalization of the univariate Gaussian.
+This conﬁrms that the multivariate Gaussian (3.26) is indeed normalized.
+3.2.2
+Moments
+We now look at the moments of the Gaussian distribution and thereby provide an
+interpretation of the parameters µ and Σ. The expectation of x under the Gaussian
+distribution is given by
+E[x] =
+1
+(2π)D/2
+1
+|Σ|1/2
+Z
+exp
+
+−1
+2(x −µ)TΣ−1(x −µ)
+
+x dx
+=
+1
+(2π)D/2
+1
+|Σ|1/2
+Z
+exp
+
+−1
+2zTΣ−1z
+
+(z + µ) dz
+(3.41)
+where we have changed variables using z = x−µ. Note that the exponent is an even
+function of the components of z, and because the integrals over these are taken over
+the range (−∞, ∞), the term in z in the factor (z + µ) will vanish by symmetry.
+Thus,
+E[x] = µ,
+(3.42)
+and so we refer to µ as the mean of the Gaussian distribution.
+We now consider second-order moments of the Gaussian. In the univariate case,
+we considered the second-order moment given by E[x2]. For the multivariate Gaus-
+sian, there are D2 second-order moments given by E[xixj], which we can group
+together to form the matrix E[xxT]. This matrix can be written as
+E[xxT] =
+1
+(2π)D/2
+1
+|Σ|1/2
+Z
+exp
+
+−1
+2(x −µ)TΣ−1(x −µ)
+
+xxT dx
+=
+1
+(2π)D/2
+1
+|Σ|1/2
+Z
+exp
+
+−1
+2zTΣ−1z
+
+(z + µ)(z + µ)T dz
+(3.43)
+where again we have changed variables using z = x −µ. Note that the cross-terms
+involving µzT and µTz will again vanish by symmetry. The term µµT is constant
+and can be taken outside the integral, which itself is unity because the Gaussian
+distribution is normalized. Consider the term involving zzT. Again, we can make
+use of the eigenvector expansion of the covariance matrix given by (3.28), together
+with the completeness of the set of eigenvectors, to write
+z =
+D
+X
+j=1
+yjuj
+(3.44)
+
+--- Page 94 ---
+3.2. The Multivariate Gaussian
+75
+where yj = uT
+j z, which gives
+1
+(2π)D/2
+1
+|Σ|1/2
+Z
+exp
+
+−1
+2zTΣ−1z
+
+zzT dz
+=
+1
+(2π)D/2
+1
+|Σ|1/2
+D
+X
+i=1
+D
+X
+j=1
+uiuT
+j
+Z
+exp
+(
+−
+D
+X
+k=1
+y2
+k
+2λk
+)
+yiyj dy
+=
+D
+X
+i=1
+uiuT
+i λi = Σ
+(3.45)
+where we have made use of the eigenvector equation (3.28), together with the fact
+that the integral on the middle line vanishes by symmetry unless i = j. In the ﬁnal
+line we have made use of the results (2.53) and (3.38), together with (3.31). Thus,
+we have
+E[xxT] = µµT + Σ.
+(3.46)
+When deﬁning the variance for a single random variable, we subtracted the mean
+before taking the second moment. Similarly, in the multivariate case it is again
+convenient to subtract off the mean, giving rise to the covariance of a random vector
+x deﬁned by
+cov[x] = E
+
+(x −E[x])(x −E[x])T
+.
+(3.47)
+For the speciﬁc case of a Gaussian distribution, we can make use of E[x] = µ,
+together with the result (3.46), to give
+cov[x] = Σ.
+(3.48)
+Because the parameter matrix Σ governs the covariance of x under the Gaussian
+distribution, it is called the covariance matrix.
+3.2.3
+Limitations
+Although the Gaussian distribution (3.26) is often used as a simple density
+model, it suffers from some signiﬁcant limitations. Consider the number of free
+parameters in the distribution. A general symmetric covariance matrix Σ will have
+D(D + 1)/2 independent parameters, and there are another D independent parame-
+Exercise 3.15
+ters in µ, giving D(D + 3)/2 parameters in total. For large D, the total number of
+parameters therefore grows quadratically with D, and the computational task of ma-
+nipulating and inverting the large matrices can become prohibitive. One way to ad-
+dress this problem is to use restricted forms of the covariance matrix. If we consider
+covariance matrices that are diagonal, so that Σ = diag(σ2
+i ), we then have a total
+of 2D independent parameters in the density model. The corresponding contours of
+constant density are given by axis-aligned ellipsoids. We could further restrict the
+covariance matrix to be proportional to the identity matrix, Σ = σ2I, known as an
+isotropic covariance, giving D + 1 independent parameters in the model together
+with spherical surfaces of constant density. The three possibilities of general, diag-
+onal, and isotropic covariance matrices are illustrated in Figure 3.4. Unfortunately,
+
+--- Page 95 ---
+76
+3. STANDARD DISTRIBUTIONS
+Figure 3.4
+Contours of constant
+probability density for a Gaussian
+distribution in two dimensions in
+which the covariance matrix is (a)
+of general form, (b) diagonal, in
+which case the elliptical contours
+are aligned with the coordinate axes,
+and (c) proportional to the identity
+matrix, in which case the contours
+are concentric circles.
+x1
+x2
+(a)
+x1
+x2
+(b)
+x1
+x2
+(c)
+whereas such approaches limit the number of degrees of freedom in the distribu-
+tion and make inversion of the covariance matrix a much faster operation, they also
+greatly restrict the form of the probability density and limit its ability to capture
+interesting correlations in the data.
+A further limitation of the Gaussian distribution is that it is intrinsically uni-
+modal (i.e., has a single maximum) and so is unable to provide a good approximation
+to multimodal distributions. Thus, the Gaussian distribution can be both too ﬂexible,
+in the sense of having too many parameters, and too limited in the range of distribu-
+tions that it can adequately represent. We will see later that the introduction of latent
+variables, also called hidden variables or unobserved variables, allows both of these
+problems to be addressed. In particular, a rich family of multimodal distributions is
+obtained by introducing discrete latent variables leading to mixtures of Gaussians.
+Section 3.2.9
+Similarly, the introduction of continuous latent variables leads to models in which the
+number of free parameters can be controlled independently of the dimensionality D
+of the data space while still allowing the model to capture the dominant correlations
+in the data set.
+Chapter 16
+3.2.4
+Conditional distribution
+An important property of a multivariate Gaussian distribution is that if two sets
+of variables are jointly Gaussian, then the conditional distribution of one set condi-
+tioned on the other is again Gaussian. Similarly, the marginal distribution of either
+set is also Gaussian.
+First, consider the case of conditional distributions. Suppose that x is a D-
+dimensional vector with Gaussian distribution N(x|µ, Σ) and that we partition x
+into two disjoint subsets xa and xb. Without loss of generality, we can take xa
+to form the ﬁrst M components of x, with xb comprising the remaining D −M
+components, so that
+x =
+
+xa
+xb
+
+.
+(3.49)
+We also deﬁne corresponding partitions of the mean vector µ given by
+µ =
+
+µa
+µb
+
+(3.50)
+
+--- Page 96 ---
+3.2. The Multivariate Gaussian
+77
+and of the covariance matrix Σ given by
+Σ =
+
+Σaa
+Σab
+Σba
+Σbb
+
+.
+(3.51)
+Note that the symmetry ΣT = Σ of the covariance matrix implies that Σaa and Σbb
+are symmetric and that Σba = ΣT
+ab.
+In many situations, it will be convenient to work with the inverse of the covari-
+ance matrix:
+Λ ≡Σ−1,
+(3.52)
+which is known as the precision matrix. In fact, we will see that some properties
+of Gaussian distributions are most naturally expressed in terms of the covariance,
+whereas others take a simpler form when viewed in terms of the precision. We
+therefore also introduce the partitioned form of the precision matrix:
+Λ =
+
+Λaa
+Λab
+Λba
+Λbb
+
+(3.53)
+corresponding to the partitioning (3.49) of the vector x. Because the inverse of a
+symmetric matrix is also symmetric, we see that Λaa and Λbb are symmetric and
+Exercise 3.16
+that Λba = ΛT
+ab. It should be stressed at this point that, for instance, Λaa is not
+simply given by the inverse of Σaa. In fact, we will shortly examine the relation
+between the inverse of a partitioned matrix and the inverses of its partitions.
+We begin by ﬁnding an expression for the conditional distribution p(xa|xb).
+From the product rule of probability, we see that this conditional distribution can be
+evaluated from the joint distribution p(x) = p(xa, xb) simply by ﬁxing xb to the
+observed value and normalizing the resulting expression to obtain a valid probability
+distribution over xa. Instead of performing this normalization explicitly, we can
+obtain the solution more efﬁciently by considering the quadratic form in the exponent
+of the Gaussian distribution given by (3.27) and then reinstating the normalization
+coefﬁcient at the end of the calculation. If we make use of the partitioning (3.49),
+(3.50), and (3.53), we obtain
+−1
+2(x −µ)TΣ−1(x −µ) =
+−1
+2(xa −µa)TΛaa(xa −µa) −1
+2(xa −µa)TΛab(xb −µb)
+−1
+2(xb −µb)TΛba(xa −µa) −1
+2(xb −µb)TΛbb(xb −µb).
+(3.54)
+We see that as a function of xa, this is again a quadratic form, and hence, the cor-
+responding conditional distribution p(xa|xb) will be Gaussian. Because this distri-
+bution is completely characterized by its mean and its covariance, our goal will be
+to identify expressions for the mean and covariance of p(xa|xb) by inspection of
+(3.54).
+This is an example of a rather common operation associated with Gaussian
+distributions, sometimes called ‘completing the square’, in which we are given a
+
+--- Page 97 ---
+78
+3. STANDARD DISTRIBUTIONS
+quadratic form deﬁning the exponent terms in a Gaussian distribution and we need
+to determine the corresponding mean and covariance. Such problems can be solved
+straightforwardly by noting that the exponent in a general Gaussian distribution
+N(x|µ, Σ) can be written as
+−1
+2(x −µ)TΣ−1(x −µ) = −1
+2xTΣ−1x + xTΣ−1µ + const
+(3.55)
+where ‘const’ denotes terms that are independent of x, We have also made use of
+the symmetry of Σ. Thus, if we take our general quadratic form and express it in
+the form given by the right-hand side of (3.55), then we can immediately equate the
+matrix of coefﬁcients entering the second-order term in x to the inverse covariance
+matrix Σ−1 and the coefﬁcient of the linear term in x to Σ−1µ, from which we can
+obtain µ.
+Now let us apply this procedure to the conditional Gaussian distribution p(xa|xb)
+for which the quadratic form in the exponent is given by (3.54). We will denote the
+mean and covariance of this distribution by µa|b and Σa|b, respectively. Consider
+the functional dependence of (3.54) on xa in which xb is regarded as a constant. If
+we pick out all terms that are second order in xa, we have
+−1
+2xT
+a Λaaxa
+(3.56)
+from which we can immediately conclude that the covariance (inverse precision) of
+p(xa|xb) is given by
+Σa|b = Λ−1
+aa .
+(3.57)
+Now consider all the terms in (3.54) that are linear in xa:
+xT
+a {Λaaµa −Λab(xb −µb)}
+(3.58)
+where we have used ΛT
+ba = Λab. From our discussion of the general form (3.55),
+the coefﬁcient of xa in this expression must equal Σ−1
+a|bµa|b and, hence,
+µa|b
+=
+Σa|b {Λaaµa −Λab(xb −µb)}
+=
+µa −Λ−1
+aa Λab(xb −µb)
+(3.59)
+where we have made use of (3.57).
+The results (3.57) and (3.59) are expressed in terms of the partitioned precision
+matrix of the original joint distribution p(xa, xb). We can also express these results
+in terms of the corresponding partitioned covariance matrix. To do this, we make use
+of the following identity for the inverse of a partitioned matrix:
+Exercise 3.18
+
+A
+B
+C
+D
+−1
+=
+
+M
+−MBD−1
+−D−1CM
+D−1 + D−1CMBD−1
+
+(3.60)
+where we have deﬁned
+M = (A −BD−1C)−1.
+(3.61)
+
+--- Page 98 ---
+3.2. The Multivariate Gaussian
+79
+The quantity M−1 is known as the Schur complement of the matrix on the left-hand
+side of (3.60) with respect to the submatrix D. Using the deﬁnition
+
+Σaa
+Σab
+Σba
+Σbb
+−1
+=
+
+Λaa
+Λab
+Λba
+Λbb
+
+(3.62)
+and making use of (3.60), we have
+Λaa
+=
+(Σaa −ΣabΣ−1
+bb Σba)−1
+(3.63)
+Λab
+=
+−(Σaa −ΣabΣ−1
+bb Σba)−1ΣabΣ−1
+bb .
+(3.64)
+From these we obtain the following expressions for the mean and covariance of the
+conditional distribution p(xa|xb):
+µa|b
+=
+µa + ΣabΣ−1
+bb (xb −µb)
+(3.65)
+Σa|b
+=
+Σaa −ΣabΣ−1
+bb Σba.
+(3.66)
+Comparing (3.57) and (3.66), we see that the conditional distribution p(xa|xb) takes
+a simpler form when expressed in terms of the partitioned precision matrix than
+when it is expressed in terms of the partitioned covariance matrix. Note that the
+mean of the conditional distribution p(xa|xb), given by (3.65), is a linear function of
+xb and that the covariance, given by (3.66), is independent of xb. This represents an
+example of a linear-Gaussian model.
+Section 11.1.4
+3.2.5
+Marginal distribution
+We have seen that if a joint distribution p(xa, xb) is Gaussian, then the condi-
+tional distribution p(xa|xb) will again be Gaussian. Now we turn to a discussion of
+the marginal distribution given by
+p(xa) =
+Z
+p(xa, xb) dxb,
+(3.67)
+which, as we will see, is also Gaussian. Once again, our strategy for calculating this
+distribution will be to focus on the quadratic form in the exponent of the joint distri-
+bution and thereby to identify the mean and covariance of the marginal distribution
+p(xa).
+The quadratic form for the joint distribution can be expressed, using the parti-
+tioned precision matrix, in the form (3.54). Our goal is to integrate out xb, which is
+most easily achieved by ﬁrst considering the terms involving xb and then completing
+the square to facilitate the integration. Picking out just those terms that involve xb,
+we have
+−1
+2xT
+b Λbbxb+xT
+b m = −1
+2(xb−Λ−1
+bb m)TΛbb(xb−Λ−1
+bb m)+ 1
+2mTΛ−1
+bb m (3.68)
+where we have deﬁned
+m = Λbbµb −Λba(xa −µa).
+(3.69)
+
+--- Page 99 ---
+80
+3. STANDARD DISTRIBUTIONS
+We see that the dependence on xb has been cast into the standard quadratic form of a
+Gaussian distribution corresponding to the ﬁrst term on the right-hand side of (3.68)
+plus a term that does not depend on xb (but that does depend on xa). Thus, when
+we take the exponential of this quadratic form, we see that the integration over xb
+required by (3.67) will take the form
+Z
+exp
+
+−1
+2(xb −Λ−1
+bb m)TΛbb(xb −Λ−1
+bb m)
+
+dxb.
+(3.70)
+This integration is easily performed by noting that it is the integral over an unnor-
+malized Gaussian, and so the result will be the reciprocal of the normalization coef-
+ﬁcient. We know from the form of the normalized Gaussian given by (3.26) that this
+coefﬁcient is independent of the mean and depends only on the determinant of the
+covariance matrix. Thus, by completing the square with respect to xb, we can inte-
+grate out xb so that the only term remaining from the contributions on the left-hand
+side of (3.68) that depends on xa is the last term on the right-hand side of (3.68) in
+which m is given by (3.69). Combining this term with the remaining terms from
+(3.54) that depend on xa, we obtain
+1
+2 [Λbbµb −Λba(xa −µa)]T Λ−1
+bb [Λbbµb −Λba(xa −µa)]
+−1
+2xT
+a Λaaxa + xT
+a (Λaaµa + Λabµb) + const
+=
+−1
+2xT
+a (Λaa −ΛabΛ−1
+bb Λba)xa
++xT
+a (Λaa −ΛabΛ−1
+bb Λba)µa + const
+(3.71)
+where ‘const’ denotes quantities independent of xa. Again, by comparison with
+(3.55), we see that the covariance of the marginal distribution p(xa) is given by
+Σa = (Λaa −ΛabΛ−1
+bb Λba)−1.
+(3.72)
+Similarly, the mean is given by
+Σa(Λaa −ΛabΛ−1
+bb Λba)µa = µa
+(3.73)
+where we have used (3.72). The covariance (3.72) is expressed in terms of the par-
+titioned precision matrix given by (3.53). We can rewrite this in terms of the cor-
+responding partitioning of the covariance matrix given by (3.51), as we did for the
+conditional distribution. These partitioned matrices are related by
+
+Λaa
+Λab
+Λba
+Λbb
+−1
+=
+
+Σaa
+Σab
+Σba
+Σbb
+
+.
+(3.74)
+Making use of (3.60), we then have
+ Λaa −ΛabΛ−1
+bb Λba
+−1 = Σaa.
+(3.75)
+
+--- Page 100 ---
+3.2. The Multivariate Gaussian
+81
+Thus, we obtain the intuitively satisfying result that the marginal distribution p(xa)
+has mean and covariance given by
+E[xa]
+=
+µa
+(3.76)
+cov[xa]
+=
+Σaa.
+(3.77)
+We see that for a marginal distribution, the mean and covariance are most simply ex-
+pressed in terms of the partitioned covariance matrix, in contrast to the conditional
+distribution for which the partitioned precision matrix gives rise to simpler expres-
+sions.
+Our results for the marginal and conditional distributions of a partitioned Gaus-
+sian can be summarized as follows. Given a joint Gaussian distribution N(x|µ, Σ)
+with Λ ≡Σ−1 and the following partitions
+x =
+
+xa
+xb
+
+,
+µ =
+
+µa
+µb
+
+(3.78)
+Σ =
+
+Σaa
+Σab
+Σba
+Σbb
+
+,
+Λ =
+
+Λaa
+Λab
+Λba
+Λbb
+
+(3.79)
+then the conditional distribution is given by
+p(xa|xb)
+=
+N(x|µa|b, Λ−1
+aa )
+(3.80)
+µa|b
+=
+µa −Λ−1
+aa Λab(xb −µb)
+(3.81)
+and the marginal distribution is given by
+p(xa) = N(xa|µa, Σaa).
+(3.82)
+We illustrate the idea of conditional and marginal distributions associated with
+a multivariate Gaussian using an example involving two variables in Figure 3.5.
+3.2.6
+Bayes’ theorem
+In Sections 3.2.4 and 3.2.5 we considered a Gaussian p(x) in which we parti-
+tioned the vector x into two subvectors x = (xa, xb) and then found expressions
+for the conditional distribution p(xa|xb) and the marginal distribution p(xa). We
+noted that the mean of the conditional distribution p(xa|xb) was a linear function of
+xb. Here we will suppose that we are given a Gaussian marginal distribution p(x)
+and a Gaussian conditional distribution p(y|x) in which p(y|x) has a mean that is a
+linear function of x and a covariance that is independent of x. This is an example
+of a linear-Gaussian model (Roweis and Ghahramani, 1999). We wish to ﬁnd the
+Section 11.1.4
+marginal distribution p(y) and the conditional distribution p(x|y). This is a struc-
+ture that arises in several types of generative model and it will prove convenient to
+Chapter 16
+derive the general results here.
+We will take the marginal and conditional distributions to be
+p(x)
+=
+N
+ x|µ, Λ−1
+(3.83)
+p(y|x)
+=
+N
+ y|Ax + b, L−1
+(3.84)
+
+--- Page 101 ---
+82
+3. STANDARD DISTRIBUTIONS
+0
+0.5
+1
+0
+0.5
+1
+xa
+xb
+xb = 0.7
+p(xa, xb)
+(a)
+0
+0.5
+1
+0
+5
+10
+xa
+p(xa)
+p(xa|xb = 0.7)
+(b)
+Figure 3.5
+(a) Contours of a Gaussian distribution p(xa, xb) over two variables. (b) The marginal distribution
+p(xa) (blue curve) and the conditional distribution p(xa|xb) for xb = 0.7 (red curve).
+where µ, A, and b are parameters governing the means, and Λ and L are precision
+matrices. If x has dimensionality M and y has dimensionality D, then the matrix A
+has size D × M.
+First we ﬁnd an expression for the joint distribution over x and y. To do this, we
+deﬁne
+z =
+
+x
+y
+
+(3.85)
+and then consider the log of the joint distribution:
+ln p(z)
+=
+ln p(x) + ln p(y|x)
+=
+−1
+2(x −µ)TΛ(x −µ)
+−1
+2(y −Ax −b)TL(y −Ax −b) + const
+(3.86)
+where ‘const’ denotes terms independent of x and y. As before, we see that this is a
+quadratic function of the components of z, and hence, p(z) is Gaussian distribution.
+To ﬁnd the precision of this Gaussian, we consider the second-order terms in (3.86),
+which can be written as
+−1
+2xT(Λ + ATLA)x −1
+2yTLy + 1
+2yTLAx + 1
+2xTATLy
+=
+−1
+2
+
+x
+y
+T 
+Λ + ATLA
+−ATL
+−LA
+L
+ 
+x
+y
+
+= −1
+2zTRz
+(3.87)
+and so the Gaussian distribution over z has precision (inverse covariance) matrix
+
+--- Page 102 ---
+3.2. The Multivariate Gaussian
+83
+given by
+R =
+
+Λ + ATLA
+−ATL
+−LA
+L
+
+.
+(3.88)
+The covariance matrix is found by taking the inverse of the precision, which can be
+done using the matrix inversion formula (3.60) to give
+Exercise 3.23
+cov[z] = R−1 =
+
+Λ−1
+Λ−1AT
+AΛ−1
+L−1 + AΛ−1AT
+
+.
+(3.89)
+Similarly, we can ﬁnd the mean of the Gaussian distribution over z by identify-
+ing the linear terms in (3.86), which are given by
+xTΛµ −xTATLb + yTLb =
+
+x
+y
+T 
+Λµ −ATLb
+Lb
+
+.
+(3.90)
+Using our earlier result (3.55) obtained by completing the square over the quadratic
+form of a multivariate Gaussian, we ﬁnd that the mean of z is given by
+E[z] = R−1
+
+Λµ −ATLb
+Lb
+
+.
+(3.91)
+Making use of (3.89), we then obtain
+Exercise 3.24
+E[z] =
+
+µ
+Aµ + b
+
+.
+(3.92)
+Next we ﬁnd an expression for the marginal distribution p(y) in which we have
+marginalized over x. Recall that the marginal distribution over a subset of the com-
+ponents of a Gaussian random vector takes a particularly simple form when ex-
+pressed in terms of the partitioned covariance matrix. Speciﬁcally, its mean and
+Section 3.2
+covariance are given by (3.76) and (3.77), respectively. Making use of (3.89) and
+(3.92), we see that the mean and covariance of the marginal distribution p(y) are
+given by
+E[y]
+=
+Aµ + b
+(3.93)
+cov[y]
+=
+L−1 + AΛ−1AT.
+(3.94)
+A special case of this result is when A = I, in which case the marginal distribution
+reduces to the convolution of two Gaussians, for which we see that the mean of the
+convolution is the sum of the means of the two Gaussians and the covariance of the
+convolution is the sum of their covariances.
+Finally, we seek an expression for the conditional p(x|y). Recall that the results
+for the conditional distribution are most easily expressed in terms of the partitioned
+precision matrix, using (3.57) and (3.59). Applying these results to (3.89) and (3.92),
+Section 3.2
+we see that the conditional distribution p(x|y) has mean and covariance given by
+E[x|y]
+=
+(Λ + ATLA)−1 
+ATL(y −b) + Λµ
+	
+(3.95)
+cov[x|y]
+=
+(Λ + ATLA)−1.
+(3.96)
+
+--- Page 103 ---
+84
+3. STANDARD DISTRIBUTIONS
+The evaluation of this conditional distribution can be seen as an example of
+Bayes’ theorem, in which we interpret p(x) as a prior distribution over x. If the
+variable y is observed, then the conditional distribution p(x|y) represents the corre-
+sponding posterior distribution over x. Having found the marginal and conditional
+distributions, we have effectively expressed the joint distribution p(z) = p(x)p(y|x)
+in the form p(x|y)p(y).
+These results can be summarized as follows. Given a marginal Gaussian distri-
+bution for x and a conditional Gaussian distribution for y given x in the form
+p(x)
+=
+N(x|µ, Λ−1)
+(3.97)
+p(y|x)
+=
+N(y|Ax + b, L−1),
+(3.98)
+then the marginal distribution of y and the conditional distribution of x given y are
+given by
+p(y)
+=
+N(y|Aµ + b, L−1 + AΛ−1AT)
+(3.99)
+p(x|y)
+=
+N(x|Σ{ATL(y −b) + Λµ}, Σ)
+(3.100)
+where
+Σ = (Λ + ATLA)−1.
+(3.101)
+3.2.7
+Maximum likelihood
+Given a data set X = (x1, . . . , xN)T in which the observations {xn} are as-
+sumed to be drawn independently from a multivariate Gaussian distribution, we can
+estimate the parameters of the distribution by maximum likelihood. The log likeli-
+hood function is given by
+ln p(X|µ, Σ) = −ND
+2
+ln(2π)−N
+2 ln |Σ|−1
+2
+N
+X
+n=1
+(xn−µ)TΣ−1(xn−µ). (3.102)
+By simple rearrangement, we see that the likelihood function depends on the data set
+only through the two quantities
+N
+X
+n=1
+xn,
+N
+X
+n=1
+xnxT
+n.
+(3.103)
+These are known as the sufﬁcient statistics for the Gaussian distribution. Using
+(A.19), the derivative of the log likelihood with respect to µ is given by
+Appendix A
+∂
+∂µ ln p(X|µ, Σ) =
+N
+X
+n=1
+Σ−1(xn −µ),
+(3.104)
+and setting this derivative to zero, we obtain the solution for the maximum likelihood
+estimate of the mean:
+µML = 1
+N
+N
+X
+n=1
+xn,
+(3.105)
+
+--- Page 104 ---
+3.2. The Multivariate Gaussian
+85
+which is the mean of the observed set of data points. The maximization of (3.102)
+with respect to Σ is rather more involved. The simplest approach is to ignore the
+symmetry constraint and show that the resulting solution is symmetric as required.
+Exercise 3.28
+Alternative derivations of this result, which impose the symmetry and positive deﬁ-
+niteness constraints explicitly, can be found in Magnus and Neudecker (1999). The
+result is as expected and takes the form
+ΣML = 1
+N
+N
+X
+n=1
+(xn −µML)(xn −µML)T,
+(3.106)
+which involves µML because this is the result of a joint maximization with respect
+to µ and Σ. Note that the solution (3.105) for µML does not depend on ΣML, and so
+we can ﬁrst evaluate µML and then use this to evaluate ΣML.
+If we evaluate the expectations of the maximum likelihood solutions under the
+true distribution, we obtain the following results
+Exercise 3.29
+E[µML]
+=
+µ
+(3.107)
+E[ΣML]
+=
+N −1
+N
+Σ.
+(3.108)
+We see that the expectation of the maximum likelihood estimate for the mean is equal
+to the true mean. However, the maximum likelihood estimate for the covariance has
+an expectation that is less than the true value, and hence, it is biased. We can correct
+this bias by deﬁning a different estimator eΣ given by
+eΣ =
+1
+N −1
+N
+X
+n=1
+(xn −µML)(xn −µML)T.
+(3.109)
+Clearly from (3.106) and (3.108), the expectation of eΣ is equal to Σ.
+3.2.8
+Sequential estimation
+Our discussion of the maximum likelihood solution represents a batch method
+in which the entire training data set is considered at once. An alternative is to use
+sequential methods, which allow data points to be processed one at a time and then
+discarded. These are important for online applications and for large data when the
+batch processing of all data points at once is infeasible.
+Consider the result (3.105) for the maximum likelihood estimator of the mean
+µML, which we will denote by µ(N)
+ML when it is based on N observations. If we
+
+--- Page 105 ---
+86
+3. STANDARD DISTRIBUTIONS
+Figure 3.6
+Plots of the Old Faith-
+ful data in which the red curves are
+contours of constant probability den-
+sity. (a) A single Gaussian distribu-
+tion which has been ﬁtted to the data
+using maximum likelihood. Note that
+this distribution fails to capture the
+two clumps in the data and indeed
+places much of its probability mass
+in the central region between the
+clumps where the data are relatively
+sparse. (b) The distribution given by
+a linear combination of two Gaus-
+sians, also ﬁtted by maximum likeli-
+hood, which gives a better represen-
+tation of the data.
+1
+2
+3
+4
+5
+6
+40
+60
+80
+100
+(a)
+1
+2
+3
+4
+5
+6
+40
+60
+80
+100
+(b)
+dissect out the contribution from the ﬁnal data point xN, we obtain
+µ(N)
+ML
+=
+1
+N
+N
+X
+n=1
+xn
+=
+1
+N xN + 1
+N
+N−1
+X
+n=1
+xn
+=
+1
+N xN + N −1
+N
+µ(N−1)
+ML
+=
+µ(N−1)
+ML
++ 1
+N (xN −µ(N−1)
+ML
+).
+(3.110)
+This result has a nice interpretation, as follows. After observing N −1 data points,
+we estimate µ by µ(N−1)
+ML
+. We now observe data point xN, and we obtain our revised
+estimate µ(N)
+ML by moving the old estimate a small amount, proportional to 1/N, in
+the direction of the ‘error signal’ (xN −µ(N−1)
+ML
+). Note that, as N increases, so the
+contributions from successive data points get smaller.
+3.2.9
+Mixtures of Gaussians
+Although the Gaussian distribution has some important analytical properties, it
+suffers from signiﬁcant limitations when used to model modelling real data sets.
+Consider the example shown in Figure 3.6(a). This is known as the ‘Old Faithful’
+data set, and comprises 272 measurements of the eruption of the Old Faithful geyser
+in Yellowstone National Park in the USA. Each measurement gives the duration of
+the eruption in minutes (horizontal axis) and the time in minutes to the next eruption
+(vertical axis). We see that the data set forms two dominant clumps, and that a simple
+Gaussian distribution is unable to capture this structure.
+We might expect that a superposition of two Gaussian distributions would be
+able to do a much better job of representing the structure in this data set, and indeed
+
+--- Page 106 ---
+3.2. The Multivariate Gaussian
+87
+Figure 3.7
+Example of a Gaussian mixture distri-
+bution in one dimension showing three
+Gaussians (each scaled by a coefﬁcient)
+in blue and their sum in red.
+t
+p(t|x)
+this proves to be the case, as can be seen from Figure 3.6(b). Such superpositions,
+formed by taking linear combinations of more basic distributions such as Gaussians,
+can be formulated as probabilistic models known as mixture distributions. In this sec-
+Chapter 15
+tion we will consider Gaussians to illustrate the framework of mixture models. More
+generally, mixture models can comprise linear combinations of other distributions,
+for example mixtures of Bernoulli distributions for binary variables. In Figure 3.7 we
+see that a linear combination of Gaussians can give rise to very complex densities.
+By using a sufﬁcient number of Gaussians and by adjusting their means and covari-
+ances as well as the coefﬁcients in the linear combination, almost any continuous
+distribution can be approximated to arbitrary accuracy.
+We therefore consider a superposition of K Gaussian densities of the form
+p(x) =
+K
+X
+k=1
+πkN(x|µk, Σk),
+(3.111)
+which is called a mixture of Gaussians. Each Gaussian density N(x|µk, Σk) is
+called a component of the mixture and has its own mean µk and covariance Σk.
+Contour and surface plots for a Gaussian mixture in two dimensions having three
+components are shown in Figure 3.8.
+The parameters πk in (3.111) are called mixing coefﬁcients. If we integrate both
+sides of (3.111) with respect to x, and note that both p(x) and the individual Gaussian
+components are normalized, we obtain
+K
+X
+k=1
+πk = 1.
+(3.112)
+Also, given that N(x|µk, Σk) ⩾0, a sufﬁcient condition for the requirement p(x) ⩾
+0 is that πk ⩾0 for all k. Combining this with the condition (3.112), we obtain
+0 ⩽πk ⩽1.
+(3.113)
+We can therefore see that the mixing coefﬁcients satisfy the requirements to be prob-
+abilities, and we will show that this probabilistic interpretation of mixture distribu-
+tions is very powerful.
+Chapter 15
+
+--- Page 107 ---
+88
+3. STANDARD DISTRIBUTIONS
+x1
+x2
+π1 = 0.5
+π2 = 0.3
+π3 = 0.2
+(a)
+x1
+x2
+p(x)
+(b)
+x1
+x2
+(c)
+Figure 3.8
+Illustration of a mixture of three Gaussians in a two-dimensional space. (a) Contours of constant
+density for each of the mixture components, in which the three components are denoted red, blue, and green, and
+the values of the mixing coefﬁcients are shown below each component. (b) Contours of the marginal probability
+density p(x) of the mixture distribution. (c) A surface plot of the distribution p(x).
+From the sum and product rules of probability, the marginal density can be writ-
+ten as
+p(x) =
+K
+X
+k=1
+p(k)p(x|k),
+(3.114)
+which is equivalent to (3.111) in which we can view πk = p(k) as the prior proba-
+bility of picking the kth component, and the density N(x|µk, Σk) = p(x|k) as the
+probability of x conditioned on k. As we will see in later chapters, an important role
+is played by the corresponding posterior probabilities p(k|x), which are also known
+as responsibilities. From Bayes’ theorem, these are given by
+γk(x)
+≡
+p(k|x)
+=
+p(k)p(x|k)
+P
+l p(l)p(x|l)
+=
+πkN(x|µk, Σk)
+P
+l πlN(x|µl, Σl).
+(3.115)
+The form of the Gaussian mixture distribution is governed by the parameters π,
+µ, and Σ, where we have used the notation π ≡{π1, . . . , πK}, µ ≡{µ1, . . . , µK},
+and Σ ≡{Σ1, . . . ΣK}. One way to set the values of these parameters is to use
+maximum likelihood. From (3.111), the log of the likelihood function is given by
+ln p(X|π, µ, Σ) =
+N
+X
+n=1
+ln
+( K
+X
+k=1
+πkN(xn|µk, Σk)
+)
+(3.116)
+where X = {x1, . . . , xN}. We immediately see that the situation is now much more
+complex than with a single Gaussian, due to the summation over k inside the log-
+
+--- Page 108 ---
+3.3. Periodic Variables
+89
+arithm. As a result, the maximum likelihood solution for the parameters no longer
+has a closed-form analytical solution. One approach for maximizing the likelihood
+function is to use iterative numerical optimization techniques. Alternatively, we can
+employ a powerful framework called expectation maximization, which has wide ap-
+Chapter 15
+plicability to a variety of different deep generative models.
+3.3. Periodic Variables
+Although Gaussian distributions are of great practical signiﬁcance, both in their own
+right and as building blocks for more complex probabilistic models, there are situa-
+tions in which they are inappropriate as density models for continuous variables. One
+important case, which arises in practical applications, is that of periodic variables.
+An example of a periodic variable is the wind direction at a particular geographi-
+cal location. We might, for instance, measure the wind direction at multiple locations
+and wish to summarize this data using a parametric distribution. Another example
+is calendar time, where we may be interested in modelling quantities that are be-
+lieved to be periodic over 24 hours or over an annual cycle. Such quantities can
+conveniently be represented using an angular (polar) coordinate 0 ⩽θ < 2π.
+We might be tempted to treat periodic variables by choosing some direction
+as the origin and then applying a conventional distribution such as the Gaussian.
+Such an approach, however, would give results that were strongly dependent on the
+arbitrary choice of origin. Suppose, for instance, that we have two observations at
+θ1 = 1◦and θ2 = 359◦, and we model them using a standard univariate Gaussian
+distribution. If we place the origin at 0◦, then the sample mean of this data set will be
+180◦with standard deviation 179◦, whereas if we place the origin at 180◦, then the
+mean will be 0◦and the standard deviation will be 1◦. We clearly need to develop a
+special approach for periodic variables.
+3.3.1
+Von Mises distribution
+Let us consider the problem of evaluating the mean of a set of observations
+D = {θ1, . . . , θN} of a periodic variable θ where θ is measured in radians. We have
+already seen that the simple average (θ1 + · · · + θN)/N will be strongly coordinate
+dependent. To ﬁnd an invariant measure of the mean, note that the observations
+can be viewed as points on the unit circle and can therefore be described instead by
+two-dimensional unit vectors x1, . . . , xN where ∥xn∥= 1 for n = 1, . . . , N, as
+illustrated in Figure 3.9. We can average the vectors {xn} instead to give
+x = 1
+N
+N
+X
+n=1
+xn
+(3.117)
+and then ﬁnd the corresponding angle θ of this average. Clearly, this deﬁnition will
+ensure that the location of the mean is independent of the origin of the angular coor-
+dinate. Note that x will typically lie inside the unit circle. The Cartesian coordinates
+
+--- Page 109 ---
+90
+3. STANDARD DISTRIBUTIONS
+Figure 3.9
+Illustration of the representation of val-
+ues θn of a periodic variable as two-
+dimensional vectors xn living on the unit
+circle.
+Also shown is the average x of
+those vectors.
+x1
+x2
+x1
+x2
+x3
+x4
+x
+r
+θ
+of the observations are given by xn = (cos θn, sin θn), and we can write the Carte-
+sian coordinates of the sample mean in the form x = (r cos θ, r sin θ). Substituting
+into (3.117) and equating the x1 and x2 components then gives
+x1 = r cos θ = 1
+N
+N
+X
+n=1
+cos θn,
+x2 = r sin θ = 1
+N
+N
+X
+n=1
+sin θn.
+(3.118)
+Taking the ratio, and using the identity tan θ = sin θ/ cos θ, we can solve for θ to
+give
+θ = tan−1
+ P
+n sin θn
+P
+n cos θn
+
+.
+(3.119)
+Shortly, we will see how this result arises naturally as a maximum likelihood estima-
+tor.
+First, we need to deﬁne a periodic generalization of the Gaussian called the
+von Mises distribution. Here we will limit our attention to univariate distributions,
+although analogous periodic distributions can also be found over hyperspheres of
+arbitrary dimension (Mardia and Jupp, 2000).
+By convention, we will consider distributions p(θ) that have period 2π. Any
+probability density p(θ) deﬁned over θ must not only be non-negative and integrate
+to one, but it must also be periodic. Thus, p(θ) must satisfy the three conditions:
+p(θ)
+⩾
+0
+(3.120)
+Z 2π
+0
+p(θ) dθ
+=
+1
+(3.121)
+p(θ + 2π)
+=
+p(θ).
+(3.122)
+From (3.122), it follows that p(θ + M2π) = p(θ) for any integer M.
+We can easily obtain a Gaussian-like distribution that satisﬁes these three prop-
+erties as follows. Consider a Gaussian distribution over two variables x = (x1, x2)
+
+--- Page 110 ---
+3.3. Periodic Variables
+91
+Figure 3.10
+The von Mises distribution can be derived by considering
+a two-dimensional Gaussian of the form (3.123), whose
+density contours are shown in blue, and conditioning on
+the unit circle shown in red.
+x1
+x2
+p(x)
+r = 1
+having mean µ = (µ1, µ2) and a covariance matrix Σ = σ2I where I is the 2 × 2
+identity matrix, so that
+p(x1, x2) =
+1
+2πσ2 exp
+
+−(x1 −µ1)2 + (x2 −µ2)2
+2σ2
+
+.
+(3.123)
+The contours of constant p(x) are circles, as illustrated in Figure 3.10.
+Now suppose we consider the value of this distribution along a circle of ﬁxed
+radius. Then by construction, this distribution will be periodic, although it will not
+be normalized. We can determine the form of this distribution by transforming from
+Cartesian coordinates (x1, x2) to polar coordinates (r, θ) so that
+x1 = r cos θ,
+x2 = r sin θ.
+(3.124)
+We also map the mean µ into polar coordinates by writing
+µ1 = r0 cos θ0,
+µ2 = r0 sin θ0.
+(3.125)
+Next we substitute these transformations into the two-dimensional Gaussian distribu-
+tion (3.123), and then condition on the unit circle r = 1, noting that we are interested
+only in the dependence on θ. Focusing on the exponent in the Gaussian distribution
+we have
+−1
+2σ2
+
+(r cos θ −r0 cos θ0)2 + (r sin θ −r0 sin θ0)2	
+=
+−1
+2σ2
+
+1 + r2
+0 −2r0 cos θ cos θ0 −2r0 sin θ sin θ0
+	
+=
+r0
+σ2 cos(θ −θ0) + const
+(3.126)
+where ‘const’ denotes terms independent of θ. We have made use of the following
+trigonometrical identities:
+cos2 A + sin2 A
+=
+1
+(3.127)
+cos A cos B + sin A sin B
+=
+cos(A −B).
+(3.128)
+If we now deﬁne m = r0/σ2, we obtain our ﬁnal expression for the distribution of
+p(θ) along the unit circle r = 1 in the form
+p(θ|θ0, m) =
+1
+2πI0(m) exp {m cos(θ −θ0)} ,
+(3.129)
+
+--- Page 111 ---
+92
+3. STANDARD DISTRIBUTIONS
+ 
+ 
+m = 5, θ0 = π/4
+m = 1, θ0 = 3π/4
+2π
+0
+π/4
+3π/4
+ 
+m = 5, θ0 = π/4
+m = 1, θ0 = 3π/4
+Figure 3.11
+The von Mises distribution plotted for two different parameter values, shown as a Cartesian plot
+on the left and as the corresponding polar plot on the right.
+which is called the von Mises distribution or the circular normal. Here the param-
+eter θ0 corresponds to the mean of the distribution, whereas m, which is known
+as the concentration parameter, is analogous to the inverse variance (i.e. the pre-
+cision) for the Gaussian. The normalization coefﬁcient in (3.129) is expressed in
+terms of I0(m), which is the zeroth-order modiﬁed Bessel function of the ﬁrst kind
+(Abramowitz and Stegun, 1965) and is deﬁned by
+I0(m) = 1
+2π
+Z 2π
+0
+exp {m cos θ} dθ.
+(3.130)
+For large m, the distribution becomes approximately Gaussian. The von Mises dis-
+Exercise 3.31
+tribution is plotted in Figure 3.11, and the function I0(m) is plotted in Figure 3.12.
+Now consider the maximum likelihood estimators for the parameters θ0 and m
+for the von Mises distribution. The log likelihood function is given by
+ln p(D|θ0, m) = −N ln(2π) −N ln I0(m) + m
+N
+X
+n=1
+cos(θn −θ0).
+(3.131)
+Setting the derivative with respect to θ0 equal to zero gives
+N
+X
+n=1
+sin(θn −θ0) = 0.
+(3.132)
+To solve for θ0, we make use of the trigonometric identity
+sin(A −B) = cos B sin A −cos A sin B
+(3.133)
+from which we obtain
+Exercise 3.32
+
+--- Page 112 ---
+3.3. Periodic Variables
+93
+I0(m)
+m
+0
+5
+10
+0
+1000
+2000
+3000
+A(m)
+m
+0
+5
+10
+0
+0.5
+1
+Figure 3.12
+Plot of the Bessel function I0(m) deﬁned by (3.130), together with the function A(m) deﬁned by
+(3.136).
+θML
+0
+= tan−1
+ P
+n sin θn
+P
+n cos θn
+
+,
+(3.134)
+which we recognize as the result (3.119) obtained earlier for the mean of the obser-
+vations viewed in a two-dimensional Cartesian space.
+Similarly, maximizing (3.131) with respect to m and making use of I′
+0(m) =
+I1(m) (Abramowitz and Stegun, 1965), we have
+A(mML) = 1
+N
+N
+X
+n=1
+cos(θn −θML
+0
+)
+(3.135)
+where we have substituted for the maximum likelihood solution for θML
+0
+(recalling
+that we are performing a joint optimization over θ and m), and we have deﬁned
+A(m) = I1(m)
+I0(m).
+(3.136)
+The function A(m) is plotted in Figure 3.12. Making use of the trigonometric iden-
+tity (3.128), we can write (3.135) in the form
+A(mML) =
+ 
+1
+N
+N
+X
+n=1
+cos θn
+!
+cos θML
+0
++
+ 
+1
+N
+N
+X
+n=1
+sin θn
+!
+sin θML
+0
+.
+(3.137)
+The right-hand side of (3.137) is easily evaluated, and the function A(m) can be in-
+verted numerically. One limitation of the von Mises distribution is that it is unimodal.
+By forming mixtures of von Mises distributions, we obtain a ﬂexible framework for
+modelling periodic variables that can handle multimodality.
+For completeness, we mention brieﬂy some alternative techniques for construct-
+ing periodic distributions. The simplest approach is to use a histogram of observa-
+tions in which the angular coordinate is divided into ﬁxed bins. This has the virtue of
+
+--- Page 113 ---
+94
+3. STANDARD DISTRIBUTIONS
+simplicity and ﬂexibility but also suffers from signiﬁcant limitations, as we will see
+when we discuss histogram methods in more detail later. Another approach starts,
+Section 3.5
+like the von Mises distribution, from a Gaussian distribution over a Euclidean space
+but now marginalizes onto the unit circle rather than conditioning (Mardia and Jupp,
+2000). However, this leads to more complex forms of distribution and will not be
+discussed further. Finally, any valid distribution over the real axis (such as a Gaus-
+sian) can be turned into a periodic distribution by mapping successive intervals of
+width 2π onto the periodic variable (0, 2π), which corresponds to ‘wrapping’ the
+real axis around the unit circle. Again, the resulting distribution is more complex to
+handle than the von Mises distribution.
+3.4. The Exponential Family
+The probability distributions that we have studied so far in this chapter (with the
+exception of mixture models) are speciﬁc examples of a broad class of distributions
+called the exponential family (Duda and Hart, 1973; Bernardo and Smith, 1994).
+Members of the exponential family have many important properties in common, and
+it is illuminating to discuss these properties in some generality.
+The exponential family of distributions over x, given parameters η, is deﬁned to
+be the set of distributions of the form
+p(x|η) = h(x)g(η) exp
+
+ηTu(x)
+	
+(3.138)
+where x may be scalar or vector and may be discrete or continuous. Here η are called
+the natural parameters of the distribution, and u(x) is some function of x. The
+function g(η) can be interpreted as the coefﬁcient that ensures that the distribution
+is normalized, and therefore, it satisﬁes
+g(η)
+Z
+h(x) exp
+
+ηTu(x)
+	
+dx = 1
+(3.139)
+where the integration is replaced by summation if x is a discrete variable.
+We begin by taking some examples of the distributions introduced earlier in
+the chapter and showing that they are indeed members of the exponential family.
+Consider ﬁrst the Bernoulli distribution:
+p(x|µ) = Bern(x|µ) = µx(1 −µ)1−x.
+(3.140)
+Expressing the right-hand side as the exponential of the logarithm, we have
+p(x|µ)
+=
+exp {x ln µ + (1 −x) ln(1 −µ)}
+=
+(1 −µ) exp
+
+ln
+
+µ
+1 −µ
+
+x
+
+.
+(3.141)
+Comparison with (3.138) allows us to identify
+η = ln
+
+µ
+1 −µ
+
+(3.142)
+
+--- Page 114 ---
+3.4. The Exponential Family
+95
+which we can solve for µ to give µ = σ(η), where
+σ(η) =
+1
+1 + exp(−η)
+(3.143)
+is called the logistic sigmoid function. Thus, we can write the Bernoulli distribution
+using the standard representation (3.138) in the form
+p(x|η) = σ(−η) exp(ηx)
+(3.144)
+where we have used 1 −σ(η) = σ(−η), which is easily proved from (3.143). Com-
+parison with (3.138) shows that
+u(x)
+=
+x
+(3.145)
+h(x)
+=
+1
+(3.146)
+g(η)
+=
+σ(−η).
+(3.147)
+Next consider the multinomial distribution which, for a single observation x,
+takes the form
+p(x|µ) =
+M
+Y
+k=1
+µxk
+k = exp
+( M
+X
+k=1
+xk ln µk
+)
+(3.148)
+where x = (x1, . . . , xM)T. Again, we can write this in the standard representation
+(3.138) so that
+p(x|η) = exp(ηTx)
+(3.149)
+where ηk = ln µk, and we have deﬁned η = (η1, . . . , ηM)T. Again, comparing with
+(3.138) we have
+u(x)
+=
+x
+(3.150)
+h(x)
+=
+1
+(3.151)
+g(η)
+=
+1.
+(3.152)
+Note that the parameters ηk are not independent because the parameters µk are sub-
+ject to the constraint
+M
+X
+k=1
+µk = 1
+(3.153)
+so that, given any M −1 of the parameters µk, the value of the remaining parameter
+is ﬁxed. In some circumstances, it will be convenient to remove this constraint by
+expressing the distribution in terms of only M −1 parameters. This can be achieved
+by using the relationship (3.153) to eliminate µM by expressing it in terms of the
+remaining {µk} where k = 1, . . . , M −1, thereby leaving M −1 parameters. Note
+that these remaining parameters are still subject to the constraints
+0 ⩽µk ⩽1,
+M−1
+X
+k=1
+µk ⩽1.
+(3.154)
+
+--- Page 115 ---
+96
+3. STANDARD DISTRIBUTIONS
+Making use of the constraint (3.153), the multinomial distribution in this representa-
+tion then becomes
+exp
+( M
+X
+k=1
+xk ln µk
+)
+=
+exp
+(M−1
+X
+k=1
+xk ln µk +
+ 
+1 −
+M−1
+X
+k=1
+xk
+!
+ln
+ 
+1 −
+M−1
+X
+k=1
+µk
+!)
+=
+exp
+(M−1
+X
+k=1
+xk ln
+ 
+µk
+1 −PM−1
+j=1 µj
+!
++ ln
+ 
+1 −
+M−1
+X
+k=1
+µk
+!)
+.
+(3.155)
+We now identify
+ln
+ 
+µk
+1 −P
+j µj
+!
+= ηk,
+(3.156)
+which we can solve for µk by ﬁrst summing both sides over k and then rearranging
+and back-substituting to give
+µk =
+exp(ηk)
+1 + P
+j exp(ηj).
+(3.157)
+This is called the softmax function or the normalized exponential. In this representa-
+tion, the multinomial distribution therefore takes the form
+p(x|η) =
+ 
+1 +
+M−1
+X
+k=1
+exp(ηk)
+!−1
+exp(ηTx).
+(3.158)
+This is the standard form of the exponential family, with parameter vector η =
+(η1, . . . , ηM−1)T in which
+u(x)
+=
+x
+(3.159)
+h(x)
+=
+1
+(3.160)
+g(η)
+=
+ 
+1 +
+M−1
+X
+k=1
+exp(ηk)
+!−1
+.
+(3.161)
+Finally, let us consider the Gaussian distribution. For the univariate Gaussian,
+we have
+p(x|µ, σ2)
+=
+1
+(2πσ2)1/2 exp
+
+−1
+2σ2 (x −µ)2
+
+(3.162)
+=
+1
+(2πσ2)1/2 exp
+
+−1
+2σ2 x2 + µ
+σ2 x −
+1
+2σ2 µ2
+
+,
+(3.163)
+which, after some simple rearranging, can be cast in the standard exponential family
+form (3.138) with
+Exercise 3.35
+
+--- Page 116 ---
+3.4. The Exponential Family
+97
+η
+=
+
+µ/σ2
+−1/2σ2
+
+(3.164)
+u(x)
+=
+
+x
+x2
+
+(3.165)
+h(x)
+=
+(2π)−1/2
+(3.166)
+g(η)
+=
+(−2η2)1/2 exp
+ η2
+1
+4η2
+
+.
+(3.167)
+Finally, we shall sometimes make use of a restricted form of (3.138) in which
+we choose u(x) = x. However, this can be somewhat generalized by noting that if
+f(x) is a normalized density then
+1
+sf
+1
+sx
+
+(3.168)
+is also a normalized density, where s > 0 is a scale parameter. Combining these, we
+arrive at a restricted set of exponential family class-conditional densities of the form
+p(x|λk, s) = 1
+sh
+1
+sx
+
+g(λk) exp
+1
+sλT
+k x
+
+.
+(3.169)
+Note that we are allowing each class to have its own parameter vector λk but we are
+assuming that the classes share the same scale parameter s.
+3.4.1
+Sufﬁcient statistics
+Let us now consider the problem of estimating the parameter vector η in the gen-
+eral exponential family distribution (3.138) using the technique of maximum likeli-
+hood. Taking the gradient of both sides of (3.139) with respect to η, we have
+∇g(η)
+Z
+h(x) exp
+
+ηTu(x)
+	
+dx
++
+g(η)
+Z
+h(x) exp
+
+ηTu(x)
+	
+u(x) dx = 0.
+(3.170)
+Rearranging and making use again of (3.139) then gives
+−
+1
+g(η)∇g(η) = g(η)
+Z
+h(x) exp
+
+ηTu(x)
+	
+u(x) dx = E[u(x)].
+(3.171)
+We therefore obtain the result
+−∇ln g(η) = E[u(x)].
+(3.172)
+Note that the covariance of u(x) can be expressed in terms of the second derivatives
+of g(η), and similarly for higher-order moments. Thus, provided we can normalize a
+Exercise 3.36
+distribution from the exponential family, we can always ﬁnd its moments by simple
+differentiation.
+
+--- Page 117 ---
+98
+3. STANDARD DISTRIBUTIONS
+Now consider a set of independent identically distributed data denoted by X =
+{x1, . . . , xn}, for which the likelihood function is given by
+p(X|η) =
+ N
+Y
+n=1
+h(xn)
+!
+g(η)N exp
+(
+ηT
+N
+X
+n=1
+u(xn)
+)
+.
+(3.173)
+Setting the gradient of ln p(X|η) with respect to η to zero, we get the following
+condition to be satisﬁed by the maximum likelihood estimator ηML:
+−∇ln g(ηML) = 1
+N
+N
+X
+n=1
+u(xn),
+(3.174)
+which can in principle be solved to obtain ηML. We see that the solution for the
+maximum likelihood estimator depends on the data only through P
+n u(xn), which
+is therefore called the sufﬁcient statistic of the distribution (3.138). We do not need
+to store the entire data set itself but only the value of the sufﬁcient statistic. For
+the Bernoulli distribution, for example, the function u(x) is given just by x and
+so we need only keep the sum of the data points {xn}, whereas for the Gaussian
+u(x) = (x, x2)T, and so we should keep both the sum of {xn} and the sum of {x2
+n}.
+If we consider the limit N →∞, then the right-hand side of (3.174) becomes
+E[u(x)], and so by comparing with (3.172) we see that in this limit, ηML will equal
+the true value η.
+3.5. Nonparametric Methods
+Throughout this chapter, we have focused on the use of probability distributions
+having speciﬁc functional forms governed by a small number of parameters whose
+values are to be determined from a data set. This is called the parametric approach
+to density modelling. An important limitation of this approach is that the chosen
+density might be a poor model of the distribution that generates the data, which can
+result in poor predictive performance. For instance, if the process that generates the
+data is multimodal, then this aspect of the distribution can never be captured by a
+Gaussian, which is necessarily unimodal. In this ﬁnal section, we consider some
+nonparametric approaches to density estimation that make few assumptions about
+the form of the distribution.
+3.5.1
+Histograms
+Let us start with a discussion of histogram methods for density estimation, which
+we have already encountered in the context of marginal and conditional distributions
+in Figure 2.5 and in the context of the central limit theorem in Figure 3.2. Here we
+explore the properties of histogram density models in more detail, focusing on cases
+with a single continuous variable x. Standard histograms simply partition x into
+distinct bins of width ∆i and then count the number ni of observations of x falling
+
+--- Page 118 ---
+3.5. Nonparametric Methods
+99
+Figure 3.13
+An illustration of the histogram
+approach to density estimation,
+in which a data set of 50 data
+points is generated from the dis-
+tribution
+shown
+by
+the
+green
+curve.
+Histogram density esti-
+mates, based on (3.175) with a
+common bin width ∆, are shown
+for various values of ∆.
+∆= 0.04
+0
+0.5
+1
+0
+5
+∆= 0.08
+0
+0.5
+1
+0
+5
+∆= 0.25
+0
+0.5
+1
+0
+5
+in bin i. To turn this count into a normalized probability density, we simply divide
+by the total number N of observations and by the width ∆i of the bins to obtain
+probability values for each bin:
+pi =
+ni
+N∆i
+(3.175)
+for which it is easily seen that
+R
+p(x) dx = 1. This gives a model for the density
+p(x) that is constant over the width of each bin. Often the bins are chosen to have
+the same width ∆i = ∆.
+In Figure 3.13, we show an example of histogram density estimation. Here the
+data is drawn from the distribution corresponding to the green curve, which is formed
+from a mixture of two Gaussians. Also shown are three examples of histogram
+density estimates corresponding to three different choices for the bin width ∆. We
+see that when ∆is very small (top ﬁgure), the resulting density model is very spiky,
+with a lot of structure that is not present in the underlying distribution that generated
+the data set. Conversely, if ∆is too large (bottom ﬁgure) then the result is a model
+that is too smooth and consequently fails to capture the bimodal property of the
+green curve. The best results are obtained for some intermediate value of ∆(middle
+ﬁgure). In principle, a histogram density model is also dependent on the choice of
+edge location for the bins, though this is typically much less signiﬁcant than the bin
+width ∆.
+Note that the histogram method has the property (unlike the methods to be dis-
+cussed shortly) that, once the histogram has been computed, the data set itself can
+be discarded, which can be advantageous if the data set is large. Also, the histogram
+approach is easily applied if the data points arrive sequentially.
+In practice, the histogram technique can be useful for obtaining a quick visual-
+ization of data in one or two dimensions but is unsuited to most density estimation
+applications. One obvious problem is that the estimated density has discontinuities
+that are due to the bin edges rather than any property of the underlying distribution
+that generated the data. A major limitation of the histogram approach is its scal-
+ing with dimensionality. If we divide each variable in a D-dimensional space into
+
+--- Page 119 ---
+100
+3. STANDARD DISTRIBUTIONS
+M bins, then the total number of bins will be M D. This exponential scaling with
+D is an example of the curse of dimensionality. In a space of high dimensionality,
+Section 6.1.1
+the quantity of data needed to provide meaningful estimates of the local probability
+density would be prohibitive.
+The histogram approach to density estimation does, however, teach us two im-
+portant lessons. First, to estimate the probability density at a particular location,
+we should consider the data points that lie within some local neighbourhood of that
+point. Note that the concept of locality requires that we assume some form of dis-
+tance measure, and here we have been assuming Euclidean distance. For histograms,
+this neighbourhood property was deﬁned by the bins, and there is a natural ‘smooth-
+ing’ parameter describing the spatial extent of the local region, in this case the bin
+width. Second, to obtain good results, the value of the smoothing parameter should
+be neither too large nor too small. This is reminiscent of the choice of model com-
+plexity in polynomial regression where the degree M of the polynomial, or alterna-
+Chapter 1
+tively the value λ of the regularization parameter, was optimal for some intermediate
+value, neither too large nor too small. Armed with these insights, we turn now to a
+discussion of two widely used nonparametric techniques for density estimation, ker-
+nel estimators and nearest neighbours, which have better scaling with dimensionality
+than the simple histogram model.
+3.5.2
+Kernel densities
+Let us suppose that observations are being drawn from some unknown probabil-
+ity density p(x) in some D-dimensional space, which we will take to be Euclidean,
+and we wish to estimate the value of p(x). From our earlier discussion of locality,
+let us consider some small region R containing x. The probability mass associated
+with this region is given by
+P =
+Z
+R
+p(x) dx.
+(3.176)
+Now suppose that we have collected a data set comprising N observations drawn
+from p(x). Because each data point has a probability P of falling within R, the total
+number K of points that lie inside R will be distributed according to the binomial
+distribution:
+Section 3.1.2
+Bin(K|N, P) =
+N!
+K!(N −K)!P K(1 −P)N−K.
+(3.177)
+Using (3.11), we see that the mean fraction of points falling inside the region is
+E[K/N] = P, and similarly using (3.12), we see that the variance around this mean
+is var[K/N] = P(1 −P)/N. For large N, this distribution will be sharply peaked
+around the mean and so
+K ≃NP.
+(3.178)
+If, however, we also assume that the region R is sufﬁciently small so that the proba-
+bility density p(x) is roughly constant over the region, then we have
+P ≃p(x)V
+(3.179)
+
+--- Page 120 ---
+3.5. Nonparametric Methods
+101
+where V is the volume of R. Combining (3.178) and (3.179), we obtain our density
+estimate in the form
+p(x) = K
+NV .
+(3.180)
+Note that the validity of (3.180) depends on two contradictory assumptions, namely
+that the region R is sufﬁciently small that the density is approximately constant over
+the region and yet sufﬁciently large (in relation to the value of that density) that the
+number K of points falling inside the region is sufﬁcient for the binomial distribution
+to be sharply peaked.
+We can exploit the result (3.180) in two different ways. Either we can ﬁx K and
+determine the value of V from the data, which gives rise to the K-nearest-neighbour
+technique discussed shortly, or we can ﬁx V and determine K from the data, giv-
+ing rise to the kernel approach. It can be shown that both the K-nearest-neighbour
+density estimator and the kernel density estimator converge to the true probability
+density in the limit N →∞provided that V shrinks with N and that K grows with
+N, at an appropriate rate (Duda and Hart, 1973).
+We begin by discussing the kernel method in detail. To start with we take the
+region R to be a small hypercube centred on the point x at which we wish to de-
+termine the probability density. To count the number K of points falling within this
+region, it is convenient to deﬁne the following function:
+k(u) =
+
+1,
+|ui| ⩽1/2,
+i = 1, . . . , D,
+0,
+otherwise,
+(3.181)
+which represents a unit cube centred on the origin. The function k(u) is an example
+of a kernel function, and in this context, it is also called a Parzen window. From
+(3.181), the quantity k((x −xn)/h) will be 1 if the data point xn lies inside a cube
+of side h centred on x, and zero otherwise. The total number of data points lying
+inside this cube will therefore be
+K =
+N
+X
+n=1
+k
+x −xn
+h
+
+.
+(3.182)
+Substituting this expression into (3.180) then gives the following result for the esti-
+mated density at x:
+p(x) = 1
+N
+N
+X
+n=1
+1
+hD k
+x −xn
+h
+
+(3.183)
+where we have used V = hD for the volume of a hypercube of side h in D di-
+mensions. Using the symmetry of the function k(u), we can now reinterpret this
+equation, not as a single cube centred on x but as the sum over N cubes centred on
+the N data points xn.
+As it stands, the kernel density estimator (3.183) will suffer from one of the same
+problems that the histogram method suffered from, namely the presence of artiﬁcial
+discontinuities, in this case at the boundaries of the cubes. We can obtain a smoother
+
+--- Page 121 ---
+102
+3. STANDARD DISTRIBUTIONS
+Figure 3.14
+Illustration of the kernel den-
+sity model (3.184) applied to the
+same data set used to demon-
+strate the histogram approach in
+Figure 3.13. We see that h acts
+as a smoothing parameter and
+that if it is set too small (top
+panel), the result is a very noisy
+density model, whereas if it is
+set too large (bottom panel), then
+the bimodal nature of the under-
+lying distribution from which the
+data is generated (shown by the
+green curve) is washed out. The
+best density model is obtained
+for some intermediate value of h
+(middle panel).
+h = 0.005
+0
+0.5
+1
+0
+5
+h = 0.07
+0
+0.5
+1
+0
+5
+h = 0.2
+0
+0.5
+1
+0
+5
+density model if we choose a smoother kernel function, and a common choice is the
+Gaussian, which gives rise to the following kernel density model:
+p(x) = 1
+N
+N
+X
+n=1
+1
+(2πh2)D/2 exp
+
+−∥x −xn∥2
+2h2
+
+(3.184)
+where h represents the standard deviation of the Gaussian components. Thus, our
+density model is obtained by placing a Gaussian over each data point, adding up the
+contributions over the whole data set, and then dividing by N so that the density
+is correctly normalized. In Figure 3.14, we apply the model (3.184) to the data
+set used earlier to demonstrate the histogram technique. We see that, as expected,
+the parameter h plays the role of a smoothing parameter, and there is a trade-off
+between sensitivity to noise at small h and over-smoothing at large h. Again, the
+optimization of h is a problem in model complexity, analogous to the choice of bin
+width in histogram density estimation or the degree of the polynomial used in curve
+ﬁtting.
+We can choose any other kernel function k(u) in (3.183) subject to the condi-
+tions
+k(u)
+⩾
+0,
+(3.185)
+Z
+k(u) du
+=
+1,
+(3.186)
+which ensure that the resulting probability distribution is non-negative everywhere
+and integrates to one. The class of density model given by (3.183) is called a kernel
+density estimator or Parzen estimator. It has a great merit that there is no computation
+involved in the ‘training’ phase because this simply requires the training set to be
+stored. However, this is also one of its great weaknesses because the computational
+cost of evaluating the density grows linearly with the size of the data set.
+
+--- Page 122 ---
+3.5. Nonparametric Methods
+103
+Figure 3.15
+Illustration
+of
+K-nearest-
+neighbour
+density
+estimation
+using the same data set as in
+Figures 3.14 and 3.13. We see
+that the parameter K governs
+the
+degree
+of
+smoothing,
+so
+that a small value of K leads
+to a very noisy density model
+(top panel),
+whereas a large
+value (bottom panel) smooths
+out the bimodal nature of the true
+distribution (shown by the green
+curve) from which the data set
+was generated.
+K = 1
+0
+0.5
+1
+0
+5
+K = 5
+0
+0.5
+1
+0
+5
+K = 30
+0
+0.5
+1
+0
+5
+3.5.3
+Nearest-neighbours
+One of the difﬁculties with the kernel approach to density estimation is that the
+parameter h governing the kernel width is ﬁxed for all kernels. In regions of high
+data density, a large value of h may lead to over-smoothing and a washing out of
+structure that might otherwise be extracted from the data. However, reducing h may
+lead to noisy estimates elsewhere in the data space where the density is smaller.
+Thus, the optimal choice for h may be dependent on the location within the data
+space. This issue is addressed by nearest-neighbour methods for density estimation.
+We therefore return to our general result (3.180) for local density estimation,
+and instead of ﬁxing V and determining the value of K from the data, we consider
+a ﬁxed value of K and use the data to ﬁnd an appropriate value for V . To do this,
+we consider a small sphere centred on the point x at which we wish to estimate the
+density p(x), and we allow the radius of the sphere to grow until it contains precisely
+K data points. The estimate of the density p(x) is then given by (3.180) with V
+set to the volume of the resulting sphere. This technique is known as K nearest
+neighbours and is illustrated in Figure 3.15 for various choices of the parameter K
+using the same data set as used in Figures 3.13 and 3.14. We see that the value of K
+now governs the degree of smoothing and that again there is an optimum choice for
+K that is neither too large nor too small. Note that the model produced by K nearest
+neighbours is not a true density model because the integral over all space diverges.
+Exercise 3.38
+We close this chapter by showing how the K-nearest-neighbour technique for
+density estimation can be extended to the problem of classiﬁcation. To do this, we
+apply the K-nearest-neighbour density estimation technique to each class separately
+and then make use of Bayes’ theorem. Let us suppose that we have a data set com-
+prising Nk points in class Ck with N points in total, so that P
+k Nk = N. If we
+wish to classify a new point x, we draw a sphere centred on x containing precisely
+K points irrespective of their class. Suppose this sphere has volume V and contains
+Kk points from class Ck. Then (3.180) provides an estimate of the density associated
+
+--- Page 123 ---
+104
+3. STANDARD DISTRIBUTIONS
+Figure 3.16
+(a) In the K-nearest-
+neighbour classiﬁer, a new point,
+shown by the black diamond, is clas-
+siﬁed according to the majority class
+membership of the K closest train-
+ing data points, in this case K =
+3.
+(b) In the nearest-neighbour
+(K = 1) approach to classiﬁcation,
+the resulting decision boundary is
+composed of hyperplanes that form
+perpendicular bisectors of pairs of
+points from different classes.
+x1
+x2
+(a)
+x1
+x2
+(b)
+with each class:
+p(x|Ck) = Kk
+NkV .
+(3.187)
+Similarly, the unconditional density is given by
+p(x) = K
+NV
+(3.188)
+and the class priors are given by
+p(Ck) = Nk
+N .
+(3.189)
+We can now combine (3.187), (3.188), and (3.189) using Bayes’ theorem to obtain
+the posterior probability of class membership:
+p(Ck|x) = p(x|Ck)p(Ck)
+p(x)
+= Kk
+K .
+(3.190)
+We can minimize the probability of misclassiﬁcation by assigning the test point x to
+the class having the largest posterior probability, corresponding to the largest value
+of Kk/K. Thus, to classify a new point, we identify the K nearest points from the
+training data set and then assign the new point to the class having the largest number
+of representatives amongst this set. Ties can be broken at random. The particular
+case of K = 1 is called the nearest-neighbour rule, because a test point is simply
+assigned to the same class as the nearest point from the training set. These concepts
+are illustrated in Figure 3.16.
+An interesting property of the nearest-neighbour (K = 1) classiﬁer is that, in the
+limit N →∞, the error rate is never more than twice the minimum achievable error
+rate of an optimal classiﬁer, i.e., one that uses the true class distributions (Cover and
+Hart, 1967) .
+As discussed so far, both the K-nearest-neighbour method and the kernel den-
+sity estimator require the entire training data set to be stored, leading to expensive
+
+--- Page 124 ---
+Exercises
+105
+computation if the data set is large. This effect can be offset, at the expense of some
+additional one-off computation, by constructing tree-based search structures to allow
+(approximate) near neighbours to be found efﬁciently without doing an exhaustive
+search of the data set. Nevertheless, these nonparametric methods are still severely
+limited. On the other hand, we have seen that simple parametric models are very
+restricted in terms of the forms of distribution that they can represent. We therefore
+need to ﬁnd density models that are very ﬂexible and yet for which the complexity
+of the models can be controlled independently of the size of the training set, and this
+can be achieved using deep neural networks.
+Exercises
+3.1
+(⋆) Verify that the Bernoulli distribution (3.2) satisﬁes the following properties:
+1
+X
+x=0
+p(x|µ)
+=
+1
+(3.191)
+E[x]
+=
+µ
+(3.192)
+var[x]
+=
+µ(1 −µ).
+(3.193)
+Show that the entropy H[x] of a Bernoulli-distributed random binary variable x is
+given by
+H[x] = −µ ln µ −(1 −µ) ln(1 −µ).
+(3.194)
+3.2
+(⋆⋆) The form of the Bernoulli distribution given by (3.2) is not symmetric between
+the two values of x. In some situations, it will be more convenient to use an equiva-
+lent formulation for which x ∈{−1, 1}, in which case the distribution can be written
+p(x|µ) =
+1 −µ
+2
+(1−x)/2 1 + µ
+2
+(1+x)/2
+(3.195)
+where µ ∈[−1, 1]. Show that the distribution (3.195) is normalized, and evaluate its
+mean, variance, and entropy.
+3.3
+(⋆⋆) In this exercise, we prove that the binomial distribution (3.9) is normalized.
+First, use the deﬁnition (3.10) of the number of combinations of m identical objects
+chosen from a total of N to show that
+N
+m
+
++
+
+N
+m −1
+
+=
+N + 1
+m
+
+.
+(3.196)
+Use this result to prove by induction the following result:
+(1 + x)N =
+N
+X
+m=0
+N
+m
+
+xm,
+(3.197)
+
+--- Page 125 ---
+106
+3. STANDARD DISTRIBUTIONS
+which is known as the binomial theorem and which is valid for all real values of x.
+Finally, show that the binomial distribution is normalized, so that
+N
+X
+m=0
+N
+m
+
+µm(1 −µ)N−m = 1,
+(3.198)
+which can be done by ﬁrst pulling a factor (1 −µ)N out of the summation and then
+making use of the binomial theorem.
+3.4
+(⋆⋆) Show that the mean of the binomial distribution is given by (3.11). To do this,
+differentiate both sides of the normalization condition (3.198) with respect to µ and
+then rearrange to obtain an expression for the mean of n. Similarly, by differentiating
+(3.198) twice with respect to µ and making use of the result (3.11) for the mean of
+the binomial distribution, prove the result (3.12) for the variance of the binomial.
+3.5
+(⋆) Show that the mode of the multivariate Gaussian (3.26) is given by µ.
+3.6
+(⋆⋆) Suppose that x has a Gaussian distribution with mean µ and covariance Σ.
+Show that the linearly transformed variable Ax + b is also Gaussian, and ﬁnd its
+mean and covariance.
+3.7
+(⋆⋆⋆) Show that the Kullback–Leibler divergence between two Gaussian distribu-
+tions q(x) = N(x|µq, Σq) and p(x) = N(x|µp, Σp) is given by
+KL (q(x)∥p(x))
+= 1
+2
+
+ln |Σp|
+|Σq| −D + Tr
+ Σ−1
+p Σq
+
++ (µp −µq)TΣ−1
+p (µp −µq)
+
+(3.199)
+where Tr(·) denotes the trace of a matrix, and D is the dimensionality of x.
+3.8
+(⋆⋆) This exercise demonstrates that the multivariate distribution with maximum
+entropy, for a given covariance, is a Gaussian. The entropy of a distribution p(x) is
+given by
+H[x] = −
+Z
+p(x) ln p(x) dx.
+(3.200)
+We wish to maximize H[x] over all distributions p(x) subject to the constraints that
+p(x) is normalized and that it has a speciﬁc mean and covariance, so that
+Z
+p(x) dx = 1
+(3.201)
+Z
+p(x)x dx = µ
+(3.202)
+Z
+p(x)(x −µ)(x −µ)T dx = Σ.
+(3.203)
+By performing a variational maximization of (3.200) and using Lagrange multipliers
+to enforce the constraints (3.201), (3.202), and (3.203), show that the maximum
+likelihood distribution is given by the Gaussian (3.26).
+
+--- Page 126 ---
+Exercises
+107
+3.9
+(⋆⋆⋆) Show that the entropy of the multivariate Gaussian N(x|µ, Σ) is given by
+H[x] = 1
+2 ln |Σ| + D
+2 (1 + ln(2π))
+(3.204)
+where D is the dimensionality of x.
+3.10
+(⋆⋆⋆) Consider two random variables x1 and x2 having Gaussian distributions with
+means µ1 and µ2 and precisions τ1 and τ2, respectively. Derive an expression for the
+differential entropy of the variable x = x1 + x2. To do this, ﬁrst ﬁnd the distribution
+of x by using the relation
+p(x) =
+Z ∞
+−∞
+p(x|x2)p(x2) dx2
+(3.205)
+and completing the square in the exponent. Then observe that this represents the
+convolution of two Gaussian distributions, which itself will be Gaussian, and ﬁnally
+make use of the result (2.99) for the entropy of the univariate Gaussian.
+3.11
+(⋆) Consider the multivariate Gaussian distribution given by (3.26). By writing the
+precision matrix (inverse covariance matrix) as the sum of a symmetric and an anti-
+symmetric matrix, show that the antisymmetric term does not appear in the exponent
+of the Gaussian, and hence, that the precision matrix may be taken to be symmetric
+without loss of generality. Because the inverse of a symmetric matrix is also sym-
+metric (see Exercise 3.16), it follows that the covariance matrix may also be chosen
+to be symmetric without loss of generality.
+3.12
+(⋆⋆⋆) Consider a real, symmetric matrix Σ whose eigenvalue equation is given by
+(3.28). By taking the complex conjugate of this equation, subtracting the original
+equation, and then forming the inner product with eigenvector ui, show that the
+eigenvalues λi are real. Similarly, use the symmetry property of Σ to show that two
+eigenvectors ui and uj will be orthogonal provided λj̸ = λi. Finally, show that,
+without loss of generality, the set of eigenvectors can be chosen to be orthonormal,
+so that they satisfy (3.29), even if some of the eigenvalues are zero.
+3.13
+(⋆⋆) Show that a real, symmetric matrix Σ having the eigenvector equation (3.28)
+can be expressed as an expansion in the eigenvectors, with coefﬁcients given by the
+eigenvalues, of the form (3.31). Similarly, show that the inverse matrix Σ−1 has a
+representation of the form (3.32).
+3.14
+(⋆⋆) A positive deﬁnite matrix Σ can be deﬁned as one for which the quadratic form
+aTΣa
+(3.206)
+is positive for any real value of the vector a. Show that a necessary and sufﬁcient
+condition for Σ to be positive deﬁnite is that all the eigenvalues λi of Σ, deﬁned by
+(3.28), are positive.
+3.15
+(⋆) Show that a real, symmetric matrix of size D × D has D(D + 1)/2 independent
+parameters.
+
+--- Page 127 ---
+108
+3. STANDARD DISTRIBUTIONS
+3.16
+(⋆) Show that the inverse of a symmetric matrix is itself symmetric.
+3.17
+(⋆⋆) By diagonalizing the coordinate system using the eigenvector expansion (3.31),
+show that the volume contained within the hyperellipsoid corresponding to a constant
+Mahalanobis distance ∆is given by
+VD|Σ|1/2∆D
+(3.207)
+where VD is the volume of the unit sphere in D dimensions, and the Mahalanobis
+distance is deﬁned by (3.27).
+3.18
+(⋆⋆) Prove the identity (3.60) by multiplying both sides by the matrix
+
+A
+B
+C
+D
+
+(3.208)
+and making use of the deﬁnition (3.61).
+3.19
+(⋆⋆⋆) In Sections 3.2.4 and 3.2.5, we considered the conditional and marginal distri-
+butions for a multivariate Gaussian. More generally, we can consider a partitioning
+of the components of x into three groups xa, xb, and xc, with a corresponding par-
+titioning of the mean vector µ and of the covariance matrix Σ in the form
+µ =
+
+
+µa
+µb
+µc
+
+,
+Σ =
+
+
+Σaa
+Σab
+Σac
+Σba
+Σbb
+Σbc
+Σca
+Σcb
+Σcc
+
+.
+(3.209)
+By making use of the results of Section 3.2, ﬁnd an expression for the conditional
+distribution p(xa|xb) in which xc has been marginalized out.
+3.20
+(⋆⋆) A very useful result from linear algebra is the Woodbury matrix inversion for-
+mula given by
+(A + BCD)−1 = A−1 −A−1B(C−1 + DA−1B)−1DA−1.
+(3.210)
+By multiplying both sides by (A + BCD), prove the correctness of this result.
+3.21
+(⋆) Let x and z be two independent random vectors, so that p(x, z) = p(x)p(z).
+Show that the mean of their sum y = x + z is given by the sum of the means of each
+of the variables separately. Similarly, show that the covariance matrix of y is given
+by the sum of the covariance matrices of x and z.
+3.22
+(⋆⋆⋆) Consider a joint distribution over the variable
+z =
+
+x
+y
+
+(3.211)
+whose mean and covariance are given by (3.92) and (3.89), respectively. By making
+use of the results (3.76) and (3.77), show that the marginal distribution p(x) is given
+by (3.83). Similarly, by making use of the results (3.65) and (3.66), show that the
+conditional distribution p(y|x) is given by (3.84).
+
+--- Page 128 ---
+Exercises
+109
+3.23
+(⋆⋆) Using the partitioned matrix inversion formula (3.60), show that the inverse of
+the precision matrix (3.88) is given by the covariance matrix (3.89).
+3.24
+(⋆⋆) By starting from (3.91) and making use of the result (3.89), verify the result
+(3.92).
+3.25
+(⋆⋆) Consider two multi-dimensional random vectors x and z having Gaussian dis-
+tributions p(x) = N(x|µx, Σx) and p(z) = N(z|µz, Σz), respectively, together
+with their sum y = x + z. By considering the linear-Gaussian model comprising
+the product of the marginal distribution p(x) and the conditional distribution p(y|x)
+and making use of the results (3.93) and (3.94), show that the marginal distribution
+of p(y) is given by
+p(y) = N(y|µx + µz, Σx + Σz).
+(3.212)
+3.26
+(⋆⋆⋆) This exercise and the next provide practice at manipulating the quadratic
+forms that arise in linear-Gaussian models, and they also serve as an independent
+check of results derived in the main text. Consider a joint distribution p(x, y) de-
+ﬁned by the marginal and conditional distributions given by (3.83) and (3.84). By
+examining the quadratic form in the exponent of the joint distribution and using the
+technique of ‘completing the square’ discussed in Section 3.2, ﬁnd expressions for
+the mean and covariance of the marginal distribution p(y) in which the variable x
+has been integrated out. To do this, make use of the Woodbury matrix inversion
+formula (3.210). Verify that these results agree with (3.93) and (3.94).
+3.27
+(⋆⋆⋆) Consider the same joint distribution as in Exercise 3.26, but now use the tech-
+nique of completing the square to ﬁnd expressions for the mean and covariance of
+the conditional distribution p(x|y). Again, verify that these agree with the corre-
+sponding expressions (3.95) and (3.96).
+3.28
+(⋆⋆) To ﬁnd the maximum likelihood solution for the covariance matrix of a mul-
+tivariate Gaussian, we need to maximize the log likelihood function (3.102) with
+respect to Σ, noting that the covariance matrix must be symmetric and positive def-
+inite. Here we proceed by ignoring these constraints and doing a straightforward
+maximization. Using the results (A.21), (A.26), and (A.28) from Appendix A, show
+that the covariance matrix Σ that maximizes the log likelihood function (3.102) is
+given by the sample covariance (3.106). We note that the ﬁnal result is necessarily
+symmetric and positive deﬁnite (provided the sample covariance is non-singular).
+3.29
+(⋆⋆) Use the result (3.42) to prove (3.46). Now, using the results (3.42) and (3.46),
+show that
+E[xnxT
+m] = µµT + InmΣ
+(3.213)
+where xn denotes a data point sampled from a Gaussian distribution with mean µ
+and covariance Σ, and Inm denotes the (n, m) element of the identity matrix. Hence,
+prove the result (3.108).
+3.30
+(⋆) The various trigonometric identities used in the discussion of periodic variables
+in this chapter can be proven easily from the relation
+exp(iA) = cos A + i sin A
+(3.214)
+
+--- Page 129 ---
+110
+3. STANDARD DISTRIBUTIONS
+in which i is the square root of minus one. By considering the identity
+exp(iA) exp(−iA) = 1
+(3.215)
+prove the result (3.127). Similarly, using the identity
+cos(A −B) = ℜexp{i(A −B)}
+(3.216)
+where ℜdenotes the real part, prove (3.128). Finally, by using sin(A −B) =
+ℑexp{i(A −B)}, where ℑdenotes the imaginary part, prove the result (3.133).
+3.31
+(⋆⋆) For large m, the von Mises distribution (3.129) becomes sharply peaked around
+the mode θ0. By deﬁning ξ = m1/2(θ −θ0) and taking the Taylor expansion of the
+cosine function given by
+cos α = 1 −α2
+2 + O(α4)
+(3.217)
+show that as m →∞, the von Mises distribution tends to a Gaussian.
+3.32
+(⋆) Using the trigonometric identity (3.133), show that solution of (3.132) for θ0 is
+given by (3.134).
+3.33
+(⋆) By computing the ﬁrst and second derivatives of the von Mises distribution
+(3.129), and using I0(m) > 0 for m > 0, show that the maximum of the distribution
+occurs when θ = θ0 and that the minimum occurs when θ = θ0 + π (mod 2π).
+3.34
+(⋆) By making use of the result (3.118) together with (3.134) and the trigonometric
+identity (3.128), show that the maximum likelihood solution mML for the concentra-
+tion of the von Mises distribution satisﬁes A(mML) = r where r is the radius of the
+mean of the observations viewed as unit vectors in the two-dimensional Euclidean
+plane, as illustrated in Figure 3.9.
+3.35
+(⋆) Verify that the multivariate Gaussian distribution can be cast in exponential fam-
+ily form (3.138), and derive expressions for η, u(x), h(x), and g(η) analogous to
+(3.164) to (3.167).
+3.36
+(⋆) The result (3.172) showed that the negative gradient of ln g(η) for the exponential
+family is given by the expectation of u(x). By taking the second derivatives of
+(3.139), show that
+−∇∇ln g(η) = E[u(x)u(x)T] −E[u(x)]E[u(x)T] = cov[u(x)].
+(3.218)
+3.37
+(⋆⋆) Consider a histogram-like density model in which the space x is divided into
+ﬁxed regions for which the density p(x) takes the constant value hi over the ith re-
+gion. The volume of region i is denoted ∆i. Suppose we have a set of N observations
+of x such that ni of these observations fall in region i. Using a Lagrange multiplier
+to enforce the normalization constraint on the density, derive an expression for the
+maximum likelihood estimator for the {hi}.
+3.38
+(⋆) Show that the K-nearest-neighbour density model deﬁnes an improper distribu-
+tion whose integral over all space is divergent.

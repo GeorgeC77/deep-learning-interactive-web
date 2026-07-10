@@ -1,3 +1,44 @@
-node_modules
-dist
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.log
+
+# Build output
+dist/
+build/
+.next/
+.cache/
+coverage/
+*.tsbuildinfo
+
+# OS files
 .DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large binaries / archives (should not be committed)
+*.zip
+*.exe
+
+# Node.js runtime bundled in repo
+nodejs/
+
+# Large PDF textbooks (use Git LFS or external storage if needed)
+*.pdf
+
+# Temp files
+*.tmp
+*.bak
