@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, AlertTriangle, Layers, ArrowRight, Target, Lightbulb, Brain, Activity, GitBranch } from 'lucide-react';
+import { BookOpen, AlertTriangle, Layers, ArrowRight, Target, Lightbulb, Brain, GitBranch } from 'lucide-react';
 
 const roadmapItems = [
   {

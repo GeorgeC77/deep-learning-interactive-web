@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from 'react';
-import { cn } from '@/lib/utils';
 import { Lightbulb, ChevronRight } from 'lucide-react';
 
 type PredictionGateProps = {

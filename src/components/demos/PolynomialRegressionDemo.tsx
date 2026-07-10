@@ -1,7 +1,6 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import KaTeX from '@/components/KaTeX';
 
 /* -------------------------------------------------------------------------- */
 /* 数值工具                                                                   */
@@ -142,7 +141,6 @@ export default function PolynomialRegressionDemo() {
   }, [w, degree, xMin, xMax, yMin, yMax]);
 
   const svgRef = useRef<SVGSVGElement>(null);
-  const [hoverLabel, setHoverLabel] = useState('');
 
   const pointRadius = 3.5;
 

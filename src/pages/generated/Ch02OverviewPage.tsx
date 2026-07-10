@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, SeparatorVertical, Scale, BrainCircuit, Activity, ArrowRight, Target, Lightbulb } from 'lucide-react';
-import KaTeX from '@/components/KaTeX';
 
 const roadmapItems = [
   {

@@ -91,17 +91,15 @@ const W = 420, H = 380, M = { t: 10, r: 10, b: 35, l: 45 };
 const PW = W - M.l - M.r, PH = H - M.t - M.b;
 
 export default function EMELBOLab() {
-  const [k, setK] = useState(3);
-  const [N] = useState(200);
-  const [seed, setSeed] = useState(42);
+  const k = 3;
+  const N = 200;
+  const seed = 42;
   const [means, setMeans] = useState<[number, number][]>([[0, 0], [2, 2], [-2, 1]]);
-  const [covs, setCovs] = useState<[number, number, number][]>([[0.8, 0.8, 0], [0.5, 0.5, 0], [0.6, 0.6, 0]]);
+  const covs: [number, number, number][] = [[0.8, 0.8, 0], [0.5, 0.5, 0], [0.6, 0.6, 0]];
   const [pis, setPis] = useState([0.4, 0.35, 0.25]);
   const [iteration, setIteration] = useState(0);
   const [mode, setMode] = useState<'soft' | 'hard'>('soft');
   const [logLikHistory, setLogLikHistory] = useState<number[]>([]);
-  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
-  const [showELBO, setShowELBO] = useState(false);
   const [currentResp, setCurrentResp] = useState<number[][] | null>(null);
 
   const data = useMemo(() => generateGMMData(N, means, covs, pis, seed), [N, seed]);
@@ -122,7 +120,7 @@ export default function EMELBOLab() {
   }, [iteration, means, data]);
 
   const singleStep = () => {
-    const { newMeans, newCovs, newPis, logLik, resp } = emStep(
+    const { newMeans, newPis, logLik, resp } = emStep(
       data,
       iteration === 0 ? means : currentMeans,
       iteration === 0 ? covs : currentMeans.map(() => [0.5, 0.5, 0] as [number, number, number]),
@@ -136,7 +134,7 @@ export default function EMELBOLab() {
   };
 
   const resetAll = () => {
-    const initMeans: [number, number][] = Array.from({ length: k }, (_, i) => [
+    const initMeans: [number, number][] = Array.from({ length: k }, () => [
       (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4,
     ]);
     setMeans(initMeans);

@@ -145,19 +145,6 @@ export default function AttentionLab() {
     });
   }, [X, Ws, numHeads, N, dK, causalMask]);
 
-  // Concatenate heads → N x dModel, then apply W_O
-  const finalOutput = useMemo(() => {
-    // Concat: [head0 | head1 | ...] → N x dModel
-    const concat: number[][] = Array.from({ length: N }, () => Array(dModel).fill(0));
-    for (let h = 0; h < numHeads; h++) {
-      const ho = headOutputs[h].headOut;
-      for (let i = 0; i < N; i++)
-        for (let j = 0; j < dK; j++)
-          concat[i][h * dK + j] = ho[i][j];
-    }
-    return matMul(concat, Ws.WO);
-  }, [headOutputs, N, dModel, dK, numHeads, Ws.WO]);
-
   const active = headOutputs[activeHead] ?? headOutputs[0];
 
   // Cell detail

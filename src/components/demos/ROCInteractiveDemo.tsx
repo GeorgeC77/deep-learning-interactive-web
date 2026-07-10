@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import KaTeX from '@/components/KaTeX';
 
 /* -------------------------------------------------------------------------- */
 /* ROC 数据生成                                                                */

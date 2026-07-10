@@ -49,14 +49,13 @@ const toX = (v: number) => M.l + ((v + 2.5) / 5) * PW;
 const toY = (v: number) => M.t + PH - ((v + 2.5) / 5) * PH;
 
 export default function DiffusionTimelineLab() {
-  const [T, setT] = useState(10);
+  const T = 10;
+  const N = 100;
+  const betaStart = 0.0001;
+  const betaEnd = 0.02;
   const [currentT, setCurrentT] = useState(0);
   const [cloudType, setCloudType] = useState<'circle' | 'swiss' | 'moons'>('circle');
-  const [N, setN] = useState(100);
-  const [betaStart, setBetaStart] = useState(0.0001);
-  const [betaEnd, setBetaEnd] = useState(0.02);
   const [seed, setSeed] = useState(42);
-  const [mode, setMode] = useState<'forward' | 'reverse'>('forward');
   const [stochastic, setStochastic] = useState(false);
 
   const betas = useMemo(() => makeBetaSchedule(T, betaStart, betaEnd), [T, betaStart, betaEnd]);

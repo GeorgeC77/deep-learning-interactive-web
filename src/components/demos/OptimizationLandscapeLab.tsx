@@ -92,11 +92,7 @@ export default function OptimizationLandscapeLab() {
   const [momentum, setMomentum] = useState(0.9);
   const [beta1, setBeta1] = useState(0.9);
   const [beta2, setBeta2] = useState(0.999);
-  const [opt, setOpt] = useState<Optimizer>('Adam');
-  const [startX, setStartX] = useState(1.5);
-  const [startY, setStartY] = useState(1.5);
-  const [steps, setSteps] = useState(30);
-  const [showContour, setShowContour] = useState(true);
+  const startX = 1.5, startY = 1.5, steps = 30;
 
   // Run all 4 optimizers
   const runOpt = (optName: Optimizer) => {
@@ -125,7 +121,6 @@ export default function OptimizationLandscapeLab() {
 
   // Contour data
   const contourLines = useMemo(() => {
-    if (!showContour) return [];
     const lines: { lvl: number; pts: string }[] = [];
     for (let l = -1; l <= 3; l += 0.5) {
       const lvl = Math.pow(10, l);
@@ -143,7 +138,7 @@ export default function OptimizationLandscapeLab() {
       if (pts.length > 0) lines.push({ lvl, pts: pts.join(' ') });
     }
     return lines;
-  }, [landscape, showContour]);
+  }, [landscape]);
 
   const toX = (v: number) => M.l + ((v + 2) / 4) * PW;
   const toY = (v: number) => M.t + PH - ((v + 2) / 4) * PH;
