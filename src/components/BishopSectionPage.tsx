@@ -137,9 +137,9 @@ export default function BishopSectionPage({
           </div>
         )}
 
-        <p className="mt-6 text-sm text-amber-800">
-          <ShieldAlert className="w-4 h-4 inline-block mr-1" />
-          本页内容仅供教学与非商业学习使用（CC BY-NC 4.0）。
+        <p className="mt-6 text-sm text-gray-500 max-w-3xl mx-auto leading-relaxed">
+          本页为依据 Bishop &amp; Bishop 教材知识体系制作的原创教学解释与交互演示。
+          教材原文、原图及习题解答版权归原作者和出版方所有；本项目不复制教材原文和原图。
         </p>
       </section>
 

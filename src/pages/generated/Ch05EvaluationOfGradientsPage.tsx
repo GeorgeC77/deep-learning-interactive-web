@@ -1,102 +1,97 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { GitBranch } from 'lucide-react';
+import BackpropagationLab from '@/components/demos/BackpropagationLab';
 
 export default function Ch05EvaluationOfGradientsPage() {
   return (
     <BishopSectionPage
       sectionPath="/ch05/evaluation-of-gradients"
       heroIcon={<GitBranch className="w-9 h-9 text-blue-600" />}
-      summary={"反向传播利用链式法则高效计算复合函数（如神经网络损失）对每层参数的梯度。它是大规模神经网络训练的核心算法。"}
+      summary={
+        "反向传播是训练深度神经网络的核心算法。对于标量损失 L，反向模式自动微分能以一次前向计算的常数倍成本，计算 L 对全部参数的梯度——这是深度学习可行的数学基石。本节用可交互计算图演示前向传播、局部导数与梯度累积。"
+      }
       concepts={[
         {
-          title: "链式法则",
-          description: "多重复合函数的梯度可分解为各层局部雅可比矩阵的乘积。",
-          formula: String.raw`\frac{\partial L}{\partial \mathbf{w}} = \frac{\partial L}{\partial \mathbf{a}} \frac{\partial \mathbf{a}}{\partial \mathbf{z}} \frac{\partial \mathbf{z}}{\partial \mathbf{w}}`,
+          title: "计算图（Computation graph）",
+          description: "神经网络的前向计算表示为有向无环图（DAG）。每个节点是基本操作（+、×、sin、exp 等），边传递数据流。反向传播沿逆向边传播梯度，每个节点的局部导数仅依赖该节点操作和输入值。",
         },
         {
-          title: "前向-反向模式",
-          description: "前向传播保存中间激活，反向传播从输出层开始逐层回传梯度。",
+          title: "链式法则（Chain rule）",
+          description: "若 L = f(g(x))，则 ∂L/∂x = (∂L/∂y)·(∂y/∂x)。反向传播系统地对每个节点应用链式法则，从输出端向输入端累积 adjoint。每个节点的局部导数独立计算，乘以从输出传来的梯度后分发给输入。",
+          formula: String.raw`\frac{\partial L}{\partial x} = \frac{\partial L}{\partial y} \cdot \frac{\partial y}{\partial x}`,
         },
         {
-          title: "计算图",
-          description: "将运算表示为节点与边，自动微分系统通过遍历计算图完成梯度计算。",
+          title: "反向模式的成本 = O(前向)",
+          description: "标量输出 + N 个参数：一次前向+一次后向即可计算全部梯度（约 2-3 倍前向成本，与 N 无关）。有限差分需每个参数至少一次额外前向（O(N) 倍）。当参数达百万级，反传优势是指数级的。",
         },
         {
-          title: "计算复杂度",
-          description: "反向传播的计算量与前向传播同阶，避免了逐参数数值差分的高昂代价。",
+          title: "数值梯度校验",
+          description: "用中心差分 (f(w+h)−f(w−h))/(2h) 验证反传正确性。相对误差应在 10⁻⁵ 量级。h 过小→舍入误差；h 过大→截断误差——形成 U 形误差曲线。",
         },
-      
-    {
-      title: "Single-layer networks",
-      description: "介绍 Single-layer networks 的定义、关键公式与典型应用场景。",
-    },
-    {
-      title: "General feed-forward networks",
-      description: "介绍 General feed-forward networks 的定义、关键公式与典型应用场景。",
-    },
-  ]}
-      learningObjectives={[
-        "理解链式法则在多层网络中的应用。",
-        "能说明前向传播与反向传播各自保存/计算什么。",
-        "了解反向传播为何比数值差分高效。",
       ]}
-      coreIntuition={"反向传播像从山顶把错误信号一路传回每个路口：每到一个节点，只问‘我对后面的影响有多大’，再把信号分摊给前面的节点。"}
+      learningObjectives={[
+        "理解计算图如何将复合函数分解为基本操作 DAG",
+        "能逐节点追踪前向值和反向梯度（adjoint）",
+        "解释反向模式为何以常数倍成本计算全部参数梯度",
+        "进行数值梯度校验并理解 h 选择对误差的影响",
+      ]}
+      coreIntuition={
+        "想象一个分水岭：正向是水流从源头经各支流到终点，反向是跟踪终点的出水量回溯——每个节点只关心'我传了多少水给下游'（局部导数），最终累积得到每个源头的总贡献（参数梯度）。"
+      }
       commonMistakes={[
-        "把反向传播当成一种独立的优化器；它只是计算梯度的方法。",
-        "忘记保存前向传播的中间结果，导致反向传播需要重新计算。",
-        "混淆 ∂L/∂w 与 ∂L/∂x 的符号含义。",
+        "反向模式以一次前向+一次后向的常数倍成本计算全部参数梯度。不要说'参数平方增长'——反传成本与参数数量解耦，这正是它使深度学习可行的原因。",
+        "忘记保存前向传播的中间激活值——反向传播需要它们来计算局部导数，这是神经网络内存消耗的主要来源。",
+        "混淆 adjoint（从输出传来的累积梯度）和 local derivative（仅本节点的 ∂out/∂in）。",
       ]}
       quiz={[
         {
-          question: "反向传播主要解决什么问题？",
+          question: "有 10⁶ 个参数的标量损失，反向模式计算全部梯度需多少次前向？",
           options: [
-            "高效计算神经网络中所有参数的梯度",
-            "初始化网络权重",
-            "直接找到全局最优解",
-            "降低模型的偏差",
+            "1 次前向 + 1 次后向（约 2-3 倍前向成本）",
+            "10⁶ 次前向（每个参数一次）",
+            "约 1000 次前向",
+            "与参数数量的对数成正比",
           ],
           correctIndex: 0,
-          explanation: "反向传播利用链式法则和前向缓存，高效得到损失对各层参数的梯度。",
+          explanation: "反向模式自动微分的核心优势：梯度计算成本与参数数量解耦，仅需约 1 次前向+1 次后向。",
         },
         {
-          question: "对于 z=wx+b, a=σ(z), L=(a-y)²，∂L/∂w 等于？",
+          question: "计算图中，节点 multiply(a,b) 对输入 a 的局部导数是多少？",
           options: [
-            "2(a-y) · σ'(z) · x",
-            "2(a-y) · x",
-            "2(a-y) · σ'(z)",
-            "2(a-y) · w",
+            "b（另一个操作数的值）",
+            "a（自身的值）",
+            "1",
+            "a × b",
           ],
           correctIndex: 0,
-          explanation: "由链式法则：∂L/∂w = ∂L/∂a · ∂a/∂z · ∂z/∂w = 2(a-y) · σ'(z) · x。",
+          explanation: "∂(a·b)/∂a = b。乘法操作的局部导数是另一个操作数——这是反传中'梯度互换'的原理。",
         },
         {
-          question: "反向传播相比数值差分的主要优势是？",
+          question: "有限差分的 h 太大或太小时分别导致什么误差？",
           options: [
-            "计算量与网络规模近似线性，而非随参数数平方增长",
-            "不需要前向传播",
-            "可以自动选择学习率",
-            "避免局部极小值",
+            "h 太大→截断误差（忽略高阶项），h 太小→舍入误差（浮点精度）",
+            "h 太大→舍入误差，h 太小→截断误差",
+            "两种都导致截断误差",
+            "h 的选择与误差无关",
           ],
           correctIndex: 0,
-          explanation: "数值差分需要对每个参数单独前向计算；反向传播一次前向加一次反向即可得到所有梯度。",
+          explanation: "截断误差 ∝ O(h²)，舍入误差 ∝ O(1/h)。最优 h 使两者平衡，通常约 10⁻⁵。",
         },
       ]}
       bishopMapping={{
         chapter: "Ch 8",
         section: "8.1",
-        pages: "Ch 8",
+        pages: "§8.1",
         textbookSubsections: [
           "8.1 Evaluation of Gradients",
           "8.1.1 Single-layer networks",
           "8.1.2 General feed-forward networks",
-          "8.1.3 A simple example",
-          "8.1.4 Numerical differentiation",
-          "8.1.5 The Jacobian matrix",
-          "8.1.6 The Hessian matrix"
+          "8.1.3 Jacobian and Hessian matrices",
         ],
-        formulas: ["链式法则", "反向传播递推"],
-        exercises: ["手推两层网络的反向传播梯度。", "比较反向传播与数值差分的计算复杂度。"],
+        formulas: ["chain rule", "backpropagation recursion", "gradient check"],
+        algorithms: ["reverse-mode automatic differentiation"],
       }}
+      extraContent={<BackpropagationLab />}
     />
   );
 }
