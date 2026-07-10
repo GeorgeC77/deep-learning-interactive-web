@@ -6,87 +6,107 @@ export default function Ch02DiscriminativeClassifiersPage() {
     <BishopSectionPage
       sectionPath="/ch02/discriminative-classifiers"
       heroIcon={<Activity className="w-9 h-9 text-blue-600" />}
-      summary={"判别分类器直接建模后验概率。激活函数把线性输出映射到概率；逻辑回归与多类逻辑回归通过最大似然估计参数，probit 与典则联系函数提供不同选择。"}
+      summary={
+        "判别分类器直接建模后验概率 p(C_k|x)，跳过对输入分布 p(x) 的建模。逻辑回归（sigmoid）是二分类的经典方法，softmax 回归将其推广到多分类。本节还涵盖 probit 回归与规范链接函数，覆盖 §5.4.1–5.4.6，是深度学习分类器的理论基础。"
+      }
       concepts={[
         {
-          title: "Activation functions",
-          description: "把线性组合映射到概率或类别的非线性函数，如 sigmoid、tanh、ReLU 等。",
-          formula: String.raw`\sigma(a) = \frac{1}{1 + \exp(-a)}`,
+          title: "激活函数（Activation functions）",
+          description: "将线性输出 a = wᵀϕ(x) 映射到概率空间。sigmoid σ(a) = 1/(1+e⁻ᵃ) 是 log-odds 的逆函数；softmax 是 sigmoid 的多类推广。关键性质：单调、可微、输出 (0,1) 或和为 1 的概率向量。",
+          formula: String.raw`\text{sigmoid: } \sigma(a) = \frac{1}{1+e^{-a}},\quad \text{softmax: } \frac{e^{a_k}}{\sum_j e^{a_j}}`,
         },
         {
-          title: "Fixed basis functions",
-          description: "与回归类似，可先对输入做非线性变换，再在线性特征空间上构建分类器。",
+          title: "固定基函数（Fixed basis functions）",
+          description: "与回归相同，可先用非线性基函数 ϕ(x) 将输入变换到特征空间，再在此空间上学习线性判别。这使得即使是线性分类器也能解决非线性分类问题——前提是基函数设计恰当。",
         },
         {
-          title: "Logistic regression",
-          description: "用 sigmoid 建模二分类后验，通过交叉熵损失进行最大似然估计。",
-          formula: String.raw`p(\mathcal{C}_1 \mid \mathbf{x}) = \sigma(\mathbf{w}^{\!T}\boldsymbol{\phi}(\mathbf{x}))`,
+          title: "逻辑回归（Logistic regression）",
+          description: "二分类：p(C₁|x) = σ(wᵀϕ(x))。通过最大化伯努利似然（等价于最小化交叉熵损失）估计 w。损失是凸的，可用梯度下降或 Newton-Raphson 优化。log-odds（对数几率）是 x 的线性函数。",
+          formula: String.raw`p(\mathcal{C}_1 \mid \mathbf{x}) = \sigma(\mathbf{w}^{\!T}\boldsymbol{\phi}(\mathbf{x})),\quad \ln\frac{p(\mathcal{C}_1)}{p(\mathcal{C}_2)} = \mathbf{w}^{\!T}\boldsymbol{\phi}(\mathbf{x})`,
         },
         {
-          title: "Multi-class logistic regression",
-          description: "用 softmax 函数把 K 个线性输出归一化为类别后验概率。",
-          formula: String.raw`p(\mathcal{C}_k \mid \mathbf{x}) = \frac{\exp(a_k)}{\sum_j \exp(a_j)}`,
+          title: "多类逻辑回归（Softmax regression）",
+          description: "K 类时，第 k 类的后验 p(C_k|x) = exp(a_k)/Σ_j exp(a_j)，其中 a_k = w_kᵀϕ(x)。交叉熵损失 L = −Σ_{n,k} t_{nk}·ln p(C_k|x_n) 对每组权重独立可导。最终决策边界分段线性。",
+          formula: String.raw`p(\mathcal{C}_k \mid \mathbf{x}) = \frac{\exp(a_k)}{\sum_j \exp(a_j)},\quad a_k = \mathbf{w}_k^{\!T}\boldsymbol{\phi}(\mathbf{x})`,
         },
         {
-          title: "Probit regression",
-          description: "用标准正态累积分布函数代替 sigmoid 建模后验，对异常值更鲁棒。",
-          formula: String.raw`p(\mathcal{C}_1 \mid \mathbf{x}) = \Phi(a)`,
+          title: "Probit 回归",
+          description: "用标准正态累积分布函数 Φ(a) 代替 sigmoid，源自潜在变量阈值模型。probit 对异常值比逻辑回归更鲁棒（因为正态分布的尾部比 sigmoid 更薄），但在数据量大时两者差异很小。",
+          formula: String.raw`p(\mathcal{C}_1 \mid \mathbf{x}) = \Phi(a) = \int_{-\infty}^{a} \mathcal{N}(z \mid 0, 1) \, dz`,
         },
         {
-          title: "Canonical link functions",
-          description: "广义线性模型中连接期望响应与线性预测器的函数，使推断与优化具有良好性质。",
+          title: "规范链接函数（Canonical link functions）",
+          description: "在广义线性模型（GLM）中，规范链接函数将自然参数 η 与线性预测器连接。对于伯努利分布，规范链接是 logit（对应逻辑回归）；对正态分布，规范链接是恒等（对应线性回归）。使用规范链接可保证似然的凸性。",
         },
       ]}
       learningObjectives={[
-        "理解 sigmoid 与 softmax 如何把实数输出转化为概率。",
-        "能写出逻辑回归的似然函数与交叉熵损失。",
-        "了解 probit 回归与逻辑回归的区别。",
+        "理解 sigmoid 函数作为 log-odds 逆函数的概率解释",
+        "能写出逻辑回归的似然函数和交叉熵损失",
+        "推导逻辑回归的梯度下降更新式",
+        "理解 softmax 如何确保多类后验非负且和为 1",
+        "对比 probit 和逻辑回归在异常值鲁棒性上的差异",
+        "了解规范链接函数在 GLM 框架中的作用",
       ]}
-      coreIntuition={"判别分类器直接学习‘这条边界该怎么画’：sigmoid 给出二分类边界一侧的概率，softmax 把多条边界竞争结果归一化。"}
+      coreIntuition={
+        "判别分类器直接回答'这条线怎么画'的问题。sigmoid 说'在线的这边，你是正类的概率是 70%'；softmax 说'在这片区域里，你是三类中最有可能是第二类的那 55%'。它们把所有精力都放在决策边界附近，不浪费参数去建模不相干的 x。"
+      }
       commonMistakes={[
-        "把逻辑回归的线性输出直接当作概率而不经过 sigmoid。",
-        "在多分类中使用多个二分类 sigmoid 代替 softmax，导致概率和不为一。",
-        "忽视特征尺度对梯度下降收敛的影响。",
+        "把逻辑回归的线性输出 a = wᵀx 直接当作概率——必须经过 sigmoid 映射到 (0,1)",
+        "在多分类中用 K 个独立的二分类 sigmoid 代替 softmax——概率和不等于 1，模型之间无法比较",
+        "忽视特征缩放对梯度下降收敛的影响——逻辑回归的 loss landscape 对尺度敏感",
+        "在类别完全线性可分时不加正则化——最大似然会使权重发散到无穷大（'完美分离问题'），需要加 L2 正则化",
+        "混淆 probit 和 logit——probit 使用正态 CDF，logit 使用 sigmoid；两者形状相似但尾部行为不同",
       ]}
       quiz={[
         {
-          question: "逻辑回归中，后验概率 p(C₁|x) 与线性输出 a 的关系是？",
+          question: "逻辑回归中，log-odds ln[p(C₁)/p(C₂)] 与输入 x 的关系是什么？",
           options: [
-            "p(C₁|x) = σ(a)",
-            "p(C₁|x) = a",
-            "p(C₁|x) = exp(a)",
-            "p(C₁|x) = 1 - a",
+            "x 的线性函数",
+            "x 的 sigmoid 函数",
+            "x 的二次函数",
+            "与 x 无关的常数",
           ],
           correctIndex: 0,
-          explanation: "sigmoid 把任意实数映射到 (0,1)，作为正类的后验概率。",
+          explanation: "p(C₁) = σ(wᵀx) ⇒ logit = ln[σ/(1−σ)] = wᵀx，即 log-odds 是 x 的线性函数，这是逻辑回归得名'回归'的原因。",
         },
         {
-          question: "softmax 函数的主要作用是什么？",
+          question: "softmax(a_k) 的分母 Σ_j exp(a_j) 的作用是什么？",
           options: [
-            "把 K 个实数输出归一化为和为 1 的类别概率。",
-            "把概率映射到任意实数。",
-            "计算两个分布的 KL 散度。",
-            "替代损失函数。",
+            "确保所有输出非负且总和为 1，形成有效的概率分布",
+            "加速计算",
+            "防止过拟合",
+            "消除特征间的相关性",
           ],
           correctIndex: 0,
-          explanation: "softmax 取指数后归一化，确保多类后验概率非负且总和为 1。",
+          explanation: "exp 确保非负，除以总和确保归一化——这就是 softmax 作为概率映射的核心机制。",
         },
         {
-          question: "probit 回归与逻辑回归的主要区别在哪里？",
+          question: "数据中存在异常值时，probit 和逻辑回归哪个更鲁棒？为什么？",
           options: [
-            "probit 使用正态 CDF，逻辑回归使用 sigmoid。",
-            "probit 只能处理二分类，逻辑回归只能处理多分类。",
-            "probit 不需要最大似然估计。",
-            "probit 使用平方损失。",
+            "probit，因为正态 CDF 的尾部比 sigmoid 更薄，异常值的反传梯度更小",
+            "逻辑回归，因为 sigmoid 曲线更平滑",
+            "两者完全一样鲁棒",
+            "都不能处理异常值",
           ],
           correctIndex: 0,
-          explanation: "两者都是把线性输出映射到概率，但使用的连接函数不同：probit 用 Φ，逻辑回归用 σ。",
+          explanation: "sigmoid 尾部以 exp(−a) 衰减，probit 以 exp(−a²/2) 衰减。对于大幅度异常值，probit 的梯度更快趋零，影响更小。",
+        },
+        {
+          question: "在多类分类中，以下哪个损失函数是正确且凸的？",
+          options: [
+            "交叉熵损失：−Σ_k t_k·ln(softmax(a_k))",
+            "平方误差：Σ_k (t_k − a_k)²",
+            "hinge 损失：Σ_k max(0, 1 − a_k)",
+            "绝对值误差：Σ_k |t_k − a_k|",
+          ],
+          correctIndex: 0,
+          explanation: "与 softmax 配合的交叉熵损失是凸的且导数为 softmax(a_k) − t_k，形式简洁优雅。平方误差配合 softmax 是非凸的。",
         },
       ]}
       bishopMapping={{
         chapter: "Ch 5",
         section: "5.4",
-        pages: "Ch 5",
+        pages: "§5.4, pp. 157–166",
         textbookSubsections: [
           "5.4 Discriminative Classifiers",
           "5.4.1 Activation functions",
@@ -94,13 +114,14 @@ export default function Ch02DiscriminativeClassifiersPage() {
           "5.4.3 Logistic regression",
           "5.4.4 Multi-class logistic regression",
           "5.4.5 Probit regression",
-          "5.4.6 Canonical link functions"
+          "5.4.6 Canonical link functions",
         ],
-        formulas: ["sigmoid", "softmax", "cross-entropy"],
-        algorithms: ["logistic regression", "softmax regression"],
+        formulas: ["sigmoid σ(a)", "softmax", "cross-entropy loss", "probit Φ(a)", "canonical link (GLM)"],
+        algorithms: ["logistic regression", "softmax regression", "gradient descent", "Newton-Raphson"],
         exercises: [
-          "推导逻辑回归的梯度下降更新式。",
-          "用 softmax 实现多类分类并观察决策边界。",
+          "推导逻辑回归的梯度下降更新式并与线性回归的对比",
+          "实现 softmax 多分类并可视化决策边界",
+          "在含异常值的数据上比较逻辑回归和 probit 的决策边界",
         ],
       }}
     />

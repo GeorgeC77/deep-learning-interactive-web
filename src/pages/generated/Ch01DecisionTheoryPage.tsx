@@ -6,96 +6,111 @@ export default function Ch01DecisionTheoryPage() {
     <BishopSectionPage
       sectionPath="/ch01/decision-theory"
       heroIcon={<Scale className="w-9 h-9 text-blue-600" />}
-      summary={"决策理论研究不确定性下的最优选择。通过损失函数量化错误代价，并按后验概率计算期望损失，从而得到贝叶斯最优决策。"}
+      summary={
+        "决策理论提供了一个概率框架，用于在不确定性下选择最优行动。它将对世界的推断（后验概率 p(t|x,D)）与决策（选择预测值 y）分开——先计算预测分布，再按损失函数选择使期望损失最小的 y。"
+      }
       concepts={[
         {
-          title: "Loss function",
-          description: "量化决策与真实状态之间差距的函数；不同任务、不同错误代价对应不同的损失。",
+          title: "损失函数（Loss function）",
+          description: "L(t, y(x)) 量化真实值 t 与预测 y(x) 之间差距的代价。回归中常用平方损失 L = (t − y)² 或绝对损失 L = |t − y|。不同损失函数对应不同的最优预测。",
+          formula: String.raw`L(t, y(\mathbf{x}))`,
         },
         {
-          title: "Expected loss",
-          description: "对未知状态按后验概率加权后的平均损失，是选择决策的依据。",
-          formula: String.raw`\mathbb{E}[L] = \sum_{k} L_{kj} \, p(\mathcal{C}_k \mid \mathbf{x})`,
+          title: "期望损失（Expected loss）",
+          description: "对 t 的不确定性取期望——加权所有可能的 t 值，权重为后验概率。这个框架使我们可以比较不同预测策略的长期平均表现。",
+          formula: String.raw`\mathbb{E}[L] = \int L(t, y(\mathbf{x})) \, p(t \mid \mathbf{x}) \, dt`,
         },
         {
-          title: "Bayes optimal decision",
-          description: "选择使期望损失最小的决策，是理论上不可超越的基准。",
+          title: "贝叶斯最优决策",
+          description: "选择使期望损失最小的预测值 y*(x)。对于平方损失，最优预测是条件均值 E[t|x]；对于绝对损失，最优预测是条件中位数。",
+          formula: String.raw`y^{*}(\mathbf{x}) = \arg\min_{y} \mathbb{E}[L(t, y)]`,
         },
         {
-          title: "Generative vs discriminative",
-          description: "生成分类器先建模类条件分布再推导后验；判别分类器直接建模后验；决策理论为两者提供统一的决策目标。",
+          title: "平方损失的最优解",
+          description: "将期望损失对 y 求导置零，得到 y* = E[t|x]，即后验均值。这表明最小二乘目标的最优预测是条件期望。",
+          formula: String.raw`\frac{\partial \mathbb{E}[(t-y)^2]}{\partial y} = 0 \;\Longrightarrow\; y = \mathbb{E}[t \mid \mathbf{x}]`,
+        },
+        {
+          title: "推断与决策的分离",
+          description: "Bishop 强调两个独立阶段：(1) 推断——用数据估计后验 p(t|x,D)；(2) 决策——基于损失函数和推断结果选择最优行动。分离使模型可与不同损失函数配合使用。",
         },
       ]}
       learningObjectives={[
-        "能写出期望损失的表达式并解释各项含义。",
-        "理解贝叶斯最优决策是使期望损失最小化的决策。",
-        "了解损失函数选择如何影响最优决策边界。",
+        "能写出回归问题中期望损失的积分表达式",
+        "理解平方损失下贝叶斯最优预测是条件均值 E[t|x]",
+        "理解绝对损失下最优预测是条件中位数",
+        "掌握推断与决策分离的核心思想及其实际意义",
+        "能解释为什么不同损失函数会导致不同的最优预测",
       ]}
-      coreIntuition={"决策理论像一位医生开药：先评估各种病情的概率（后验），再权衡每种误诊的代价（损失），最后选择让患者期望风险最小的方案。"}
+      coreIntuition={
+        "决策理论像一个气象预报系统：先根据数据推断明天降水量的概率分布（推断阶段），然后根据你的需求（出去玩 vs. 种庄稼）做决策。如果下雨损失大，你会更保守地做决定——这就是损失函数的作用。"
+      }
       commonMistakes={[
-        "默认使用 0-1 损失而不考虑实际错误代价，导致决策边界偏离业务最优。",
-        "把后验概率估计准确等同于决策最优；决策还需要损失矩阵。",
-        "混淆推断（估计概率）与决策（选择动作）两个不同阶段。",
+        "默认使用平方损失而不考虑其假设（对称惩罚、对异常值敏感）",
+        "混淆推断（估计概率）与决策（选择行动）两个不同阶段",
+        "认为后验均值在所有场景中都是最优预测——如果损失是 L1（绝对损失），中位数才是最优",
+        "在估计 y 时不传递预测不确定性——真正的贝叶斯决策保留完整分布 p(t|x)",
       ]}
       quiz={[
         {
-          question: "贝叶斯最优决策的核心目标是什么？",
+          question: "对于平方损失 L(t,y) = (t−y)²，贝叶斯最优预测是什么？",
           options: [
-            "最小化期望损失",
-            "最大化后验概率",
-            "最小化训练误差",
-            "最大化似然函数",
+            "条件均值 E[t|x]",
+            "条件中位数",
+            "条件众数（mode）",
+            "任意 t 的随机样本",
           ],
           correctIndex: 0,
-          explanation: "贝叶斯最优决策对每种可能状态的后验概率加权损失，选择使总体期望损失最小的动作。",
+          explanation: "最小化 E[(t−y)²| x] 对 y 求导得 −2E[t−y|x] = 0 ⇒ y = E[t|x]。",
         },
         {
-          question: "如果某个疾病的漏诊代价远高于误诊代价，最优决策边界会如何移动？",
+          question: "对于绝对损失 L(t,y) = |t−y|，贝叶斯最优预测是？",
           options: [
-            "倾向于更积极地判为患病，即使后验概率不高。",
-            "保持不变，因为后验概率不受影响。",
-            "倾向于更保守，只在中毒概率极高时才判为患病。",
-            "完全随机决策。",
+            "条件中位数",
+            "条件均值",
+            "条件方差",
+            "后验概率最大的 t",
           ],
           correctIndex: 0,
-          explanation: "当漏诊代价高时，降低判为阳性的阈值可以减少漏诊，即使增加误诊。",
+          explanation: "绝对损失的最小化器是中位数，因为导数为 −∫_{-∞}^y p(t|x)dt + ∫_y^∞ p(t|x)dt = 0 时两侧概率相等。",
         },
         {
-          question: "生成分类器与判别分类器在决策理论框架下的主要区别是什么？",
+          question: "将推断与决策分开的主要优势是什么？",
           options: [
-            "建模路径不同：生成模型先估计 p(x|C)p(C)，判别模型直接估计 p(C|x)。",
-            "生成分类器不需要损失函数。",
-            "判别分类器不能直接给出决策。",
-            "两者在相同损失下会给出不同的最优决策。",
+            "同一个模型（后验分布）可配合不同损失函数反复使用，无需重新训练",
+            "提高训练速度",
+            "简化模型结构",
+            "减小正则化参数",
           ],
           correctIndex: 0,
-          explanation: "无论生成还是判别，最终决策都可统一到期望损失最小化；区别在于如何获得后验概率。",
+          explanation: "模型只需估计一次后验分布（推断），然后可根据不同业务需求换用不同损失函数。",
         },
       ]}
       bishopMapping={{
         chapter: "Ch 4",
         section: "4.2",
-        pages: "Ch 4",
+        pages: "§4.2, pp. 120–122",
         textbookSubsections: ["4.2 Decision theory"],
-        formulas: ["expected loss", "Bayes optimal decision"],
+        formulas: ["expected loss", "Bayes optimal decision", "conditional distribution"],
         exercises: [
-          "对二分类问题推导 0-1 损失下的贝叶斯最优决策。",
-          "给定损失矩阵，手算不同后验下的最优类别。",
+          "推导平方损失下最优预测是条件均值",
+          "推导绝对损失下最优预测是条件中位数",
+          "举例说明为何推断与决策的分离在医疗诊断中有实用价值",
         ],
       }}
       demo={{
-        title: "不同损失的权衡",
-        label: "假阳性损失 L_fp",
+        title: "不同损失函数的决策权衡",
+        label: "损失不对称性",
         param: 1,
         min: 0.1,
         max: 5,
         step: 0.1,
         compute: (lfp) => ({
-          label: '最优决策阈值相对偏移',
+          label: '最优决策偏移量',
           value: Math.log(lfp) / 2,
-          display: String.raw`\Delta=${(Math.log(lfp) / 2).toFixed(2)}`,
+          display: String.raw`\Delta=` + (Math.log(lfp) / 2).toFixed(2),
         }),
-        formula: String.raw`\text{阈值偏移} \propto \ln L_{fp}`,
+        formula: String.raw`\text{偏移} \propto \ln(\text{假阳性损失}/\text{假阴性损失})`,
       }}
     />
   );

@@ -53,6 +53,29 @@ npm run dev
 npm run build
 ```
 
+## 常用命令
+
+| 命令 | 说明 |
+|---|---|
+| `npm run dev` | 启动本地开发服务器 |
+| `npm run build` | 生产构建 |
+| `npm run coverage:build` | 生成 Bishop 覆盖矩阵 |
+| `npm run coverage:check` | 审计路由和元数据 |
+| `npm run audit:bishop` | 审计 Bishop 教材对齐度 |
+| `npm run lint` | ESLint 检查 |
+
+## 部署
+
+- GitHub Pages: https://georgec77.github.io/deep-learning-interactive-web/
+- 使用 HashRouter，确保刷新时路由正常
+- Vite base 路径: `/deep-learning-interactive-web/`
+
+## 注意事项
+
+- 网站章节号与 Bishop 教材章节号不一一对应，UI 中标注 `Bishop Ch N` 区分
+- 所有章节页面需包含 `<SectionMetadata />` 组件
+- 详细项目结构见 [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)
+
 ## 许可
 
 本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 非商业许可。

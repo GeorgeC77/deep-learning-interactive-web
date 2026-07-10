@@ -7,7 +7,7 @@ const MANIFEST_TS = path.join(ROOT, 'src', 'course', 'manifest.ts');
 const APP_TSX = path.join(ROOT, 'src', 'App.tsx');
 const COVERAGE_JSON = path.join(ROOT, 'src', 'course', 'coverage_matrix.json');
 const PAGES_DIR = path.join(ROOT, 'src', 'pages');
-const REPORT_MD = path.join(ROOT, 'coverage_report.md');
+const REPORT_MD = path.join(ROOT, 'reports', 'coverage_report.md');
 
 function parseManifestSections(source) {
   const sections = [];
