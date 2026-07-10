@@ -1,80 +1,87 @@
-import BishopSectionPage from '@/components/BishopSectionPage';
-import { TrendingDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { BookOpen, Mountain, ArrowDownCircle, Zap, Scale, ArrowRight } from 'lucide-react';
+
+const roadmapItems = [
+  {
+    label: '7.1 误差曲面',
+    path: '/ch04/error-surfaces',
+    icon: Mountain,
+    desc: '局部二次近似、Hessian 矩阵、曲率方向与鞍点',
+    color: 'bg-blue-100 text-blue-700 border-blue-300',
+  },
+  {
+    label: '7.2 梯度下降优化',
+    path: '/ch04/gradient-descent-optimization',
+    icon: ArrowDownCircle,
+    desc: '梯度信息、批量/随机/小批量梯度下降与参数初始化',
+    color: 'bg-emerald-100 text-emerald-700 border-emerald-300',
+  },
+  {
+    label: '7.3 收敛性',
+    path: '/ch04/convergence',
+    icon: Zap,
+    desc: '动量法、学习率调度、RMSProp 与 Adam 自适应优化',
+    color: 'bg-amber-100 text-amber-700 border-amber-300',
+  },
+  {
+    label: '7.4 归一化',
+    path: '/ch04/normalization',
+    icon: Scale,
+    desc: '数据归一化、批归一化与层归一化',
+    color: 'bg-violet-100 text-violet-700 border-violet-300',
+  },
+];
 
 export default function Ch04OverviewPage() {
   return (
-    <BishopSectionPage
-      sectionPath="/ch04/overview"
-      heroIcon={<TrendingDown className="w-9 h-9 text-blue-600" />}
-      summary={"本章介绍训练深度网络的核心优化方法：从误差曲面的局部结构到批量、随机、动量、自适应学习率等实用算法。"}
-      concepts={[
-    {
-      title: "误差曲面",
-      description: "损失函数在高维参数空间形成复杂曲面，局部曲率决定优化难度。",
-    },
-    {
-      title: "梯度下降族",
-      description: "批量 GD、SGD 与小批量 SGD 在计算效率与梯度方差之间权衡。",
-    },
-    {
-      title: "自适应方法",
-      description: "动量、RMSProp 与 Adam 通过累积历史梯度信息加速收敛并减少震荡。",
-    },
-    {
-      title: "学习率调度",
-      description: "随训练进程降低学习率，兼顾快速收敛与精细逼近局部极小值。",
-    }
-      ]}
-      learningObjectives={[
-      "理解 误差曲面 的含义与作用。",
-      "理解 梯度下降族 的含义与作用。",
-      "理解 自适应方法 的含义与作用。"
-    ]}
-      coreIntuition={"本章介绍训练深度网络的核心优化方法：从误差曲面的局部结构到批量、随机、动量、自适应学习率等实用算法。"}
-      commonMistakes={[
-      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
-      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
-    ]}
-      quiz={[
-      {
-        question: "下列关于“误差曲面”的叙述，哪一项最准确？",
-        options: ["损失函数在高维参数空间形成复杂曲面，局部曲率决定优化难度。", "误差曲面 只是术语，没有独立建模意义。", "误差曲面 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。损失函数在高维参数空间形成复杂曲面，局部曲率决定优化难度。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“梯度下降族”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要模型足够复杂，数据分布的形状就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。梯度下降族 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“自适应方法”的结果与预期不符，应优先排查哪些前提？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。自适应方法 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
-      bishopMapping={{
-      chapter: "Ch 7",
-      pages: "Ch 7",
-      textbookSubsections: [],
-      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
-    }}
-          demo={{
-      title: "学习率对收敛步数的影响",
-      label: "学习率 η",
-      param: 0.3,
-      min: 0.01,
-      max: 1,
-      step: 0.01,
-      compute: (eta) => ({
-        label: '单步相对进展',
-        value: eta * Math.exp(-eta),
-        display: String.raw`\Delta = ${(eta * Math.exp(-eta)).toFixed(3)}`,
-      }),
-      formula: String.raw`\Delta(\eta) = \eta e^{-\eta}`,
-    }}
-    />
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-12">
+      <section className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-200">
+        <div className="flex justify-center mb-4">
+          <BookOpen className="w-12 h-12 text-blue-600" />
+        </div>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">梯度下降</h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Bishop 第 7 章介绍训练神经网络的核心优化方法：从误差曲面的局部几何结构出发，
+          讨论批量、随机与小批量梯度下降的取舍，再到动量、Adam 等自适应优化策略，
+          以及归一化技术对训练稳定性的关键作用。
+        </p>
+      </section>
+
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">本章学习路线</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          {roadmapItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`group flex flex-col p-5 rounded-xl border-2 transition-all hover:scale-105 hover:shadow-md ${item.color.replace('bg-', 'border-').split(' ')[2]} bg-white`}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`w-10 h-10 rounded-lg ${item.color.split(' ')[0]} flex items-center justify-center`}>
+                    <Icon className={`w-5 h-5 ${item.color.split(' ')[1]}`} />
+                  </div>
+                  <span className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{item.label}</span>
+                </div>
+                <p className="text-sm text-gray-600 mb-4 flex-grow">{item.desc}</p>
+                <div className="flex items-center text-sm font-medium text-blue-600">
+                  开始学习 <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6">
+        <h3 className="text-lg font-bold text-blue-800 mb-3">学习提示</h3>
+        <p className="text-sm text-blue-800 leading-relaxed">
+          梯度下降的本质是在高维参数空间中沿最陡下降方向行走。理解误差曲面的曲率（Hessian）
+          能帮助你选择合适的学习率；理解批量大小与梯度方差的关系能帮助你平衡效率与稳定性；
+          而归一化技术则是让深度网络能够使用大学习率快速训练的关键工程技巧。
+        </p>
+      </section>
+    </div>
   );
 }

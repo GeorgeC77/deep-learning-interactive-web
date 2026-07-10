@@ -4,7 +4,6 @@ import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
-  ShieldAlert,
   SlidersHorizontal,
   Target,
   Lightbulb,

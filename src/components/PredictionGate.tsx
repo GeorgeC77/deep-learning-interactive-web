@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { Lightbulb, ChevronDown, ChevronRight } from 'lucide-react';
+import { Lightbulb, ChevronRight } from 'lucide-react';
 
 type PredictionGateProps = {
   question: string;
