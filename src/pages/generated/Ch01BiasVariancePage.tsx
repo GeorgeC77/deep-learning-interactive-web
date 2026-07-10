@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { Scale } from 'lucide-react';
+import PolynomialRegressionDemo from '@/components/demos/PolynomialRegressionDemo';
 
 export default function Ch01BiasVariancePage() {
   return (
@@ -101,6 +102,7 @@ export default function Ch01BiasVariancePage() {
           "解释为什么测试误差在某个中间复杂度达到最小值",
         ],
       }}
+      extraContent={<PolynomialRegressionDemo />}
     />
   );
 }

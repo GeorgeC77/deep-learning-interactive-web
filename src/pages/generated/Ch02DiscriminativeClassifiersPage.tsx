@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { Activity } from 'lucide-react';
+import LogisticDecisionBoundaryDemo from '@/components/demos/LogisticDecisionBoundaryDemo';
 
 export default function Ch02DiscriminativeClassifiersPage() {
   return (
@@ -124,6 +125,7 @@ export default function Ch02DiscriminativeClassifiersPage() {
           "在含异常值的数据上比较逻辑回归和 probit 的决策边界",
         ],
       }}
+      extraContent={<LogisticDecisionBoundaryDemo />}
     />
   );
 }

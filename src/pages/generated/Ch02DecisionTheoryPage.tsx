@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { Scale } from 'lucide-react';
+import ROCInteractiveDemo from '@/components/demos/ROCInteractiveDemo';
 
 export default function Ch02DecisionTheoryPage() {
   return (
@@ -103,6 +104,7 @@ export default function Ch02DecisionTheoryPage() {
           "画出不同分类器在同数据上的 ROC 曲线并比较 AUC",
         ],
       }}
+      extraContent={<ROCInteractiveDemo />}
     />
   );
 }

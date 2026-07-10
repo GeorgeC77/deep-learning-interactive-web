@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { SeparatorVertical } from 'lucide-react';
+import LogisticDecisionBoundaryDemo from '@/components/demos/LogisticDecisionBoundaryDemo';
 
 export default function Ch02DiscriminantFunctionsPage() {
   return (
@@ -103,6 +104,7 @@ export default function Ch02DiscriminantFunctionsPage() {
         }),
         formula: String.raw`x = -w_0 / w_1 \quad (\text{设 } w_1 = 1)`,
       }}
+      extraContent={<LogisticDecisionBoundaryDemo />}
     />
   );
 }
