@@ -17,10 +17,12 @@ import Ch02GenerativeClassifiersPage from './pages/generated/Ch02GenerativeClass
 import Ch02DiscriminativeClassifiersPage from './pages/generated/Ch02DiscriminativeClassifiersPage';
 
 // Ch 6 (manifest ch03): Deep Neural Networks
-import Chapter07OverviewPage from './pages/chapters/chapter07/OverviewPage';
+import Ch03OverviewPage from './pages/generated/Ch03OverviewPage';
 import Ch03LimitationsOfFixedBasisFunctionsPage from './pages/generated/Ch03LimitationsOfFixedBasisFunctionsPage';
 import Ch03MultilayerNetworksPage from './pages/generated/Ch03MultilayerNetworksPage';
 import Ch03DeepNetworksPage from './pages/generated/Ch03DeepNetworksPage';
+import Ch03ErrorFunctionsPage from './pages/generated/Ch03ErrorFunctionsPage';
+import Ch03MixtureDensityNetworksPage from './pages/generated/Ch03MixtureDensityNetworksPage';
 
 // Ch 8 (manifest ch05): Backpropagation
 import Ch05EvaluationOfGradientsPage from './pages/generated/Ch05EvaluationOfGradientsPage';
@@ -65,8 +67,6 @@ import PrerequisiteChapter03NonparametricPage from './pages/prerequisite/chapter
 import AppendixAOverviewPage from './pages/generated/AppendixAOverviewPage';
 import AppendixBOverviewPage from './pages/generated/AppendixBOverviewPage';
 import AppendixCOverviewPage from './pages/generated/AppendixCOverviewPage';
-import Ch03ErrorFunctionsPage from './pages/generated/Ch03ErrorFunctionsPage';
-import Ch03MixtureDensityNetworksPage from './pages/generated/Ch03MixtureDensityNetworksPage';
 import Ch04ConvergencePage from './pages/generated/Ch04ConvergencePage';
 import Ch04ErrorSurfacesPage from './pages/generated/Ch04ErrorSurfacesPage';
 import Ch04GradientDescentOptimizationPage from './pages/generated/Ch04GradientDescentOptimizationPage';
@@ -141,10 +141,12 @@ const sectionComponents: Record<string, React.ComponentType> = {
   '/ch02/discriminative-classifiers': Ch02DiscriminativeClassifiersPage,
 
   // Ch 6 (manifest ch03): Deep Neural Networks
-  '/ch03/overview': Chapter07OverviewPage,
+  '/ch03/overview': Ch03OverviewPage,
   '/ch03/limitations-of-fixed-basis-functions': Ch03LimitationsOfFixedBasisFunctionsPage,
   '/ch03/multilayer-networks': Ch03MultilayerNetworksPage,
   '/ch03/deep-networks': Ch03DeepNetworksPage,
+  '/ch03/error-functions': Ch03ErrorFunctionsPage,
+  '/ch03/mixture-density-networks': Ch03MixtureDensityNetworksPage,
 
   // Ch 8 (manifest ch05): Backpropagation
   '/ch05/evaluation-of-gradients': Ch05EvaluationOfGradientsPage,
@@ -191,8 +193,6 @@ const sectionComponents: Record<string, React.ComponentType> = {
   '/appendix/a/overview': AppendixAOverviewPage,
   '/appendix/b/overview': AppendixBOverviewPage,
   '/appendix/c/overview': AppendixCOverviewPage,
-  '/ch03/error-functions': Ch03ErrorFunctionsPage,
-  '/ch03/mixture-density-networks': Ch03MixtureDensityNetworksPage,
   '/ch04/convergence': Ch04ConvergencePage,
   '/ch04/error-surfaces': Ch04ErrorSurfacesPage,
   '/ch04/gradient-descent-optimization': Ch04GradientDescentOptimizationPage,
