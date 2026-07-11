@@ -11,11 +11,11 @@ export default function Ch15AutoregressiveFlowsPage() {
         {
           title: "自回归分解",
           description: "任意联合密度可写成各维度条件分布的乘积，自回归流据此逐维构造可逆变换。",
-          formula: String.raw`p(\mathbf{x}) = \prod_{i=1}^{D} p(x_i \mid \mathbf{x}_{<i})`,
+          formula: `p(\\mathbf{x}) = \\prod_{i=1}^{D} p(x_i \\mid \\mathbf{x}_{<i})`,
         },
         {
           title: "三角 Jacobian",
-          description: "由于 x_i 只依赖于 z_{\le i}，Jacobian 矩阵 ∂x/∂z 是下三角，行列式为对角元的乘积。",
+          description: "由于 x_i 只依赖于 z_{\\le i}，Jacobian 矩阵 ∂x/∂z 是下三角，行列式为对角元的乘积。",
           formula: String.raw`\ln \left|\det \frac{\partial \mathbf{x}}{\partial \mathbf{z}}\right| = \sum_{i=1}^{D} \ln \left|\frac{\partial x_i}{\partial z_i}\right|`,
         },
         {

@@ -23,16 +23,6 @@ function genData(N: number, seed: number) {
 /* -------------------------------------------------------------------------- */
 function sigmoid(z: number) { return 1 / (1 + Math.exp(-z)); }
 
-function crossEntropyLoss(X: number[][], y: number[], w: number[]): number {
-  let loss = 0;
-  for (let i = 0; i < X.length; i++) {
-    const z = w[0] + w[1] * X[i][0] + w[2] * X[i][1];
-    const p = sigmoid(z);
-    loss += -(y[i] * Math.log(Math.max(p, 1e-12)) + (1 - y[i]) * Math.log(Math.max(1 - p, 1e-12)));
-  }
-  return loss / X.length;
-}
-
 function computeDecisionBoundary(w: number[], xRange: [number, number]): { x1: number; y1: number; x2: number; y2: number } | null {
   if (Math.abs(w[2]) < 1e-6) return null; // vertical line
   const x1 = xRange[0];
@@ -65,9 +55,21 @@ export default function LogisticDecisionBoundaryDemo() {
   const boundary = computeDecisionBoundary(w, XRANGE);
 
   // Loss calculation
-  const X = [...data.class0.map((p) => [p.x, p.y]), ...data.class1.map((p) => [p.x, p.y])];
-  const y = [...Array(data.class0.length).fill(0), ...Array(data.class1.length).fill(1)];
-  const loss = useMemo(() => crossEntropyLoss(X, y, w), [X, y, w]);
+  const { X, y } = useMemo(() => {
+    const X = [...data.class0.map((p) => [p.x, p.y]), ...data.class1.map((p) => [p.x, p.y])];
+    const y = [...Array(data.class0.length).fill(0), ...Array(data.class1.length).fill(1)];
+    return { X, y };
+  }, [data]);
+
+  const loss = useMemo(() => {
+    let total = 0;
+    for (let i = 0; i < X.length; i++) {
+      const z = w[0] + w[1] * X[i][0] + w[2] * X[i][1];
+      const p = sigmoid(z);
+      total += -(y[i] * Math.log(Math.max(p, 1e-12)) + (1 - y[i]) * Math.log(Math.max(1 - p, 1e-12)));
+    }
+    return total / X.length;
+  }, [X, y, w]);
 
   // Accuracy
   const accuracy = useMemo(() => {

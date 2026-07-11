@@ -61,10 +61,10 @@ export default function Ch07StyleTransferPage() {
           explanation: "Gram 矩阵通过通道间内积去掉空间信息，保留纹理统计特征，因此适合表示风格。",
         },
         {
-          question: "设某层风格图像 Gram 矩阵为 G^s，合成图像 Gram 矩阵为 G^\hat{x}，则该层风格损失正比于？",
+          question: "设某层风格图像 Gram 矩阵为 G^s，合成图像 Gram 矩阵为 G^\\hat{x}，则该层风格损失正比于？",
           options: [
-            "G^\hat{x} 与 G^s 对应元素差的平方和。",
-            "G^\hat{x} 与 G^s 的逐元素乘积。",
+            "G^\\hat{x} 与 G^s 对应元素差的平方和。",
+            "G^\\hat{x} 与 G^s 的逐元素乘积。",
             "合成图像与风格图像的像素差。",
             "内容特征与风格特征的点积。",
           ],

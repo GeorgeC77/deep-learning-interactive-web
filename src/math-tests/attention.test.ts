@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { softmax, divisors, multiHeadAttention, matMul } from '../lib/math/attention';
+import {
+  softmax,
+  matMul,
+  multiHeadAttention,
+  divisors,
+} from '../lib/math/attention';
 
 function makeW(rows: number, cols: number, seed: number): number[][] {
   const rng = mulberry32(seed);
@@ -87,7 +92,7 @@ describe('attention', () => {
   });
 
   it('permutation equivariance without PE', () => {
-    const dModel = 4, dK = 2, N = 3;
+    const dModel = 4, dK = 2;
     const X = [[1,2,3,4],[5,6,7,8],[9,10,11,12]];
     // Permute: swap rows 0 and 1
     const PX = [X[1], X[0], X[2]];

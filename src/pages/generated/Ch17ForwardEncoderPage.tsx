@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import DiffusionTimelineLab from '@/components/demos/DiffusionTimelineLab';
 import { Wind } from 'lucide-react';
 
 export default function Ch17ForwardEncoderPage() {
@@ -105,6 +106,7 @@ export default function Ch17ForwardEncoderPage() {
         }),
         formula: String.raw`\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\, \mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\, \boldsymbol{\epsilon}`,
       }}
+      extraContent={<DiffusionTimelineLab />}
     />
   );
 }

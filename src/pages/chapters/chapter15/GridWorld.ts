@@ -191,7 +191,7 @@ export function simulateTrajectory(
     const a = policy[s];
     const trans = getTransitions(s, a, config);
     rand = (rand * 9301 + 49297) % 233280;
-    let u = rand / 233280;
+    const u = rand / 233280;
     let cum = 0;
     let nextS = s;
     for (const t of trans) {

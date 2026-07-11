@@ -24,7 +24,8 @@ function generateData(N: number, seed: number): number[][] {
     let cum = 0, k = 0;
     for (; k < TRUE_PIS.length; k++) { cum += TRUE_PIS[k]; if (u < cum) break; }
     const [mx, my] = TRUE_MEANS[k];
-    const [[sx, sxy], [_, sy]] = TRUE_COVS[k];
+    const cov = TRUE_COVS[k];
+    const sx = cov[0][0], sxy = cov[0][1], sy = cov[1][1];
     const bm1 = Math.sqrt(-2 * Math.log(Math.max(rng(), 1e-10))) * Math.cos(2 * Math.PI * rng());
     const bm2 = Math.sqrt(-2 * Math.log(Math.max(rng(), 1e-10))) * Math.sin(2 * Math.PI * rng());
     pts.push([mx + Math.sqrt(sx) * bm1, my + sxy / Math.sqrt(Math.max(sx, 1e-10)) * bm1 + Math.sqrt(Math.max(sy - sxy * sxy / sx, 0)) * bm2]);

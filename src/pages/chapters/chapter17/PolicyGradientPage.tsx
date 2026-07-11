@@ -212,7 +212,7 @@ function ReinforceDemo() {
   const runBatch = () => {
     // 标准 batch REINFORCE：先在固定旧策略下累积梯度，再统一更新参数
     const gradTheta = Array.from({ length: N }, () => new Array(ACTIONS.length).fill(0));
-    let newBaseline = [...baseline];
+    const newBaseline = [...baseline];
     const returns: number[] = [];
     let lastTraj: number[] = [START];
 

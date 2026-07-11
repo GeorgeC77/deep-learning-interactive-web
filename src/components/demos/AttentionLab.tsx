@@ -39,7 +39,7 @@ export default function AttentionLab() {
     const allWV = Array.from({ length: numHeads }, (_, h) => makeW(dModel, dK, 300 + h * 3));
     const WO = makeW(dModel, dModel, 400);
     return { allWQ, allWK, allWV, WO };
-  }, [dModel, numHeads]);
+  }, [dModel, dK, numHeads]);
 
   // X
   const X = useMemo(() => {
@@ -114,7 +114,7 @@ export default function AttentionLab() {
             <select value={numHeads} onChange={(e) => { setNumHeads(Number(e.target.value)); setActiveHead(0); }} className="w-full px-2 py-1.5 border rounded text-xs">
               {divisors(dModel).map((d) => <option key={d} value={d}>{d}头</option>)}</select></div>
           <div><div className="text-xs font-medium text-gray-700 mb-1">d_model</div>
-            <select value={dModel} onChange={(e) => { setDModel(Number(e.target.value)); setNumHeads(1); }} className="w-full px-2 py-1.5 border rounded text-xs">
+            <select value={dModel} onChange={(e) => { setDModel(Number(e.target.value)); setNumHeads(1); setActiveHead(0); }} className="w-full px-2 py-1.5 border rounded text-xs">
               {[2,4,6,8,10,12].map((d) => <option key={d} value={d}>{d}</option>)}</select></div>
           <div className="flex flex-col gap-1">
             <label className="text-xs"><input type="checkbox" checked={usePE} onChange={() => setUsePE(!usePE)} /> PE</label>
@@ -139,8 +139,9 @@ export default function AttentionLab() {
                   <tr key={i}><td className="p-1 border bg-gray-50 font-mono font-bold">{tokens[i]?.text}</td>
                     {row.map((val, j) => {
                       const masked = causalMask && j > i;
-                      return <td key={j} onClick={() => !masked && setClickedCell({ q: i, k: j })} className={`p-1 border text-center font-mono cursor-pointer ${clickedCell?.q === i && clickedCell?.k === j ? 'ring-2 ring-indigo-500' : ''}`}
-                        style={{ backgroundColor: masked ? '#f3f4f6' : `rgba(99,102,241,${Math.min(1, val * 1.5)})`, color: masked ? '#9ca3af' : val > 0.5 ? 'white' : '#1f2937' }}>{masked ? '−' : val.toFixed(2)}</td>;
+                      const maxVal = Math.max(...active.attention.flat(), 1e-6);
+                      return <td key={j} onClick={() => !masked && setClickedCell({ q: i, k: j })} className={`p-1 border text-center font-mono ${masked ? '' : 'cursor-pointer'} ${clickedCell?.q === i && clickedCell?.k === j ? 'ring-2 ring-indigo-500' : ''}`}
+                        style={{ backgroundColor: masked ? '#f3f4f6' : `rgba(99,102,241,${val / maxVal})`, color: masked ? '#9ca3af' : val / maxVal > 0.55 ? 'white' : '#1f2937' }}>{masked ? '−' : val.toFixed(2)}</td>;
                     })}
                   </tr>))}
               </tbody>
@@ -157,6 +158,29 @@ export default function AttentionLab() {
             <div className="mt-3 bg-indigo-50 rounded-lg p-3 text-[10px]">
               <p><strong>维度：</strong>X:{N}×{dModel} → Q/K/V:{N}×{dK} → A:{N}×{N} → O_h:{N}×{dK}</p>
             </div>
+          </div>
+        </div>
+
+        {/* Active head output */}
+        <div className="bg-white border rounded-lg p-3">
+          <div className="text-xs font-medium text-gray-600 mb-2">Head {activeHead} Output (A·V) [{N}×{dK}]</div>
+          <div className="overflow-x-auto">
+            <table className="text-[10px] border-collapse">
+              <thead>
+                <tr>
+                  <th className="p-1 border bg-gray-50">token</th>
+                  {Array.from({ length: dK }, (_, i) => <th key={i} className="p-1 border bg-gray-50 font-mono">d{i}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {active?.headOut.map((row, i) => (
+                  <tr key={i}>
+                    <td className="p-1 border bg-gray-50 font-mono font-bold">{tokens[i]?.text}</td>
+                    {row.map((v, j) => <td key={j} className="p-1 border text-right font-mono">{v.toFixed(2)}</td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 

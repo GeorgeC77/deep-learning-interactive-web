@@ -195,17 +195,18 @@ function FiniteHorizonChainDemo() {
   }, [horizon, slip, goal]);
 
   const trajectory = useMemo(() => {
+    const rng = mulberry32(runKey);
     const path: number[] = [start];
     let s = start;
     for (let t = 0; t < horizon; t++) {
       const a = policy[t][s];
       const intended = clamp(s + a, 0, N - 1);
-      const next = Math.random() < slip ? s : intended;
+      const next = rng() < slip ? s : intended;
       path.push(next);
       s = next;
     }
     return path;
-  }, [horizon, start, policy, runKey]);
+  }, [horizon, start, policy, runKey, slip]);
 
   const flatV = V.flat();
   const minV = Math.min(...flatV);
@@ -331,6 +332,15 @@ function terminalReward(s: number, goal: number) {
 
 function clamp(v: number, lo: number, hi: number) {
   return Math.max(lo, Math.min(hi, v));
+}
+
+function mulberry32(a: number) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
 }
 
 function Control({ label, children }: { label: string; children: ReactNode }) {

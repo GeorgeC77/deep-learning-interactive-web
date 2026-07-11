@@ -16,7 +16,7 @@ function genScores(N: number, seed: number, overlap: number) {
   const std = 1.0 + overlap * 0.2;
   for (let i = 0; i < N; i++) {
     // Box-Muller transform
-    let u1 = rng(), u2 = rng();
+    let u1 = rng(); const u2 = rng();
     if (u1 < 1e-10) u1 = 1e-10;
     const z1 = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
     const z2 = Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);

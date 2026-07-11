@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { ShieldAlert, Ruler, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
@@ -24,8 +24,11 @@ export default function MarginIntuitionPage() {
   const [b, setB] = useState(-4.0);
 
   // Signed geometric margin for point (x, y)
-  const signedValue = (x: number, y: number) =>
-    (w1 * x + w2 * y + b) / Math.sqrt(w1 * w1 + w2 * w2);
+  const signedValue = useCallback(
+    (x: number, y: number) =>
+      (w1 * x + w2 * y + b) / Math.sqrt(w1 * w1 + w2 * w2),
+    [w1, w2, b]
+  );
 
   const { minMargin, supportVectors } = useMemo(() => {
     let min = Infinity;
@@ -41,7 +44,7 @@ export default function MarginIntuitionPage() {
       }
     });
     return { minMargin: min, supportVectors: sv };
-  }, [w1, w2, b]);
+  }, [signedValue]);
 
   // Check if all points are correctly classified
   const allCorrect = POINTS.every((p) => p.label * signedValue(p.x, p.y) > 0);

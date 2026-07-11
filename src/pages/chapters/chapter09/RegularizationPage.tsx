@@ -67,7 +67,7 @@ function fitPolyLasso(xs: number[], ys: number[], degree: number, lambda: number
   }
   const eta = maxEigen > 0 ? 1 / maxEigen : 0.01;
 
-  let w = new Array(d).fill(0);
+  const w = new Array(d).fill(0);
   for (let step = 0; step < steps; step++) {
     const grad = new Array(d).fill(0);
     for (let i = 0; i < n; i++) {

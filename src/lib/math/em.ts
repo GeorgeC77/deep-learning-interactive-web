@@ -31,6 +31,18 @@ export function eStep(data: number[][], params: GMMParams): number[][] {
   return resp;
 }
 
+/** Ensure a 2x2 covariance matrix is positive definite with eigenvalues >= floor. */
+function regularizeCov(cov: number[][], floor: number): number[][] {
+  const a = cov[0][0], b = cov[0][1], c = cov[1][1];
+  const trace = a + c;
+  const det = a * c - b * b;
+  const disc = Math.sqrt(Math.max(trace * trace - 4 * det, 0));
+  const lambdaMin = (trace - disc) / 2;
+  if (lambdaMin >= floor) return cov;
+  const delta = floor - lambdaMin + 1e-8;
+  return [[a + delta, b], [b, c + delta]];
+}
+
 /** M-step: update μ, Σ, π from responsibilities */
 export function mStep(data: number[][], responsibilities: number[][], epsilon: number = 1e-6): GMMParams {
   const K = responsibilities[0].length, N = data.length;
@@ -54,7 +66,8 @@ export function mStep(data: number[][], responsibilities: number[][], epsilon: n
       s01 += responsibilities[i][k] * dx * dy;
       s11 += responsibilities[i][k] * dy * dy;
     }
-    return [[s00 / Nk[k] + epsilon, s01 / Nk[k]], [s01 / Nk[k], s11 / Nk[k] + epsilon]];
+    const raw = [[s00 / Nk[k] + epsilon, s01 / Nk[k]], [s01 / Nk[k], s11 / Nk[k] + epsilon]] as number[][];
+    return regularizeCov(raw, epsilon);
   });
 
   const newPis = Nk.map((n) => Math.max(n / N, 1e-12));
@@ -107,22 +120,44 @@ export function emIteration(data: number[][], params: GMMParams, epsilon: number
   return { responsibilities, newMeans: newParams.means, newCovs: newParams.covs, newPis: newParams.pis, newParams, logLikelihood: ll };
 }
 
-/** Eigen decomposition for 2x2 covariance — returns {vals, vecs} for ellipse */
+/** Eigen decomposition for 2x2 covariance — returns {vals, vecs} for ellipse.
+ *  vals[0] = sqrt(λ_min), vals[1] = sqrt(λ_max).
+ *  vecs[0] is the eigenvector for λ_min, vecs[1] for λ_max.
+ */
 export function eigen2x2(cov: number[][]): { vals: [number, number]; vecs: [number, number][] } {
   const a = cov[0][0], b = cov[0][1], c = cov[1][1];
   const trace = a + c, det = a * c - b * b;
   const disc = Math.sqrt(Math.max(trace * trace - 4 * det, 0));
-  const v1 = (trace + disc) / 2, v2 = (trace - disc) / 2;
-  // Eigenvectors
-  let vec1: [number, number] = [1, 0], vec2: [number, number] = [0, 1];
+  const lambdaSmall = (trace - disc) / 2;
+  const lambdaLarge = (trace + disc) / 2;
+
+  let vecSmall: [number, number] = [0, 1];
+  let vecLarge: [number, number] = [1, 0];
+
   if (Math.abs(b) > 1e-10) {
-    vec1 = [b, v1 - a];
-    vec2 = [b, v2 - a];
+    // (A - λI) v = 0  ⇒  (a - λ) v_x + b v_y = 0
+    const vLx = b;
+    const vLy = lambdaLarge - a;
+    const nL = Math.hypot(vLx, vLy);
+    vecLarge = nL > 1e-10 ? [vLx / nL, vLy / nL] : [1, 0];
+
+    const vSx = b;
+    const vSy = lambdaSmall - a;
+    const nS = Math.hypot(vSx, vSy);
+    vecSmall = nS > 1e-10 ? [vSx / nS, vSy / nS] : [0, 1];
+  } else {
+    // Diagonal matrix: pick axes in the order of the eigenvalues.
+    if (a < c) {
+      vecSmall = [1, 0];
+      vecLarge = [0, 1];
+    } else {
+      vecSmall = [0, 1];
+      vecLarge = [1, 0];
+    }
   }
-  // Normalize
-  [vec1, vec2].forEach((v) => {
-    const norm = Math.hypot(v[0], v[1]);
-    if (norm > 1e-10) { v[0] /= norm; v[1] /= norm; }
-  });
-  return { vals: [Math.sqrt(Math.max(v2, 1e-10)), Math.sqrt(Math.max(v1, 1e-10))], vecs: [vec1, vec2] };
+
+  return {
+    vals: [Math.sqrt(Math.max(lambdaSmall, 1e-10)), Math.sqrt(Math.max(lambdaLarge, 1e-10))],
+    vecs: [vecSmall, vecLarge],
+  };
 }

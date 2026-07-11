@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import {
-  type NodeSpec,
   topoSort,
   forwardPass,
   backwardPass,
-  evalNode,
   centralDiff,
+  evalNode,
+  type NodeSpec,
 } from '../lib/math/backprop';
 
 /* -------------------------------------------------------------------------- */
@@ -85,19 +85,18 @@ describe('backprop', () => {
   });
 
   it('branched graph gradients accumulate correctly', () => {
-    // Graph: x→(add w), then both branches feed into mul → f = (x+w)^2
+    // Graph: y = x^2 + sin(x), dy/dx = 2x + cos(x)
+    const xVal = 1.5;
     const g2: NodeSpec[] = [
-      { id: 'x',  op: 'input', inputs: [], value: 3 },
-      { id: 'w',  op: 'weight', inputs: [], value: 2 },
-      { id: 'a1', op: 'add', inputs: ['x','w'], value: 0 },
-      { id: 'a2', op: 'add', inputs: ['x','w'], value: 0 },
-      { id: 'mul',op: 'multiply', inputs: ['a1','a2'], value: 0 },
+      { id: 'x',  op: 'input', inputs: [], value: xVal },
+      { id: 'x2', op: 'square', inputs: ['x'], value: 0 },
+      { id: 'sx', op: 'sin', inputs: ['x'], value: 0 },
+      { id: 'y',  op: 'add', inputs: ['x2','sx'], value: 0 },
     ];
     const vals = forwardPass(g2);
-    expect(vals['mul']).toBeCloseTo(25, 10);
+    expect(vals['y']).toBeCloseTo(xVal * xVal + Math.sin(xVal), 10);
     const { grads } = backwardPass(g2, vals);
-    expect(grads['mul']).toBeCloseTo(1, 10);
-    expect(grads['w']).toBeCloseTo(10, 10); // ∂/∂w of (x+w)² = 2(x+w) = 10
+    expect(grads['x']).toBeCloseTo(2 * xVal + Math.cos(xVal), 10);
   });
 
   it('evalNode operations', () => {

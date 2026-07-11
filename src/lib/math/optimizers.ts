@@ -28,27 +28,79 @@ export function analyticalGrad(x: number, y: number, landscape: Landscape): [num
   }
 }
 
+/** True Hessian of the Rosenbrock function at (x, y). */
+function rosenbrockHessian(x: number, y: number): [[number, number], [number, number]] {
+  return [
+    [2 + 1200 * x * x - 400 * y, -400 * x],
+    [-400 * x, 200],
+  ];
+}
+
+/** Eigen-decomposition of a symmetric 2x2 matrix [[a,b],[b,c]]. */
+function eigen2x2Symmetric(
+  a: number,
+  b: number,
+  c: number,
+): { vals: [number, number]; vecs: [[number, number], [number, number]] } {
+  const trace = a + c;
+  const det = a * c - b * b;
+  const disc = Math.sqrt(Math.max(trace * trace - 4 * det, 0));
+  const v1 = (trace - disc) / 2;
+  const v2 = (trace + disc) / 2;
+
+  let vec1: [number, number] = [1, 0];
+  let vec2: [number, number] = [0, 1];
+
+  if (Math.abs(b) > 1e-10) {
+    // (A - λI) v = 0  ⇒  (a - λ) v_x + b v_y = 0
+    // Pick the formulation with the larger coefficient to avoid cancellation.
+    const v1x = b;
+    const v1y = v1 - a;
+    const n1 = Math.hypot(v1x, v1y);
+    vec1 = n1 > 1e-10 ? [v1x / n1, v1y / n1] : [1, 0];
+    // Second eigenvector is orthogonal to the first.
+    vec2 = [-vec1[1], vec1[0]];
+  } else {
+    // Diagonal matrix: eigenvectors are the coordinate axes.
+    if (Math.abs(a - c) < 1e-10) {
+      // Repeated eigenvalue; any basis works.
+      vec1 = [1, 0];
+      vec2 = [0, 1];
+    } else if (a > c) {
+      // λ2 = a (larger), λ1 = c (smaller)
+      vec1 = [0, 1];
+      vec2 = [1, 0];
+    }
+  }
+
+  return { vals: [v1, v2], vecs: [vec1, vec2] };
+}
+
 export function stationaryPoint(landscape: Landscape): [number, number] {
   switch (landscape) {
     case 'quadratic': return [0, 0];
     case 'illcond': return [0, 0];
-    case 'saddle': return [0, 0]; // saddle point — minima at (0, ±√5)
+    case 'saddle': return [0, 0]; // saddle point — minima at (0, ±√10)
     case 'rosenbrock': return [1, 1];
   }
 }
 
-export function hessianEigen(landscape: Landscape, x: number, y: number): { vals: [number, number]; vecs: [number, number][] } {
+export function hessianEigen(
+  landscape: Landscape,
+  x: number,
+  y: number,
+): { vals: [number, number]; vecs: [number, number][] } {
   switch (landscape) {
     case 'quadratic': return { vals: [2, 2], vecs: [[1, 0], [0, 1]] };
     case 'illcond': return { vals: [0.1, 10], vecs: [[1, 0], [0, 1]] };
     case 'saddle': {
-      const hxx = 2 + 0.6 * x * x, hyy = -2 + 0.6 * y * y;
-      return { vals: [hxx, hyy], vecs: [[1, 0], [0, 1]] };
+      const hxx = 2 + 0.6 * x * x;
+      const hyy = -2 + 0.6 * y * y;
+      return eigen2x2Symmetric(hxx, 0, hyy);
     }
     case 'rosenbrock': {
-      // Approximation
-      const a = 1200 * x * x - 400 * y + 2;
-      return { vals: [a / 10, a], vecs: [[1, 0], [0, 1]] };
+      const H = rosenbrockHessian(x, y);
+      return eigen2x2Symmetric(H[0][0], H[0][1], H[1][1]);
     }
   }
 }

@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import OptimizationLandscapeLab from '@/components/demos/OptimizationLandscapeLab';
 import { Mountain } from 'lucide-react';
 
 export default function Ch04ErrorSurfacesPage() {
@@ -126,6 +127,7 @@ export default function Ch04ErrorSurfacesPage() {
         }),
         formula: String.raw`\eta_{\max} = \frac{2}{\lambda_{\max}}`,
       }}
+      extraContent={<OptimizationLandscapeLab />}
     />
   );
 }

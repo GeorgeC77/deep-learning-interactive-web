@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
+import { contours as d3Contours } from 'd3-contour';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import { loss, analyticalGrad, stationaryPoint, hessianEigen, type Optimizer, type Landscape, step, type OptState } from '@/lib/math/optimizers';
 
-const GRID = 100; // contour resolution
+const GRID = 80; // contour resolution
 const W = 520, H = 420, ML = { t: 15, r: 15, b: 40, l: 55 };
 const PW = W - ML.l - ML.r, PH = H - ML.t - ML.b;
 
@@ -16,6 +17,16 @@ const PRESETS = [
   { key: 'rosenbrock', label: '🍌 Rosenbrock', lr: 0.003, b1: 0.9, b2: 0.999, landscape: 'rosenbrock' as Landscape },
 ];
 
+const LANDSCAPE_LEVELS: Record<Landscape, number[]> = {
+  quadratic: [0.2, 0.5, 1, 2, 4, 8],
+  illcond: [0.5, 1, 2, 5, 10, 20],
+  saddle: [-3, -2, -1, 0, 1, 2, 3],
+  rosenbrock: [1, 5, 25, 125, 625, 3125],
+};
+
+const ALL_OPTS: Optimizer[] = ['GD', 'Momentum', 'RMSProp', 'Adam'];
+const OPT_COLORS: Record<Optimizer, string> = { GD: '#3b82f6', Momentum: '#f59e0b', RMSProp: '#10b981', Adam: '#ef4444' };
+
 export default function OptimizationLandscapeLab() {
   const [landscape, setLandscape] = useState<Landscape>('quadratic');
   const [lr, setLr] = useState(0.05);
@@ -23,12 +34,9 @@ export default function OptimizationLandscapeLab() {
   const [beta2, setBeta2] = useState(0.999);
   const startX = 1.5, startY = 1.5, steps = 30;
 
-  const allOpts: Optimizer[] = ['GD', 'Momentum', 'RMSProp', 'Adam'];
-  const optColors: Record<Optimizer, string> = { GD: '#3b82f6', Momentum: '#f59e0b', RMSProp: '#10b981', Adam: '#ef4444' };
-
   const results = useMemo(() => {
     const r: Record<string, { path: [number, number][]; lossPath: number[] }> = {};
-    for (const opt of allOpts) {
+    for (const opt of ALL_OPTS) {
       let st: OptState = { x: startX, y: startY, vx: 0, vy: 0, sx: 0, sy: 0, t: 0 };
       const path: [number, number][] = [[st.x, st.y]];
       const lossPath: number[] = [loss(st.x, st.y, landscape)];
@@ -43,20 +51,31 @@ export default function OptimizationLandscapeLab() {
     return r;
   }, [landscape, lr, beta1, beta2]);
 
-  // Real contour grid
-  const contours = useMemo(() => {
+  // Real contour grid computed with d3-contour (marching squares).
+  const contourData = useMemo(() => {
     const xMin = -2.2, xMax = 2.2, yMin = -2.2, yMax = 2.2;
     const xs = Array.from({ length: GRID }, (_, i) => xMin + (i / (GRID - 1)) * (xMax - xMin));
     const ys = Array.from({ length: GRID }, (_, i) => yMin + (i / (GRID - 1)) * (yMax - yMin));
-    const grid = xs.map((x) => ys.map((y) => loss(x, y, landscape)));
-    const minL = Math.min(...grid.flat());
-    const maxL = Math.max(...grid.flat());
-    const levels = [0.1, 0.5, 1, 2, 5, 10, 20, 50, 100, 200].filter((l) => l >= minL && l <= maxL);
-    return { levels, grid, minL, maxL, xs, ys, xMin, xMax, yMin, yMax };
+
+    // d3-contour expects values in row-major order: values[y * width + x].
+    const values: number[] = new Array(GRID * GRID);
+    for (let i = 0; i < GRID; i++) {
+      for (let j = 0; j < GRID; j++) {
+        values[j * GRID + i] = loss(xs[i], ys[j], landscape);
+      }
+    }
+
+    const levels = LANDSCAPE_LEVELS[landscape];
+    const cont = d3Contours().size([GRID, GRID]).smooth(true).thresholds(levels)(values);
+
+    return { cont, xMin, xMax, yMin, yMax };
   }, [landscape]);
 
-  const toX = (v: number) => ML.l + ((v - contours.xMin) / (contours.xMax - contours.xMin)) * PW;
-  const toY = (v: number) => ML.t + PH - ((v - contours.yMin) / (contours.yMax - contours.yMin)) * PH;
+  const toX = (v: number) => ML.l + ((v - contourData.xMin) / (contourData.xMax - contourData.xMin)) * PW;
+  const toY = (v: number) => ML.t + PH - ((v - contourData.yMin) / (contourData.yMax - contourData.yMin)) * PH;
+
+  const toSvgX = (gx: number) => toX(contourData.xMin + (gx / (GRID - 1)) * (contourData.xMax - contourData.xMin));
+  const toSvgY = (gy: number) => toY(contourData.yMin + (gy / (GRID - 1)) * (contourData.yMax - contourData.yMin));
 
   const sp = stationaryPoint(landscape);
   const hessian = hessianEigen(landscape, sp[0], sp[1]);
@@ -65,8 +84,8 @@ export default function OptimizationLandscapeLab() {
     <InteractiveDemo title="优化器对比实验室">
       <div className="space-y-5">
         <p className="text-sm text-gray-600">
-          四种优化器同屏对比。Momentum 使用经典定义 v = βv + g（不是 EMA）；相同学习率不代表相同有效步长。
-          梯度向量显示在起点处。鞍点 (0,0) 的 Hessian 特征值: {hessian.vals[0].toFixed(2)}, {hessian.vals[1].toFixed(2)}。
+          四种优化器同屏对比。等高线由真实损失函数通过 marching squares 绘制；Momentum 使用经典定义 v = βv + g（不是 EMA）；相同学习率不代表相同有效步长。
+          鞍点 (0,0) 的 Hessian 特征值: {hessian.vals[0].toFixed(2)}, {hessian.vals[1].toFixed(2)}。
         </p>
 
         <div className="flex flex-wrap gap-1">
@@ -91,20 +110,15 @@ export default function OptimizationLandscapeLab() {
 
         <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
           <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ maxHeight: 440 }}>
-            {/* Contour heatmap — simplified: just level lines */}
-            {contours.levels.map((lvl, li) => {
-              const paths: string[] = [];
-              for (let i = 1; i < GRID; i++) for (let j = 1; j < GRID; j++) {
-                const corners = [contours.grid[i - 1][j - 1], contours.grid[i][j - 1], contours.grid[i][j], contours.grid[i - 1][j]];
-                const above = corners.filter((v) => v <= lvl);
-                if (above.length > 0 && above.length < 4) {
-                  const x = toX(contours.xs[i - 1] + (contours.xs[i] - contours.xs[i - 1]) / 2);
-                  const y = toY(contours.ys[j - 1] + (contours.ys[j] - contours.ys[j - 1]) / 2);
-                  paths.push(`${x},${y}`);
-                }
-              }
-              return paths.length > 0 ? <polygon key={li} points={paths.join(' ')} fill="none" stroke="#e5e7eb" strokeWidth={0.3} /> : null;
-            })}
+            {/* Real contour lines */}
+            {contourData.cont.map((c, ci) => (
+              <g key={ci}>
+                {c.coordinates.map((ring, ri) => {
+                  const d = (ring as unknown as [number, number][]).map(([gx, gy], i) => `${i === 0 ? 'M' : 'L'} ${toSvgX(gx)} ${toSvgY(gy)}`).join(' ');
+                  return <path key={ri} d={d} fill="none" stroke="#94a3b8" strokeWidth={0.6} opacity={0.7} />;
+                })}
+              </g>
+            ))}
             {/* Start + gradient vector */}
             <circle cx={toX(startX)} cy={toY(startY)} r={4} fill="#1f2937" />
             {(() => {
@@ -113,12 +127,12 @@ export default function OptimizationLandscapeLab() {
               return <line x1={toX(startX)} y1={toY(startY)} x2={toX(startX - gx * scale)} y2={toY(startY - gy * scale)} stroke="#1f2937" strokeWidth={2} markerEnd="url(#arrow)" />;
             })()}
             {/* Paths */}
-            {allOpts.map((o) => (
-              <polyline key={o} points={results[o].path.map(([x, y]) => `${toX(x)},${toY(y)}`).join(' ')} fill="none" stroke={optColors[o]} strokeWidth={1.5} opacity={0.8} />
+            {ALL_OPTS.map((o) => (
+              <polyline key={o} points={results[o].path.map(([x, y]) => `${toX(x)},${toY(y)}`).join(' ')} fill="none" stroke={OPT_COLORS[o]} strokeWidth={1.5} opacity={0.8} />
             ))}
-            {allOpts.map((o) => {
+            {ALL_OPTS.map((o) => {
               const last = results[o].path[results[o].path.length - 1];
-              return <circle key={o} cx={toX(last[0])} cy={toY(last[1])} r={3.5} fill={optColors[o]} />;
+              return <circle key={o} cx={toX(last[0])} cy={toY(last[1])} r={3.5} fill={OPT_COLORS[o]} />;
             })}
             {/* Stationary point — use eigenvalues to determine type */}
             <circle cx={toX(sp[0])} cy={toY(sp[1])} r={5} fill="none" stroke="#6b7280" strokeWidth={2} />
@@ -126,12 +140,12 @@ export default function OptimizationLandscapeLab() {
               ★ {hessian.vals[0] > 0 && hessian.vals[1] > 0 ? 'minimum' : hessian.vals[0] < 0 && hessian.vals[1] < 0 ? 'maximum' : 'saddle'}
               {landscape === 'rosenbrock' ? ' @ (1,1)' : ''}
             </text>
-            {/* Arnold arrow marker */}
+            {/* Arrow marker */}
             <defs><marker id="arrow" viewBox="0 0 10 10" refX={5} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937" /></marker></defs>
             <rect x={ML.l} y={ML.t} width={PW} height={PH} fill="none" stroke="#d1d5db" strokeWidth={1} />
           </svg>
           <div className="flex justify-center gap-3 pb-2 text-[10px]">
-            {allOpts.map((o) => <span key={o}><span className="inline-block w-3 h-[2px] align-middle mr-1" style={{backgroundColor: optColors[o]}} />{o}</span>)}
+            {ALL_OPTS.map((o) => <span key={o}><span className="inline-block w-3 h-[2px] align-middle mr-1" style={{backgroundColor: OPT_COLORS[o]}} />{o}</span>)}
           </div>
         </div>
 
@@ -140,22 +154,22 @@ export default function OptimizationLandscapeLab() {
           <div className="text-xs font-medium text-gray-600 mb-2">Loss vs Iteration（共享纵轴）</div>
           <svg viewBox="0 0 480 160" className="w-full" style={{ maxHeight: 180 }}>
             {(() => {
-              const allLosses = allOpts.flatMap((o) => results[o].lossPath);
+              const allLosses = ALL_OPTS.flatMap((o) => results[o].lossPath);
               const globalMax = Math.max(...allLosses, 1);
               const globalMin = Math.max(0, Math.min(...allLosses));
               const range = Math.max(globalMax - globalMin, 1e-6);
-              return allOpts.map((o) => {
+              return ALL_OPTS.map((o) => {
                 const lp = results[o].lossPath;
-                return <polyline key={o} points={lp.map((l, i) => `${10 + i / steps * 460},${150 - ((l - globalMin) / range) * 140}`).join(' ')} fill="none" stroke={optColors[o]} strokeWidth={1.5} opacity={0.8} />;
+                return <polyline key={o} points={lp.map((l, i) => `${10 + i / steps * 460},${150 - ((l - globalMin) / range) * 140}`).join(' ')} fill="none" stroke={OPT_COLORS[o]} strokeWidth={1.5} opacity={0.8} />;
               });
             })()}
           </svg>
         </div>
 
         <div className="grid grid-cols-4 gap-2 text-center">
-          {allOpts.map((o) => {
+          {ALL_OPTS.map((o) => {
             const last = results[o].lossPath[results[o].lossPath.length - 1];
-            return <div key={o} className="rounded-lg p-2" style={{backgroundColor: optColors[o] + '15'}}><div className="text-[10px] text-gray-600">{o}</div><div className="text-sm font-bold" style={{color: optColors[o]}}>{last.toFixed(4)}</div></div>;
+            return <div key={o} className="rounded-lg p-2" style={{backgroundColor: OPT_COLORS[o] + '15'}}><div className="text-[10px] text-gray-600">{o}</div><div className="text-sm font-bold" style={{color: OPT_COLORS[o]}}>{last.toFixed(4)}</div></div>;
           })}
         </div>
 

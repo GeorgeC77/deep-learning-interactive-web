@@ -1,34 +1,15 @@
 import { useState, useMemo } from 'react';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import { makeBetaSchedule, alphaBar, generateGaussianNoise, forwardClosed, forwardIncremental } from '@/lib/math/diffusion';
-
-/* -------------------------------------------------------------------------- */
-/* reverseStep: z_{t-1} = mu_theta(z_t, t) + sigma_t * epsilon               */
-/* mu_theta = (z_t - beta_t/sqrt(1-alphaBar_t) * epsilon_hat) / sqrt(1-beta_t) */
-/* sigma_t = sqrt(beta_t * (1 - alphaBar_{t-1}) / (1 - alphaBar_t))           */
-/* -------------------------------------------------------------------------- */
-function reverseStep(
-  zt: number[][], t: number, betas: number[], epsilonHat: number[][],
-  stochastic: boolean, seed: number
-): number[][] {
-  const betaT = betas[t];
-  const abT = alphaBar(t + 1, betas);
-  const abTminus1 = alphaBar(t, betas);
-  const sqrt1mAbT = Math.sqrt(Math.max(1 - abT, 1e-10));
-  const sqrt1mBetaT = Math.sqrt(1 - betaT);
-  const coef = betaT / sqrt1mAbT;
-  const sigmaT = Math.sqrt(betaT * (1 - abTminus1) / Math.max(1 - abT, 1e-10));
-
-  const rng = mulberry32(seed + t * 1000);
-  return zt.map((row, i) => {
-    const mu0 = (row[0] - coef * epsilonHat[i][0]) / sqrt1mBetaT;
-    const mu1 = (row[1] - coef * epsilonHat[i][1]) / sqrt1mBetaT;
-    const noise0 = stochastic ? sigmaT * boxMuller(rng) : 0;
-    const noise1 = stochastic ? sigmaT * boxMuller(rng) : 0;
-    return [mu0 + noise0, mu1 + noise1] as [number, number];
-  });
-}
+import {
+  makeBetaSchedule,
+  alphaBar,
+  generateGaussianNoise,
+  forwardClosed,
+  forwardIncremental,
+  reverseChain,
+  mulberry32,
+} from '@/lib/math/diffusion';
 
 /* -------------------------------------------------------------------------- */
 /* Point cloud generators                                                     */
@@ -73,70 +54,63 @@ export default function DiffusionTimelineLab() {
   const [predictionError, setPredictionError] = useState(false);
   const [stochasticReverse, setStochasticReverse] = useState(true);
 
-  const realT = Math.round((displayT / (DISPLAY_STEPS - 1)) * (T - 1));
+  // Map slider step 0..DISPLAY_STEPS-1 to diffusion time 0..T.
+  const realT = Math.round((displayT / (DISPLAY_STEPS - 1)) * T);
   const betas = useMemo(() => makeBetaSchedule(T, 1e-4, 0.02), []);
   const abT = useMemo(() => alphaBar(T, betas), [betas]);
 
   const z0 = useMemo(() => generatePointCloud(cloudType, N, seed), [cloudType, N, seed]);
   const epsilon = useMemo(() => generateGaussianNoise(N, 2, seed), [N, seed]);
 
-  // epsilon_hat
+  // epsilon_hat: optional prediction error added to the true noise.
   const epsilonHat = useMemo(() => {
     const err = predictionError ? 0.3 : 0;
     const rng = mulberry32(seed + 999);
     return epsilon.map(([ex, ey]) => [ex + (rng() - 0.5) * err, ey + (rng() - 0.5) * err] as [number, number]);
   }, [epsilon, seed, predictionError]);
 
-  // Closed-form forward
-  const ztClosed = useMemo(() => forwardClosed(z0, epsilon, alphaBar(realT + 1, betas)), [z0, epsilon, betas, realT]);
+  // Closed-form forward: alphaBar(0) = 1 ⇒ displayT=0 gives exactly z0.
+  const ztClosed = useMemo(() => forwardClosed(z0, epsilon, alphaBar(realT, betas)), [z0, epsilon, betas, realT]);
 
-  // Incremental forward
+  // Incremental forward: execute exactly realT transitions; realT=0 ⇒ z0.
   const ztIncremental = useMemo(() => {
     let z: number[][] = z0.map(([x, y]) => [x, y]);
-    for (let t = 0; t <= realT; t++) {
+    for (let t = 0; t < realT; t++) {
       const epsT = generateGaussianNoise(N, 2, seed + t * 200);
       z = forwardIncremental(z, epsT, betas[t]);
     }
     return z;
   }, [z0, betas, realT, seed]);
 
-  // Reverse sampling
+  // Reverse chain: start from a fixed z_T and denoise back to z_0.
   const reversePath = useMemo(() => {
-    const steps = DISPLAY_STEPS;
-    const interval = Math.max(1, Math.floor((T - 1) / (steps - 1)));
-    const path: number[][][] = [];
-    let z: number[][] = ztClosed.map(([x, y]) => [x, y]);
-    for (let s = 0; s < steps; s++) {
-      const tReal = Math.max(0, (T - 1) - s * interval);
-      if (tReal <= 0) { path.push(z0); break; }
-      const tIndex = tReal - 1; // betas[tIndex] corresponds to transition tIndex→tIndex+1
-      if (tIndex < 0) { path.push(z0); break; }
-      path.push(z.map(row => [...row]));
-      z = reverseStep(z, tIndex, betas, epsilonHat, stochasticReverse, seed);
-    }
-    // Last step: no noise (t=0)
-    path.push(z0);
-    return path;
-  }, [ztClosed, betas, T, DISPLAY_STEPS, epsilonHat, stochasticReverse, seed, z0]);
+    const zT = forwardClosed(z0, epsilon, alphaBar(T, betas));
+    const predictNoise = () => epsilonHat;
+    return reverseChain(zT, T, betas, predictNoise, stochasticReverse);
+  }, [z0, epsilon, betas, T, epsilonHat, stochasticReverse]);
 
-  // x0 prediction (clean-sample estimate)
+  // x0 prediction (clean-sample estimate) at time realT.
   const x0Pred = useMemo(() => {
-    const ab = alphaBar(realT + 1, betas);
+    const ab = alphaBar(realT, betas);
     const sqrtAb = Math.sqrt(Math.max(ab, 1e-10));
     const sqrt1mAb = Math.sqrt(Math.max(1 - ab, 1e-10));
     return ztClosed.map(([x, y], i) => [(x - sqrt1mAb * epsilonHat[i][0]) / sqrtAb, (y - sqrt1mAb * epsilonHat[i][1]) / sqrtAb] as [number, number]);
   }, [ztClosed, epsilonHat, betas, realT]);
 
-  const currentAb = alphaBar(realT + 1, betas);
+  const currentAb = alphaBar(realT, betas);
 
-  const displayPts = mode === 'closed-forward' ? ztClosed : mode === 'incremental-forward' ? ztIncremental : (reversePath[displayT] ?? z0);
+  const displayPts = mode === 'closed-forward'
+    ? ztClosed
+    : mode === 'incremental-forward'
+      ? ztIncremental
+      : (reversePath[realT] ?? z0);
 
   return (
     <InteractiveDemo title="扩散模型时间线实验：forward + reverse">
       <div className="space-y-4">
         <p className="text-sm text-gray-600">
           T={T} 步线性 beta 调度。ᾱ(T) = {abT.toFixed(6)} {abT < 0.01 ? '✅ < 0.01' : '⚠️ >= 0.01'}。
-          ε 使用 Box-Muller 生成标准高斯 N(0,I)。
+          ε 使用 Box-Muller 生成标准高斯 N(0,I)。ᾱ(0)=1，因此 t=0 时 z_t 严格等于 z₀。
         </p>
 
         <div className="flex flex-wrap gap-2">
@@ -168,7 +142,7 @@ export default function DiffusionTimelineLab() {
 
         <div>
           <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
-            <span>时间步</span><span>t={realT} / {T - 1} (显示 {displayT + 1}/{DISPLAY_STEPS})</span>
+            <span>时间步</span><span>t={realT} / {T} (显示 {displayT + 1}/{DISPLAY_STEPS})</span>
           </div>
           <Slider value={[displayT]} min={0} max={DISPLAY_STEPS - 1} step={1} onValueChange={(v) => setDisplayT(v[0])} />
           <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
@@ -180,7 +154,7 @@ export default function DiffusionTimelineLab() {
         <div className="grid md:grid-cols-3 gap-3">
           {[
             { label: 'z₀（原始数据）', pts: z0, color: '#3b82f6' },
-            { label: mode === 'reverse' ? `z_t reverse (step ${displayT})` : `z_t（t=${realT}）`, pts: displayPts, color: '#f59e0b' },
+            { label: mode === 'reverse' ? `z_t reverse (t=${realT})` : `z_t（t=${realT}）`, pts: displayPts, color: '#f59e0b' },
             { label: '基于 ε̂ 的 clean-sample estimate', pts: x0Pred, color: '#10b981' },
           ].map((view, vi) => (
             <div key={vi} className="bg-gray-50 rounded-lg border overflow-hidden">
@@ -198,14 +172,11 @@ export default function DiffusionTimelineLab() {
         <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs space-y-2">
           <p><strong>🎓 关键公式：</strong></p>
           <p className="font-mono">z_t = √ᾱ_t · z_0 + √(1-ᾱ_t) · ε,  ε ~ N(0,I)</p>
-          <p className="font-mono">x̂₀ = (z_t − √(1-ᾱ_t) · ε̂) / √ᾱ_t （基于 epsilon_hat 的 clean-sample estimate，不是完整反向扩散）</p>
-          <p className="font-mono">z_{'{t-1}'} = (z_t − β_t/√(1-ᾱ_t)·ε̂) / √(1-β_t) + σ_t·ε', reverseStep(t, stochastic={stochasticReverse ? 'true' : 'false'})</p>
-          <p className="text-gray-500 mt-1">alphaBar(0)={alphaBar(0, betas).toFixed(1)}, alphaBar(T)={abT.toFixed(6)}. 最终一步(t=0)不加噪声。</p>
+          <p className="font-mono">x̂₀ = (z_t − √(1-ᾱ_t) · ε̂) / √ᾱ_t</p>
+          <p className="font-mono">z_{'{t-1}'} = (z_t − β_t/√(1-ᾱ_t)·ε̂) / √(1-β_t) + σ_t·ε'</p>
+          <p className="text-gray-500 mt-1">alphaBar(0)={alphaBar(0, betas).toFixed(1)}, alphaBar(T)={abT.toFixed(6)}。反向链从固定的 z_T 出发，与滑块位置无关。</p>
         </div>
       </div>
     </InteractiveDemo>
   );
 }
-
-function mulberry32(a: number) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-function boxMuller(rng: () => number): number { const u1 = Math.max(rng(), 1e-12), u2 = rng(); return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2); }

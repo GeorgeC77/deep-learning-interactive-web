@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 
@@ -13,11 +13,10 @@ export default function MaskedAutoencoderDemo() {
     return Array.from({ length: GRID * GRID }, () => rng());
   }, [seed]);
 
-  const [mask, setMask] = useState<boolean[]>(() => generateMask(original.length, maskRatio, seed + 1));
-
-  useEffect(() => {
-    setMask(generateMask(original.length, maskRatio, seed + 100));
-  }, [maskRatio, seed]);
+  const mask = useMemo(
+    () => generateMask(original.length, maskRatio, seed + 100),
+    [original.length, maskRatio, seed],
+  );
 
   const visibleValues = original.filter((_, i) => !mask[i]);
   const mean = visibleValues.length > 0

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { BookOpen, ChevronLeft, ChevronRight, Focus, ShieldAlert, SlidersHorizontal, AlertTriangle, HelpCircle, Target, Lightbulb, MapPin, Layers } from 'lucide-react';
+import AttentionLab from '@/components/demos/AttentionLab';
 import ConceptCard from '@/components/ConceptCard';
 import FormulaCard from '@/components/FormulaCard';
 import InteractiveDemo from '@/components/InteractiveDemo';
@@ -494,6 +495,9 @@ export default function Ch09AttentionPage() {
           </div>
         </div>
       </InteractiveDemo>
+
+      {/* Full multi-head attention lab */}
+      <AttentionLab />
 
       {/* Common mistakes */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

@@ -7,7 +7,7 @@ const MANIFEST_TS = path.join(ROOT, 'src', 'course', 'manifest.ts');
 const APP_TSX = path.join(ROOT, 'src', 'App.tsx');
 const COVERAGE_JSON = path.join(ROOT, 'src', 'course', 'coverage_matrix.json');
 const PAGES_DIR = path.join(ROOT, 'src', 'pages');
-const REPORT_MD = path.join(ROOT, 'reports', 'coverage_report.md');
+const REPORT_MD = path.join(ROOT, 'reports', 'page_coverage_report.md');
 
 function parseManifestSections(source) {
   const sections = [];
@@ -194,6 +194,9 @@ function main() {
         issue: 'Component name is not semantically consistent with Bishop section',
       });
     }
+
+    // Overview pages are chapter summaries and do not require full Bishop metadata.
+    if (section.path.endsWith('/overview')) continue;
 
     const pageFile = findPageFile(componentName, importPaths);
     if (pageFile) {

@@ -345,7 +345,7 @@
     "bishopSection": "",
     "sectionTitle": "课程概览",
     "routePath": "/ch01/overview",
-    "componentName": "Chapter01OverviewPage",
+    "componentName": "Ch01OverviewPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -425,7 +425,7 @@
     "bishopSection": "",
     "sectionTitle": "课程概览",
     "routePath": "/ch02/overview",
-    "componentName": "Chapter02OverviewPage",
+    "componentName": "Ch02OverviewPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -525,7 +525,7 @@
     "bishopSection": "",
     "sectionTitle": "课程概览",
     "routePath": "/ch03/overview",
-    "componentName": "Chapter07OverviewPage",
+    "componentName": "Ch03OverviewPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [

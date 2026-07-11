@@ -12,6 +12,9 @@ const ACTIVATIONS = [
   { name: 'Tanh', fn: (z: number) => Math.tanh(z) },
 ];
 
+const DEMO_OUTPUT_WEIGHTS = [0.8, -0.6, 0.7];
+const DEMO_OUTPUT_BIAS = -0.2;
+
 export default function NeuralNetworksPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
@@ -310,7 +313,7 @@ function ActivationFunctionDemo() {
       pts.push({ x, y: active.fn(x) });
     }
     return pts;
-  }, [active]);
+  }, [active, xMin, xMax]);
 
   const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${xScale(p.x)} ${yScale(p.y)}`).join(' ');
 
@@ -616,7 +619,7 @@ function LinearCollapseDemo() {
       yMin: Math.min(-1, dataMin - margin),
       yMax: Math.max(3, dataMax + margin),
     };
-  }, [w1, b1, w2, b2, wOut, bOut]);
+  }, [w1, b1, w2, b2, wOut, bOut, xMin, xMax]);
 
   const xScale = (x: number) => padding + ((x - xMin) / (xMax - xMin)) * (width - 2 * padding);
   const yScale = (y: number) => padding + (1 - (y - yMin) / (yMax - yMin)) * (height - 2 * padding);
@@ -757,9 +760,6 @@ function LearnedFeaturesDemo() {
     const theta = ((a + rotation[0]) * Math.PI) / 180;
     return { wx: Math.cos(theta), wy: Math.sin(theta), b: 0 };
   });
-  const outputWeights = [0.8, -0.6, 0.7];
-  const outputBias = -0.2;
-
   const width = 520;
   const height = 360;
   const padding = 32;
@@ -770,22 +770,23 @@ function LearnedFeaturesDemo() {
   const yScale = (y: number) => padding + (1 - (y - viewMin) / (viewMax - viewMin)) * (height - 2 * padding);
 
   const gridSize = 28;
+  const strengthValue = strength[0];
   const cells = useMemo(() => {
     const arr: { x: number; y: number; pred: number }[] = [];
     for (let i = 0; i < gridSize; i++) {
       for (let j = 0; j < gridSize; j++) {
         const x = viewMin + ((i + 0.5) / gridSize) * (viewMax - viewMin);
         const y = viewMin + ((j + 0.5) / gridSize) * (viewMax - viewMin);
-        let z = outputBias;
+        let z = DEMO_OUTPUT_BIAS;
         hidden.forEach((h, idx) => {
           const a = Math.max(0, h.wx * x + h.wy * y + h.b);
-          z += outputWeights[idx] * a * strength[0];
+          z += DEMO_OUTPUT_WEIGHTS[idx] * a * strengthValue;
         });
         arr.push({ x, y, pred: z });
       }
     }
     return arr;
-  }, [rotation[0], strength[0]]);
+  }, [strengthValue, hidden, viewMin, viewMax]);
 
   // Hidden neuron boundary lines: wx*x + wy*y + b = 0 => y = -(wx*x + b)/wy
   function hiddenLine(h: { wx: number; wy: number; b: number }, idx: number) {

@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import BackpropagationLab from '@/components/demos/BackpropagationLab';
 import { Calculator } from 'lucide-react';
 
 export default function Ch05AutomaticDifferentiationPage() {
@@ -76,6 +77,7 @@ export default function Ch05AutomaticDifferentiationPage() {
       }),
       formula: String.raw`f(x)=x^2 \Rightarrow \frac{df}{dx}=2x`,
     }}
+    extraContent={<BackpropagationLab />}
     />
   );
 }

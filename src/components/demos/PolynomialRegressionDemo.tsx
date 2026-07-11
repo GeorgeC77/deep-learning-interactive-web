@@ -1,16 +1,16 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
 
 /* -------------------------------------------------------------------------- */
 /* 数值工具                                                                   */
 /* -------------------------------------------------------------------------- */
-function generateData(N: number, noise: number) {
+function generateData(N: number, noise: number, rng: () => number = Math.random) {
   const xs: number[] = [];
   const ys: number[] = [];
   for (let i = 0; i < N; i++) {
     const x = (i / (N - 1)) * Math.PI * 2;
-    const y = Math.sin(x) + (Math.random() - 0.5) * 2 * noise;
+    const y = Math.sin(x) + (rng() - 0.5) * 2 * noise;
     xs.push(x);
     ys.push(y);
   }
@@ -106,12 +106,8 @@ export default function PolynomialRegressionDemo() {
   // Keep data stable per seed via useMemo
   const { train, test } = useMemo(() => {
     const rng = mulberry32(seed);
-    // override Math.random temporarily
-    const orig = Math.random;
-    Math.random = rng;
-    const train = generateData(N, noise);
-    const test = generateData(50, noise);
-    Math.random = orig;
+    const train = generateData(N, noise, rng);
+    const test = generateData(50, noise, rng);
     return { train, test };
   }, [N, noise, seed]);
 
@@ -127,8 +123,8 @@ export default function PolynomialRegressionDemo() {
   const yMin = Math.min(...allY) - 0.5;
   const yMax = Math.max(...allY) + 0.5;
 
-  const toX = (x: number) => MARGIN.left + ((x - xMin) / (xMax - xMin)) * PW;
-  const toY = (y: number) => MARGIN.top + PH - ((y - yMin) / (yMax - yMin)) * PH;
+  const toX = useCallback((x: number) => MARGIN.left + ((x - xMin) / (xMax - xMin)) * PW, [xMin, xMax]);
+  const toY = useCallback((y: number) => MARGIN.top + PH - ((y - yMin) / (yMax - yMin)) * PH, [yMin, yMax]);
 
   // Generate SVG paths
   const curvePoints = useMemo(() => {
@@ -138,7 +134,7 @@ export default function PolynomialRegressionDemo() {
       pts.push({ x: toX(x), y: toY(predict(x, w, degree)) });
     }
     return pts.map((p) => `${p.x},${p.y}`).join(' ');
-  }, [w, degree, xMin, xMax, yMin, yMax]);
+  }, [w, degree, xMin, xMax, toX, toY]);
 
   const svgRef = useRef<SVGSVGElement>(null);
 

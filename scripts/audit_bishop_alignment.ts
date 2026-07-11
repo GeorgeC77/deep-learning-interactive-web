@@ -64,10 +64,6 @@ function isBishopSectionRoute(sec: Section): boolean {
   return section.length > 0;
 }
 
-function getBishopChapter(sec: Section): string {
-  return coverageByPath.get(sec.path)?.bishopChapter ?? '';
-}
-
 function resolveComponentFile(importSource: string): string {
   if (!importSource) return '';
   const rel = importSource.replace(/^\.\//, '');
@@ -133,7 +129,7 @@ const legacyOverviewAllowed = new Set<string>([
   '/ch06/overview',
 ]);
 
-function getExpectedSubsections(routePath: string, _section: string): string[] {
+function getExpectedSubsections(routePath: string): string[] {
   return expectedSubsectionsByRoute[routePath] ?? [];
 }
 
@@ -216,8 +212,6 @@ for (const file of generatedFiles) {
 
   const subsections = extractFirstArray(mappingBlock, 'textbookSubsections');
 
-  const bishopSection = coverageByPath.get(routePath)?.bishopSection ?? '';
-
   if (enforceSubsections) {
     for (const sub of subsections) {
       if (!allowedSubsections.has(sub)) {
@@ -228,7 +222,7 @@ for (const file of generatedFiles) {
       }
     }
 
-    const expectedSubsections = getExpectedSubsections(routePath, bishopSection);
+    const expectedSubsections = getExpectedSubsections(routePath);
     for (const expected of expectedSubsections) {
       if (!subsections.includes(expected)) {
         missingExpectedRows.push({
@@ -446,12 +440,13 @@ for (const sec of getAllSections()) {
 }
 
 const fatalIssues =
+  invalidSubsectionRows.length +
+  missingExpectedRows.length +
   wrongFormulaRows.length +
   templateRows.length +
   supplementalTopicRows.length +
   oldTitleRows.length +
   seriousRouteIssues;
-const allIssues = fatalIssues + conceptCoverageRows.length;
 
 const coverageMd = [
   '# Coverage Report',

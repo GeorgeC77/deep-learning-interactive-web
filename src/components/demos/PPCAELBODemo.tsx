@@ -98,7 +98,7 @@ export default function PPCAELBODemo() {
       mse: sqErr / N,
       logLikelihood: ll,
     };
-  }, [centered, M, sigma2]);
+  }, [centered, mean, M, sigma2]);
 
   const selected = centered[sampleIdx];
   const wtX: number[] = [];

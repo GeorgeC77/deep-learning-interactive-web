@@ -207,7 +207,7 @@ export default function ExponentialFamilyPage() {
           />
 
           {dist === 'bernoulli' ? (
-            <BernoulliComparison eta={eta} phi={bernoulliPhi} />
+            <BernoulliComparison phi={bernoulliPhi} />
           ) : (
             <GaussianComparison eta={eta} />
           )}
@@ -238,7 +238,7 @@ export default function ExponentialFamilyPage() {
   );
 }
 
-function BernoulliComparison({ eta: _eta, phi }: { eta: number; phi: number }) {
+function BernoulliComparison({ phi }: { phi: number }) {
   const p0 = 1 - phi;
   const p1 = phi;
   return (

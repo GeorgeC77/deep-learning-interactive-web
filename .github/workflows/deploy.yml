@@ -28,10 +28,19 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Math tests
         run: npm run test:math
+
+      - name: Type check
+        run: npx tsc -b
+
+      - name: Coverage matrix
+        run: npm run coverage:build
+
+      - name: Coverage check
+        run: npm run coverage:check
 
       - name: Bishop audit
         run: npm run audit:bishop
@@ -39,7 +48,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Upload artifact
+      - name: Upload reports artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: reports/
+          if-no-files-found: ignore
+
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist

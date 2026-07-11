@@ -59,15 +59,15 @@ interface EigResult {
 }
 
 function eigenDecomposition(m: [[number, number], [number, number]]): EigResult {
-  const [[a, b], [_, d]] = m;
+  const a = m[0][0], b = m[0][1], d = m[1][1];
   const trace = a + d;
   const delta = Math.sqrt(((a - d) / 2) * ((a - d) / 2) + b * b);
   const lambda1 = trace / 2 + delta;
   const lambda2 = trace / 2 - delta;
 
   // 计算第一个特征向量（对应 lambda1）
-  let vx = lambda1 - d;
-  let vy = b;
+  const vx = lambda1 - d;
+  const vy = b;
   const norm1 = Math.sqrt(vx * vx + vy * vy);
   const u1 = { x: vx / norm1, y: vy / norm1 };
 

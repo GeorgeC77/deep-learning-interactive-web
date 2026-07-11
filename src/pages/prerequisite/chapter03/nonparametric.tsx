@@ -42,7 +42,7 @@ export default function NonparametricMethodsPage() {
     const arr: { x: number; p: number }[] = [];
     for (let x = xMin; x <= xMax; x += 0.05) arr.push({ x, p: kde(x, data, h) });
     return arr;
-  }, [data, h]);
+  }, [data, h, xMin, xMax]);
 
   const maxP = Math.max(...grid.map((d) => d.p), 0.05);
 
@@ -52,8 +52,8 @@ export default function NonparametricMethodsPage() {
   const innerW = width - pad.left - pad.right;
   const innerH = height - pad.top - pad.bottom;
 
-  const xScale = useCallback((x: number) => pad.left + ((x - xMin) / (xMax - xMin)) * innerW, [innerW]);
-  const yScale = useCallback((p: number) => pad.top + innerH - (p / maxP) * innerH, [innerH, maxP]);
+  const xScale = useCallback((x: number) => pad.left + ((x - xMin) / (xMax - xMin)) * innerW, [pad.left, xMin, xMax, innerW]);
+  const yScale = useCallback((p: number) => pad.top + innerH - (p / maxP) * innerH, [pad.top, innerH, maxP]);
 
   const pathD = grid.map((d, i) => `${i === 0 ? 'M' : 'L'} ${xScale(d.x)} ${yScale(d.p)}`).join(' ');
 

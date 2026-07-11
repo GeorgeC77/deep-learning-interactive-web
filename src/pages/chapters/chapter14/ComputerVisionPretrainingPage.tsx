@@ -178,7 +178,7 @@ function ContrastiveDemo() {
       for (let i = 0; i < n; i++) {
         const zi = current[i];
         const zia = augmented[i];
-        let posSim = zi.x * zia.x + zi.y * zia.y;
+        const posSim = zi.x * zia.x + zi.y * zia.y;
         let denom = Math.exp(posSim);
         const negs: number[] = [];
         for (let j = 0; j < n; j++) {

@@ -167,12 +167,14 @@ function LQRDemo() {
     const traj: number[][] = [[initPos, initVel]];
     let s = [initPos, initVel];
     let cost = 0;
+    const rng = mulberry32(runKey);
+    const localRandn = () => randn(rng);
     for (let t = 0; t < horizon; t++) {
       const k = Klist[t];
       const a = -(k[0] * s[0] + k[1] * s[1]);
       const As = matVec(A, s);
       const Ba = [B[0][0] * a, B[1][0] * a];
-      const noise = processNoise > 0 ? [randn() * processNoise, randn() * processNoise] : [0, 0];
+      const noise = processNoise > 0 ? [localRandn() * processNoise, localRandn() * processNoise] : [0, 0];
       s = [As[0] + Ba[0] + noise[0], As[1] + Ba[1] + noise[1]];
       traj.push([...s]);
       cost += (qPos * s[0] * s[0] + rControl * a * a) * dt;
@@ -362,10 +364,19 @@ function scaleMat(A: number[][], c: number) {
   return A.map((row) => row.map((v) => v * c));
 }
 
-function randn() {
+function randn(rng: () => number = Math.random) {
   let u = 0;
   let v = 0;
-  while (u === 0) u = Math.random();
-  while (v === 0) v = Math.random();
+  while (u === 0) u = rng();
+  while (v === 0) v = rng();
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function mulberry32(a: number) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
 }
