@@ -16,17 +16,33 @@ export function gaussianPdf(x: number[], mean: number[], cov: number[][]): numbe
   return Math.exp(-0.5 * quad) / (2 * Math.PI * Math.sqrt(Math.max(det, 1e-10)));
 }
 
+/** Log of the 2D Gaussian PDF. */
+export function logGaussian(x: number[], mean: number[], cov: number[][]): number {
+  const det = cov[0][0] * cov[1][1] - cov[0][1] * cov[1][0];
+  const inv = [[cov[1][1] / det, -cov[0][1] / det], [-cov[1][0] / det, cov[0][0] / det]];
+  const dx = [x[0] - mean[0], x[1] - mean[1]];
+  const quad = inv[0][0] * dx[0] * dx[0] + 2 * inv[0][1] * dx[0] * dx[1] + inv[1][1] * dx[1] * dx[1];
+  return -Math.log(2 * Math.PI) - 0.5 * Math.log(Math.max(det, 1e-10)) - 0.5 * quad;
+}
+
+/** Stable log-sum-exp. */
+export function logSumExp(logArr: number[]): number {
+  const maxLog = Math.max(...logArr);
+  const sumExp = logArr.reduce((s, v) => s + Math.exp(v - maxLog), 0);
+  return maxLog + Math.log(sumExp);
+}
+
 /** E-step: compute responsibilities γ_nk = p(z_n=k | x_n, θ) */
 export function eStep(data: number[][], params: GMMParams): number[][] {
   const K = params.means.length, N = data.length;
   const resp: number[][] = Array.from({ length: N }, () => Array(K).fill(0));
   for (let i = 0; i < N; i++) {
-    let total = 0;
+    const logPis = params.pis.map((p) => Math.log(Math.max(p, 1e-12)));
+    const logComp = Array.from({ length: K }, (_, k) => logPis[k] + logGaussian(data[i], params.means[k], params.covs[k]));
+    const logTotal = logSumExp(logComp);
     for (let k = 0; k < K; k++) {
-      resp[i][k] = params.pis[k] * gaussianPdf(data[i], params.means[k], params.covs[k]);
-      total += resp[i][k];
+      resp[i][k] = Math.exp(logComp[k] - logTotal);
     }
-    if (total > 1e-12) for (let k = 0; k < K; k++) resp[i][k] /= total;
   }
   return resp;
 }
@@ -70,18 +86,20 @@ export function mStep(data: number[][], responsibilities: number[][], epsilon: n
     return regularizeCov(raw, epsilon);
   });
 
-  const newPis = Nk.map((n) => Math.max(n / N, 1e-12));
+  const floor = 1e-12;
+  const rawPis = Nk.map((n) => Math.max(n / N, floor));
+  const sumRaw = rawPis.reduce((a, b) => a + b, 0);
+  const newPis = rawPis.map((p) => p / sumRaw);
   return { means: newMeans, covs: newCovs, pis: newPis };
 }
 
 /** Compute log-likelihood log p(X|θ) */
 export function logLikelihood(data: number[][], params: GMMParams): number {
   let ll = 0;
+  const logPis = params.pis.map((p) => Math.log(Math.max(p, 1e-12)));
   for (const x of data) {
-    let total = 0;
-    for (let k = 0; k < params.means.length; k++)
-      total += params.pis[k] * gaussianPdf(x, params.means[k], params.covs[k]);
-    ll += Math.log(Math.max(total, 1e-12));
+    const logComp = params.means.map((mean, k) => logPis[k] + logGaussian(x, mean, params.covs[k]));
+    ll += logSumExp(logComp);
   }
   return ll;
 }
@@ -89,11 +107,12 @@ export function logLikelihood(data: number[][], params: GMMParams): number {
 /** ELBO = E_q[log p(x,z|θ)] + H(q) */
 export function elbo(data: number[][], params: GMMParams, q: number[][]): number {
   const N = data.length, K = params.means.length;
+  const logPis = params.pis.map((p) => Math.log(Math.max(p, 1e-12)));
   let elbo = 0;
   for (let i = 0; i < N; i++) {
     for (let k = 0; k < K; k++) {
       if (q[i][k] < 1e-12) continue;
-      const logJoint = Math.log(Math.max(params.pis[k] * gaussianPdf(data[i], params.means[k], params.covs[k]), 1e-12));
+      const logJoint = logPis[k] + logGaussian(data[i], params.means[k], params.covs[k]);
       elbo += q[i][k] * (logJoint - Math.log(Math.max(q[i][k], 1e-12)));
     }
   }

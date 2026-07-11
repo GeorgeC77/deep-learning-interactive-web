@@ -42,9 +42,12 @@ export function multiHeadAttention(
   causalMask: boolean,
 ): MultiHeadResult {
   const H = allWQ.length;
+  const N = X.length;
+  if (N === 0) {
+    return { headOutputs: [], concat: [], finalOutput: [] };
+  }
   const dModel = X[0].length;
   const dK = dModel / H;
-  const N = X.length;
 
   const headOutputs = Array.from({ length: H }, (_, h) => {
     const Q = matMul(X, allWQ[h]);

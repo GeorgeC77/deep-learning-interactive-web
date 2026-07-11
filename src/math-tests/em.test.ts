@@ -105,6 +105,42 @@ describe('em', () => {
       expect(cov[1][0] * vx + cov[1][1] * vy).toBeCloseTo(λ * vy, 5);
     }
   });
+
+  it('handles data point far from all means', () => {
+    const farPoint = [[1e6, 1e6]];
+    const params: GMMParams = {
+      means: [[0, 0], [3, 3]],
+      covs: [[[1, 0], [0, 1]], [[1, 0], [0, 1]]],
+      pis: [0.5, 0.5],
+    };
+    const resp = eStep(farPoint, params);
+    expect(resp[0].reduce((a, b) => a + b)).toBeCloseTo(1, 8);
+    expect(resp[0].some(Number.isNaN)).toBe(false);
+  });
+
+  it('handles covariance with very small determinant', () => {
+    const point = [[0.1, 0.1]];
+    const params: GMMParams = {
+      means: [[0, 0], [3, 3]],
+      covs: [[[1e-8, 0], [0, 1e-8]], [[1, 0], [0, 1]]],
+      pis: [0.5, 0.5],
+    };
+    const resp = eStep(point, params);
+    expect(resp[0].reduce((a, b) => a + b)).toBeCloseTo(1, 8);
+    expect(resp[0].some(Number.isNaN)).toBe(false);
+  });
+
+  it('handles mixture component with very small weight', () => {
+    const point = [[0.1, 0.1]];
+    const params: GMMParams = {
+      means: [[0, 0], [3, 3]],
+      covs: [[[1, 0], [0, 1]], [[1, 0], [0, 1]]],
+      pis: [1e-12, 1 - 1e-12],
+    };
+    const resp = eStep(point, params);
+    expect(resp[0].reduce((a, b) => a + b)).toBeCloseTo(1, 8);
+    expect(resp[0].some(Number.isNaN)).toBe(false);
+  });
 });
 
 function mulberry32(a: number) {

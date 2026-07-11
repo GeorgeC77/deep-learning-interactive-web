@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   makeBetaSchedule, alphaBar, boxMuller, generateGaussianNoise,
-  forwardClosed, forwardIncremental, sampleStats,
+  forwardClosed, forwardIncremental, reverseChain, sampleStats,
 } from '../lib/math/diffusion';
 
 describe('diffusion', () => {
@@ -69,6 +69,49 @@ describe('diffusion', () => {
     // Means and variances should be similar
     expect(Math.abs(cStats.mean - iStats.mean)).toBeLessThan(0.5);
     expect(Math.abs(cStats.variance - iStats.variance)).toBeLessThan(0.5);
+  });
+
+  describe('reverse chain semantics', () => {
+    const smallT = 20;
+    const smallBetas = makeBetaSchedule(smallT, 1e-4, 0.02);
+    const z0 = [[1, 2], [3, 4], [-1, -0.5]];
+    const epsilon = [[0.1, 0.2], [0.3, 0.4], [-0.2, 0.1]];
+    const zT = forwardClosed(z0, epsilon, alphaBar(smallT, smallBetas));
+
+    const oraclePredictNoise = (z: number[][], t: number) => {
+      const ab = alphaBar(t, smallBetas);
+      const sqrtAb = Math.sqrt(Math.max(ab, 1e-10));
+      const sqrt1mAb = Math.sqrt(Math.max(1 - ab, 1e-10));
+      if (sqrt1mAb < 1e-10) return z.map((row) => row.map(() => 0));
+      return z.map((row, i) =>
+        row.map((v, j) => (v - sqrtAb * z0[i][j]) / sqrt1mAb),
+      );
+    };
+
+    const reversePath = reverseChain(zT, smallT, smallBetas, oraclePredictNoise, false);
+
+    it('reversePath[0] corresponds to zT', () => {
+      expect(reversePath.length).toBe(smallT + 1);
+      for (let i = 0; i < zT.length; i++)
+        for (let j = 0; j < zT[i].length; j++)
+          expect(reversePath[0][i][j]).toBeCloseTo(zT[i][j], 10);
+    });
+
+    it('reversePath[T] corresponds to z0 under deterministic oracle', () => {
+      for (let i = 0; i < z0.length; i++)
+        for (let j = 0; j < z0[i].length; j++)
+          expect(reversePath[smallT][i][j]).toBeCloseTo(z0[i][j], 8);
+    });
+
+    it('UI reverse mapping: t=0 -> reversePath[T], t=T -> reversePath[0]', () => {
+      const reverseIndexAtClean = smallT - 0;
+      const reverseIndexAtNoise = smallT - smallT;
+      for (let i = 0; i < z0.length; i++)
+        for (let j = 0; j < z0[i].length; j++) {
+          expect(reversePath[reverseIndexAtClean][i][j]).toBeCloseTo(z0[i][j], 8);
+          expect(reversePath[reverseIndexAtNoise][i][j]).toBeCloseTo(zT[i][j], 10);
+        }
+    });
   });
 });
 

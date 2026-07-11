@@ -4,6 +4,7 @@ import {
   matMul,
   multiHeadAttention,
   divisors,
+  sinusoidalPE,
 } from '../lib/math/attention';
 
 function makeW(rows: number, cols: number, seed: number): number[][] {
@@ -110,6 +111,75 @@ describe('attention', () => {
       maxErr = Math.max(maxErr, Math.abs(r2.finalOutput[2][j] - r1.finalOutput[2][j]));
     }
     expect(maxErr).toBeLessThan(1e-8);
+  });
+
+  it('empty token list returns empty output without error', () => {
+    const dModel = 4;
+    const X: number[][] = [];
+    const wq = [makeW(dModel, 2, 1)];
+    const wk = [makeW(dModel, 2, 2)];
+    const wv = [makeW(dModel, 2, 3)];
+    const wo = makeW(dModel, dModel, 4);
+    const result = multiHeadAttention(X, wq, wk, wv, wo, false);
+    expect(result.headOutputs).toEqual([]);
+    expect(result.concat).toEqual([]);
+    expect(result.finalOutput).toEqual([]);
+  });
+
+  function equivarianceMetric(
+    X: number[][],
+    PX: number[][],
+    wq: number[][][],
+    wk: number[][][],
+    wv: number[][][],
+    wo: number[][],
+    causalMask: boolean,
+  ): number {
+    const N = X.length;
+    const dModel = X[0].length;
+    const yX = multiHeadAttention(X, wq, wk, wv, wo, causalMask).finalOutput;
+    const yPX = multiHeadAttention(PX, wq, wk, wv, wo, causalMask).finalOutput;
+    let maxErr = 0;
+    for (let i = 0; i < N; i++) {
+      const pi = N - 1 - i;
+      for (let j = 0; j < dModel; j++) {
+        maxErr = Math.max(maxErr, Math.abs(yPX[pi][j] - yX[i][j]));
+      }
+    }
+    return maxErr;
+  }
+
+  it('maxAbs(Y(PX)-P·Y(X)) is near zero when PE and causal mask are both off', () => {
+    const dModel = 6, dK = 3, N = 4;
+    const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, (_, j) => (i + 1) * (j + 1)));
+    const PX = [...X].reverse();
+    const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
+    const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
+    const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
+    const wo = makeW(dModel, dModel, 7);
+    const metric = equivarianceMetric(X, PX, wq, wk, wv, wo, false);
+    expect(metric).toBeLessThan(1e-8);
+  });
+
+  it('maxAbs(Y(PX)-P·Y(X)) is non-zero when PE or causal mask is on', () => {
+    const dModel = 6, dK = 3, N = 4;
+    const base = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, (_, j) => (i + 1) * (j + 1)));
+    const X = base.map((row, i) => {
+      const pe = sinusoidalPE(i, dModel);
+      return row.map((v, j) => v + pe[j]);
+    });
+    const PX = base.map((_, i) => {
+      const pe = sinusoidalPE(i, dModel);
+      return base[N - 1 - i].map((v, j) => v + pe[j]);
+    });
+    const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
+    const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
+    const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
+    const wo = makeW(dModel, dModel, 7);
+    const metricPE = equivarianceMetric(X, PX, wq, wk, wv, wo, false);
+    const metricCausal = equivarianceMetric(base, [...base].reverse(), wq, wk, wv, wo, true);
+    expect(metricPE).toBeGreaterThan(1e-6);
+    expect(metricCausal).toBeGreaterThan(1e-6);
   });
 });
 

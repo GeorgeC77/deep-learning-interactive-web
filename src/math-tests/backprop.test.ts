@@ -5,6 +5,9 @@ import {
   backwardPass,
   centralDiff,
   evalNode,
+  computeLocalGrads,
+  stepForwardOnce,
+  stepBackwardOnce,
   type NodeSpec,
 } from '../lib/math/backprop';
 
@@ -29,6 +32,38 @@ function closedFormAnalytic(x: number, w1: number, w2: number): { w1: number; w2
     w1: w2 * Math.cos(inner) * x,
     w2: Math.sin(inner),
   };
+}
+
+function runStepForwardAll(nodes: NodeSpec[], order: string[]) {
+  let stepFwdIdx: number | null = null;
+  let stepFwdVals: Record<string, number> = {};
+  while (true) {
+    const res = stepForwardOnce(nodes, order, stepFwdIdx, stepFwdVals);
+    if (!res) break;
+    stepFwdIdx = res.stepFwdIdx;
+    stepFwdVals = res.stepFwdVals;
+  }
+  return { stepFwdIdx, stepFwdVals };
+}
+
+function runStepBackwardAll(
+  nodes: NodeSpec[],
+  order: string[],
+  revOrder: string[],
+  stepFwdVals: Record<string, number>,
+  fwdVals: Record<string, number> | null,
+) {
+  let stepBwdIdx: number | null = null;
+  let stepBwdGrads: Record<string, number> = {};
+  let allDetails: ReturnType<typeof stepBackwardOnce>['details'] = [];
+  while (true) {
+    const res = stepBackwardOnce(nodes, order, revOrder, stepBwdIdx, stepFwdVals, fwdVals, stepBwdGrads);
+    if (!res) break;
+    stepBwdIdx = res.stepBwdIdx;
+    stepBwdGrads = res.stepBwdGrads;
+    allDetails = allDetails.concat(res.details);
+  }
+  return { stepBwdIdx, stepBwdGrads, allDetails };
 }
 
 describe('backprop', () => {
@@ -106,5 +141,71 @@ describe('backprop', () => {
     expect(evalNode('relu', [3])).toBe(3);
     expect(evalNode('sin', [0])).toBeCloseTo(0, 10);
     expect(evalNode('square', [4])).toBe(16);
+  });
+
+  it('stepBwdGrads matches backwardPass after full forward + backward step', () => {
+    const nodes = JSON.parse(JSON.stringify(graph)) as NodeSpec[];
+    const order = topoSort(nodes);
+    const revOrder = [...order].reverse();
+    const fwdVals = forwardPass(nodes);
+
+    const { stepFwdVals } = runStepForwardAll(nodes, order);
+    expect(stepFwdVals).toEqual(fwdVals);
+
+    const { stepBwdGrads } = runStepBackwardAll(nodes, order, revOrder, stepFwdVals, fwdVals);
+    const { grads } = backwardPass(nodes, fwdVals);
+    for (const id of order) {
+      expect(stepBwdGrads[id]).toBeCloseTo(grads[id], 10);
+    }
+  });
+
+  it('edge magnitudes during stepping equal |g_upstream * localGrad|', () => {
+    const nodes = JSON.parse(JSON.stringify(graph)) as NodeSpec[];
+    const order = topoSort(nodes);
+    const revOrder = [...order].reverse();
+    const fwdVals = forwardPass(nodes);
+    const { stepFwdVals } = runStepForwardAll(nodes, order);
+
+    let stepBwdIdx: number | null = null;
+    let stepBwdGrads: Record<string, number> = {};
+
+    for (let i = 0; i < revOrder.length; i++) {
+      const res = stepBackwardOnce(nodes, order, revOrder, stepBwdIdx, stepFwdVals, fwdVals, stepBwdGrads);
+      expect(res).not.toBeNull();
+      stepBwdIdx = res!.stepBwdIdx;
+      stepBwdGrads = res!.stepBwdGrads;
+
+      // For every edge updated in this step, the UI edge magnitude is
+      // |upstream_adjoint * local_derivative|. Recompute it independently
+      // from the stepped gradients and forward values and verify it matches
+      // the contribution recorded for that edge.
+      for (const d of res!.details) {
+        const node = nodes.find((n) => n.id === d.nodeId)!;
+        const lgs = computeLocalGrads(node, stepFwdVals);
+        const upstream = stepBwdGrads[d.nodeId] ?? 0;
+        const localGrad = lgs?.[d.parentId] ?? 0;
+        const expectedMag = Math.abs(upstream * localGrad);
+        expect(expectedMag).toBeCloseTo(Math.abs(d.contribution), 10);
+      }
+    }
+  });
+
+  it('numerical gradient selector correctly targets the chosen leaf', () => {
+    const nodes = JSON.parse(JSON.stringify(graph)) as NodeSpec[];
+    const order = topoSort(nodes);
+    const outputId = order[order.length - 1];
+    const { grads } = backwardPass(nodes, forwardPass(nodes));
+
+    for (const leaf of nodes.filter((n) => n.op === 'input' || n.op === 'weight')) {
+      const f = (p: number[]) => {
+        const g = JSON.parse(JSON.stringify(nodes)) as NodeSpec[];
+        g.forEach((n) => {
+          if (n.id === leaf.id) n.value = p[0];
+        });
+        return forwardPass(g)[outputId];
+      };
+      const numGrad = centralDiff(f, [leaf.value], 0, 1e-5);
+      expect(numGrad).toBeCloseTo(grads[leaf.id], 6);
+    }
   });
 });

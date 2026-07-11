@@ -45,6 +45,26 @@ function badInit(): GMMParams {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Simplex helpers: three logits -> probability vector                        */
+/* -------------------------------------------------------------------------- */
+function softmax(logits: [number, number, number]): [number, number, number] {
+  const maxLogit = Math.max(...logits);
+  const exps = logits.map((l) => Math.exp(l - maxLogit));
+  const sum = exps.reduce((a, b) => a + b, 0);
+  return exps.map((e) => e / sum) as [number, number, number];
+}
+
+function probsToLogits(probs: [number, number, number]): [number, number, number] {
+  // Use a fixed reference logit for component 0 so mapping is deterministic.
+  const logRef = Math.log(Math.max(probs[0], 1e-12));
+  return [
+    0,
+    Math.log(Math.max(probs[1], 1e-12)) - logRef,
+    Math.log(Math.max(probs[2], 1e-12)) - logRef,
+  ] as [number, number, number];
+}
+
+/* -------------------------------------------------------------------------- */
 /* SVG                                                                        */
 /* -------------------------------------------------------------------------- */
 const W = 420, H = 380, MG = { t: 10, r: 10, b: 35, l: 45 };
@@ -84,7 +104,8 @@ export default function EMELBOLab() {
 
   // ELBO interactive state
   const [selectedPt, setSelectedPt] = useState<number | null>(null);
-  const [manualQ, setManualQ] = useState<[number, number, number]>([1/3, 1/3, 1/3]);
+  const [manualLogits, setManualLogits] = useState<[number, number, number]>([0, 0, 0]);
+  const manualQ = useMemo(() => softmax(manualLogits), [manualLogits]);
 
   const currentParams: GMMParams = useMemo(() => ({ means: estMeans, covs: estCovs, pis: estPis }), [estMeans, estCovs, estPis]);
 
@@ -112,9 +133,10 @@ export default function EMELBOLab() {
     const resp = eStep(data, currentParams);
     const np = mStep(data, resp);
     setEstMeans(np.means); setEstCovs(np.covs); setEstPis(np.pis);
-    setResponsibilities(resp);
+    setResponsibilities(null);
     setIteration(iteration + 1);
     setLogLikHistory([...logLikHistory, logLikelihood(data, np)]);
+    setPhase('need-e');
   };
 
   const resetBad = () => {
@@ -143,6 +165,11 @@ export default function EMELBOLab() {
     const logP = logLikelihood([x], currentParams);
     return { x, elbo: e, kl, logP, posterior };
   }, [selectedPt, data, currentParams, manualQ]);
+
+  const setQToPosterior = () => {
+    if (selectedPt === null || !elboInfo) return;
+    setManualLogits(probsToLogits(elboInfo.posterior as [number, number, number]));
+  };
 
   return (
     <InteractiveDemo title="EM 算法与 ELBO：高斯混合模型交互实验">
@@ -214,25 +241,29 @@ export default function EMELBOLab() {
         {/* ELBO Interactive Panel */}
         <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs">
           <p><strong>📊 ELBO 交互：</strong>点击上方数据点，手动调节 q(z=k)，验证 log p = ELBO + KL</p>
-          <div className="flex gap-3 mt-2 items-center">
+          <div className="flex flex-wrap gap-3 mt-2 items-center">
             {[0, 1, 2].map((k) => (
               <div key={k} className="flex items-center gap-1">
-                <span className="text-[10px] font-medium" style={{color: clusterColors[k]}}>q(z={k+1})</span>
-                <input type="range" min={0} max={1} step={0.01}
-                  value={manualQ[k]}
+                <span className="text-[10px] font-medium" style={{color: clusterColors[k]}}>logit {k+1}</span>
+                <input type="range" min={-8} max={8} step={0.1}
+                  value={manualLogits[k]}
                   onChange={(e) => {
-                    const newQ = [...manualQ] as [number, number, number];
-                    newQ[k] = Number(e.target.value);
-                    const rem = 1 - newQ[k];
-                    const others = [0, 1, 2].filter(i => i !== k);
-                    if (rem >= 0) { newQ[others[0]] = rem / 2; newQ[others[1]] = rem / 2; }
-                    setManualQ(newQ);
+                    const newLogits = [...manualLogits] as [number, number, number];
+                    newLogits[k] = Number(e.target.value);
+                    setManualLogits(newLogits);
                   }}
-                  className="w-16" />
-                <span className="font-mono text-[10px] w-8">{manualQ[k].toFixed(2)}</span>
+                  className="w-24" />
+                <span className="font-mono text-[10px] w-10">q{k+1}={manualQ[k].toFixed(2)}</span>
               </div>
             ))}
             <span className="text-[10px] text-gray-400">sum={manualQ.reduce((a,b)=>a+b,0).toFixed(2)}</span>
+            <button
+              onClick={setQToPosterior}
+              disabled={selectedPt === null}
+              className="px-2 py-1 text-[10px] bg-indigo-600 text-white rounded disabled:bg-gray-300 hover:bg-indigo-700"
+            >
+              令 q = posterior
+            </button>
           </div>
           {!elboInfo && selectedPt === null && (
             <p className="mt-2 text-gray-500">点击数据点查看 ELBO 分解</p>
@@ -245,7 +276,11 @@ export default function EMELBOLab() {
               <p><strong>KL(q||posterior)</strong> = <span className="font-mono">{elboInfo.kl.toFixed(4)}</span></p>
               <p><strong>验证 log p = ELBO + KL</strong>: <span className="font-mono">{elboInfo.logP.toFixed(4)} = {elboInfo.elbo.toFixed(4)} + {elboInfo.kl.toFixed(4)} = {(elboInfo.elbo + elboInfo.kl).toFixed(4)}</span></p>
               <p className="text-gray-500">posterior p(z|x,θ) = [{elboInfo.posterior.map((v: number) => v.toFixed(3)).join(', ')}]</p>
-              <p className="text-gray-500">{elboInfo.kl < 0.001 ? '✅ q ≈ posterior，KL ≈ 0（E-step 的 KL=0 条件）' : '调节 q 使 KL → 0，验证 ELBO → log p'}</p>
+              <p className="text-gray-500">
+                {elboInfo.kl < 1e-8 && Math.abs(elboInfo.elbo - elboInfo.logP) < 1e-8
+                  ? `✅ q = posterior，KL < 1e-8，|ELBO - logP| < 1e-8`
+                  : '调节 q 使 KL → 0，验证 ELBO → log p'}
+              </p>
             </div>
           )}
         </div>

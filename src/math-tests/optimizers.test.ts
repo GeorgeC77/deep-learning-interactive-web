@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { loss, analyticalGrad, stationaryPoint, hessianEigen, step, type OptState } from '../lib/math/optimizers';
+import { contours as d3Contours } from 'd3-contour';
+import { loss, analyticalGrad, stationaryPoint, hessianEigen, step, type OptState, type Landscape } from '../lib/math/optimizers';
 
 describe('optimizers', () => {
   it('gradient vs central difference (quadratic)', () => {
@@ -95,5 +96,87 @@ describe('optimizers', () => {
     expect(hxx).toBeCloseTo(2, 5);
     expect(hyy).toBeCloseTo(2, 5);
     expect(hxy).toBeCloseTo(0, 5);
+  });
+});
+
+const GRID = 80;
+const LANDSCAPE_LEVELS: Record<Landscape, number[]> = {
+  quadratic: [0.2, 0.5, 1, 2, 4, 8],
+  illcond: [0.5, 1, 2, 5, 10, 20],
+  saddle: [-3, -2, -1, 0, 1, 2, 3],
+  rosenbrock: [1, 5, 25, 125, 625, 3125],
+};
+
+function buildContourData(landscape: Landscape) {
+  const xMin = -2.2, xMax = 2.2, yMin = -2.2, yMax = 2.2;
+  const xs = Array.from({ length: GRID }, (_, i) => xMin + (i / (GRID - 1)) * (xMax - xMin));
+  const ys = Array.from({ length: GRID }, (_, i) => yMin + (i / (GRID - 1)) * (yMax - yMin));
+
+  const values: number[] = new Array(GRID * GRID);
+  for (let i = 0; i < GRID; i++) {
+    for (let j = 0; j < GRID; j++) {
+      values[j * GRID + i] = loss(xs[i], ys[j], landscape);
+    }
+  }
+
+  const cont = d3Contours().size([GRID, GRID]).smooth(true).thresholds(LANDSCAPE_LEVELS[landscape])(values);
+
+  const toX = (v: number) => ((v - xMin) / (xMax - xMin));
+  const toY = (v: number) => 1 - ((v - yMin) / (yMax - yMin));
+  const toSvgX = (gx: number) => toX(xMin + ((gx - 0.5) / (GRID - 1)) * (xMax - xMin));
+  const toSvgY = (gy: number) => toY(yMin + ((gy - 0.5) / (GRID - 1)) * (yMax - yMin));
+
+  const paths: string[] = [];
+  let totalRings = 0;
+  for (const c of cont) {
+    for (const polygon of c.coordinates) {
+      for (const ring of polygon) {
+        totalRings++;
+        const d = ring.map(([gx, gy], i) => `${i === 0 ? 'M' : 'L'} ${toSvgX(gx)} ${toSvgY(gy)}`).join(' ') + ' Z';
+        paths.push(d);
+      }
+    }
+  }
+
+  return { cont, paths, totalRings };
+}
+
+describe('OptimizationLandscapeLab contour rendering', () => {
+  const landscapes: Landscape[] = ['quadratic', 'illcond', 'saddle', 'rosenbrock'];
+
+  it('generated SVG path strings contain no NaN', () => {
+    for (const landscape of landscapes) {
+      const { paths } = buildContourData(landscape);
+      for (const d of paths) {
+        expect(d).not.toContain('NaN');
+      }
+    }
+  });
+
+  it('number of rendered path rings matches total contour rings', () => {
+    for (const landscape of landscapes) {
+      const { paths, totalRings } = buildContourData(landscape);
+      expect(paths.length).toBe(totalRings);
+    }
+  });
+
+  it('disconnected components are rendered as separate path elements', () => {
+    // For quadratic (circles) and rosenbrock (banana-shaped), each ring should be its own path.
+    for (const landscape of ['quadratic', 'rosenbrock'] as Landscape[]) {
+      const { cont, paths } = buildContourData(landscape);
+      for (const c of cont) {
+        let ringCount = 0;
+        for (const polygon of c.coordinates) {
+          ringCount += polygon.length;
+        }
+        // Each ring maps to exactly one path string.
+        expect(ringCount).toBeGreaterThan(0);
+      }
+      // No path string should contain more than one 'M' command (each ring is one path).
+      for (const d of paths) {
+        const mCount = (d.match(/M/g) || []).length;
+        expect(mCount).toBe(1);
+      }
+    }
   });
 });

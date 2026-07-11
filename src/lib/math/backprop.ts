@@ -11,6 +11,16 @@ export type NodeSpec = {
   value: number;
 };
 
+export type StepBwdDetail = {
+  nodeId: string;
+  incomingAdjoint: number;
+  parentId: string;
+  localDerivative: number;
+  contribution: number;
+  previousParentAdjoint: number;
+  newParentAdjoint: number;
+};
+
 export function evalNode(op: OpType, inVals: number[]): number {
   switch (op) {
     case 'add': return inVals.reduce((s, v) => s + v, 0);
@@ -105,6 +115,102 @@ export function backwardPass(
     }
   }
   return { grads, localGrads };
+}
+
+/**
+ * Compute local gradients for a single node's inputs from forward values.
+ */
+export function computeLocalGrads(
+  node: NodeSpec,
+  fwdVals: Record<string, number>,
+): Record<string, number> | undefined {
+  if (node.inputs.length === 0) return undefined;
+  const inVals = node.inputs.map((id) => fwdVals[id]);
+  const outVal = fwdVals[node.id];
+  if (inVals.some((v) => v === undefined) || outVal === undefined) return undefined;
+  const localGrads: Record<string, number> = {};
+  for (let i = 0; i < node.inputs.length; i++) {
+    localGrads[node.inputs[i]] = localDeriv(node.op as OpType, outVal, inVals, i);
+  }
+  return localGrads;
+}
+
+/**
+ * Advance the step-by-step forward pass by one node.
+ */
+export function stepForwardOnce(
+  nodes: NodeSpec[],
+  order: string[],
+  stepFwdIdx: number | null,
+  stepFwdVals: Record<string, number>,
+): { stepFwdIdx: number; stepFwdVals: Record<string, number> } | null {
+  const next = stepFwdIdx === null ? 0 : stepFwdIdx + 1;
+  if (next >= order.length) return null;
+  const node = nodes.find((n) => n.id === order[next])!;
+  const vals: Record<string, number> = {};
+  if (node.op === 'input' || node.op === 'weight') vals[node.id] = node.value;
+  else vals[node.id] = evalNode(node.op as OpType, node.inputs.map((inId) => stepFwdVals[inId]));
+  return { stepFwdIdx: next, stepFwdVals: { ...stepFwdVals, ...vals } };
+}
+
+/**
+ * Advance the step-by-step backward pass by one node.
+ * Requires forward values for the active node to be available in `stepFwdVals`
+ * (or supplied via `fwdVals` fallback); otherwise throws.
+ */
+export function stepBackwardOnce(
+  nodes: NodeSpec[],
+  order: string[],
+  revOrder: string[],
+  stepBwdIdx: number | null,
+  stepFwdVals: Record<string, number>,
+  fwdVals: Record<string, number> | null,
+  stepBwdGrads: Record<string, number>,
+): { stepBwdIdx: number; stepBwdGrads: Record<string, number>; details: StepBwdDetail[] } | null {
+  const next = stepBwdIdx === null ? 0 : stepBwdIdx + 1;
+  if (next >= revOrder.length) return null;
+  const nodeId = revOrder[next];
+  const node = nodes.find((n) => n.id === nodeId)!;
+  const g = { ...stepBwdGrads };
+  const details: StepBwdDetail[] = [];
+
+  if (stepBwdIdx === null) {
+    for (const id of order) g[id] = 0;
+    g[revOrder[0]] = 1; // output node adjoint
+  }
+
+  if (node.inputs.length > 0) {
+    const inVals = node.inputs.map((inId) => {
+      const v = stepFwdVals[inId] ?? fwdVals?.[inId];
+      if (v === undefined) {
+        throw new Error(`Forward value missing for input ${inId} of node ${nodeId} at backward step ${next}`);
+      }
+      return v;
+    });
+    const outVal = stepFwdVals[nodeId] ?? fwdVals?.[nodeId];
+    if (outVal === undefined) {
+      throw new Error(`Forward value missing for node ${nodeId} at backward step ${next}`);
+    }
+    for (let i = 0; i < node.inputs.length; i++) {
+      const parentId = node.inputs[i];
+      const previousParentAdjoint = g[parentId] ?? 0;
+      const incomingAdjoint = g[nodeId] ?? 0;
+      const localDerivative = localDeriv(node.op as OpType, outVal, inVals, i);
+      const contribution = incomingAdjoint * localDerivative;
+      g[parentId] = previousParentAdjoint + contribution;
+      details.push({
+        nodeId,
+        incomingAdjoint,
+        parentId,
+        localDerivative,
+        contribution,
+        previousParentAdjoint,
+        newParentAdjoint: g[parentId],
+      });
+    }
+  }
+
+  return { stepBwdIdx: next, stepBwdGrads: g, details };
 }
 
 /**

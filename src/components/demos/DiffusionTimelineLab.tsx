@@ -41,6 +41,7 @@ const toX = (v: number) => MG.l + ((v + 2.5) / 5) * PW;
 const toY = (v: number) => MG.t + PH - ((v + 2.5) / 5) * PH;
 
 type Mode = 'closed-forward' | 'incremental-forward' | 'reverse';
+type ReverseDenoiser = 'oracle' | 'generation';
 
 export default function DiffusionTimelineLab() {
   const T = 1000;
@@ -53,6 +54,7 @@ export default function DiffusionTimelineLab() {
   const [seed, setSeed] = useState(42);
   const [predictionError, setPredictionError] = useState(false);
   const [stochasticReverse, setStochasticReverse] = useState(true);
+  const [reverseDenoiser, setReverseDenoiser] = useState<ReverseDenoiser>('oracle');
 
   // Map slider step 0..DISPLAY_STEPS-1 to diffusion time 0..T.
   const realT = Math.round((displayT / (DISPLAY_STEPS - 1)) * T);
@@ -62,7 +64,7 @@ export default function DiffusionTimelineLab() {
   const z0 = useMemo(() => generatePointCloud(cloudType, N, seed), [cloudType, N, seed]);
   const epsilon = useMemo(() => generateGaussianNoise(N, 2, seed), [N, seed]);
 
-  // epsilon_hat: optional prediction error added to the true noise.
+  // epsilon_hat: optional prediction error added to the true noise (used in forward modes).
   const epsilonHat = useMemo(() => {
     const err = predictionError ? 0.3 : 0;
     const rng = mulberry32(seed + 999);
@@ -82,28 +84,93 @@ export default function DiffusionTimelineLab() {
     return z;
   }, [z0, betas, realT, seed]);
 
-  // Reverse chain: start from a fixed z_T and denoise back to z_0.
+  // Reverse chain: path[0] = z_T, path[T] = z_0.
   const reversePath = useMemo(() => {
-    const zT = forwardClosed(z0, epsilon, alphaBar(T, betas));
-    const predictNoise = () => epsilonHat;
-    return reverseChain(zT, T, betas, predictNoise, stochasticReverse);
-  }, [z0, epsilon, betas, T, epsilonHat, stochasticReverse]);
+    if (reverseDenoiser === 'oracle') {
+      const zT = forwardClosed(z0, epsilon, alphaBar(T, betas));
+      const oraclePredictNoise = (z: number[][], t: number) => {
+        const ab = alphaBar(t, betas);
+        const sqrtAb = Math.sqrt(Math.max(ab, 1e-10));
+        const sqrt1mAb = Math.sqrt(Math.max(1 - ab, 1e-10));
+        if (sqrt1mAb < 1e-10) {
+          return z.map((row) => row.map(() => 0));
+        }
+        return z.map((row, i) =>
+          row.map((v, j) => (v - sqrtAb * z0[i][j]) / sqrt1mAb),
+        );
+      };
+      return reverseChain(zT, T, betas, oraclePredictNoise, stochasticReverse);
+    }
 
-  // x0 prediction (clean-sample estimate) at time realT.
-  const x0Pred = useMemo(() => {
-    const ab = alphaBar(realT, betas);
-    const sqrtAb = Math.sqrt(Math.max(ab, 1e-10));
-    const sqrt1mAb = Math.sqrt(Math.max(1 - ab, 1e-10));
-    return ztClosed.map(([x, y], i) => [(x - sqrt1mAb * epsilonHat[i][0]) / sqrtAb, (y - sqrt1mAb * epsilonHat[i][1]) / sqrtAb] as [number, number]);
-  }, [ztClosed, epsilonHat, betas, realT]);
+    // Generation mode: start from fresh noise and use a toy denoiser that does NOT see z0.
+    const zTGen = generateGaussianNoise(N, 2, seed + 999999);
+    const toyPredictNoise = (z: number[][]) => {
+      // Toy hand-written denoiser: a small bias toward the origin.
+      // This is intentionally imperfect (it is not an oracle) and only demonstrates
+      // that a non-oracle reverse trajectory can run without accessing z0.
+      return z.map((row) => row.map((v) => -0.1 * v));
+    };
+    return reverseChain(zTGen, T, betas, toyPredictNoise, stochasticReverse);
+  }, [reverseDenoiser, z0, epsilon, betas, T, N, seed, stochasticReverse]);
 
-  const currentAb = alphaBar(realT, betas);
-
+  // Reverse time-axis mapping: slider progress is reverse progress; the displayed
+  // state corresponds to forward diffusion time realT.
+  const reverseIndex = T - realT;
   const displayPts = mode === 'closed-forward'
     ? ztClosed
     : mode === 'incremental-forward'
       ? ztIncremental
-      : (reversePath[realT] ?? z0);
+      : (reversePath[reverseIndex] ?? z0);
+
+  // x0 prediction (clean-sample estimate) at time realT.
+  const x0Pred = useMemo(() => {
+    if (mode !== 'reverse') {
+      const ab = alphaBar(realT, betas);
+      const sqrtAb = Math.sqrt(Math.max(ab, 1e-10));
+      const sqrt1mAb = Math.sqrt(Math.max(1 - ab, 1e-10));
+      return ztClosed.map(([x, y], i) => [(x - sqrt1mAb * epsilonHat[i][0]) / sqrtAb, (y - sqrt1mAb * epsilonHat[i][1]) / sqrtAb] as [number, number]);
+    }
+
+    // In reverse mode, base the estimate on the currently displayed reverse state.
+    if (reverseDenoiser === 'oracle') {
+      const ab = alphaBar(realT, betas);
+      const sqrtAb = Math.sqrt(Math.max(ab, 1e-10));
+      const sqrt1mAb = Math.sqrt(Math.max(1 - ab, 1e-10));
+      if (sqrt1mAb < 1e-10 || sqrtAb < 1e-10) {
+        return displayPts.map(([x, y]) => [x, y] as [number, number]);
+      }
+      return displayPts.map(([x, y], i) => {
+        const ex = (x - sqrtAb * z0[i][0]) / sqrt1mAb;
+        const ey = (y - sqrtAb * z0[i][1]) / sqrt1mAb;
+        return [(x - sqrt1mAb * ex) / sqrtAb, (y - sqrt1mAb * ey) / sqrtAb] as [number, number];
+      });
+    }
+
+    // Generation mode cannot compute a meaningful x0 estimate without z0.
+    return null;
+  }, [mode, reverseDenoiser, ztClosed, epsilonHat, betas, realT, displayPts, z0]);
+
+  const currentAb = alphaBar(realT, betas);
+
+  const views: { label: string; pts: number[][]; color: string }[] = [
+    { label: 'z₀（原始数据）', pts: z0, color: '#3b82f6' },
+    {
+      label: mode === 'reverse'
+        ? `z_t reverse (t=${realT}, reverse progress s=${realT})`
+        : `z_t（t=${realT}）`,
+      pts: displayPts,
+      color: '#f59e0b',
+    },
+  ];
+  if (x0Pred) {
+    views.push({
+      label: mode === 'reverse'
+        ? '基于当前 z_t 的 clean-sample estimate（oracle）'
+        : '基于 ε̂ 的 clean-sample estimate',
+      pts: x0Pred,
+      color: '#10b981',
+    });
+  }
 
   return (
     <InteractiveDemo title="扩散模型时间线实验：forward + reverse">
@@ -126,7 +193,7 @@ export default function DiffusionTimelineLab() {
         </div>
 
         {/* Mode selector */}
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1 items-center">
           {(['closed-forward', 'incremental-forward', 'reverse'] as const).map((m) => (
             <button key={m} onClick={() => { setMode(m); setDisplayT(0); }}
               className={`px-3 py-1 text-xs rounded-lg ${mode === m ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
@@ -140,6 +207,28 @@ export default function DiffusionTimelineLab() {
           )}
         </div>
 
+        {/* Reverse denoiser selector */}
+        {mode === 'reverse' && (
+          <div className="flex flex-wrap gap-2 items-start">
+            <div className="flex gap-1">
+              {(['oracle', 'generation'] as const).map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setReverseDenoiser(d)}
+                  className={`px-3 py-1 text-xs rounded-lg ${reverseDenoiser === d ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  {d === 'oracle' ? 'Oracle 反演（已知 z₀）' : '生成式采样（toy denoiser）'}
+                </button>
+              ))}
+            </div>
+            <p className="text-[10px] text-gray-500 max-w-md">
+              {reverseDenoiser === 'oracle'
+                ? '教学用 oracle：可访问真实 z₀，仅用于演示反向公式，不是生成模型。'
+                : 'Toy denoiser：使用手写的小偏向原点偏置，不访问 z₀，结果不完美，仅演示无 oracle 的反向链。'}
+            </p>
+          </div>
+        )}
+
         <div>
           <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
             <span>时间步</span><span>t={realT} / {T} (显示 {displayT + 1}/{DISPLAY_STEPS})</span>
@@ -151,12 +240,8 @@ export default function DiffusionTimelineLab() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-3">
-          {[
-            { label: 'z₀（原始数据）', pts: z0, color: '#3b82f6' },
-            { label: mode === 'reverse' ? `z_t reverse (t=${realT})` : `z_t（t=${realT}）`, pts: displayPts, color: '#f59e0b' },
-            { label: '基于 ε̂ 的 clean-sample estimate', pts: x0Pred, color: '#10b981' },
-          ].map((view, vi) => (
+        <div className={`grid gap-3 ${x0Pred ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
+          {views.map((view, vi) => (
             <div key={vi} className="bg-gray-50 rounded-lg border overflow-hidden">
               <div className="text-center text-[9px] font-medium text-gray-600 pt-1">{view.label}</div>
               <svg viewBox={`0 0 ${W / 2} ${H / 2}`} className="w-full" style={{ maxHeight: 180 }}>
@@ -174,7 +259,10 @@ export default function DiffusionTimelineLab() {
           <p className="font-mono">z_t = √ᾱ_t · z_0 + √(1-ᾱ_t) · ε,  ε ~ N(0,I)</p>
           <p className="font-mono">x̂₀ = (z_t − √(1-ᾱ_t) · ε̂) / √ᾱ_t</p>
           <p className="font-mono">z_{'{t-1}'} = (z_t − β_t/√(1-ᾱ_t)·ε̂) / √(1-β_t) + σ_t·ε'</p>
-          <p className="text-gray-500 mt-1">alphaBar(0)={alphaBar(0, betas).toFixed(1)}, alphaBar(T)={abT.toFixed(6)}。反向链从固定的 z_T 出发，与滑块位置无关。</p>
+          <p className="text-gray-500 mt-1">
+            alphaBar(0)={alphaBar(0, betas).toFixed(1)}, alphaBar(T)={abT.toFixed(6)}。
+            反向链 path[0]=z_T、path[T]=z₀；反向模式下滑块进度 s 对应反向进度，显示状态为 z_t（t=realT）。
+          </p>
         </div>
       </div>
     </InteractiveDemo>

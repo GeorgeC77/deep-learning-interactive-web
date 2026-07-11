@@ -74,8 +74,8 @@ export default function OptimizationLandscapeLab() {
   const toX = (v: number) => ML.l + ((v - contourData.xMin) / (contourData.xMax - contourData.xMin)) * PW;
   const toY = (v: number) => ML.t + PH - ((v - contourData.yMin) / (contourData.yMax - contourData.yMin)) * PH;
 
-  const toSvgX = (gx: number) => toX(contourData.xMin + (gx / (GRID - 1)) * (contourData.xMax - contourData.xMin));
-  const toSvgY = (gy: number) => toY(contourData.yMin + (gy / (GRID - 1)) * (contourData.yMax - contourData.yMin));
+  const toSvgX = (gx: number) => toX(contourData.xMin + ((gx - 0.5) / (GRID - 1)) * (contourData.xMax - contourData.xMin));
+  const toSvgY = (gy: number) => toY(contourData.yMin + ((gy - 0.5) / (GRID - 1)) * (contourData.yMax - contourData.yMin));
 
   const sp = stationaryPoint(landscape);
   const hessian = hessianEigen(landscape, sp[0], sp[1]);
@@ -84,8 +84,12 @@ export default function OptimizationLandscapeLab() {
     <InteractiveDemo title="优化器对比实验室">
       <div className="space-y-5">
         <p className="text-sm text-gray-600">
-          四种优化器同屏对比。等高线由真实损失函数通过 marching squares 绘制；Momentum 使用经典定义 v = βv + g（不是 EMA）；相同学习率不代表相同有效步长。
-          鞍点 (0,0) 的 Hessian 特征值: {hessian.vals[0].toFixed(2)}, {hessian.vals[1].toFixed(2)}。
+          {landscape === 'quadratic' && '二次函数，全局最小值在 (0,0)。'}
+          {landscape === 'illcond' && '病态二次函数，全局最小值在 (0,0)，不同方向曲率差异大。'}
+          {landscape === 'saddle' && '当前视图展示 (0,0) 附近的局部鞍点结构。'}
+          {landscape === 'rosenbrock' && 'Rosenbrock 函数，全局最小值在 (1,1)。'}
+          {' 四种优化器同屏对比。等高线由真实损失函数通过 marching squares 绘制；Momentum 使用经典定义 v = βv + g（不是 EMA）；相同学习率不代表相同有效步长。'}
+          {landscape === 'saddle' && ` 鞍点 (0,0) 的 Hessian 特征值: ${hessian.vals[0].toFixed(2)}, ${hessian.vals[1].toFixed(2)}。`}
         </p>
 
         <div className="flex flex-wrap gap-1">
@@ -113,10 +117,12 @@ export default function OptimizationLandscapeLab() {
             {/* Real contour lines */}
             {contourData.cont.map((c, ci) => (
               <g key={ci}>
-                {c.coordinates.map((ring, ri) => {
-                  const d = (ring as unknown as [number, number][]).map(([gx, gy], i) => `${i === 0 ? 'M' : 'L'} ${toSvgX(gx)} ${toSvgY(gy)}`).join(' ');
-                  return <path key={ri} d={d} fill="none" stroke="#94a3b8" strokeWidth={0.6} opacity={0.7} />;
-                })}
+                {c.coordinates.map((polygon, pi) =>
+                  polygon.map((ring, ri) => {
+                    const d = ring.map(([gx, gy], i) => `${i === 0 ? 'M' : 'L'} ${toSvgX(gx)} ${toSvgY(gy)}`).join(' ') + ' Z';
+                    return <path key={`${ci}-${pi}-${ri}`} d={d} fill="none" stroke="#94a3b8" strokeWidth={0.6} opacity={0.7} />;
+                  })
+                )}
               </g>
             ))}
             {/* Start + gradient vector */}
@@ -156,7 +162,7 @@ export default function OptimizationLandscapeLab() {
             {(() => {
               const allLosses = ALL_OPTS.flatMap((o) => results[o].lossPath);
               const globalMax = Math.max(...allLosses, 1);
-              const globalMin = Math.max(0, Math.min(...allLosses));
+              const globalMin = Math.min(...allLosses);
               const range = Math.max(globalMax - globalMin, 1e-6);
               return ALL_OPTS.map((o) => {
                 const lp = results[o].lossPath;
