@@ -13,8 +13,7 @@ describe('optimizers', () => {
 
   it('saddle Hessian at origin has one positive and one negative eigenvalue', () => {
     const h = hessianEigen('saddle', 0, 0);
-    expect(h.vals[0]).toBeLessThan(0);
-    expect(h.vals[1]).toBeGreaterThan(0);
+    expect(h.vals[0] * h.vals[1]).toBeLessThan(0); // one positive, one negative (2, -2)
   });
 
   it('Rosenbrock grad(1,1) = 0', () => {
