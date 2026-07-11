@@ -65,8 +65,6 @@ Deep_learning/
 │
 ├── config/                     # 工程配置文件
 │   ├── vite.config.ts          # Vite 配置
-│   ├── tailwind.config.js      # Tailwind CSS 配置
-│   ├── postcss.config.js       # PostCSS 配置
 │   ├── eslint.config.js        # ESLint 配置
 │   ├── components.json         # shadcn/ui 配置
 │   ├── tsconfig.app.json       # 应用 TS 配置
@@ -77,6 +75,8 @@ Deep_learning/
 │   └── LICENSE_AND_ATTRIBUTION.md  # 许可与版权归属
 │
 ├── index.html                  # Vite HTML 入口
+├── tailwind.config.js          # Tailwind CSS 配置
+├── postcss.config.js           # PostCSS 配置
 ├── tsconfig.json               # TypeScript solution 配置
 ├── package.json                # 项目依赖与脚本
 ├── package-lock.json           # 依赖锁定
