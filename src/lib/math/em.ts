@@ -104,7 +104,7 @@ export function emIteration(data: number[][], params: GMMParams, epsilon: number
   const responsibilities = eStep(data, params);
   const newParams = mStep(data, responsibilities, epsilon);
   const ll = logLikelihood(data, newParams);
-  return { responsibilities, newParams, logLikelihood: ll };
+  return { responsibilities, newMeans: newParams.means, newCovs: newParams.covs, newPis: newParams.pis, newParams, logLikelihood: ll };
 }
 
 /** Eigen decomposition for 2x2 covariance — returns {vals, vecs} for ellipse */
