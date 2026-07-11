@@ -21,12 +21,12 @@ function GaussianPlot({ mu, sigma }: { mu: number; sigma: number }) {
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
 
-  const xMin = mu - 4 * sigma;
-  const xMax = mu + 4 * sigma;
-  const yMax = 1 / (sigma * Math.sqrt(2 * Math.PI));
+  const xMin = -8;
+  const xMax = 8;
+  const fixedYMax = 1.4;
 
   const xScale = (x: number) => pad.left + ((x - xMin) / (xMax - xMin)) * plotW;
-  const yScale = (y: number) => pad.top + plotH - (y / (yMax * 1.1)) * plotH;
+  const yScale = (y: number) => pad.top + plotH - (y / (fixedYMax * 1.1)) * plotH;
 
   const points: [number, number][] = [];
   const n = 200;
@@ -49,13 +49,13 @@ function GaussianPlot({ mu, sigma }: { mu: number; sigma: number }) {
     return regionPoints.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x} ${y}`).join(' ') + ' Z';
   };
 
-  const xTicks = [mu - 3 * sigma, mu - 2 * sigma, mu - sigma, mu, mu + sigma, mu + 2 * sigma, mu + 3 * sigma];
+  const xTicks = [-6, -4, -2, 0, 2, 4, 6];
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
       <rect x={pad.left} y={pad.top} width={plotW} height={plotH} fill="#f8f9fa" stroke="#e5e7eb" />
 
-      {[0, 0.5 * yMax, yMax].map((t, i) => (
+      {[0, 0.5 * fixedYMax, fixedYMax].map((t, i) => (
         <g key={`y-${i}`}>
           <line
             x1={pad.left}
