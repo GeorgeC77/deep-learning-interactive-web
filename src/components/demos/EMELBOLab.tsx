@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import { eStep, mStep, logLikelihood, elbo, gaussianPdf, eigen2x2, type GMMParams } from '@/lib/math/em';
+import { eStep, mStep, logLikelihood, elbo, klResponsibilities, eigen2x2, type GMMParams } from '@/lib/math/em';
 
 /* -------------------------------------------------------------------------- */
 /* 固定真值参数                                                               */
@@ -81,6 +81,10 @@ export default function EMELBOLab() {
   const [iteration, setIteration] = useState(0);
   const [logLikHistory, setLogLikHistory] = useState<number[]>([]);
 
+  // ELBO interactive state
+  const [selectedPt, setSelectedPt] = useState<number | null>(null);
+  const [manualQ, setManualQ] = useState<[number, number, number]>([1/3, 1/3, 1/3]);
+
   const currentParams: GMMParams = useMemo(() => ({ means: estMeans, covs: estCovs, pis: estPis }), [estMeans, estCovs, estPis]);
 
   const doEStep = () => {
@@ -118,6 +122,18 @@ export default function EMELBOLab() {
   const llMin = logLikHistory.length ? Math.min(...logLikHistory) : 0;
   const llMax = logLikHistory.length ? Math.max(...logLikHistory) : 1;
   const llRange = Math.max(llMax - llMin, 1);
+
+  // ELBO calculation for selected point
+  const elboInfo = useMemo(() => {
+    if (selectedPt === null) return null;
+    const x = data[selectedPt];
+    const q = [manualQ] as number[][];
+    const posterior = eStep([x], currentParams)[0];
+    const e = elbo([x], currentParams, q);
+    const kl = klResponsibilities(q, [posterior]);
+    const logP = logLikelihood([x], currentParams);
+    return { x, elbo: e, kl, logP, posterior };
+  }, [selectedPt, data, currentParams, manualQ]);
 
   return (
     <InteractiveDemo title="EM 算法与 ELBO：高斯混合模型交互实验">
