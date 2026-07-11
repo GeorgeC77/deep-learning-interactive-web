@@ -87,20 +87,27 @@ export default function EMELBOLab() {
 
   const currentParams: GMMParams = useMemo(() => ({ means: estMeans, covs: estCovs, pis: estPis }), [estMeans, estCovs, estPis]);
 
+  const [phase, setPhase] = useState<'need-e' | 'need-m'>('need-e');
+
   const doEStep = () => {
+    if (phase !== 'need-e') return;
     const resp = eStep(data, currentParams);
     setResponsibilities(resp);
+    setPhase('need-m');
   };
 
   const doMStep = () => {
-    if (!responsibilities) return;
+    if (phase !== 'need-m' || !responsibilities) return;
     const np = mStep(data, responsibilities);
     setEstMeans(np.means); setEstCovs(np.covs); setEstPis(np.pis);
     setIteration(iteration + 1);
     setLogLikHistory([...logLikHistory, logLikelihood(data, np)]);
+    setResponsibilities(null); // old responsibilities belong to theta_old
+    setPhase('need-e');
   };
 
   const doFullEM = () => {
+    if (phase !== 'need-e') return;
     const resp = eStep(data, currentParams);
     const np = mStep(data, resp);
     setEstMeans(np.means); setEstCovs(np.covs); setEstPis(np.pis);
@@ -117,6 +124,7 @@ export default function EMELBOLab() {
     setResponsibilities(null);
     setIteration(0);
     setLogLikHistory([]);
+    setPhase('need-e');
   };
 
   const llMin = logLikHistory.length ? Math.min(...logLikHistory) : 0;

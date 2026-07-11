@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import { softmax, matMul, multiHeadAttention, divisors, sinusoidalPE } from '@/lib/math/attention';
+import { multiHeadAttention, divisors, sinusoidalPE } from '@/lib/math/attention';
 
 type Token = { text: string; pos: number };
 function tokenize(text: string): Token[] {

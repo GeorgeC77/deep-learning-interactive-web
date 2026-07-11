@@ -63,7 +63,61 @@ export function sampleStats(samples: number[][]): { mean: number; variance: numb
   return { mean, variance: sumSq / count - mean * mean };
 }
 
-function mulberry32(a: number) {
+/**
+ * Single reverse step: z_{t-1} = mu_theta(z_t, t) + sigma_t * epsilon
+ * mu_theta = (z_t - (β_t / √(1-ᾱ_t)) * ε̂_t) / √(1-β_t)
+ * sigma_t = √β_t (or 0 for final step)
+ */
+export function reverseMean(
+  zt: number[], t: number, epsilonHat: number[], betas: number[],
+): number[] {
+  const ab = alphaBar(t, betas);
+  const abPrev = alphaBar(t - 1, betas);
+  const betaT = betas[t - 1];
+  const sqrt1mAb = Math.sqrt(Math.max(1 - ab, 1e-10));
+  const sqrt1mBeta = Math.sqrt(Math.max(1 - betaT, 1e-10));
+  const frac = betaT / sqrt1mAb;
+  return zt.map((z, j) => (z - frac * epsilonHat[j]) / sqrt1mBeta);
+}
+
+export function reverseStep(
+  zt: number[][], t: number, epsilonHat: number[][], betas: number[],
+  isFinalStep: boolean,
+): number[][] {
+  const betaT = betas[t - 1];
+  const noise = isFinalStep ? 0 : Math.sqrt(betaT);
+  // Generate new Gaussian noise for stochastic reverse
+  const rng = mulberry32(t * 12345 + 1);
+  return zt.map((row, i) => {
+    const mu = reverseMean(row, t, epsilonHat[i], betas);
+    return mu.map((m, j) => m + (noise > 0 ? noise * boxMuller(rng) : 0));
+  });
+}
+
+/**
+ * Full reverse chain from zT back to z0.
+ * predictNoise(z, t) is called at each step.
+ * Returns full path: [zT, z_{T-1}, ..., z0]
+ */
+export function reverseChain(
+  zT: number[][],
+  T: number,
+  betas: number[],
+  predictNoise: (z: number[][], t: number) => number[][],
+  stochastic: boolean,
+): number[][][] {
+  const path: number[][][] = [zT.map((r) => [...r])];
+  let z = zT.map((r) => [...r]);
+  for (let t = T; t >= 1; t--) {
+    const epsilonHat = predictNoise(z, t);
+    const isFinal = (t === 1) || !stochastic;
+    z = reverseStep(z, t, epsilonHat, betas, isFinal);
+    path.push(z.map((r) => [...r]));
+  }
+  return path;
+}
+
+export function mulberry32(a: number) {
   return function () {
     a |= 0; a = a + 0x6D2B79F5 | 0;
     let t = Math.imul(a ^ a >>> 15, 1 | a);

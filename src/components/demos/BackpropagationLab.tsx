@@ -98,22 +98,27 @@ export default function BackpropagationLab() {
     const next = stepBwdIdx === null ? 0 : stepBwdIdx + 1;
     if (next >= order.length) return;
     if (stepBwdIdx === null) {
-      const init: Record<string, number> = {};
-      order.forEach(id => init[id] = 0);
-      init[order[0]] = 1;
-      setStepBwdGrads(init); setStepBwdIdx(0); return;
+      // Initialize AND process output node (index 0 = next when null→0)
+      // So effectively next === 0, process order[0] which is the output node
     }
     const nodeId = order[next];
     const node = graph.find(n => n.id === nodeId)!;
-    const newG = { ...stepBwdGrads };
+    // Initialize grads if needed
+    const currentG = { ...stepBwdGrads };
+    if (stepBwdIdx === null) {
+      for (const id of order) currentG[id] = 0;
+      currentG[order[0]] = 1; // output node adjoint
+    }
+    // Propagate from this node to its inputs
     if (node.inputs.length > 0) {
       const inVals = node.inputs.map(inId => stepFwdVals[inId] ?? fwdVals?.[inId] ?? 0);
       for (let i = 0; i < node.inputs.length; i++) {
         const lg = localDeriv(node.op as any, stepFwdVals[nodeId] ?? fwdVals?.[nodeId] ?? 0, inVals, i);
-        newG[node.inputs[i]] = (newG[node.inputs[i]] ?? 0) + (newG[nodeId] ?? 0) * lg;
+        currentG[node.inputs[i]] = (currentG[node.inputs[i]] ?? 0) + (currentG[nodeId] ?? 0) * lg;
       }
     }
-    setStepBwdGrads(newG); setStepBwdIdx(next);
+    setStepBwdGrads(currentG);
+    setStepBwdIdx(next);
   }, [stepBwdIdx, graph, topo, stepFwdVals, fwdVals, stepBwdGrads]);
 
   const resetAll = useCallback(() => {
