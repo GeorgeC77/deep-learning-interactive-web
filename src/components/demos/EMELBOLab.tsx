@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import { emIteration, gaussianPdf, type GMMParams } from '@/lib/math/em';
+import { eStep, mStep, logLikelihood, elbo, gaussianPdf, eigen2x2, type GMMParams } from '@/lib/math/em';
 
 /* -------------------------------------------------------------------------- */
 /* 固定真值参数                                                               */
@@ -51,14 +51,13 @@ const PW = W - MG.l - MG.r, PH = H - MG.t - MG.b;
 const clusterColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6'];
 
 function ellipsePts(mx: number, my: number, cov: number[][], n: number): string {
-  const [[a, b], [_, c]] = cov;
-  const det = a * c - b * b;
+  const { vals, vecs } = eigen2x2(cov);
   const pts: string[] = [];
   for (let i = 0; i < n; i++) {
     const angle = (2 * Math.PI * i) / n;
-    const u = Math.cos(angle), v = Math.sin(angle);
-    const x = mx + Math.sqrt(Math.max(det, 1e-10)) * (c * u - b * v) / Math.sqrt(Math.max(det, 1e-10)) * 3;
-    const y = my + Math.sqrt(Math.max(det, 1e-10)) * (-b * u + a * v) / Math.sqrt(Math.max(det, 1e-10)) * 3;
+    const u = Math.cos(angle) * vals[1] * 3, v = Math.sin(angle) * vals[0] * 3;
+    const x = mx + vecs[0][0] * u + vecs[1][0] * v;
+    const y = my + vecs[0][1] * u + vecs[1][1] * v;
     pts.push(`${toX(x)},${toY(y)}`);
   }
   return pts.join(' ');
@@ -82,31 +81,28 @@ export default function EMELBOLab() {
   const [iteration, setIteration] = useState(0);
   const [logLikHistory, setLogLikHistory] = useState<number[]>([]);
 
+  const currentParams: GMMParams = useMemo(() => ({ means: estMeans, covs: estCovs, pis: estPis }), [estMeans, estCovs, estPis]);
+
   const doEStep = () => {
-    const result = emIteration(data, { means: estMeans, covs: estCovs, pis: estPis });
-    setResponsibilities(result.responsibilities);
-    setLogLikHistory([...logLikHistory, result.logLikelihood]);
+    const resp = eStep(data, currentParams);
+    setResponsibilities(resp);
   };
 
   const doMStep = () => {
     if (!responsibilities) return;
-    const result = emIteration(data, { means: estMeans, covs: estCovs, pis: estPis });
-    setEstMeans(result.newMeans);
-    setEstCovs(result.newCovs);
-    setEstPis(result.newPis);
-    setResponsibilities(result.responsibilities);
+    const np = mStep(data, responsibilities);
+    setEstMeans(np.means); setEstCovs(np.covs); setEstPis(np.pis);
     setIteration(iteration + 1);
-    setLogLikHistory([...logLikHistory, result.logLikelihood]);
+    setLogLikHistory([...logLikHistory, logLikelihood(data, np)]);
   };
 
   const doFullEM = () => {
-    const result = emIteration(data, { means: estMeans, covs: estCovs, pis: estPis });
-    setEstMeans(result.newMeans);
-    setEstCovs(result.newCovs);
-    setEstPis(result.newPis);
-    setResponsibilities(result.responsibilities);
+    const resp = eStep(data, currentParams);
+    const np = mStep(data, resp);
+    setEstMeans(np.means); setEstCovs(np.covs); setEstPis(np.pis);
+    setResponsibilities(resp);
     setIteration(iteration + 1);
-    setLogLikHistory([...logLikHistory, result.logLikelihood]);
+    setLogLikHistory([...logLikHistory, logLikelihood(data, np)]);
   };
 
   const resetBad = () => {
