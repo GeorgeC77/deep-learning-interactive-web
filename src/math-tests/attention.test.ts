@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { softmax, divisors, multiHeadAttention, matMul } from '../lib/math/attention';
 
 function makeW(rows: number, cols: number, seed: number): number[][] {
   const rng = mulberry32(seed);
@@ -26,7 +27,7 @@ describe('attention', () => {
   });
 
   it('multi-head concat dimensions correct', () => {
-    const dModel = 6, _H = 2, dK = 3, N = 4;
+    const dModel = 6, dK = 3, N = 4;
     const X = Array.from({ length: N }, () => Array.from({ length: dModel }, () => 1));
     const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
     const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
@@ -40,7 +41,7 @@ describe('attention', () => {
   });
 
   it('every attention row sums to 1', () => {
-    const dModel = 6, _H = 2, dK = 3, N = 4;
+    const dModel = 6, dK = 3, N = 4;
     const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, () => i));
     const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
     const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
@@ -55,7 +56,7 @@ describe('attention', () => {
   });
 
   it('causal mask future weights = 0', () => {
-    const dModel = 6, _H = 2, dK = 3, N = 4;
+    const dModel = 6, dK = 3, N = 4;
     const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, () => i));
     const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
     const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
@@ -72,7 +73,7 @@ describe('attention', () => {
   });
 
   it('final output = concat × W_O', () => {
-    const dModel = 6, _H = 2, dK = 3, N = 3;
+    const dModel = 6, dK = 3, N = 3;
     const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, () => (i + 1)));
     const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
     const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
@@ -86,7 +87,7 @@ describe('attention', () => {
   });
 
   it('permutation equivariance without PE', () => {
-    const dModel = 4, _H = 2, dK = 2, N = 3;
+    const dModel = 4, dK = 2, N = 3;
     const X = [[1,2,3,4],[5,6,7,8],[9,10,11,12]];
     // Permute: swap rows 0 and 1
     const PX = [X[1], X[0], X[2]];

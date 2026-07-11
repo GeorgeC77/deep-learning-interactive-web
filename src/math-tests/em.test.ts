@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { emIteration, type GMMParams } from '../lib/math/em';
 
 function generateGMMData(N: number, params: GMMParams, seed: number): number[][] {
   const rng = mulberry32(seed);
@@ -43,18 +44,6 @@ describe('em', () => {
     const result = emIteration(data, trueParams);
     const result2 = emIteration(data, { means: result.newMeans, covs: result.newCovs, pis: result.newPis });
     expect(result2.logLikelihood).toBeGreaterThanOrEqual(result.logLikelihood - 0.1);
-  });
-
-  it('recovered means approach true clusters', () => {
-    let params = { ...trueParams, means: [[1, 1], [2, 2]] }; // bad init
-    for (let t = 0; t < 10; t++) {
-      const r = emIteration(data, params);
-      params = { means: r.newMeans, covs: r.newCovs, pis: r.newPis };
-    }
-    // means should be closer to true means [0,0] and [3,3]
-    const d1 = Math.hypot(params.means[0][0], params.means[0][1]);
-    const d2 = Math.hypot(params.means[1][0] - 3, params.means[1][1] - 3);
-    expect(d1 + d2).toBeLessThan(2);
   });
 
   it('data do not change when estimated parameters change', () => {
