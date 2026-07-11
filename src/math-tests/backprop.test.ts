@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  evalNode, localDeriv, topoSort, forwardPass, backwardPass, centralDiff,
   type NodeSpec,
 } from '../lib/math/backprop';
 
@@ -67,9 +66,9 @@ describe('backprop', () => {
 
   it('central difference relative error < 1e-5 for w1', () => {
     const x = graph[0].value, w1 = graph[1].value, w2 = graph[6].value;
-    const f = (p: number[]) => (graph[6].value = p[1], graph[1].value = p[0]) && forwardPass([...graph])['mul2'];
+    const _f = (p: number[]) => (graph[6].value = p[1], graph[1].value = p[0]) && forwardPass([...graph])['mul2'];
     // Rebuild with fresh params
-    const makeF = (params: number[]) => {
+    const _makeF = (params: number[]) => {
       const g: NodeSpec[] = JSON.parse(JSON.stringify(graph));
       g[1].value = params[0]; // w1
       g[6].value = params[1]; // w2

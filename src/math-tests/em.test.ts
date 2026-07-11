@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { gaussianPdf, emIteration, type GMMParams } from '../lib/math/em';
 
 function generateGMMData(N: number, params: GMMParams, seed: number): number[][] {
   const rng = mulberry32(seed);
@@ -60,7 +59,7 @@ describe('em', () => {
 
   it('data do not change when estimated parameters change', () => {
     const dataCopy = JSON.parse(JSON.stringify(data));
-    const result = emIteration(dataCopy, trueParams);
+    const _result = emIteration(dataCopy, trueParams);
     // Data should be unchanged
     for (let i = 0; i < data.length; i++)
       for (let j = 0; j < 2; j++)

@@ -42,7 +42,6 @@ export default function BackpropagationLab() {
     localGrads: Record<string, Record<string, number>>;
   } | null>(null);
   const [phase, setPhase] = useState<'idle' | 'forward' | 'backward'>('idle');
-  const [fdH, setFdH] = useState(0.001);
   const [fdGrad, setFdGrad] = useState<number | null>(null);
   const [useBranched, setUseBranched] = useState(false);
 

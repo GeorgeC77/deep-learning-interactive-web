@@ -68,7 +68,7 @@ function toY(v: number) { return MG.t + PH - ((v + 4) / 8) * PH; }
 
 export default function EMELBOLab() {
   const dataSeed = 42;
-  const K = 3;
+  
 
   // Data generated from TRUE params, never changes
   const data = useMemo(() => generateData(200, dataSeed), []);

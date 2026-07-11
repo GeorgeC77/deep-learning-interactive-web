@@ -11,7 +11,7 @@ import { makeBetaSchedule, alphaBar, generateGaussianNoise, forwardClosed, forwa
 function reverseStep(
   zt: number[][], t: number, betas: number[], epsilonHat: number[][],
   stochastic: boolean, seed: number
-): [number, number][] {
+): number[][] {
   const betaT = betas[t];
   const abT = alphaBar(t + 1, betas);
   const abTminus1 = alphaBar(t, betas);
@@ -33,7 +33,7 @@ function reverseStep(
 /* -------------------------------------------------------------------------- */
 /* Point cloud generators                                                     */
 /* -------------------------------------------------------------------------- */
-function generatePointCloud(type: 'circle' | 'swiss' | 'moons', N: number, seed: number): [number, number][] {
+function generatePointCloud(type: 'circle' | 'swiss' | 'moons', N: number, seed: number): number[][] {
   const rng = mulberry32(seed);
   return Array.from({ length: N }, (_, i) => {
     let x: number, y: number;
@@ -104,7 +104,7 @@ export default function DiffusionTimelineLab() {
   const reversePath = useMemo(() => {
     const steps = DISPLAY_STEPS;
     const interval = Math.max(1, Math.floor((T - 1) / (steps - 1)));
-    const path: [number, number][][] = [];
+    const path: number[][][] = [];
     let z: number[][] = ztClosed.map(([x, y]) => [x, y]);
     for (let s = 0; s < steps; s++) {
       const tReal = Math.max(0, (T - 1) - s * interval);

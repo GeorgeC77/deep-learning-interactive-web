@@ -72,7 +72,7 @@ export function reverseMean(
   zt: number[], t: number, epsilonHat: number[], betas: number[],
 ): number[] {
   const ab = alphaBar(t, betas);
-  const abPrev = alphaBar(t - 1, betas);
+  
   const betaT = betas[t - 1];
   const sqrt1mAb = Math.sqrt(Math.max(1 - ab, 1e-10));
   const sqrt1mBeta = Math.sqrt(Math.max(1 - betaT, 1e-10));
@@ -90,7 +90,7 @@ export function reverseStep(
   const rng = mulberry32(t * 12345 + 1);
   return zt.map((row, i) => {
     const mu = reverseMean(row, t, epsilonHat[i], betas);
-    return mu.map((m, j) => m + (noise > 0 ? noise * boxMuller(rng) : 0));
+    return mu.map((m) => m + (noise > 0 ? noise * boxMuller(rng) : 0));
   });
 }
 

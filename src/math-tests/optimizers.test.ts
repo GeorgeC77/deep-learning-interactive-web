@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { loss, analyticalGrad, stationaryPoint, hessianEigen, step, type Landscape, type Optimizer, type OptState } from '../lib/math/optimizers';
+import { loss, analyticalGrad, stationaryPoint, hessianEigen, step, type type Optimizer, type OptState } from '../lib/math/optimizers';
 
 describe('optimizers', () => {
   it('gradient vs central difference (quadratic)', () => {
