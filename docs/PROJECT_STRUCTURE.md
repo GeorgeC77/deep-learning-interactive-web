@@ -46,9 +46,8 @@ Deep_learning/
 │   └── data/
 │
 ├── references/                 # 参考文献
-│   ├── Deep Learning Foundations and Concepts (...Bishop).pdf  # 教材
-│   ├── toc.txt                 # 教材目录
-│   └── toc2.txt                # 教材目录（备用版）
+│   └── Deep Learning Foundations and Concepts (...Bishop).pdf  # 教材
+│   └── toc.txt                 # 教材目录
 │
 ├── reports/                    # 自动生成的审计/覆盖报告（gitignore）
 │   ├── coverage_report.md
@@ -64,22 +63,26 @@ Deep_learning/
 ├── dist/                       # 构建输出（gitignore）
 ├── node_modules/               # 依赖（gitignore）
 │
+├── config/                     # 工程配置文件
+│   ├── vite.config.ts          # Vite 配置
+│   ├── tailwind.config.js      # Tailwind CSS 配置
+│   ├── postcss.config.js       # PostCSS 配置
+│   ├── eslint.config.js        # ESLint 配置
+│   ├── components.json         # shadcn/ui 配置
+│   ├── tsconfig.app.json       # 应用 TS 配置
+│   └── tsconfig.node.json      # Node 端 TS 配置
+│
+├── docs/                       # 项目文档
+│   ├── PROJECT_STRUCTURE.md    # 本文档
+│   └── LICENSE_AND_ATTRIBUTION.md  # 许可与版权归属
+│
 ├── index.html                  # Vite HTML 入口
-├── vite.config.ts              # Vite 配置
-├── tailwind.config.js          # Tailwind CSS 配置
-├── postcss.config.js           # PostCSS 配置
-├── components.json             # shadcn/ui 配置
-├── eslint.config.js            # ESLint 配置
-├── tsconfig.json               # TypeScript 配置
-├── tsconfig.app.json           # 应用 TS 配置
-├── tsconfig.node.json          # Node 端 TS 配置
+├── tsconfig.json               # TypeScript solution 配置
 ├── package.json                # 项目依赖与脚本
 ├── package-lock.json           # 依赖锁定
 ├── .gitignore                  # Git 忽略规则
 ├── LICENSE                     # 许可
-├── README.md                   # 项目说明
-├── info.md                     # 额外项目信息
-└── PROJECT_STRUCTURE.md        # 本文档
+└── README.md                   # 项目说明
 ```
 
 ---

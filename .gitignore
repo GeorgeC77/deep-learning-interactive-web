@@ -17,6 +17,7 @@ build/
 .cache/
 coverage/
 *.tsbuildinfo
+public/data/*.json
 
 # OS files
 .DS_Store

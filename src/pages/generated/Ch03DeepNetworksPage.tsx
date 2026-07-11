@@ -31,8 +31,12 @@ export default function Ch03DeepNetworksPage() {
           description: "自监督表示学习方法：拉近相似样本（正对）的表示、推远不相似样本（负对）的表示。SimCLR、MoCo 等方法无需标签即可学习高质量视觉表示，在少量有标签微调后超越监督基线。",
         },
         {
-          title: "通用网络架构与张量",
-          description: "除标准前馈网络外，还有跳跃连接、残差块（ResNet）、密集连接（DenseNet）等架构创新。张量（tensor）是多维数组的推广，卷积层涉及 4D 张量（批量×通道×高×宽），现代框架通过张量运算高效实现。",
+          title: "通用网络架构",
+          description: "除标准前馈网络外，还有跳跃连接、残差块（ResNet）、密集连接（DenseNet）等架构创新。这些设计缓解了梯度消失并允许训练极深网络，是深度模型规模化的关键。",
+        },
+        {
+          title: "张量（Tensors）",
+          description: "张量是多维数组的推广，是深度学习数据的基本容器。卷积层涉及 4D 张量（批量×通道×高×宽），现代框架通过张量运算在 GPU 上高效实现前向与反向传播。",
         },
       ]}
       learningObjectives={[

@@ -28,6 +28,16 @@ export default function Ch05EvaluationOfGradientsPage() {
           title: "数值梯度校验",
           description: "用中心差分 (f(w+h)−f(w−h))/(2h) 验证反传正确性。相对误差应在 10⁻⁵ 量级。h 过小→舍入误差；h 过大→截断误差——形成 U 形误差曲线。",
         },
+        {
+          title: "Jacobian 矩阵",
+          description: "Jacobian 矩阵 J 收集向量值函数对所有输入的偏导数，J_{ij} = ∂f_i/∂x_j。在神经网络中，它描述一层输出对输入的局部线性变换，是链式法则的矩阵形式。",
+          formula: String.raw`\mathbf{J} = \begin{bmatrix} \frac{\partial f_1}{\partial x_1} & \cdots & \frac{\partial f_1}{\partial x_n} \\ \vdots & \ddots & \vdots \\ \frac{\partial f_m}{\partial x_1} & \cdots & \frac{\partial f_m}{\partial x_n} \end{bmatrix}`,
+        },
+        {
+          title: "Hessian 矩阵",
+          description: "Hessian 矩阵 H 是标量函数二阶偏导数矩阵，H_{ij} = ∂²L/∂w_i∂w_j。它描述损失曲面的局部曲率，可用于牛顿法、学习率自适应和鞍点分析，但计算/存储成本随参数平方增长。",
+          formula: String.raw`\mathbf{H} = \nabla^2 L(\mathbf{w}) = \begin{bmatrix} \frac{\partial^2 L}{\partial w_1^2} & \cdots & \frac{\partial^2 L}{\partial w_1 \partial w_n} \\ \vdots & \ddots & \vdots \\ \frac{\partial^2 L}{\partial w_n \partial w_1} & \cdots & \frac{\partial^2 L}{\partial w_n^2} \end{bmatrix}`,
+        },
       ]}
       learningObjectives={[
         "理解计算图如何将复合函数分解为基本操作 DAG",
@@ -86,7 +96,10 @@ export default function Ch05EvaluationOfGradientsPage() {
           "8.1 Evaluation of Gradients",
           "8.1.1 Single-layer networks",
           "8.1.2 General feed-forward networks",
-          "8.1.3 Jacobian and Hessian matrices",
+          "8.1.3 A simple example",
+          "8.1.4 Numerical differentiation",
+          "8.1.5 The Jacobian matrix",
+          "8.1.6 The Hessian matrix",
         ],
         formulas: ["chain rule", "backpropagation recursion", "gradient check"],
         algorithms: ["reverse-mode automatic differentiation"],

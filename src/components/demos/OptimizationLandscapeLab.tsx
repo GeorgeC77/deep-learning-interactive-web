@@ -160,8 +160,7 @@ export default function OptimizationLandscapeLab() {
         </div>
 
         <div className="text-[10px] text-gray-400">
-          Momentum: v_t = β·v_{t-1} + g_t（经典定义，非EMA）。Adam 中 β₁ 控制一阶矩估计衰减。
-          相同 learning rate 在不同优化器中不代表相同有效步长。
+          {"Momentum: v_t = β·v_{t-1} + g_t（经典定义，非EMA）。Adam 中 β₁ 控制一阶矩估计衰减。相同 learning rate 在不同优化器中不代表相同有效步长。"}
         </div>
       </div>
     </InteractiveDemo>

@@ -360,7 +360,8 @@ const routeMd = [
   `Legacy overview allowed: ${routeRows.filter((r) => r.legacyOverviewAllowed).length}`,
   `Issues: ${routeRows.filter((r) => r.issue).length}`,
 ].join('\n');
-fs.writeFileSync('route_audit_report.md', routeMd, 'utf8');
+fs.mkdirSync('reports', { recursive: true });
+fs.writeFileSync('reports/route_audit_report.md', routeMd, 'utf8');
 
 // ---------- Write invalid Bishop subsections report ----------
 const invalidMd = [
@@ -434,7 +435,7 @@ const invalidMd = [
       ]
     : ['None.']),
 ].join('\n');
-fs.writeFileSync('invalid_bishop_subsections_report.md', invalidMd, 'utf8');
+fs.writeFileSync('reports/invalid_bishop_subsections_report.md', invalidMd, 'utf8');
 
 // ---------- Write coverage report ----------
 const legacyCount = routeRows.filter((r) => r.usesLegacyComponent).length;
@@ -476,7 +477,7 @@ const coverageMd = [
     ? '✅ All fatal audit items pass.' + (conceptCoverageRows.length ? ` (${conceptCoverageRows.length} concept coverage warning(s) remain.)` : '')
     : '⚠️ Some issues remain; see route_audit_report.md and invalid_bishop_subsections_report.md.',
 ].join('\n');
-fs.writeFileSync('coverage_report.md', coverageMd, 'utf8');
+fs.writeFileSync('reports/coverage_report.md', coverageMd, 'utf8');
 
 console.log(`Audit complete.`);
 console.log(`Routes: ${routeRows.length}, legacy components: ${legacyCount}, route issues: ${seriousRouteIssues}`);

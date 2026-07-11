@@ -32,6 +32,10 @@ export default function Ch02DecisionTheoryPage() {
           title: "分类器准确率与ROC曲线",
           description: "准确率（accuracy）是 0-1 损失的正确率经验估计，对类别不平衡可能误导。ROC 曲线以假正例率（FPR）为横轴、真正例率（TPR=召回率）为纵轴，AUC 衡量分类器在所有阈值下的平均表现。",
         },
+        {
+          title: "代价敏感决策",
+          description: "实际应用中不同错误往往对应不同代价。通过损失矩阵将业务代价形式化后，最小期望损失决策可以显著降低总体风险。代价敏感学习是决策理论在工程中的直接落地。",
+        },
       ]}
       learningObjectives={[
         "能写出分类问题的期望损失表达式并解释损失矩阵的含义",

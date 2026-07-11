@@ -74,7 +74,7 @@ npm run build
 
 - 网站章节号与 Bishop 教材章节号不一一对应，UI 中标注 `Bishop Ch N` 区分
 - 所有章节页面需包含 `<SectionMetadata />` 组件
-- 详细项目结构见 [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)
+- 详细项目结构见 [docs/PROJECT_STRUCTURE.md](./docs/PROJECT_STRUCTURE.md)
 
 ## 许可
 
