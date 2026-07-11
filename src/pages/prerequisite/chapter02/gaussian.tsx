@@ -21,8 +21,8 @@ function GaussianPlot({ mu, sigma }: { mu: number; sigma: number }) {
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
 
-  const xMin = -8;
-  const xMax = 8;
+  const xMin = -10;
+  const xMax = 10;
   const fixedYMax = 1.4;
 
   const xScale = (x: number) => pad.left + ((x - xMin) / (xMax - xMin)) * plotW;
@@ -49,10 +49,15 @@ function GaussianPlot({ mu, sigma }: { mu: number; sigma: number }) {
     return regionPoints.map(([x, y], i) => `${i === 0 ? 'M' : 'L'} ${x} ${y}`).join(' ') + ' Z';
   };
 
-  const xTicks = [-6, -4, -2, 0, 2, 4, 6];
+  const xTicks = [-8, -4, 0, 4, 8];
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
+      <defs>
+        <clipPath id="gaussian-plot-area">
+          <rect x={pad.left} y={pad.top} width={plotW} height={plotH} />
+        </clipPath>
+      </defs>
       <rect x={pad.left} y={pad.top} width={plotW} height={plotH} fill="#f8f9fa" stroke="#e5e7eb" />
 
       {[0, 0.5 * fixedYMax, fixedYMax].map((t, i) => (
@@ -87,20 +92,20 @@ function GaussianPlot({ mu, sigma }: { mu: number; sigma: number }) {
         </g>
       ))}
 
-      <path d={regionPath(mu - 2 * sigma, mu + 2 * sigma)} fill="#c7d2fe" opacity={0.5} />
-      <path d={regionPath(mu - sigma, mu + sigma)} fill="#a5b4fc" opacity={0.6} />
-
-      <path d={curvePath} fill="none" stroke="#4f46e5" strokeWidth={2.5} />
-
-      <line
-        x1={xScale(mu)}
-        y1={pad.top}
-        x2={xScale(mu)}
-        y2={pad.top + plotH}
-        stroke="#7c3aed"
-        strokeWidth={2}
-        strokeDasharray="5,5"
-      />
+      <g clipPath="url(#gaussian-plot-area)">
+        <path d={regionPath(mu - 2 * sigma, mu + 2 * sigma)} fill="#c7d2fe" opacity={0.5} />
+        <path d={regionPath(mu - sigma, mu + sigma)} fill="#a5b4fc" opacity={0.6} />
+        <path d={curvePath} fill="none" stroke="#4f46e5" strokeWidth={2.5} />
+        <line
+          x1={xScale(mu)}
+          y1={pad.top}
+          x2={xScale(mu)}
+          y2={pad.top + plotH}
+          stroke="#7c3aed"
+          strokeWidth={2}
+          strokeDasharray="5,5"
+        />
+      </g>
       <text x={xScale(mu) + 6} y={pad.top + 16} fontSize={12} fill="#7c3aed" fontWeight={600}>
         μ
       </text>
