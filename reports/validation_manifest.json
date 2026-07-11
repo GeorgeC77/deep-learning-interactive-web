@@ -1,12 +1,10 @@
 {
-  "sourceCommitSha": "5abd0890af86a8742cfe0853b35fad359a4ae9de",
-  "validatedAt": "2026-07-11T14:44:24Z",
-  "checks": {
-    "test:math": "passed",
-    "tsc": "passed",
-    "lint": "passed",
-    "coverage": "99/99 mapped",
-    "bishopAudit": "0 issues",
-    "build": "passed"
-  }
+  "sourceCommitSha": "70fe5c9edd48fbdb50bae44f23bc82ff8197b5b3",
+  "workflowRunId": "29157696659",
+  "validatedAt": "2026-07-11T15:22:15Z",
+  "testCount": 57,
+  "testFailures": 0,
+  "typeScriptErrors": 0,
+  "auditFatalIssues": 0,
+  "buildStatus": "success"
 }
