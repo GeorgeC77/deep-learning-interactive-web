@@ -97,11 +97,15 @@ export default function AttentionLab() {
     return { allWQ, allWK, allWV, WO };
   }, [dModel, numHeads]);
 
-  // X: N x dModel (with optional PE)
+  // X: N x dModel — content-based token embedding + optional PE
   const X = useMemo(() => {
     const x: number[][] = Array.from({ length: N }, (_, i) => {
-      const base = Array(dModel).fill(0);
-      base[i % dModel] = 1; // one-hot-like for simplicity
+      // Content-based: same token always gets same embedding
+      const tokenText = tokens[i].text;
+      let hash = 0;
+      for (let c = 0; c < tokenText.length; c++) hash = ((hash << 5) - hash + tokenText.charCodeAt(c)) | 0;
+      const rng = mulberry32(Math.abs(hash) + 1);
+      const base = Array.from({ length: dModel }, () => (rng() - 0.5) * 0.5);
       if (usePE) {
         const pe = sinusoidalPE(tokens[i].pos, dModel);
         for (let j = 0; j < dModel; j++) base[j] += pe[j];
@@ -164,7 +168,7 @@ export default function AttentionLab() {
     : null;
 
   // Complexity
-  const complexity = `内存 O(N²)：${N} 个 token → ${N}×${N} = ${N * N} 个注意力分数，每次 softmax 需排序或全扫描。`;
+  const complexity = `每行 softmax 需 O(N) 的最大值扫描和归一化；attention score 计算约 O(N²·d_model)；保存所有 head 的注意力矩阵约 O(H·N²)。`;
 
   // Drag-and-drop token reorder
   const moveToken = (from: number, to: number) => {
@@ -221,22 +225,22 @@ export default function AttentionLab() {
         </div>
 
         {/* Controls */}
-        <div className="grid sm:grid-cols-3 gap-3">
+        <div className="grid sm:grid-cols-3 gap-3 items-end">
           <div>
-            <div className="flex justify-between text-xs font-medium text-gray-700 mb-1">
-              <span>头数 H</span><span>{numHeads}</span>
-            </div>
-            <input type="range" value={numHeads} min={1} max={dModel}
-              onChange={(e) => { setNumHeads(Number(e.target.value)); setActiveHead(0); }}
-              className="w-full" />
+            <div className="text-xs font-medium text-gray-700 mb-1">头数 H</div>
+            <select value={numHeads} onChange={(e) => { setNumHeads(Number(e.target.value)); setActiveHead(0); }}
+              className="w-full px-2 py-1.5 border rounded text-xs">
+              {divisors(dModel).map((d) => (
+                <option key={d} value={d}>{d} 头</option>
+              ))}
+            </select>
           </div>
           <div>
-            <div className="flex justify-between text-xs font-medium text-gray-700 mb-1">
-              <span>d_model（须是 H 的倍数）</span><span>{dModel}</span>
-            </div>
-            <input type="range" value={dModel} min={2} max={12} step={2}
-              onChange={(e) => setDModel(Number(e.target.value))}
-              className="w-full" />
+            <div className="text-xs font-medium text-gray-700 mb-1">d_model</div>
+            <select value={dModel} onChange={(e) => { setDModel(Number(e.target.value)); setNumHeads(1); setActiveHead(0); }}
+              className="w-full px-2 py-1.5 border rounded text-xs">
+              {[2, 4, 6, 8, 10, 12].map((d) => <option key={d} value={d}>{d}</option>)}
+            </select>
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-xs font-medium text-gray-700 flex items-center gap-1">
@@ -341,14 +345,15 @@ export default function AttentionLab() {
 
         {/* Counterexample: no PE */}
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-xs space-y-1">
-          <strong>⚠️ 反例："猫追狗" vs "狗追猫"</strong>
+          <strong>⚠️ 反例：位置编码与置换等变性</strong>
           {usePE ? (
             <p className="text-green-700">
-              位置编码已启用 → 两个句子的位置嵌入不同，注意力可以区分"猫在位置0"和"狗在位置0"。
+              位置编码已启用 → 两个句子的位置嵌入不同，模型可以区分"猫在位置0"和"狗在位置0"。
             </p>
           ) : (
             <p className="text-red-700">
-              位置编码关闭 → 注意力只看 token 内容，不看位置。"猫 追 狗" 和 "狗 追 猫" 在自注意力层完全等价！
+              无位置编码时，自注意力对 token 重排是 permutation equivariant：
+              输入重排后，输出会以相同方式重排，但模型无法知道哪个 token 原本位于哪个绝对或相对位置。
               这是 transformer 需要位置编码的根本原因。
             </p>
           )}
