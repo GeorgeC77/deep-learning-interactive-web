@@ -159,7 +159,12 @@ export default function EMELBOLab() {
               const maxK = resp ? resp.indexOf(Math.max(...resp)) : -1;
               const color = maxK >= 0 ? clusterColors[maxK] : '#9ca3af';
               const opacity = maxK >= 0 ? Math.max(...resp!) * 0.8 + 0.2 : 0.3;
-              return <circle key={i} cx={toX(x)} cy={toY(y)} r={2.5} fill={color} opacity={opacity} />;
+              const isSelected = i === selectedPt;
+              return <circle key={i} cx={toX(x)} cy={toY(y)} r={isSelected ? 5 : 2.5}
+                fill={color} opacity={opacity}
+                stroke={isSelected ? '#1f2937' : 'none'} strokeWidth={1.5}
+                style={{cursor: 'pointer'}}
+                onClick={() => setSelectedPt(i === selectedPt ? null : i)} />;
             })}
             {/* Covariance ellipses */}
             {estCovs.map((cov, i) => (
@@ -196,6 +201,45 @@ export default function EMELBOLab() {
             <div className="text-[10px] text-gray-500 text-right font-mono">当前: {logLikHistory[logLikHistory.length - 1]?.toFixed(1)}</div>
           </div>
         )}
+
+        {/* ELBO Interactive Panel */}
+        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs">
+          <p><strong>📊 ELBO 交互：</strong>点击上方数据点，手动调节 q(z=k)，验证 log p = ELBO + KL</p>
+          <div className="flex gap-3 mt-2 items-center">
+            {[0, 1, 2].map((k) => (
+              <div key={k} className="flex items-center gap-1">
+                <span className="text-[10px] font-medium" style={{color: clusterColors[k]}}>q(z={k+1})</span>
+                <input type="range" min={0} max={1} step={0.01}
+                  value={manualQ[k]}
+                  onChange={(e) => {
+                    const newQ = [...manualQ] as [number, number, number];
+                    newQ[k] = Number(e.target.value);
+                    const rem = 1 - newQ[k];
+                    const others = [0, 1, 2].filter(i => i !== k);
+                    if (rem >= 0) { newQ[others[0]] = rem / 2; newQ[others[1]] = rem / 2; }
+                    setManualQ(newQ);
+                  }}
+                  className="w-16" />
+                <span className="font-mono text-[10px] w-8">{manualQ[k].toFixed(2)}</span>
+              </div>
+            ))}
+            <span className="text-[10px] text-gray-400">sum={manualQ.reduce((a,b)=>a+b,0).toFixed(2)}</span>
+          </div>
+          {!elboInfo && selectedPt === null && (
+            <p className="mt-2 text-gray-500">点击数据点查看 ELBO 分解</p>
+          )}
+          {elboInfo && (
+            <div className="mt-2 space-y-1">
+              <p>选中点 x<sub>{selectedPt}</sub> = ({elboInfo.x[0].toFixed(2)}, {elboInfo.x[1].toFixed(2)})</p>
+              <p><strong>log p(x|θ)</strong> = <span className="font-mono">{elboInfo.logP.toFixed(4)}</span></p>
+              <p><strong>ELBO(q)</strong> = <span className="font-mono">{elboInfo.elbo.toFixed(4)}</span></p>
+              <p><strong>KL(q||posterior)</strong> = <span className="font-mono">{elboInfo.kl.toFixed(4)}</span></p>
+              <p><strong>验证 log p = ELBO + KL</strong>: <span className="font-mono">{elboInfo.logP.toFixed(4)} = {elboInfo.elbo.toFixed(4)} + {elboInfo.kl.toFixed(4)} = {(elboInfo.elbo + elboInfo.kl).toFixed(4)}</span></p>
+              <p className="text-gray-500">posterior p(z|x,θ) = [{elboInfo.posterior.map((v: number) => v.toFixed(3)).join(', ')}]</p>
+              <p className="text-gray-500">{elboInfo.kl < 0.001 ? '✅ q ≈ posterior，KL ≈ 0（E-step 的 KL=0 条件）' : '调节 q 使 KL → 0，验证 ELBO → log p'}</p>
+            </div>
+          )}
+        </div>
 
         <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs">
           <p><strong>💡 EM 与 ELBO：</strong></p>
