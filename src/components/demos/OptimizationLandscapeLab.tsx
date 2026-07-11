@@ -120,10 +120,11 @@ export default function OptimizationLandscapeLab() {
               const last = results[o].path[results[o].path.length - 1];
               return <circle key={o} cx={toX(last[0])} cy={toY(last[1])} r={3.5} fill={optColors[o]} />;
             })}
-            {/* Stationary point */}
+            {/* Stationary point — use eigenvalues to determine type */}
             <circle cx={toX(sp[0])} cy={toY(sp[1])} r={5} fill="none" stroke="#6b7280" strokeWidth={2} />
             <text x={toX(sp[0])} y={toY(sp[1]) - 8} textAnchor="middle" className="text-[10px]" fill="#6b7280">
-              ★ {landscape === 'saddle' ? 'saddle' : 'min'}
+              ★ {hessian.vals[0] > 0 && hessian.vals[1] > 0 ? 'minimum' : hessian.vals[0] < 0 && hessian.vals[1] < 0 ? 'maximum' : 'saddle'}
+              {landscape === 'rosenbrock' ? ' @ (1,1)' : ''}
             </text>
             {/* Arnold arrow marker */}
             <defs><marker id="arrow" viewBox="0 0 10 10" refX={5} refY={5} markerWidth={6} markerHeight={6} orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937" /></marker></defs>
@@ -134,15 +135,20 @@ export default function OptimizationLandscapeLab() {
           </div>
         </div>
 
-        {/* Loss curves */}
+        {/* Loss curves — shared y-axis */}
         <div className="bg-white rounded-lg border p-3">
-          <div className="text-xs font-medium text-gray-600 mb-2">Loss vs Iteration</div>
+          <div className="text-xs font-medium text-gray-600 mb-2">Loss vs Iteration（共享纵轴）</div>
           <svg viewBox="0 0 480 160" className="w-full" style={{ maxHeight: 180 }}>
-            {allOpts.map((o) => {
-              const lp = results[o].lossPath;
-              const maxL = Math.max(...lp, 1);
-              return <polyline key={o} points={lp.map((l, i) => `${10 + i / steps * 460},${150 - (l / maxL) * 140}`).join(' ')} fill="none" stroke={optColors[o]} strokeWidth={1.5} opacity={0.8} />;
-            })}
+            {(() => {
+              const allLosses = allOpts.flatMap((o) => results[o].lossPath);
+              const globalMax = Math.max(...allLosses, 1);
+              const globalMin = Math.max(0, Math.min(...allLosses));
+              const range = Math.max(globalMax - globalMin, 1e-6);
+              return allOpts.map((o) => {
+                const lp = results[o].lossPath;
+                return <polyline key={o} points={lp.map((l, i) => `${10 + i / steps * 460},${150 - ((l - globalMin) / range) * 140}`).join(' ')} fill="none" stroke={optColors[o]} strokeWidth={1.5} opacity={0.8} />;
+              });
+            })()}
           </svg>
         </div>
 
