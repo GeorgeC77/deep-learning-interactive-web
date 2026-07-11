@@ -179,4 +179,13 @@ describe('OptimizationLandscapeLab contour rendering', () => {
       }
     }
   });
+
+  it('saddle contour renders negative thresholds', () => {
+    const { cont } = buildContourData('saddle');
+    const negative = cont.filter((c) => c.value < 0);
+    expect(negative.length).toBeGreaterThan(0);
+    for (const c of negative) {
+      expect(c.coordinates.length).toBeGreaterThan(0);
+    }
+  });
 });

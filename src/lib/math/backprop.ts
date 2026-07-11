@@ -17,8 +17,8 @@ export type StepBwdDetail = {
   parentId: string;
   localDerivative: number;
   contribution: number;
-  previousParentAdjoint: number;
-  newParentAdjoint: number;
+  previousAdjoint: number;
+  newAdjoint: number;
 };
 
 export function evalNode(op: OpType, inVals: number[]): number {
@@ -193,19 +193,19 @@ export function stepBackwardOnce(
     }
     for (let i = 0; i < node.inputs.length; i++) {
       const parentId = node.inputs[i];
-      const previousParentAdjoint = g[parentId] ?? 0;
+      const previousAdjoint = g[parentId] ?? 0;
       const incomingAdjoint = g[nodeId] ?? 0;
       const localDerivative = localDeriv(node.op as OpType, outVal, inVals, i);
       const contribution = incomingAdjoint * localDerivative;
-      g[parentId] = previousParentAdjoint + contribution;
+      g[parentId] = previousAdjoint + contribution;
       details.push({
         nodeId,
         incomingAdjoint,
         parentId,
         localDerivative,
         contribution,
-        previousParentAdjoint,
-        newParentAdjoint: g[parentId],
+        previousAdjoint,
+        newAdjoint: g[parentId],
       });
     }
   }

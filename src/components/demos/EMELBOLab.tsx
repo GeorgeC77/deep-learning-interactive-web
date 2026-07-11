@@ -76,7 +76,9 @@ function ellipsePts(mx: number, my: number, cov: number[][], n: number): string 
   const pts: string[] = [];
   for (let i = 0; i < n; i++) {
     const angle = (2 * Math.PI * i) / n;
-    const u = Math.cos(angle) * vals[1] * 3, v = Math.sin(angle) * vals[0] * 3;
+    // vals[0]/vecs[0] = minor axis, vals[1]/vecs[1] = major axis.
+    const u = Math.cos(angle) * vals[0] * 3;
+    const v = Math.sin(angle) * vals[1] * 3;
     const x = mx + vecs[0][0] * u + vecs[1][0] * v;
     const y = my + vecs[0][1] * u + vecs[1][1] * v;
     pts.push(`${toX(x)},${toY(y)}`);

@@ -247,7 +247,7 @@ export default function BackpropagationLab() {
             <div className="space-y-1 mt-2">
               {stepBwdDetails.map((d, i) => (
                 <div key={i} className="text-xs font-mono text-red-900">
-                  ∂L/∂<strong>{d.parentId}</strong>: {d.previousParentAdjoint.toFixed(4)} + ({d.incomingAdjoint.toFixed(4)} × {d.localDerivative.toFixed(4)}) = {d.newParentAdjoint.toFixed(4)}
+                  ∂L/∂<strong>{d.parentId}</strong>: {d.previousAdjoint.toFixed(4)} + ({d.incomingAdjoint.toFixed(4)} × {d.localDerivative.toFixed(4)}) = {d.newAdjoint.toFixed(4)}
                 </div>
               ))}
             </div>

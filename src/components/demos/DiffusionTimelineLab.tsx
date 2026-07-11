@@ -56,8 +56,11 @@ export default function DiffusionTimelineLab() {
   const [stochasticReverse, setStochasticReverse] = useState(true);
   const [reverseDenoiser, setReverseDenoiser] = useState<ReverseDenoiser>('oracle');
 
-  // Map slider step 0..DISPLAY_STEPS-1 to diffusion time 0..T.
-  const realT = Math.round((displayT / (DISPLAY_STEPS - 1)) * T);
+  // Slider step 0..DISPLAY_STEPS-1 maps to progress 0..T.
+  // In forward modes this progress is the diffusion time t; in reverse mode it is the reverse progress s.
+  const progress = Math.round((displayT / (DISPLAY_STEPS - 1)) * T);
+  const realT = mode === 'reverse' ? T - progress : progress;
+  const reverseS = mode === 'reverse' ? progress : T - realT;
   const betas = useMemo(() => makeBetaSchedule(T, 1e-4, 0.02), []);
   const abT = useMemo(() => alphaBar(T, betas), [betas]);
 
@@ -113,9 +116,8 @@ export default function DiffusionTimelineLab() {
     return reverseChain(zTGen, T, betas, toyPredictNoise, stochasticReverse);
   }, [reverseDenoiser, z0, epsilon, betas, T, N, seed, stochasticReverse]);
 
-  // Reverse time-axis mapping: slider progress is reverse progress; the displayed
-  // state corresponds to forward diffusion time realT.
-  const reverseIndex = T - realT;
+  // Reverse time-axis mapping: reverseIndex equals reverse progress s and points into reversePath.
+  const reverseIndex = reverseS;
   const displayPts = mode === 'closed-forward'
     ? ztClosed
     : mode === 'incremental-forward'
@@ -156,7 +158,7 @@ export default function DiffusionTimelineLab() {
     { label: 'z₀（原始数据）', pts: z0, color: '#3b82f6' },
     {
       label: mode === 'reverse'
-        ? `z_t reverse (t=${realT}, reverse progress s=${realT})`
+        ? `z_t reverse (s=${reverseS}, t=${realT})`
         : `z_t（t=${realT}）`,
       pts: displayPts,
       color: '#f59e0b',
@@ -231,7 +233,12 @@ export default function DiffusionTimelineLab() {
 
         <div>
           <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
-            <span>时间步</span><span>t={realT} / {T} (显示 {displayT + 1}/{DISPLAY_STEPS})</span>
+            <span>{mode === 'reverse' ? '反向进度 s' : '扩散时间 t'}</span>
+            <span>
+              {mode === 'reverse'
+                ? `s=${reverseS} / ${T}, t=${realT}`
+                : `t=${realT} / ${T}`} (显示 {displayT + 1}/{DISPLAY_STEPS})
+            </span>
           </div>
           <Slider value={[displayT]} min={0} max={DISPLAY_STEPS - 1} step={1} onValueChange={(v) => setDisplayT(v[0])} />
           <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
@@ -261,7 +268,7 @@ export default function DiffusionTimelineLab() {
           <p className="font-mono">z_{'{t-1}'} = (z_t − β_t/√(1-ᾱ_t)·ε̂) / √(1-β_t) + σ_t·ε'</p>
           <p className="text-gray-500 mt-1">
             alphaBar(0)={alphaBar(0, betas).toFixed(1)}, alphaBar(T)={abT.toFixed(6)}。
-            反向链 path[0]=z_T、path[T]=z₀；反向模式下滑块进度 s 对应反向进度，显示状态为 z_t（t=realT）。
+            反向链 path[0]=z_T、path[T]=z₀；反向模式下滑块从左到右表示反向进度 s=0→T（扩散时间 t=T→0）。
           </p>
         </div>
       </div>

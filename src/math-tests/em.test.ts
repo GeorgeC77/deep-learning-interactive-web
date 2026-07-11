@@ -115,7 +115,8 @@ describe('em', () => {
     };
     const resp = eStep(farPoint, params);
     expect(resp[0].reduce((a, b) => a + b)).toBeCloseTo(1, 8);
-    expect(resp[0].some(Number.isNaN)).toBe(false);
+    expect(resp[0].some((v) => !Number.isFinite(v))).toBe(false);
+    expect(resp[0].some((v) => v > 0)).toBe(true);
   });
 
   it('handles covariance with very small determinant', () => {
@@ -127,7 +128,8 @@ describe('em', () => {
     };
     const resp = eStep(point, params);
     expect(resp[0].reduce((a, b) => a + b)).toBeCloseTo(1, 8);
-    expect(resp[0].some(Number.isNaN)).toBe(false);
+    expect(resp[0].some((v) => !Number.isFinite(v))).toBe(false);
+    expect(resp[0].some((v) => v > 0)).toBe(true);
   });
 
   it('handles mixture component with very small weight', () => {
@@ -139,7 +141,52 @@ describe('em', () => {
     };
     const resp = eStep(point, params);
     expect(resp[0].reduce((a, b) => a + b)).toBeCloseTo(1, 8);
-    expect(resp[0].some(Number.isNaN)).toBe(false);
+    expect(resp[0].some((v) => !Number.isFinite(v))).toBe(false);
+    expect(resp[0].some((v) => v > 0)).toBe(true);
+  });
+
+  it('ellipse long axis aligns with largest-eigenvalue eigenvector', () => {
+    // cov = [[4,0],[0,1]]: λ_large=4 along x, λ_small=1 along y.
+    const cov = [[4, 0], [0, 1]];
+    const { vals, vecs } = eigen2x2(cov);
+    expect(vals[1]).toBeCloseTo(2, 8); // sqrt(4)
+    expect(vals[0]).toBeCloseTo(1, 8); // sqrt(1)
+    expect(Math.abs(vecs[1][0])).toBeCloseTo(1, 8);
+    expect(Math.abs(vecs[1][1])).toBeCloseTo(0, 8);
+
+    const mx = 0, my = 0;
+
+    // Parametric point at angle 0 lies on the minor axis (vals[0]/vecs[0]).
+    const u0 = vals[0] * 3;
+    const v0 = 0;
+    const x0 = mx + vecs[0][0] * u0 + vecs[1][0] * v0;
+    const y0 = my + vecs[0][1] * u0 + vecs[1][1] * v0;
+    expect(Math.abs(x0)).toBeLessThan(1e-8);
+    expect(Math.abs(y0)).toBeCloseTo(3, 8); // sqrt(1) * 3
+
+    // Parametric point at angle π/2 lies on the major axis (vals[1]/vecs[1]).
+    const u90 = 0;
+    const v90 = vals[1] * 3;
+    const x90 = mx + vecs[0][0] * u90 + vecs[1][0] * v90;
+    const y90 = my + vecs[0][1] * u90 + vecs[1][1] * v90;
+    expect(Math.abs(y90)).toBeLessThan(1e-8);
+    expect(Math.abs(x90)).toBeCloseTo(6, 8); // sqrt(4) * 3
+  });
+
+  it('rotated covariance gives correctly rotated ellipse', () => {
+    // 45° rotation: covariance with major axis along (1,1)/√2.
+    const s2 = Math.SQRT1_2;
+    const cov = [
+      [2.5, 1.5],
+      [1.5, 2.5],
+    ];
+    const { vals, vecs } = eigen2x2(cov);
+    expect(vals[1]).toBeGreaterThan(vals[0]);
+    // Major eigenvector should be along (1,1) or (-1,-1).
+    const [vx, vy] = vecs[1];
+    expect(Math.abs(vx)).toBeCloseTo(Math.abs(vy), 5);
+    const dot = vx * s2 + vy * s2;
+    expect(Math.abs(dot)).toBeCloseTo(1, 5);
   });
 });
 
