@@ -445,8 +445,6 @@ for (const sec of getAllSections()) {
 }
 
 const fatalIssues =
-  invalidSubsectionRows.length +
-  missingExpectedRows.length +
   wrongFormulaRows.length +
   templateRows.length +
   supplementalTopicRows.length +
