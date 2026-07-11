@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { softmax, matMul, multiHeadAttention, divisors, sinusoidalPE } from '../../lib/math/attention';
+import { softmax, matMul, multiHeadAttention, divisors, sinusoidalPE } from '../lib/math/attention';
 
 function makeW(rows: number, cols: number, seed: number): number[][] {
   const rng = mulberry32(seed);

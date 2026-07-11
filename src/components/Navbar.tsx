@@ -257,10 +257,10 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors"
-              title="CC BY-NC 4.0 非商业许可"
+              title="教材版权归原作者"
             >
               <ShieldAlert className="w-4 h-4" />
-              CC BY-NC 4.0
+              MIT
             </a>
 
             <MobileNav currentPath={currentPath} />

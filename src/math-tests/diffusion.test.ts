@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest';
 import {
   makeBetaSchedule, alphaBar, boxMuller, generateGaussianNoise,
   forwardClosed, forwardIncremental, sampleStats,
-} from '../../lib/math/diffusion';
+} from '../lib/math/diffusion';
 
 describe('diffusion', () => {
-  const T = 100;
+  const T = 1000;
   const betas = makeBetaSchedule(T, 1e-4, 0.02);
 
   it('Gaussian sample mean approximately 0', () => {

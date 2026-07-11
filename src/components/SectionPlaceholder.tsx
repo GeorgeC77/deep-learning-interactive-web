@@ -47,7 +47,7 @@ export default function SectionPlaceholder({ sectionPath }: SectionPlaceholderPr
         <div className="mt-6 inline-flex items-center gap-2 bg-amber-50 border border-amber-300 rounded-lg px-5 py-3 max-w-3xl mx-auto">
           <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0" />
           <span className="text-sm font-medium text-amber-800">
-            © 版权声明：本课程内容仅供个人学习交流使用，采用 CC BY-NC 4.0 许可。未经授权，严禁以任何形式用于商业用途，包括但不限于商业培训、付费课程、企业内训等。违者将依法追究法律责任。
+            © 版权声明：本课程内容仅供个人学习交流使用，采用 MIT 许可。教材原文、原图及习题解答版权归原作者和出版方所有。
           </span>
         </div>
       </section>

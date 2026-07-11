@@ -181,7 +181,7 @@ export default function Ch09AttentionPage() {
         </div>
         <p className="mt-6 text-sm text-amber-800">
           <ShieldAlert className="w-4 h-4 inline-block mr-1" />
-          本页内容仅供教学与非商业学习使用（CC BY-NC 4.0）。
+          本页为依据 Bishop & Bishop 教材知识体系制作的原创教学解释与交互演示。教材原文、原图及习题解答版权归原作者和出版方所有。
         </p>
       </section>
 

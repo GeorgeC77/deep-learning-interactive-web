@@ -199,7 +199,7 @@ export default function HomePage() {
         </div>
         <p className="text-amber-800 text-sm leading-relaxed">
           本站所有原创内容版权归作者所有。你可以自由阅读、分享和用于个人学习，但禁止未经授权的商业使用。
-          转载或引用请注明出处并遵守 CC BY-NC 4.0 许可协议。
+          转载或引用请注明出处。教材版权归原作者。
         </p>
       </section>
     </div>

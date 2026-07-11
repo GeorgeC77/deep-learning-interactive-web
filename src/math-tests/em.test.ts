@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { gaussianPdf, emIteration, type GMMParams } from '../../lib/math/em';
+import { gaussianPdf, emIteration, type GMMParams } from '../lib/math/em';
 
 function generateGMMData(N: number, params: GMMParams, seed: number): number[][] {
   const rng = mulberry32(seed);

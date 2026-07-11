@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   evalNode, localDeriv, topoSort, forwardPass, backwardPass, centralDiff,
   type NodeSpec,
-} from '../../lib/math/backprop';
+} from '../lib/math/backprop';
 
 /* -------------------------------------------------------------------------- */
 /* Test graph: f(x,w1,w2) = w2 * sin(w1 * x + 1)                              */
@@ -101,7 +101,7 @@ describe('backprop', () => {
     expect(vals['mul']).toBeCloseTo(25, 10);
     const { grads } = backwardPass(g2, vals);
     expect(grads['mul']).toBeCloseTo(1, 10);
-    expect(grads['w']).toBeCloseTo(20, 10); // ∂/∂w of (x+w)^2 = 2(x+w) = 10, twice = 20
+    expect(grads['w']).toBeCloseTo(10, 10); // ∂/∂w of (x+w)² = 2(x+w) = 10
   });
 
   it('evalNode operations', () => {

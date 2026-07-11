@@ -19,7 +19,7 @@ export default function Footer() {
             className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 hover:bg-amber-500/20 hover:text-amber-200 transition-colors text-sm font-medium"
           >
             <ShieldAlert className="w-4 h-4" />
-            <span>© CC BY-NC 4.0 · 非商业用途</span>
+            <span>© MIT · 原创教学</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
@@ -44,7 +44,7 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="text-amber-300 hover:text-amber-200 underline"
           >
-            CC BY-NC 4.0
+            MIT
           </a>{' '}
           许可协议。违者将依法追究法律责任。
         </div>
