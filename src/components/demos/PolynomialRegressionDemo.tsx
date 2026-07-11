@@ -95,6 +95,8 @@ const H = 300;
 const MARGIN = { top: 20, right: 20, bottom: 40, left: 50 };
 const PW = W - MARGIN.left - MARGIN.right;
 const PH = H - MARGIN.top - MARGIN.bottom;
+const Y_MIN = -2.5;
+const Y_MAX = 2.5;
 
 export default function PolynomialRegressionDemo() {
   const [N, setN] = useState(30);
@@ -119,12 +121,9 @@ export default function PolynomialRegressionDemo() {
   const allX = [...train.xs, ...test.xs];
   const xMin = Math.min(...allX) - 0.3;
   const xMax = Math.max(...allX) + 0.3;
-  const allY = [...train.ys, ...test.ys, ...Array.from({ length: 100 }, (_, i) => predict(xMin + (xMax - xMin) * i / 99, w, degree))];
-  const yMin = Math.min(...allY) - 0.5;
-  const yMax = Math.max(...allY) + 0.5;
 
   const toX = useCallback((x: number) => MARGIN.left + ((x - xMin) / (xMax - xMin)) * PW, [xMin, xMax]);
-  const toY = useCallback((y: number) => MARGIN.top + PH - ((y - yMin) / (yMax - yMin)) * PH, [yMin, yMax]);
+  const toY = useCallback((y: number) => MARGIN.top + PH - ((y - Y_MIN) / (Y_MAX - Y_MIN)) * PH, []);
 
   // Generate SVG paths
   const curvePoints = useMemo(() => {
@@ -194,7 +193,7 @@ export default function PolynomialRegressionDemo() {
           <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ maxHeight: 320 }}>
             {/* Grid */}
             {[0, 0.25, 0.5, 0.75, 1].map((t) => {
-              const y = yMin + (yMax - yMin) * t;
+              const y = Y_MIN + (Y_MAX - Y_MIN) * t;
               return (
                 <g key={`grid-${t}`}>
                   <line x1={MARGIN.left} y1={toY(y)} x2={W - MARGIN.right} y2={toY(y)} stroke="#e5e7eb" strokeWidth={0.5} />
