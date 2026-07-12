@@ -16,15 +16,25 @@ export interface Rectangle {
 }
 
 export interface UNetStage {
+  /** Encoder spatial size as [H, W] (always square in this toy). */
+  encoderSpatial: [number, number];
+  /** Decoder spatial size as [H, W] before concatenation. */
+  decoderSpatial: [number, number];
+  encoderChannels: number;
+  /** Channels after upsampling inside the decoder block. */
+  upsampledChannels: number;
+  /** Channels brought in by the skip connection. */
+  skipChannels: number;
+  /** Channels after skip concatenation. */
+  concatChannels: number;
+  /** Channels after the decoder convolutions. */
+  outputChannels: number;
   encoderPosition: Rectangle;
   decoderPosition: Rectangle;
-  spatialSize: number;
-  encoderChannels: number;
-  decoderChannels: number;
 }
 
 /**
- * Compute the spatial sizes of every U-Net level.
+ * Compute the spatial sizes of every U-Net level for an already-aligned input.
  *
  * Each encoder level halves the resolution, so for i = 0..levels-1:
  *   encoderSizes[i] = inputSize / 2^i
@@ -46,8 +56,10 @@ export function computeUNetSizes(inputSize: number, levels: number): UNetSizeRes
  * Build metadata for each U-Net stage, ordered from input resolution to bottleneck.
  *
  * Layout convention:
- * - Encoder blocks descend from top-left to bottom-center.
- * - Decoder blocks ascend from bottom-center to top-right.
+ * - Encoder blocks descend from top-left to bottom-left.
+ * - Decoder blocks mirror the encoder vertically on the right side, so that
+ *   encoder[i] and decoder[levels-1-i] share the same centre y-coordinate and
+ *   the same spatial resolution (the skip-concat requirement).
  * - The bottleneck sits between the last encoder and the first decoder block.
  */
 export function buildUNetStages(
@@ -60,9 +72,19 @@ export function buildUNetStages(
   for (let i = 0; i < levels; i++) {
     const spatialSize = inputSize / Math.pow(2, i);
     const encoderChannels = baseChannels * Math.pow(growth, i);
-    const decoderChannels = baseChannels * Math.pow(growth, i);
+    const upsampledChannels = encoderChannels;
+    const skipChannels = encoderChannels;
+    const concatChannels = upsampledChannels + skipChannels;
+    const outputChannels = encoderChannels;
 
     stages.push({
+      encoderSpatial: [spatialSize, spatialSize],
+      decoderSpatial: [spatialSize, spatialSize],
+      encoderChannels,
+      upsampledChannels,
+      skipChannels,
+      concatChannels,
+      outputChannels,
       encoderPosition: {
         x: 20 + i * 120,
         y: 20 + i * 60,
@@ -71,13 +93,12 @@ export function buildUNetStages(
       },
       decoderPosition: {
         x: 20 + (2 * levels - i) * 120,
-        y: 20 + (levels - 1 - i) * 60,
+        // Align the vertical centre with the matching encoder block so that
+        // skip connections are horizontal and same-resolution endpoints coincide.
+        y: 20 + i * 60 + (80 - i * 10 - (50 + i * 10)) / 2,
         w: 80,
         h: 50 + i * 10,
       },
-      spatialSize,
-      encoderChannels,
-      decoderChannels,
     });
   }
   return stages;
@@ -88,14 +109,19 @@ export function buildUNetStages(
  * corresponding decoder feature map. They must share the same H×W.
  */
 export function checkSkipCompatibility(stage: UNetStage): boolean {
+  const [hEnc, wEnc] = stage.encoderSpatial;
+  const [hDec, wDec] = stage.decoderSpatial;
   return (
-    stage.encoderPosition.w > 0 &&
-    stage.encoderPosition.h > 0 &&
-    stage.decoderPosition.w > 0 &&
-    stage.decoderPosition.h > 0 &&
-    stage.spatialSize > 0 &&
-    Number.isFinite(stage.encoderChannels) &&
-    Number.isFinite(stage.decoderChannels)
+    Number.isFinite(hEnc) &&
+    Number.isFinite(wEnc) &&
+    Number.isFinite(hDec) &&
+    Number.isFinite(wDec) &&
+    hEnc > 0 &&
+    wEnc > 0 &&
+    hDec > 0 &&
+    wDec > 0 &&
+    hEnc === hDec &&
+    wEnc === wDec
   );
 }
 
@@ -106,4 +132,34 @@ export function checkSkipCompatibility(stage: UNetStage): boolean {
  */
 export function requiredInputAlignment(levels: number): number {
   return Math.pow(2, levels);
+}
+
+/**
+ * Compute the smallest side length that is divisible by the required alignment
+ * and the padding needed on each side to reach it.
+ */
+export function computePaddedInputSize(
+  inputSize: number,
+  levels: number,
+): {
+  paddedSize: number;
+  totalPadding: number;
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+} {
+  const alignment = requiredInputAlignment(levels);
+  const paddedSize = Math.ceil(inputSize / alignment) * alignment;
+  const totalPadding = paddedSize - inputSize;
+  const top = Math.floor(totalPadding / 2);
+  const bottom = totalPadding - top;
+  return {
+    paddedSize,
+    totalPadding,
+    top,
+    bottom,
+    left: top,
+    right: bottom,
+  };
 }

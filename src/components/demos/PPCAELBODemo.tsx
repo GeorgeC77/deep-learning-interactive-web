@@ -17,8 +17,8 @@ const SEED = 123;
 const TRUE_SIGMA = 0.4;
 const TRUE_W = [[2], [1]]; // D x M
 
-export default function PPCAELBODemo() {
-  const [M, setM] = useState(1);
+export default function PPCAELBODemo({ initialM = 1 }: { initialM?: number } = {}) {
+  const [M, setM] = useState(initialM);
   const [userSigma2, setUserSigma2] = useState(0.5);
 
   const data = useMemo(
@@ -94,7 +94,7 @@ export default function PPCAELBODemo() {
   }, [data, M, userSigma2]);
 
   const reset = () => {
-    setM(1);
+    setM(initialM);
     setUserSigma2(0.5);
   };
 
@@ -183,15 +183,33 @@ export default function PPCAELBODemo() {
           σ²_ML = (λ_{M+1} + … + λ_D) / (D − M)
         </p>
         <p>
-          这里{' '}
-          <span className="font-mono">σ²_ML</span>{' '}
-          是被丢弃方向的平均方差。 posterior 均值重构为{' '}
+          这里 <span className="font-mono">σ²_ML</span> 是被丢弃方向的平均方差。
+          后验均值在隐空间为
           <span className="font-mono">
-            E[x|x] = W M^{-1} Wᵀ (x − x̄) + x̄
+            E[z|x] = (WᵀW + σ²I)^{-1} Wᵀ (x − x̄)
           </span>
-          ，其中 <span className="font-mono">M = WᵀW + σ²I</span>。
+          ，重构样本为
+          <span className="font-mono">
+            x̂_post = μ + W E[z|x]
+          </span>
+          （等价于 <span className="font-mono">E[μ + Wz | x]</span>）。
           当 σ² → 0 时，PPCA 的后验均值退化为标准 PCA 的正交投影。
         </p>
+        {M === 0 && (
+          <p className="text-blue-700 bg-blue-50 rounded p-2">
+            <span className="font-medium">M = 0 基准：</span>
+            潜在维度为 0 时，模型退化为零因子的各向同性高斯{' '}
+            <span className="font-mono">x ~ N(μ, σ²I)</span>。此时后验没有隐变量，
+            重构退化为数据均值 <span className="font-mono">μ</span>，可作为降维前的基准。
+          </p>
+        )}
+        {M === 1 && (
+          <p className="text-green-700 bg-green-50 rounded p-2">
+            <span className="font-medium">M = 1：</span>
+            标准的二维 → 一维 PPCA 降维。后验均值给出沿主方向的收缩投影，
+            与 PCA 正交投影略有不同（σ² 越大收缩越明显）。
+          </p>
+        )}
         {ml.boundary && (
           <p className="text-amber-700 bg-amber-50 rounded p-2">
             <span className="font-medium">M = D 边界情形：</span>

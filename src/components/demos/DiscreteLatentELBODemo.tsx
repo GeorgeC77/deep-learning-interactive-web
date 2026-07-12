@@ -20,7 +20,9 @@ export default function DiscreteLatentELBODemo() {
   const data = useMemo(() => generateGMMData(8, SEED, MEANS, WEIGHTS, SIGMA), []);
   const [sampleIdx, setSampleIdx] = useState(0);
   const [q12, setQ12] = useState<[number, number]>([1 / K, 1 / K]);
-  const [locked, setLocked] = useState(false);
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   const x = data[sampleIdx];
   const q = constrainSimplex(q12);
@@ -28,25 +30,16 @@ export default function DiscreteLatentELBODemo() {
   const { elbo, logPx, kl } = computeELBO(x, q, MEANS, WEIGHTS, SIGMA);
   const residual = identityResidual(logPx, elbo, kl);
 
-  const mostLikelyComponent = posterior.indexOf(Math.max(...posterior));
-
-  const setUniform = () => {
-    setQ12([1 / K, 1 / K]);
-  };
-
   const setToPosterior = () => {
     setQ12([posterior[0], posterior[1]]);
   };
 
   const handleSampleChange = (idx: number) => {
     setSampleIdx(idx);
-    setLocked(false);
-    setUniform();
-  };
-
-  const resetDemo = () => {
-    setLocked(false);
-    setUniform();
+    setQ12([1 / K, 1 / K]);
+    setPrediction('');
+    setSubmitted(false);
+    setRevealed(false);
   };
 
   return (
@@ -88,8 +81,16 @@ export default function DiscreteLatentELBODemo() {
       </div>
 
       <PredictionGate
+        resetKey={sampleIdx}
+        prediction={prediction}
+        onPredictionChange={setPrediction}
+        submitted={submitted}
+        onSubmit={() => setSubmitted(true)}
+        revealed={revealed}
+        onReveal={() => setRevealed((r) => !r)}
+        canReveal={submitted}
         question={`观察当前样本 x = ${x.toFixed(2)}，你认为最可能来自哪个高斯分量 z？请在下方写下你的预测。`}
-        hint={`比较每个分量在该 x 处的相对高度：p(z=k|x,θ) ∝ π_k · N(x|μ_k,σ²)。真实后验的最大值出现在 k = ${mostLikelyComponent}。`}
+        hint="比较每个分量在该 x 处的相对高度：p(z=k|x,θ) ∝ π_k · N(x|μ_k,σ²)。"
         revealContent={
           <div className="space-y-4">
             <div className="bg-gray-50 rounded-lg p-4">
@@ -107,7 +108,7 @@ export default function DiscreteLatentELBODemo() {
             <div className="text-sm text-gray-700 space-y-2">
               <p>
                 <span className="font-medium">恒等式验证：</span>
-                上表中的残差是 |ln p(x|θ) − ELBO(q) − KL(q||p)|。若 q 与真实后验完全一致，KL 会严格为 0，ELBO 会等于对数似然。
+                上表中的残差是 |ln p(x|θ) − ELBO(q) − KL(q||p)|。若 q 与真实后 posterior 完全一致，KL 会严格为 0，ELBO 会等于对数似然。
               </p>
               <p>
                 <span className="font-medium">ELBO 的另一种写法：</span>
@@ -130,14 +131,14 @@ export default function DiscreteLatentELBODemo() {
               label="q(z=0)"
               value={q[0]}
               max={1 - q12[1]}
-              disabled={locked}
+              disabled={submitted}
               onChange={(v) => setQ12([v, q12[1]])}
             />
             <SimplexSlider
               label="q(z=1)"
               value={q[1]}
               max={1 - q12[0]}
-              disabled={locked}
+              disabled={submitted}
               onChange={(v) => setQ12([q12[0], v])}
             />
             <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -150,35 +151,16 @@ export default function DiscreteLatentELBODemo() {
             <p className="text-xs text-gray-500">q 求和：{q.reduce((a, b) => a + b, 0).toFixed(3)}</p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          {revealed && (
             <Button
               type="button"
               variant="outline"
               onClick={setToPosterior}
-              disabled={locked}
+              disabled={submitted}
               className="text-sm"
             >
               令 q = 真实后验
             </Button>
-            <Button
-              type="button"
-              onClick={() => setLocked(true)}
-              disabled={locked}
-              className="text-sm"
-            >
-              提交并锁定
-            </Button>
-            {locked && (
-              <Button type="button" variant="ghost" onClick={resetDemo} className="text-sm">
-                解锁 / 重置
-              </Button>
-            )}
-          </div>
-
-          {locked && (
-            <div className="bg-violet-50 border border-violet-200 rounded-lg p-3 text-sm text-violet-800">
-              已锁定你的预测。点击上方“✨ 揭晓答案”查看真实后验、ELBO 分解与解释。
-            </div>
           )}
         </div>
       </PredictionGate>

@@ -21,6 +21,7 @@ import {
   scoreThresholdFilter,
   softNms,
   type Box,
+  type SoftNmsResult,
 } from '@/lib/math/iouNms';
 
 const DEFAULT_BOXES: Box[] = [
@@ -94,7 +95,10 @@ export default function IoUNMSDemo() {
     [candidates, nmsThreshold, mode],
   );
 
-  const softResult = useMemo(() => softNms(candidates, softSigma), [candidates, softSigma]);
+  const softResult = useMemo<SoftNmsResult>(
+    () => softNms(candidates, softSigma, mode, scoreThreshold),
+    [candidates, softSigma, mode, scoreThreshold],
+  );
 
   const keptSet = useMemo(() => new Set(result.kept), [result.kept]);
   const suppressedSet = useMemo(() => new Set(result.suppressed), [result.suppressed]);
@@ -381,32 +385,82 @@ export default function IoUNMSDemo() {
                   onValueChange={(v) => setSoftSigma(v[0])}
                 />
               </div>
+
+              <p className="text-sm text-gray-700">
+                Soft-NMS 每轮从当前剩余框中选择分数最高者，然后按 IoU 衰减其它框的分数；
+                衰减后低于置信度阈值的框被移除。选择顺序由<strong>实时更新后的分数</strong>决定。
+              </p>
+
+              <div className="flex flex-wrap gap-2 text-sm">
+                <span className="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-700/10">
+                  选择顺序：{softResult.selectedOrder.join(' → ') || '无'}
+                </span>
+                <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/10">
+                  保留：{softResult.kept.join(', ') || '无'}
+                </span>
+                <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-red-700/10">
+                  阈值过滤：{softResult.removedByThreshold.join(', ') || '无'}
+                </span>
+              </div>
+
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>框</TableHead>
                     <TableHead>类别</TableHead>
                     <TableHead>原始分数</TableHead>
-                    <TableHead>Soft-NMS 衰减后</TableHead>
+                    <TableHead>最终分数</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {softResult.map((item) => {
-                    const original = candidates.find((b) => b.id === item.id)?.score ?? item.score;
+                  {candidates.map((box) => {
+                    const final = softResult.finalScores.get(box.id) ?? box.score;
                     return (
-                      <TableRow key={item.id}>
-                        <TableCell>#{item.id}</TableCell>
-                        <TableCell>c{item.classId}</TableCell>
-                        <TableCell>{original.toFixed(3)}</TableCell>
-                        <TableCell>{item.score.toFixed(3)}</TableCell>
+                      <TableRow key={box.id}>
+                        <TableCell>#{box.id}</TableCell>
+                        <TableCell>c{box.classId}</TableCell>
+                        <TableCell>{box.score.toFixed(3)}</TableCell>
+                        <TableCell>{final.toFixed(3)}</TableCell>
                       </TableRow>
                     );
                   })}
                 </TableBody>
               </Table>
-              <p className="text-sm text-gray-700">
-                Soft-NMS 不直接丢弃框，而是根据 IoU 对低分框的置信度进行高斯衰减。
-              </p>
+
+              <div>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Soft-NMS 衰减轨迹</h4>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>轮次</TableHead>
+                      <TableHead>选中框</TableHead>
+                      <TableHead>被衰减框</TableHead>
+                      <TableHead>IoU</TableHead>
+                      <TableHead>旧分数</TableHead>
+                      <TableHead>新分数</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {softResult.trace.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-gray-500">
+                          无衰减记录
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {softResult.trace.map((entry, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell>{entry.iteration}</TableCell>
+                        <TableCell>#{entry.selectedBox}</TableCell>
+                        <TableCell>#{entry.comparedBox}</TableCell>
+                        <TableCell>{entry.iou.toFixed(3)}</TableCell>
+                        <TableCell>{entry.oldScore.toFixed(3)}</TableCell>
+                        <TableCell>{entry.newScore.toFixed(3)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           )}
         </div>

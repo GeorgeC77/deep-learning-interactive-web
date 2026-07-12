@@ -15,6 +15,14 @@ const SEED = 123;
 const TRUE_W = [[2], [1]];
 const TRUE_SIGMA = 0.4;
 
+function matMulVec(M: number[][], v: number[]): number[] {
+  return M.map((row) => row.reduce((s, a, i) => s + a * v[i], 0));
+}
+
+function vecDot(a: number[], b: number[]): number {
+  return a.reduce((s, v, i) => s + v * b[i], 0);
+}
+
 describe('ppca', () => {
   const data = generatePPCAData(N, SEED, TRUE_W, TRUE_SIGMA);
   const mean = sampleMean(data);
@@ -84,5 +92,117 @@ describe('ppca', () => {
     expect(ml.Wml[1]).toHaveLength(0);
     expect(ml.sigma2ml).toBeCloseTo((eigenvalues[0] + eigenvalues[1]) / 2, 5);
     expect(ml.boundary).toBe(false);
+  });
+
+  describe('eig2x2', () => {
+    it('returns correct eigenpairs for diag(4,1)', () => {
+      const { eigenvalues, eigenvectors } = eig2x2([
+        [4, 0],
+        [0, 1],
+      ]);
+      expect(eigenvalues[0]).toBeCloseTo(4, 12);
+      expect(eigenvalues[1]).toBeCloseTo(1, 12);
+      expect(Math.abs(eigenvectors[0][0])).toBeCloseTo(1, 12);
+      expect(Math.abs(eigenvectors[1][1])).toBeCloseTo(1, 12);
+    });
+
+    it('returns correct eigenpairs for diag(1,4)', () => {
+      const { eigenvalues, eigenvectors } = eig2x2([
+        [1, 0],
+        [0, 4],
+      ]);
+      expect(eigenvalues[0]).toBeCloseTo(4, 12);
+      expect(eigenvalues[1]).toBeCloseTo(1, 12);
+      expect(Math.abs(eigenvectors[0][1])).toBeCloseTo(1, 12);
+      expect(Math.abs(eigenvectors[1][0])).toBeCloseTo(1, 12);
+    });
+
+    it('returns correct eigenpairs for diag(2,2)', () => {
+      const { eigenvalues, eigenvectors } = eig2x2([
+        [2, 0],
+        [0, 2],
+      ]);
+      expect(eigenvalues[0]).toBeCloseTo(2, 12);
+      expect(eigenvalues[1]).toBeCloseTo(2, 12);
+      expect(vecDot(eigenvectors[0], eigenvectors[1])).toBeCloseTo(0, 12);
+    });
+
+    it('returns correct eigenpairs for a rotated covariance', () => {
+      // Rotate diag(5,1) by 30 degrees.
+      const c = Math.cos(Math.PI / 6);
+      const s = Math.sin(Math.PI / 6);
+      const R = [
+        [c, -s],
+        [s, c],
+      ];
+      const D = [
+        [5, 0],
+        [0, 1],
+      ];
+      // S = R D R^T
+      const Rt = [
+        [c, s],
+        [-s, c],
+      ];
+      const RD = [
+        [R[0][0] * D[0][0], R[0][1] * D[1][1]],
+        [R[1][0] * D[0][0], R[1][1] * D[1][1]],
+      ];
+      const S = [
+        [RD[0][0] * Rt[0][0] + RD[0][1] * Rt[1][0], RD[0][0] * Rt[0][1] + RD[0][1] * Rt[1][1]],
+        [RD[1][0] * Rt[0][0] + RD[1][1] * Rt[1][0], RD[1][0] * Rt[0][1] + RD[1][1] * Rt[1][1]],
+      ];
+
+      const { eigenvalues, eigenvectors } = eig2x2(S);
+      expect(eigenvalues[0]).toBeCloseTo(5, 10);
+      expect(eigenvalues[1]).toBeCloseTo(1, 10);
+
+      for (let i = 0; i < 2; i++) {
+        const v = eigenvectors[i];
+        const len = Math.hypot(v[0], v[1]);
+        expect(len).toBeCloseTo(1, 12);
+        const Sv = matMulVec(S, v);
+        const lambdaV = [eigenvalues[i] * v[0], eigenvalues[i] * v[1]];
+        expect(Math.hypot(Sv[0] - lambdaV[0], Sv[1] - lambdaV[1])).toBeCloseTo(0, 10);
+      }
+    });
+
+    it('eigenvectors are unit length and mutually orthogonal', () => {
+      const S = [
+        [3, 1],
+        [1, 2],
+      ];
+      const { eigenvectors } = eig2x2(S);
+      expect(Math.hypot(eigenvectors[0][0], eigenvectors[0][1])).toBeCloseTo(1, 12);
+      expect(Math.hypot(eigenvectors[1][0], eigenvectors[1][1])).toBeCloseTo(1, 12);
+      expect(vecDot(eigenvectors[0], eigenvectors[1])).toBeCloseTo(0, 12);
+    });
+
+    it('never returns a zero eigenvector', () => {
+      const cases = [
+        [
+          [4, 0],
+          [0, 1],
+        ],
+        [
+          [1, 0],
+          [0, 4],
+        ],
+        [
+          [2, 0],
+          [0, 2],
+        ],
+        [
+          [3, 1],
+          [1, 2],
+        ],
+      ];
+      for (const M of cases) {
+        const { eigenvectors } = eig2x2(M);
+        for (const v of eigenvectors) {
+          expect(Math.hypot(v[0], v[1])).toBeGreaterThan(0.99);
+        }
+      }
+    });
   });
 });

@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
 import KaTeX from '@/components/KaTeX';
 import {
   computeUNetSizes,
   buildUNetStages,
   checkSkipCompatibility,
   requiredInputAlignment,
+  computePaddedInputSize,
 } from '@/lib/math/unet';
+
+const INPUT_PRESETS = [250, 255, 256, 257];
 
 export default function UnetDemo() {
   const [levels, setLevels] = useState(3);
@@ -16,11 +20,15 @@ export default function UnetDemo() {
   const [growth, setGrowth] = useState(2);
   const [numClasses, setNumClasses] = useState(21);
 
-  const { bottleneckSize } = computeUNetSizes(inputSize, levels);
-  const stages = buildUNetStages(inputSize, levels, baseChannels, growth);
-  const decoderStages = [...stages].reverse();
   const alignment = requiredInputAlignment(levels);
-  const isAligned = inputSize % alignment === 0;
+  const { paddedSize, totalPadding, top, bottom, left, right } =
+    computePaddedInputSize(inputSize, levels);
+  const isAligned = totalPadding === 0;
+
+  const { bottleneckSize } = computeUNetSizes(paddedSize, levels);
+  const stages = buildUNetStages(paddedSize, levels, baseChannels, growth);
+  const decoderStages = [...stages].reverse();
+  const bottleneckChannels = baseChannels * Math.pow(growth, levels);
 
   const lastEncoder = stages[levels - 1].encoderPosition;
   const firstDecoder = decoderStages[0].decoderPosition;
@@ -51,7 +59,19 @@ export default function UnetDemo() {
               <span>输入分辨率 H×W</span>
               <span>{inputSize}×{inputSize}</span>
             </div>
-            <Slider value={[inputSize]} min={64} max={512} step={64} onValueChange={(v) => setInputSize(v[0])} />
+            <Slider value={[inputSize]} min={64} max={512} step={1} onValueChange={(v) => setInputSize(v[0])} />
+            <div className="flex flex-wrap gap-2 mt-2">
+              {INPUT_PRESETS.map((preset) => (
+                <Button
+                  key={preset}
+                  variant={inputSize === preset ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setInputSize(preset)}
+                >
+                  {preset}
+                </Button>
+              ))}
+            </div>
           </div>
           <div>
             <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
@@ -98,7 +118,7 @@ export default function UnetDemo() {
                   fontSize={11}
                   fill="#1e3a8a"
                 >
-                  {stage.spatialSize.toFixed(0)}×{stage.spatialSize.toFixed(0)}×{stage.encoderChannels}
+                  {stage.encoderSpatial[0].toFixed(0)}×{stage.encoderSpatial[1].toFixed(0)}×{stage.encoderChannels}
                 </text>
                 {i < levels - 1 && (
                   <>
@@ -142,7 +162,7 @@ export default function UnetDemo() {
               fontSize={11}
               fill="#78350f"
             >
-              {bottleneckSize.toFixed(0)}×{bottleneckSize.toFixed(0)}
+              {bottleneckSize.toFixed(0)}×{bottleneckSize.toFixed(0)}×{bottleneckChannels}
             </text>
 
             {/* Decoder */}
@@ -164,7 +184,7 @@ export default function UnetDemo() {
                   fontSize={11}
                   fill="#064e3b"
                 >
-                  {stage.spatialSize.toFixed(0)}×{stage.spatialSize.toFixed(0)}×{stage.decoderChannels}
+                  {stage.decoderSpatial[0].toFixed(0)}×{stage.decoderSpatial[1].toFixed(0)}×{stage.outputChannels}
                 </text>
                 {i < levels - 1 && (
                   <>
@@ -247,7 +267,7 @@ export default function UnetDemo() {
                   fontSize={11}
                   fill="#1f2937"
                 >
-                  {inputSize}×{inputSize}×{numClasses}
+                  {paddedSize}×{paddedSize}×{numClasses}
                 </text>
               </g>
             )}
@@ -267,9 +287,12 @@ export default function UnetDemo() {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="px-4 py-2">阶段</th>
-                  <th className="px-4 py-2">空间尺寸 H×W</th>
-                  <th className="px-4 py-2">编码器通道</th>
-                  <th className="px-4 py-2">解码器通道</th>
+                  <th className="px-4 py-2">Encoder H×W</th>
+                  <th className="px-4 py-2">Decoder H×W</th>
+                  <th className="px-4 py-2">Skip 通道</th>
+                  <th className="px-4 py-2">Upsampled</th>
+                  <th className="px-4 py-2">Concat</th>
+                  <th className="px-4 py-2">Output</th>
                   <th className="px-4 py-2">Skip 兼容</th>
                 </tr>
               </thead>
@@ -277,17 +300,23 @@ export default function UnetDemo() {
                 {stages.map((stage, i) => (
                   <tr key={`stage-row-${i}`} className="border-t">
                     <td className="px-4 py-2">{i + 1}</td>
-                    <td className="px-4 py-2">{stage.spatialSize.toFixed(0)}×{stage.spatialSize.toFixed(0)}</td>
-                    <td className="px-4 py-2">{stage.encoderChannels}</td>
-                    <td className="px-4 py-2">{stage.decoderChannels}</td>
+                    <td className="px-4 py-2">{stage.encoderSpatial[0].toFixed(0)}×{stage.encoderSpatial[1].toFixed(0)}</td>
+                    <td className="px-4 py-2">{stage.decoderSpatial[0].toFixed(0)}×{stage.decoderSpatial[1].toFixed(0)}</td>
+                    <td className="px-4 py-2">{stage.skipChannels}</td>
+                    <td className="px-4 py-2">{stage.upsampledChannels}</td>
+                    <td className="px-4 py-2">{stage.concatChannels}</td>
+                    <td className="px-4 py-2">{stage.outputChannels}</td>
                     <td className="px-4 py-2">{checkSkipCompatibility(stage) ? '是' : '否'}</td>
                   </tr>
                 ))}
                 <tr className="border-t bg-yellow-50">
                   <td className="px-4 py-2">Bottleneck</td>
                   <td className="px-4 py-2">{bottleneckSize.toFixed(0)}×{bottleneckSize.toFixed(0)}</td>
+                  <td className="px-4 py-2">{bottleneckSize.toFixed(0)}×{bottleneckSize.toFixed(0)}</td>
                   <td className="px-4 py-2">-</td>
                   <td className="px-4 py-2">-</td>
+                  <td className="px-4 py-2">-</td>
+                  <td className="px-4 py-2">{bottleneckChannels}</td>
                   <td className="px-4 py-2">-</td>
                 </tr>
               </tbody>
@@ -301,8 +330,8 @@ export default function UnetDemo() {
             <ul className="list-disc pl-5 mt-1 space-y-1">
               <li>Encoder 逐步下采样提取高层语义；</li>
               <li>Bottleneck 位于最低分辨率，只绘制一次；</li>
-              <li>Decoder 逐步上采样恢复空间分辨率；</li>
-              <li>Skip connection 将编码器特征直接拼接到解码器，保留细节。</li>
+              <li>Decoder 从 bottleneck 向右上恢复分辨率；</li>
+              <li>Skip connection 将相同分辨率的编码器特征直接拼接到解码器，保留细节。</li>
             </ul>
           </div>
           <div>
@@ -329,11 +358,28 @@ export default function UnetDemo() {
           ) : (
             <span>
               {' '}输入尺寸 {inputSize} 不能被 2^{levels} = {alignment} 整除。
-              建议裁剪/填充到最近的 {alignment} 的倍数
-              （例如 {Math.floor(inputSize / alignment) * alignment} 或 {Math.ceil(inputSize / alignment) * alignment}）。
+              需要填充到 {paddedSize}×{paddedSize}：总填充 {totalPadding}px
+              （上 {top} / 下 {bottom} / 左 {left} / 右 {right}）。
             </span>
           )}
         </div>
+
+        {!isAligned && (
+          <div className="text-sm text-gray-700 space-y-1">
+            <p className="font-medium">每层空间尺寸（按填充后计算）</p>
+            <div className="flex flex-wrap gap-2">
+              {stages.map((stage, i) => (
+                <span key={`size-${i}`} className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs">
+                  L{i + 1}: {stage.encoderSpatial[0].toFixed(0)}×{stage.encoderSpatial[1].toFixed(0)}
+                  {checkSkipCompatibility(stage) ? ' ✓' : ' ✗'}
+                </span>
+              ))}
+              <span className="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-xs">
+                BN: {bottleneckSize.toFixed(0)}×{bottleneckSize.toFixed(0)}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </InteractiveDemo>
   );

@@ -91,18 +91,87 @@ describe('iouNms', () => {
     expect(filtered.map((box) => box.id)).toEqual([1, 3]);
   });
 
-  it('softNms decays scores but does not suppress', () => {
-    const boxes: Box[] = [
-      { id: 1, x: 0, y: 0, w: 10, h: 10, score: 0.9, classId: 0 },
-      { id: 2, x: 2, y: 2, w: 10, h: 10, score: 0.8, classId: 0 },
-      { id: 3, x: 100, y: 100, w: 10, h: 10, score: 0.7, classId: 0 },
-    ];
+  describe('softNms', () => {
+    it('dynamically reselects the maximum after decaying scores', () => {
+      // A overlaps heavily with B; B overlaps heavily with C.
+      // After A decays B, B's score must drop below C's original score so that
+      // C is selected next, not B.
+      const boxes: Box[] = [
+        { id: 1, x: 0, y: 0, w: 100, h: 100, score: 0.95, classId: 0 },
+        { id: 2, x: 10, y: 10, w: 100, h: 100, score: 0.9, classId: 0 },
+        { id: 3, x: 200, y: 200, w: 100, h: 100, score: 0.85, classId: 0 },
+      ];
 
-    const result = softNms(boxes, 0.5);
-    const scoreById = new Map(result.map((item) => [item.id, item.score]));
+      const result = softNms(boxes, 0.1, 'class-agnostic', 0.0);
 
-    expect(scoreById.get(1)).toBeCloseTo(0.9, 10);
-    expect(scoreById.get(2) ?? 0).toBeLessThan(0.8);
-    expect(scoreById.get(3)).toBeCloseTo(0.7, 10);
+      // The first selected box should be A (id=1).
+      expect(result.selectedOrder[0]).toBe(1);
+
+      // After A decays B, B should be lower than C, so C is selected second.
+      const bFinal = result.finalScores.get(2) ?? 1;
+      const cFinal = result.finalScores.get(3) ?? 1;
+      expect(bFinal).toBeLessThan(cFinal);
+      expect(result.selectedOrder[1]).toBe(3);
+    });
+
+    it('class-aware mode does not decay boxes across classes', () => {
+      const boxes: Box[] = [
+        { id: 1, x: 0, y: 0, w: 10, h: 10, score: 0.9, classId: 0 },
+        { id: 2, x: 2, y: 2, w: 10, h: 10, score: 0.85, classId: 1 },
+      ];
+
+      const aware = softNms(boxes, 0.1, 'class-aware', 0.0);
+      expect(aware.finalScores.get(2)).toBeCloseTo(0.85, 10);
+
+      const agnostic = softNms(boxes, 0.1, 'class-agnostic', 0.0);
+      expect((agnostic.finalScores.get(2) ?? 1)).toBeLessThan(0.85);
+    });
+
+    it('selected order uses updated scores, not original scores', () => {
+      const boxes: Box[] = [
+        { id: 1, x: 0, y: 0, w: 100, h: 100, score: 0.95, classId: 0 },
+        { id: 2, x: 10, y: 10, w: 100, h: 100, score: 0.9, classId: 0 },
+        { id: 3, x: 200, y: 200, w: 100, h: 100, score: 0.85, classId: 0 },
+      ];
+
+      const result = softNms(boxes, 0.1, 'class-agnostic', 0.0);
+      // Original order by score would be 1,2,3. Updated order should be 1,3,2.
+      expect(result.selectedOrder).toEqual([1, 3, 2]);
+    });
+
+    it('score threshold is applied to decayed scores', () => {
+      const boxes: Box[] = [
+        { id: 1, x: 0, y: 0, w: 100, h: 100, score: 0.95, classId: 0 },
+        { id: 2, x: 10, y: 10, w: 100, h: 100, score: 0.6, classId: 0 },
+      ];
+
+      const result = softNms(boxes, 0.1, 'class-agnostic', 0.5);
+      expect(result.selectedOrder).toContain(1);
+      expect(result.removedByThreshold).toContain(2);
+      expect(result.kept).not.toContain(2);
+    });
+
+    it('trace reproduces final scores', () => {
+      const boxes: Box[] = [
+        { id: 1, x: 0, y: 0, w: 10, h: 10, score: 0.9, classId: 0 },
+        { id: 2, x: 2, y: 2, w: 10, h: 10, score: 0.8, classId: 0 },
+      ];
+
+      const result = softNms(boxes, 0.5, 'class-agnostic', 0.0);
+      const traceEntry = result.trace.find((t) => t.comparedBox === 2);
+      expect(traceEntry).toBeDefined();
+      expect(result.finalScores.get(2)).toBeCloseTo(traceEntry!.newScore, 10);
+    });
+
+    it('smaller sigma produces stronger decay for high-IoU boxes', () => {
+      const boxes: Box[] = [
+        { id: 1, x: 0, y: 0, w: 10, h: 10, score: 0.9, classId: 0 },
+        { id: 2, x: 2, y: 2, w: 10, h: 10, score: 0.8, classId: 0 },
+      ];
+
+      const smallSigma = softNms(boxes, 0.01, 'class-agnostic', 0.0);
+      const largeSigma = softNms(boxes, 1.0, 'class-agnostic', 0.0);
+      expect(smallSigma.finalScores.get(2)!).toBeLessThan(largeSigma.finalScores.get(2)!);
+    });
   });
 });

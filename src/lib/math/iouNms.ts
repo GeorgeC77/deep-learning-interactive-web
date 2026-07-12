@@ -36,10 +36,27 @@ export type NmsResult = {
   trace: NmsTraceEntry[];
 };
 
-export type SoftNmsScore = {
-  id: number;
-  score: number;
-  classId: number;
+export type SoftNmsMode = NmsMode;
+
+export type SoftNmsTraceEntry = {
+  iteration: number;
+  selectedBox: number;
+  comparedBox: number;
+  iou: number;
+  oldScore: number;
+  newScore: number;
+};
+
+export type SoftNmsResult = {
+  /** Order in which boxes were selected as the current maximum. */
+  selectedOrder: number[];
+  /** Final score for every input box id. */
+  finalScores: Map<number, number>;
+  /** Boxes kept after Soft-NMS (selected + remaining above threshold). */
+  kept: number[];
+  /** Boxes removed because their decayed score fell below the threshold. */
+  removedByThreshold: number[];
+  trace: SoftNmsTraceEntry[];
 };
 
 /**
@@ -146,34 +163,93 @@ export function nmsTrace(
 }
 
 /**
- * Gaussian soft-NMS: decay scores of overlapping boxes instead of hard
- * suppression.
+ * Gaussian Soft-NMS.
  *
- * Returns the final decayed score for every input box.
+ * Instead of hard suppression, overlapping boxes have their scores decayed by
+ * exp(-IoU² / σ). After each decay pass the current maximum is recomputed from
+ * the updated scores, and boxes that fall below `scoreThreshold` are removed.
+ *
+ * - `class-aware`: different classes do not decay each other.
+ * - `class-agnostic`: all remaining boxes may be decayed.
  */
-export function softNms(boxes: readonly Box[], sigma: number): SoftNmsScore[] {
+export function softNms(
+  boxes: readonly Box[],
+  sigma: number,
+  mode: SoftNmsMode,
+  scoreThreshold: number,
+): SoftNmsResult {
   const safeSigma = sigma > 0 ? sigma : 1e-6;
-  const sorted = [...boxes].sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score;
-    return b.id - a.id;
-  });
+  const scores = new Map<number, number>(boxes.map((box) => [box.id, box.score]));
+  const remaining = new Set<number>(boxes.map((box) => box.id));
 
-  const scores = new Map<number, number>(sorted.map((box) => [box.id, box.score]));
+  const selectedOrder: number[] = [];
+  const removedByThreshold: number[] = [];
+  const trace: SoftNmsTraceEntry[] = [];
+  let iteration = 0;
 
-  for (let i = 0; i < sorted.length; i++) {
-    const current = sorted[i];
-    for (let j = i + 1; j < sorted.length; j++) {
-      const other = sorted[j];
+  while (remaining.size > 0) {
+    // Select the box with the current highest score.
+    let selectedId = -1;
+    let maxScore = -Infinity;
+    for (const id of remaining) {
+      const s = scores.get(id) ?? -Infinity;
+      if (s > maxScore) {
+        maxScore = s;
+        selectedId = id;
+      }
+    }
+
+    if (maxScore < scoreThreshold) {
+      for (const id of remaining) {
+        removedByThreshold.push(id);
+      }
+      remaining.clear();
+      break;
+    }
+
+    iteration += 1;
+    selectedOrder.push(selectedId);
+    remaining.delete(selectedId);
+
+    const current = boxes.find((box) => box.id === selectedId);
+    if (!current) break;
+
+    for (const id of remaining) {
+      const other = boxes.find((box) => box.id === id);
+      if (!other) continue;
+      if (mode === 'class-aware' && current.classId !== other.classId) continue;
+
       const iou = computeIoU(current, other);
-      const decay = Math.exp(-(iou * iou) / safeSigma);
-      const previous = scores.get(other.id) ?? other.score;
-      scores.set(other.id, previous * decay);
+      const oldScore = scores.get(id) ?? other.score;
+      const newScore = oldScore * Math.exp(-(iou * iou) / safeSigma);
+      scores.set(id, newScore);
+
+      trace.push({
+        iteration,
+        selectedBox: selectedId,
+        comparedBox: id,
+        iou,
+        oldScore,
+        newScore,
+      });
+    }
+
+    // Remove boxes whose decayed score is now below the threshold.
+    for (const id of remaining) {
+      if ((scores.get(id) ?? 0) < scoreThreshold) {
+        removedByThreshold.push(id);
+        remaining.delete(id);
+      }
     }
   }
 
-  return sorted.map((box) => ({
-    id: box.id,
-    score: scores.get(box.id) ?? box.score,
-    classId: box.classId,
-  }));
+  const kept = [...selectedOrder, ...remaining].sort((a, b) => a - b);
+
+  return {
+    selectedOrder,
+    finalScores: scores,
+    kept,
+    removedByThreshold,
+    trace,
+  };
 }

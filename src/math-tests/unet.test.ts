@@ -4,6 +4,7 @@ import {
   buildUNetStages,
   checkSkipCompatibility,
   requiredInputAlignment,
+  computePaddedInputSize,
   type Rectangle,
   type UNetStage,
 } from '../lib/math/unet';
@@ -50,9 +51,9 @@ describe('unet', () => {
 
     // Only the bottleneck block itself has the bottleneck spatial size.
     const allBlocks: { rect: Rectangle; spatialSize: number }[] = [
-      ...stages.map((s) => ({ rect: s.encoderPosition, spatialSize: s.spatialSize })),
+      ...stages.map((s) => ({ rect: s.encoderPosition, spatialSize: s.encoderSpatial[0] })),
       { rect: bottleneckRect, spatialSize: sizes.bottleneckSize },
-      ...stages.map((s) => ({ rect: s.decoderPosition, spatialSize: s.spatialSize })),
+      ...stages.map((s) => ({ rect: s.decoderPosition, spatialSize: s.decoderSpatial[0] })),
     ];
     const bottleneckCount = allBlocks.filter(
       (b) => b.spatialSize === sizes.bottleneckSize,
@@ -71,7 +72,7 @@ describe('unet', () => {
     }
   });
 
-  it('skip connection count equals levels', () => {
+  it('skip connection count equals levels and each stage is compatible', () => {
     const levels = 4;
     const stages = buildUNetStages(256, levels, 64, 2);
     expect(stages.length).toBe(levels);
@@ -94,20 +95,53 @@ describe('unet', () => {
 
     for (let i = 0; i < stages.length; i++) {
       const stage = stages[i];
-      expect(stage.spatialSize).toBeGreaterThan(0);
       expect(stage.encoderPosition.w).toBeGreaterThan(0);
       expect(stage.encoderPosition.h).toBeGreaterThan(0);
       expect(stage.decoderPosition.w).toBeGreaterThan(0);
       expect(stage.decoderPosition.h).toBeGreaterThan(0);
-      // Both sides of the skip connection share the same H×W.
-      expect(stage.spatialSize).toBe(encoderSizes[i]);
-      expect(stage.decoderChannels).toBe(stage.encoderChannels);
+      expect(stage.encoderSpatial[0]).toBe(encoderSizes[i]);
+      expect(stage.decoderSpatial[0]).toBe(encoderSizes[i]);
+      expect(stage.encoderSpatial).toEqual(stage.decoderSpatial);
+      expect(stage.concatChannels).toBe(stage.upsampledChannels + stage.skipChannels);
     }
+  });
+
+  it('same-resolution encoder and decoder stages share the same centre y-coordinate', () => {
+    const levels = 4;
+    const stages = buildUNetStages(256, levels, 64, 2);
+    for (const stage of stages) {
+      const encCY = stage.encoderPosition.y + stage.encoderPosition.h / 2;
+      const decCY = stage.decoderPosition.y + stage.decoderPosition.h / 2;
+      expect(encCY).toBeCloseTo(decCY, 10);
+    }
+  });
+
+  it('checkSkipCompatibility rejects mismatched spatial dimensions', () => {
+    const stages = buildUNetStages(256, 3, 64, 2);
+    const stage = { ...stages[0] };
+    expect(checkSkipCompatibility(stage)).toBe(true);
+
+    const mismatched = {
+      ...stage,
+      decoderSpatial: [stage.decoderSpatial[0] + 1, stage.decoderSpatial[1]] as [number, number],
+    };
+    expect(checkSkipCompatibility(mismatched)).toBe(false);
   });
 
   it('requiredInputAlignment returns 2^levels', () => {
     expect(requiredInputAlignment(1)).toBe(2);
     expect(requiredInputAlignment(3)).toBe(8);
     expect(requiredInputAlignment(5)).toBe(32);
+  });
+
+  it('computePaddedInputSize returns correct padding for non-aligned inputs', () => {
+    const result = computePaddedInputSize(250, 3);
+    expect(result.paddedSize).toBe(256);
+    expect(result.totalPadding).toBe(6);
+    expect(result.top + result.bottom).toBe(result.totalPadding);
+    expect(result.left + result.right).toBe(result.totalPadding);
+
+    const aligned = computePaddedInputSize(256, 3);
+    expect(aligned.totalPadding).toBe(0);
   });
 });

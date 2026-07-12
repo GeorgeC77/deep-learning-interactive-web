@@ -1,6 +1,23 @@
 # 交互质量审计报告（更新）
 
-> 更新日期：2026-06-29 | 审计范围：旗舰页面 Ch7/8/12/15/20 + 第二批核心交互 | 测试：`npm run test:math` 152 passed
+> 更新日期：2026-07-12 | 审计范围：旗舰页面 + 第二批核心交互 + 第三批数学/教学语义修复 | 测试：`npm run test:math` 230 passed
+
+## 第三批修复摘要
+
+| Demo | 关键修复 | PredictionGate | 数学测试 |
+|---|---|---|---|
+| PPCAELBODemo | 稳定 `eig2x2`（atan2 + Rayleigh quotient）；删除 `E[x\|x]`；正确写出 `E[z\|x]` 与 `x̂_post = μ + W E[z\|x]`；M=0/1/2 分段解释 | ❌（无预测门） | ✅ Vitest |
+| UnetDemo | encoder/decoder 同分辨率同 centreY；skip compatibility 比较真实 `encoderSpatial` 与 `decoderSpatial`；输入尺寸 step=1 + 250/255/256/257 预设；红色未对齐警告与填充详情 | ❌ | ✅ Vitest |
+| DiscreteLatentELBODemo | PredictionGate 完全受控：预测 → 提交锁定 → 揭晓 → 反馈；hint 不再泄露答案索引；sample 切换重置 q/prediction/submitted/revealed；真实后验按钮仅在揭晓后出现 | ✅ | ✅ Vitest |
+| IoUNMSDemo | Hard NMS class-aware/class-agnostic + scoreThreshold + trace；Soft-NMS 每轮按更新后分数重选最大值，支持 mode 与 scoreThreshold，完整 trace | ❌ | ✅ Vitest |
+
+## 第三批教学不变量（新增 `src/pedagogical-tests/fourth-batch.test.tsx`）
+
+- PPCA `eig2x2` 对 `diag(4,1)` / `diag(1,4)` / `diag(2,2)` / 旋转协方差返回正确特征对；特征向量单位长且正交；不会出现零向量。
+- PPCA 页面不出现 `E[x\|x]`，出现 `E[z\|x]`；M=0 有明确 baseline 说明。
+- U-Net 同分辨率 encoder/decoder 共享 centreY；skip compatibility 基于真实空间尺寸；非对齐输入预设触发红色警告。
+- PredictionGate：未提交时 reveal 禁用；提交后 reveal 可用并触发回调；resetKey 变化清空 prediction。
+- Soft-NMS：按更新后分数动态重选最大值；class-aware 不跨类衰减；class-agnostic 跨类衰减；阈值过滤作用于衰减后分数；trace 可复现最终分数；σ 越小高 IoU 框衰减越强。
 
 ## 旗舰页面评级（修复后）
 
@@ -28,8 +45,7 @@
 
 ## 说明
 
-- **PredictionGate** 目前未在任何页面实现真正的“先预测、锁定、再显示结果”流程，因此全部标记为 ❌。
-  若要评为 ✅，需实现：学生先预测 → 提交预测 → 锁定 → 显示数值结果 → 判断正误并解释。
+- **PredictionGate** 在 `DiscreteLatentELBODemo` 中已实现真正的“先预测 → 提交锁定 → 揭晓 → 反馈”流程，标记为 ✅。其余页面未使用 PredictionGate。
 
 ## L4 晋升条件
 
@@ -66,3 +82,13 @@
 - ✅ MCMC 增加 burn-in、ACF、ESS、mode 诊断与 preset 对比
 - ✅ MAE 拆分 image/mask seed；结构化图像；masked vs all-patch MSE 区分
 - ✅ 卷积 SAME padding 公式与移动窗口动画
+
+### 第三批（数学/教学语义）
+- ✅ PPCA `eig2x2` 稳定特征分解，修复 `diag(1,4)` 零向量问题
+- ✅ PPCA 后验均值公式正确化，删除 `E[x\|x]`，补充 M=0/1/2 语义
+- ✅ U-Net 同分辨率 stage 同 centreY，skip compatibility 比较真实 H×W
+- ✅ U-Net 输入对齐实验可触发红色警告（step=1 + 250/255/257 预设）
+- ✅ PredictionGate 完全受控，流程为预测 → 提交锁定 → 揭晓 → 反馈
+- ✅ 离散 ELBO 答案防泄露：hint 无答案索引，真实后验按钮仅揭晓后可见
+- ✅ Soft-NMS 每轮按更新后分数重选最大值，支持 mode 与 scoreThreshold
+- ✅ 新增/更新 `ppca/unet/discreteElbo/iouNms` math 测试与 `fourth-batch` 教学不变量测试

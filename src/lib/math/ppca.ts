@@ -75,38 +75,45 @@ export function sampleCovariance(centered: number[][]): number[][] {
   return cov.map((row) => row.map((v) => v / centered.length));
 }
 
-/** Eigen-decomposition of a symmetric 2x2 matrix, sorted in descending order. */
+/**
+ * Stable eigen-decomposition of a symmetric 2x2 matrix.
+ *
+ * For a symmetric matrix S = [[a, b], [b, d]], the eigenvectors are obtained
+ * from the principal rotation angle
+ *   θ = 0.5 * atan2(2b, a - d)
+ * and returned as an orthonormal pair [cosθ, sinθ], [-sinθ, cosθ].
+ * The corresponding eigenvalues are computed by the Rayleigh quotient
+ *   λ = uᵀ S u
+ * and sorted in descending order. This avoids the degenerate case where the
+ * conventional vector [λ - d, c] collapses to the zero vector (e.g. diag(1,4)).
+ */
 export function eig2x2(S: number[][]): {
   eigenvalues: [number, number];
   eigenvectors: [number[], number[]];
 } {
   const a = S[0][0];
   const b = S[0][1];
-  const c = S[1][0];
   const d = S[1][1];
-  const trace = a + d;
-  const det = a * d - b * c;
-  const disc = Math.sqrt(Math.max(trace * trace - 4 * det, 0));
-  const l1 = (trace + disc) / 2;
-  const l2 = (trace - disc) / 2;
 
-  let v1: number[];
-  let v2: number[];
-  if (disc < 1e-12) {
-    v1 = [1, 0];
-    v2 = [0, 1];
-  } else {
-    v1 = [l1 - d, c];
-    const n1 = Math.hypot(v1[0], v1[1]) || 1;
-    v1 = [v1[0] / n1, v1[1] / n1];
+  const theta = 0.5 * Math.atan2(2 * b, a - d);
+  const uA = [Math.cos(theta), Math.sin(theta)];
+  const uB = [-Math.sin(theta), Math.cos(theta)];
 
-    v2 = [l2 - d, c];
-    const n2 = Math.hypot(v2[0], v2[1]) || 1;
-    v2 = [v2[0] / n2, v2[1] / n2];
+  // Rayleigh quotients uᵀ S u.
+  const lambdaA =
+    uA[0] * (a * uA[0] + b * uA[1]) + uA[1] * (b * uA[0] + d * uA[1]);
+  const lambdaB =
+    uB[0] * (a * uB[0] + b * uB[1]) + uB[1] * (b * uB[0] + d * uB[1]);
+
+  if (lambdaA >= lambdaB) {
+    return {
+      eigenvalues: [lambdaA, lambdaB],
+      eigenvectors: [uA, uB],
+    };
   }
   return {
-    eigenvalues: [l1, l2],
-    eigenvectors: [v1, v2],
+    eigenvalues: [lambdaB, lambdaA],
+    eigenvectors: [uB, uA],
   };
 }
 
