@@ -5,6 +5,7 @@ import {
   mStep,
   logLikelihood,
   eigen2x2,
+  labelInvariantMeanError,
   type GMMParams,
 } from '../lib/math/em';
 
@@ -187,6 +188,38 @@ describe('em', () => {
     expect(Math.abs(vx)).toBeCloseTo(Math.abs(vy), 5);
     const dot = vx * s2 + vy * s2;
     expect(Math.abs(dot)).toBeCloseTo(1, 5);
+  });
+
+  it('full EM iteration does not decrease log likelihood from a poor initialization', () => {
+    const poorParams: GMMParams = {
+      means: [[1, 1], [2, 2]],
+      covs: [[[1, 0], [0, 1]], [[1, 0], [0, 1]]],
+      pis: [0.5, 0.5],
+    };
+    let params = poorParams;
+    let prevLL = logLikelihood(data, params);
+    for (let i = 0; i < 5; i++) {
+      const result = emIteration(data, params);
+      expect(result.logLikelihood).toBeGreaterThanOrEqual(prevLL - 1e-9);
+      prevLL = result.logLikelihood;
+      params = result.newParams;
+    }
+  });
+
+  it('label-invariant matching recovers a permuted labeling', () => {
+    const trueMeans = [[0, 0], [3, 3]];
+    const permutedMeans = [[3, 3], [0, 0]];
+    const { assignment, total } = labelInvariantMeanError(trueMeans, permutedMeans);
+    expect(total).toBeLessThan(1e-8);
+    expect(assignment).toEqual([1, 0]);
+  });
+
+  it('label-invariant matching chooses the min-cost assignment', () => {
+    const trueMeans = [[0, 0], [10, 0]];
+    const estMeans = [[9.5, 0], [0.2, 0]];
+    const { assignment, total } = labelInvariantMeanError(trueMeans, estMeans);
+    expect(assignment).toEqual([1, 0]);
+    expect(total).toBeCloseTo(0.7, 5);
   });
 });
 

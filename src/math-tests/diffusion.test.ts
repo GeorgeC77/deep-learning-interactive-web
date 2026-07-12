@@ -2,6 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   makeBetaSchedule, alphaBar, boxMuller, generateGaussianNoise,
   forwardClosed, forwardIncremental, reverseChain, sampleStats,
+  fitGaussianMixture2D, gaussianMixtureScore, gaussianMixtureDensity,
+  epsilonFromScore, clampPointCloud, sampleMeanVector, sampleCovarianceMatrix,
+  frobeniusDiff, mmdSquaredGaussian,
 } from '../lib/math/diffusion';
 
 describe('diffusion', () => {
@@ -71,6 +74,85 @@ describe('diffusion', () => {
     expect(Math.abs(cStats.variance - iStats.variance)).toBeLessThan(0.5);
   });
 
+  describe('forward distribution consistency (Monte Carlo)', () => {
+    it('closed-form vs incremental match in mean and covariance', () => {
+      const sampleCount = 200;
+      const evalT = 100;
+      const ab = alphaBar(evalT, betas);
+      const z0 = generateGaussianNoise(sampleCount, 2, 3000);
+      const epsClosed = generateGaussianNoise(sampleCount, 2, 4000);
+      const closed = forwardClosed(z0, epsClosed, ab);
+
+      let incremental: number[][] = z0.map((row) => [...row]);
+      for (let t = 0; t < evalT; t++) {
+        const epsT = generateGaussianNoise(sampleCount, 2, 5000 + t);
+        incremental = forwardIncremental(incremental, epsT, betas[t]);
+      }
+
+      const meanClosed = sampleMeanVector(closed);
+      const meanInc = sampleMeanVector(incremental);
+      const meanDiff = Math.sqrt(meanClosed.map((v, i) => (v - meanInc[i]) ** 2).reduce((a, b) => a + b, 0));
+      expect(Number.isFinite(meanDiff)).toBe(true);
+      expect(meanDiff).toBeLessThan(0.5);
+
+      const covClosed = sampleCovarianceMatrix(closed);
+      const covInc = sampleCovarianceMatrix(incremental);
+      const covDiff = frobeniusDiff(covClosed, covInc);
+      expect(Number.isFinite(covDiff)).toBe(true);
+      expect(covDiff).toBeLessThan(0.5);
+
+      const mmd = Math.sqrt(Math.max(0, mmdSquaredGaussian(closed, incremental)));
+      expect(Number.isFinite(mmd)).toBe(true);
+      expect(mmd).toBeLessThan(0.5);
+    });
+  });
+
+  describe('GMM generation denoiser', () => {
+    const smallT = 50;
+    const smallBetas = makeBetaSchedule(smallT, 1e-4, 0.02);
+    const z0 = generatePointCloud('circle', 80, 111);
+    const gmm = fitGaussianMixture2D(z0, 4);
+
+    it('score and density are finite for all cloud points', () => {
+      for (const pt of z0) {
+        for (let t = 1; t <= smallT; t += 10) {
+          const score = gaussianMixtureScore(pt, t, smallBetas, gmm);
+          const density = gaussianMixtureDensity(pt, t, smallBetas, gmm);
+          expect(Number.isFinite(score[0])).toBe(true);
+          expect(Number.isFinite(score[1])).toBe(true);
+          expect(Number.isFinite(density)).toBe(true);
+          expect(density).toBeGreaterThanOrEqual(0);
+        }
+      }
+    });
+
+    it('reverse chain with GMM score does not produce NaN or expand without bound', () => {
+      const zT = generateGaussianNoise(40, 2, 222);
+      const predictNoise = (z: number[][], t: number) => {
+        const ab = alphaBar(t, smallBetas);
+        return z.map((row) => epsilonFromScore(gaussianMixtureScore(row, t, smallBetas, gmm), ab));
+      };
+      const path = reverseChain(zT, smallT, smallBetas, predictNoise, true);
+      expect(path.length).toBe(smallT + 1);
+
+      const initialNormSq = meanNormSq(path[0]);
+      const finalNormSq = meanNormSq(path[path.length - 1]);
+      // Final mean norm should not be orders of magnitude larger than the initial noise.
+      expect(finalNormSq).toBeLessThan(Math.max(initialNormSq * 10, 100));
+
+      for (const step of path) {
+        const clamped = clampPointCloud(step, 1e6);
+        for (let i = 0; i < step.length; i++) {
+          for (let j = 0; j < step[i].length; j++) {
+            expect(Number.isFinite(step[i][j])).toBe(true);
+            // clampPointCloud with huge limit should be a no-op if values are reasonable
+            expect(step[i][j]).toBe(clamped[i][j]);
+          }
+        }
+      }
+    });
+  });
+
   describe('reverse chain semantics', () => {
     const smallT = 20;
     const smallBetas = makeBetaSchedule(smallT, 1e-4, 0.02);
@@ -114,6 +196,35 @@ describe('diffusion', () => {
     });
   });
 });
+
+function generatePointCloud(type: 'circle' | 'swiss' | 'moons', N: number, seed: number): number[][] {
+  const rng = mulberry32(seed);
+  return Array.from({ length: N }, (_, i) => {
+    let x: number, y: number;
+    const a = (i / N) * Math.PI * 2;
+    switch (type) {
+      case 'circle': x = Math.cos(a) * 1.2; y = Math.sin(a) * 1.2; break;
+      case 'swiss': x = a / Math.PI - 1; y = Math.sin(a * 3) * 0.8 + (rng() - 0.5) * 0.3; break;
+      case 'moons': {
+        const h = i < N / 2 ? 0 : 1;
+        const angle = (i % (N / 2)) / (N / 2) * Math.PI;
+        x = Math.cos(angle) * 1.0 + h * 0.6 - 0.3;
+        y = Math.sin(angle) * 1.0 - h * 0.3;
+        break;
+      }
+      default: x = 0; y = 0;
+    }
+    return [x + (rng() - 0.5) * 0.15, y + (rng() - 0.5) * 0.15] as [number, number];
+  });
+}
+
+function meanNormSq(pts: number[][]): number {
+  let sum = 0;
+  for (const row of pts) {
+    for (const v of row) sum += v * v;
+  }
+  return sum / (pts.length * pts[0].length);
+}
 
 function mulberry32(a: number) {
   return function () {

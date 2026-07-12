@@ -9,6 +9,17 @@ import {
   forwardIncremental,
   reverseChain,
   mulberry32,
+  fitGaussianMixture2D,
+  gaussianMixtureScore,
+  gaussianMixtureDensity,
+  epsilonFromScore,
+  clampPointCloud,
+  sampleMeanVector,
+  sampleCovarianceMatrix,
+  frobeniusDiff,
+  mmdSquaredGaussian,
+  wasserstein2GaussianApprox,
+  histogram,
 } from '@/lib/math/diffusion';
 
 /* -------------------------------------------------------------------------- */
@@ -40,13 +51,17 @@ const PW = W - MG.l - MG.r, PH = H - MG.t - MG.b;
 const toX = (v: number) => MG.l + ((v + 2.5) / 5) * PW;
 const toY = (v: number) => MG.t + PH - ((v + 2.5) / 5) * PH;
 
-type Mode = 'closed-forward' | 'incremental-forward' | 'reverse';
+const VIEW_MIN = -2.5, VIEW_RANGE = 5;
+
+type Mode = 'closed-forward' | 'incremental-forward' | 'reverse' | 'forward-compare';
 type ReverseDenoiser = 'oracle' | 'generation';
 
 export default function DiffusionTimelineLab() {
   const T = 1000;
   const DISPLAY_STEPS = 10;
   const N = 100;
+  const GMM_K = 5;
+  const COMPARE_SAMPLES = 120;
 
   const [mode, setMode] = useState<Mode>('closed-forward');
   const [displayT, setDisplayT] = useState(0);
@@ -55,6 +70,7 @@ export default function DiffusionTimelineLab() {
   const [predictionError, setPredictionError] = useState(false);
   const [stochasticReverse, setStochasticReverse] = useState(true);
   const [reverseDenoiser, setReverseDenoiser] = useState<ReverseDenoiser>('oracle');
+  const [compareSeed, setCompareSeed] = useState(1234);
 
   // Slider step 0..DISPLAY_STEPS-1 maps to progress 0..T.
   // In forward modes this progress is the diffusion time t; in reverse mode it is the reverse progress s.
@@ -66,6 +82,7 @@ export default function DiffusionTimelineLab() {
 
   const z0 = useMemo(() => generatePointCloud(cloudType, N, seed), [cloudType, N, seed]);
   const epsilon = useMemo(() => generateGaussianNoise(N, 2, seed), [N, seed]);
+  const gmm = useMemo(() => fitGaussianMixture2D(z0, GMM_K), [z0]);
 
   // epsilon_hat: optional prediction error added to the true noise (used in forward modes).
   const epsilonHat = useMemo(() => {
@@ -105,27 +122,30 @@ export default function DiffusionTimelineLab() {
       return reverseChain(zT, T, betas, oraclePredictNoise, stochasticReverse);
     }
 
-    // Generation mode: start from fresh noise and use a toy denoiser that does NOT see z0.
+    // Generation mode: start from fresh noise and use the analytic score of the fitted GMM.
     const zTGen = generateGaussianNoise(N, 2, seed + 999999);
-    const toyPredictNoise = (z: number[][]) => {
-      // Toy hand-written denoiser: a small bias toward the origin.
-      // This is intentionally imperfect (it is not an oracle) and only demonstrates
-      // that a non-oracle reverse trajectory can run without accessing z0.
-      return z.map((row) => row.map((v) => -0.1 * v));
+    const gmmPredictNoise = (z: number[][], t: number) => {
+      const ab = alphaBar(t, betas);
+      return z.map((row) => epsilonFromScore(gaussianMixtureScore(row, t, betas, gmm), ab));
     };
-    return reverseChain(zTGen, T, betas, toyPredictNoise, stochasticReverse);
-  }, [reverseDenoiser, z0, epsilon, betas, T, N, seed, stochasticReverse]);
+    const rawPath = reverseChain(zTGen, T, betas, gmmPredictNoise, stochasticReverse);
+    return rawPath.map((step) => clampPointCloud(step, 25));
+  }, [reverseDenoiser, z0, epsilon, betas, T, N, seed, stochasticReverse, gmm]);
 
   // Reverse time-axis mapping: reverseIndex equals reverse progress s and points into reversePath.
   const reverseIndex = reverseS;
-  const displayPts = mode === 'closed-forward'
+  const displayPtsRaw = mode === 'closed-forward'
     ? ztClosed
     : mode === 'incremental-forward'
       ? ztIncremental
-      : (reversePath[reverseIndex] ?? z0);
+      : mode === 'reverse'
+        ? (reversePath[reverseIndex] ?? z0)
+        : [];
+  const displayPts = clampPointCloud(displayPtsRaw, 25);
 
   // x0 prediction (clean-sample estimate) at time realT.
   const x0Pred = useMemo(() => {
+    if (mode === 'forward-compare') return null;
     if (mode !== 'reverse') {
       const ab = alphaBar(realT, betas);
       const sqrtAb = Math.sqrt(Math.max(ab, 1e-10));
@@ -154,12 +174,92 @@ export default function DiffusionTimelineLab() {
 
   const currentAb = alphaBar(realT, betas);
 
+  /* -------------------------------------------------------------------------- */
+  /* Forward distribution consistency experiment                                */
+  /* -------------------------------------------------------------------------- */
+  const compare = useMemo(() => {
+    if (mode !== 'forward-compare') return null;
+    const compareZ0 = generatePointCloud(cloudType, COMPARE_SAMPLES, compareSeed);
+    const epsClosed = generateGaussianNoise(COMPARE_SAMPLES, 2, compareSeed + 1);
+    const ab = alphaBar(realT, betas);
+    const closed = forwardClosed(compareZ0, epsClosed, ab);
+
+    let incremental: number[][] = compareZ0.map(([x, y]) => [x, y]);
+    for (let t = 0; t < realT; t++) {
+      const epsT = generateGaussianNoise(COMPARE_SAMPLES, 2, compareSeed + 10 + t);
+      incremental = forwardIncremental(incremental, epsT, betas[t]);
+    }
+
+    const meanClosed = sampleMeanVector(closed);
+    const meanInc = sampleMeanVector(incremental);
+    const meanDiff = Math.sqrt(meanClosed.map((v, i) => (v - meanInc[i]) ** 2).reduce((a, b) => a + b, 0));
+    const covClosed = sampleCovarianceMatrix(closed);
+    const covInc = sampleCovarianceMatrix(incremental);
+    const covDiff = frobeniusDiff(covClosed, covInc);
+    const mmd = Math.sqrt(Math.max(0, mmdSquaredGaussian(closed, incremental)));
+    const w2 = Math.sqrt(Math.max(0, wasserstein2GaussianApprox(closed, incremental)));
+
+    return {
+      closed,
+      incremental,
+      meanDiff,
+      covDiff,
+      mmd,
+      w2,
+      xHistClosed: histogram(closed.map((p) => p[0]), 16),
+      xHistInc: histogram(incremental.map((p) => p[0]), 16),
+      yHistClosed: histogram(closed.map((p) => p[1]), 16),
+      yHistInc: histogram(incremental.map((p) => p[1]), 16),
+    };
+  }, [mode, cloudType, compareSeed, realT, betas]);
+
+  /* -------------------------------------------------------------------------- */
+  /* Score / density grid for generation reverse mode                           */
+  /* -------------------------------------------------------------------------- */
+  const scoreGrid = useMemo(() => {
+    if (mode !== 'reverse' || reverseDenoiser !== 'generation') return null;
+    const cols = 18;
+    const rows = 16;
+    const cells: { x: number; y: number; density: number; score: number[] }[] = [];
+    let maxDensity = 0;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const x = VIEW_MIN + (c + 0.5) * (VIEW_RANGE / cols);
+        const y = VIEW_MIN + (r + 0.5) * (VIEW_RANGE / rows);
+        const density = gaussianMixtureDensity([x, y], realT, betas, gmm);
+        const score = gaussianMixtureScore([x, y], realT, betas, gmm);
+        if (Number.isFinite(density)) maxDensity = Math.max(maxDensity, density);
+        cells.push({ x, y, density: Number.isFinite(density) ? density : 0, score });
+      }
+    }
+    return { cells, maxDensity };
+  }, [mode, reverseDenoiser, realT, betas, gmm]);
+
+  /* -------------------------------------------------------------------------- */
+  /* Render helpers                                                             */
+  /* -------------------------------------------------------------------------- */
+  const renderArrow = (x0: number, y0: number, x1: number, y1: number, color: string, key: string, width = 1.5) => {
+    const sx = toX(x0) / 2;
+    const sy = toY(y0) / 2;
+    const ex = toX(x1) / 2;
+    const ey = toY(y1) / 2;
+    return (
+      <g key={key}>
+        <line x1={sx} y1={sy} x2={ex} y2={ey} stroke={color} strokeWidth={width} markerEnd={`url(#arrow-${color.replace('#', '')})`} />
+      </g>
+    );
+  };
+
+  const maxAbs = (v: number) => Math.max(Math.abs(v), 1e-6);
+
   const views: { label: string; pts: number[][]; color: string }[] = [
     { label: 'z₀（原始数据）', pts: z0, color: '#3b82f6' },
     {
       label: mode === 'reverse'
         ? `z_t reverse (s=${reverseS}, t=${realT})`
-        : `z_t（t=${realT}）`,
+        : mode === 'forward-compare'
+          ? '对比模式'
+          : `z_t（t=${realT}）`,
       pts: displayPts,
       color: '#f59e0b',
     },
@@ -173,6 +273,8 @@ export default function DiffusionTimelineLab() {
       color: '#10b981',
     });
   }
+
+  const highlightedIndex = 0;
 
   return (
     <InteractiveDemo title="扩散模型时间线实验：forward + reverse">
@@ -189,6 +291,9 @@ export default function DiffusionTimelineLab() {
             </button>
           ))}
           <button onClick={() => setSeed(Math.floor(Math.random() * 10000))} className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">🔄 ε 重采样</button>
+          {mode === 'forward-compare' && (
+            <button onClick={() => setCompareSeed(Math.floor(Math.random() * 10000))} className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">🔄 对比样本重采样</button>
+          )}
           <label className="flex items-center gap-1 text-xs text-gray-600">
             <input type="checkbox" checked={predictionError} onChange={() => setPredictionError(!predictionError)} /> prediction error
           </label>
@@ -196,18 +301,23 @@ export default function DiffusionTimelineLab() {
 
         {/* Mode selector */}
         <div className="flex flex-wrap gap-1 items-center">
-          {(['closed-forward', 'incremental-forward', 'reverse'] as const).map((m) => (
+          {(['closed-forward', 'incremental-forward', 'reverse', 'forward-compare'] as const).map((m) => (
             <button key={m} onClick={() => { setMode(m); setDisplayT(0); }}
               className={`px-3 py-1 text-xs rounded-lg ${mode === m ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
-              {m === 'closed-forward' ? '闭式前向' : m === 'incremental-forward' ? '增量前向' : '反向采样'}
+              {m === 'closed-forward' ? '闭式前向' : m === 'incremental-forward' ? '增量前向' : m === 'reverse' ? '反向采样' : '前向分布一致性'}
             </button>
           ))}
           {mode === 'reverse' && (
             <label className="flex items-center gap-1 text-xs text-gray-600 ml-2">
-              <input type="checkbox" checked={stochasticReverse} onChange={() => setStochasticReverse(!stochasticReverse)} /> 随机（关闭则确定性反向）
+              <input type="checkbox" checked={stochasticReverse} onChange={() => setStochasticReverse(!stochasticReverse)} /> 反向随机项：开/关
             </label>
           )}
         </div>
+        {mode === 'reverse' && !stochasticReverse && (
+          <p className="text-[10px] text-amber-600">
+            仅显示 mean-only reverse trajectory，不等同于 DDIM。
+          </p>
+        )}
 
         {/* Reverse denoiser selector */}
         {mode === 'reverse' && (
@@ -219,14 +329,14 @@ export default function DiffusionTimelineLab() {
                   onClick={() => setReverseDenoiser(d)}
                   className={`px-3 py-1 text-xs rounded-lg ${reverseDenoiser === d ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700'}`}
                 >
-                  {d === 'oracle' ? 'Oracle 反演（已知 z₀）' : '生成式采样（toy denoiser）'}
+                  {d === 'oracle' ? 'Oracle 反演（已知 z₀）' : '生成式采样（GMM 解析 score）'}
                 </button>
               ))}
             </div>
             <p className="text-[10px] text-gray-500 max-w-md">
               {reverseDenoiser === 'oracle'
                 ? '教学用 oracle：可访问真实 z₀，仅用于演示反向公式，不是生成模型。'
-                : 'Toy denoiser：使用手写的小偏向原点偏置，不访问 z₀，结果不完美，仅演示无 oracle 的反向链。'}
+                : 'GMM 解析 score：从点云拟合高斯混合，计算 score_t(z)=∇log p_t(z)，再转 ε̂=-√(1-ᾱ_t)·score。不访问 z₀。'}
             </p>
           </div>
         )}
@@ -247,25 +357,141 @@ export default function DiffusionTimelineLab() {
           </div>
         </div>
 
-        <div className={`grid gap-3 ${x0Pred ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
-          {views.map((view, vi) => (
-            <div key={vi} className="bg-gray-50 rounded-lg border overflow-hidden">
-              <div className="text-center text-[9px] font-medium text-gray-600 pt-1">{view.label}</div>
-              <svg viewBox={`0 0 ${W / 2} ${H / 2}`} className="w-full" style={{ maxHeight: 180 }}>
-                {view.pts.map(([x, y], i) => (
-                  <circle key={i} cx={toX(x) / 2} cy={toY(y) / 2} r={1.5} fill={view.color} opacity={0.6} />
-                ))}
-                <rect x={MG.l / 2} y={MG.t / 2} width={PW / 2} height={PH / 2} fill="none" stroke="#d1d5db" strokeWidth={1} />
-              </svg>
+        {mode === 'forward-compare' && compare && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs space-y-3">
+            <p><strong>🎓 前向分布一致性实验：</strong>same distribution, not the same realization。</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+              <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">mean diff (L2)</div><div>{compare.meanDiff.toFixed(4)}</div></div>
+              <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">cov diff (Frob)</div><div>{compare.covDiff.toFixed(4)}</div></div>
+              <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">MMD</div><div>{compare.mmd.toFixed(4)}</div></div>
+              <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">W₂ (高斯近似)</div><div>{compare.w2.toFixed(4)}</div></div>
             </div>
-          ))}
-        </div>
+            <div className={`grid gap-3 ${compare ? 'md:grid-cols-2' : ''}`}>
+              {[
+                { label: `闭式前向 t=${realT}`, pts: compare.closed, color: '#3b82f6' },
+                { label: `增量前向 t=${realT}`, pts: compare.incremental, color: '#f59e0b' },
+              ].map((view, vi) => (
+                <div key={vi} className="bg-gray-50 rounded-lg border overflow-hidden">
+                  <div className="text-center text-[9px] font-medium text-gray-600 pt-1">{view.label}</div>
+                  <svg viewBox={`0 0 ${W / 2} ${H / 2}`} className="w-full" style={{ maxHeight: 180 }}>
+                    {view.pts.map(([x, y], i) => (
+                      <circle key={i} cx={toX(x) / 2} cy={toY(y) / 2} r={1.5} fill={view.color} opacity={0.6} />
+                    ))}
+                    <rect x={MG.l / 2} y={MG.t / 2} width={PW / 2} height={PH / 2} fill="none" stroke="#d1d5db" strokeWidth={1} />
+                  </svg>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {[
+                { title: 'x 边缘分布', closed: compare.xHistClosed, inc: compare.xHistInc },
+                { title: 'y 边缘分布', closed: compare.yHistClosed, inc: compare.yHistInc },
+              ].map((h, hi) => {
+                const maxCount = Math.max(...h.closed.counts, ...h.inc.counts, 1);
+                const binW = PW / 2 / h.closed.counts.length;
+                return (
+                  <div key={hi} className="bg-white rounded border p-2">
+                    <div className="text-[10px] text-gray-500 mb-1">{h.title}</div>
+                    <svg viewBox={`0 0 ${W / 2} ${H / 4}`} className="w-full" style={{ maxHeight: 120 }}>
+                      {h.closed.counts.map((c, i) => (
+                        <rect key={`c-${i}`} x={i * binW} y={(H / 4) * (1 - c / maxCount)} width={binW * 0.45} height={(H / 4) * (c / maxCount)} fill="#3b82f6" opacity={0.7} />
+                      ))}
+                      {h.inc.counts.map((c, i) => (
+                        <rect key={`i-${i}`} x={i * binW + binW * 0.45} y={(H / 4) * (1 - c / maxCount)} width={binW * 0.45} height={(H / 4) * (c / maxCount)} fill="#f59e0b" opacity={0.7} />
+                      ))}
+                    </svg>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {mode !== 'forward-compare' && (
+          <div className={`grid gap-3 ${x0Pred ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
+            {views.map((view, vi) => (
+              <div key={vi} className="bg-gray-50 rounded-lg border overflow-hidden">
+                <div className="text-center text-[9px] font-medium text-gray-600 pt-1">{view.label}</div>
+                <svg viewBox={`0 0 ${W / 2} ${H / 2}`} className="w-full" style={{ maxHeight: 180 }}>
+                  {view.pts.map(([x, y], i) => (
+                    <circle key={i} cx={toX(x) / 2} cy={toY(y) / 2} r={1.5} fill={view.color} opacity={0.6} />
+                  ))}
+                  <rect x={MG.l / 2} y={MG.t / 2} width={PW / 2} height={PH / 2} fill="none" stroke="#d1d5db" strokeWidth={1} />
+                </svg>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Generation-mode score visualization */}
+        {mode === 'reverse' && reverseDenoiser === 'generation' && scoreGrid && (
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs space-y-2">
+            <p><strong>🎓 解析 score 可视化：</strong>heatmap = p_t(z)；绿箭头 = score_t(z)；紫箭头 = ε̂；红箭头 = 当前 reverse 均值转移。</p>
+            <svg viewBox={`0 0 ${W / 2} ${H / 2}`} className="w-full" style={{ maxHeight: 180 }}>
+              <defs>
+                <marker id="arrow-000000" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 L1.5,3 z" fill="#000000" />
+                </marker>
+                <marker id="arrow-10b981" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 L1.5,3 z" fill="#10b981" />
+                </marker>
+                <marker id="arrow-8b5cf6" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 L1.5,3 z" fill="#8b5cf6" />
+                </marker>
+                <marker id="arrow-ef4444" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 L1.5,3 z" fill="#ef4444" />
+                </marker>
+              </defs>
+              {/* Heatmap cells */}
+              {scoreGrid.cells.map((cell, i) => {
+                const cols = 18;
+                const cellW = (PW / 2) / cols;
+                const rows = 16;
+                const cellH = (PH / 2) / rows;
+                const cx = toX(cell.x) / 2 - cellW / 2;
+                const cy = toY(cell.y) / 2 - cellH / 2;
+                const intensity = scoreGrid.maxDensity > 0 ? cell.density / scoreGrid.maxDensity : 0;
+                const opacity = Math.min(0.7, intensity * 3);
+                return <rect key={`h-${i}`} x={cx} y={cy} width={cellW} height={cellH} fill="#f59e0b" opacity={opacity} />;
+              })}
+              <rect x={MG.l / 2} y={MG.t / 2} width={PW / 2} height={PH / 2} fill="none" stroke="#d1d5db" strokeWidth={1} />
+              {/* Score field (subsample) */}
+              {scoreGrid.cells.filter((_, i) => i % 4 === 0).map((cell, i) => {
+                const scale = 0.15;
+                return renderArrow(cell.x, cell.y, cell.x + cell.score[0] * scale, cell.y + cell.score[1] * scale, '#10b981', `score-${i}`, 1);
+              })}
+              {/* Epsilon-hat arrows on point cloud */}
+              {displayPts.map((pt, i) => {
+                if (i % 4 !== 0) return null;
+                const ab = currentAb;
+                const score = gaussianMixtureScore(pt, realT, betas, gmm);
+                const eps = epsilonFromScore(score, ab);
+                const scale = 0.3 / maxAbs(Math.max(Math.abs(eps[0]), Math.abs(eps[1]), 0.1));
+                return renderArrow(pt[0], pt[1], pt[0] + eps[0] * scale, pt[1] + eps[1] * scale, '#8b5cf6', `eps-${i}`, 1);
+              })}
+              {/* Current reverse transition for highlighted point */}
+              {(() => {
+                const pt = displayPts[highlightedIndex];
+                const next = reversePath[reverseIndex + 1]?.[highlightedIndex];
+                if (!pt || !next) return null;
+                return renderArrow(pt[0], pt[1], next[0], next[1], '#ef4444', 'reverse-trans', 1.5);
+              })()}
+              {/* Highlighted point */}
+              {displayPts[highlightedIndex] && (
+                <circle cx={toX(displayPts[highlightedIndex][0]) / 2} cy={toY(displayPts[highlightedIndex][1]) / 2} r={2.5} fill="#ef4444" />
+              )}
+            </svg>
+          </div>
+        )}
 
         <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs space-y-2">
           <p><strong>🎓 关键公式：</strong></p>
           <p className="font-mono">z_t = √ᾱ_t · z_0 + √(1-ᾱ_t) · ε,  ε ~ N(0,I)</p>
           <p className="font-mono">x̂₀ = (z_t − √(1-ᾱ_t) · ε̂) / √ᾱ_t</p>
           <p className="font-mono">z_{'{t-1}'} = (z_t − β_t/√(1-ᾱ_t)·ε̂) / √(1-β_t) + σ_t·ε'</p>
+          {mode === 'reverse' && reverseDenoiser === 'generation' && (
+            <p className="font-mono">score_t(z)=∇_z log p_t(z)； ε̂ = -√(1-ᾱ_t)·score_t(z)</p>
+          )}
           <p className="text-gray-500 mt-1">
             alphaBar(0)={alphaBar(0, betas).toFixed(1)}, alphaBar(T)={abT.toFixed(6)}。
             反向链 path[0]=z_T、path[T]=z₀；反向模式下滑块从左到右表示反向进度 s=0→T（扩散时间 t=T→0）。

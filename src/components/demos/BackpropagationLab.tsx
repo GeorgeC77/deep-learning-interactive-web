@@ -2,14 +2,17 @@ import { useState, useCallback, useMemo } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import {
   forwardPass,
+  forwardTape,
   backwardPass,
   centralDiff,
   computeLocalGrads,
   stepForwardOnce,
   stepBackwardOnce,
   topoSort,
+  tapeMemoryCost,
   type NodeSpec,
   type StepBwdDetail,
+  type TapeEntry,
 } from '@/lib/math/backprop';
 
 const INITIAL_GRAPH: NodeSpec[] = [
@@ -49,6 +52,7 @@ export default function BackpropagationLab() {
   const [useBranched, setUseBranched] = useState(false);
   const [graph, setGraph] = useState<NodeSpec[]>(INITIAL_GRAPH);
   const [fwdVals, setFwdVals] = useState<Record<string, number> | null>(null);
+  const [tape, setTape] = useState<TapeEntry[]>([]);
   const [bwdResult, setBwdResult] = useState<{
     grads: Record<string, number>;
     localGrads: Record<string, Record<string, number>>;
@@ -74,8 +78,8 @@ export default function BackpropagationLab() {
   const selectedLeafId = selectedLeafIdState ?? leafNodes[0]?.id ?? null;
 
   const runForward = useCallback(() => {
-    const vals = forwardPass(graph);
-    setFwdVals(vals); setPhase('forward');
+    const { values, tape: newTape } = forwardTape(graph);
+    setFwdVals(values); setTape(newTape); setPhase('forward');
     setStepFwdIdx(null); setStepBwdIdx(null); setStepFwdVals({}); setStepBwdGrads({}); setStepBwdDetails([]);
   }, [graph]);
 
@@ -89,6 +93,7 @@ export default function BackpropagationLab() {
     if (!result) return;
     setStepFwdVals(result.stepFwdVals);
     setStepFwdIdx(result.stepFwdIdx);
+    setTape((prev) => [...prev, result.tapeEntry]);
   }, [stepFwdIdx, graph, order, stepFwdVals]);
 
   const canStepBackward = fwdVals !== null || stepFwdIdx === order.length - 1;
@@ -102,7 +107,7 @@ export default function BackpropagationLab() {
   }, [stepBwdIdx, graph, order, revOrder, stepFwdVals, fwdVals, stepBwdGrads]);
 
   const resetAll = useCallback(() => {
-    setFwdVals(null); setBwdResult(null); setPhase('idle'); setFdGrad(null);
+    setFwdVals(null); setBwdResult(null); setPhase('idle'); setFdGrad(null); setTape([]);
     setStepFwdIdx(null); setStepBwdIdx(null); setStepFwdVals({}); setStepBwdGrads({}); setStepBwdDetails([]);
   }, []);
 
@@ -138,6 +143,10 @@ export default function BackpropagationLab() {
   // Choose the active forward value source: stepped values if the user has
   // stepped all the way through, otherwise the full forward pass result.
   const activeFwdVals = stepFwdIdx === order.length - 1 ? stepFwdVals : (fwdVals ?? stepFwdVals);
+
+  // A numeric-vs-analytic comparison is only meaningful once a full backward
+  // pass (or a complete step-by-step backward walk) has finished.
+  const backwardComplete = bwdResult !== null || stepBwdIdx === order.length - 1;
 
   // Edge width: from full backward pass (contribution magnitude) or from step state.
   const edgeMagnitude = (inId: string, outId: string) => {
@@ -241,6 +250,35 @@ export default function BackpropagationLab() {
           </table></div>
         )}
 
+        {tape.length > 0 && (
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-slate-800">反向模式 Tape（前向中间值）</p>
+              <span className="text-xs text-slate-500">
+                存储标量: <strong>{tapeMemoryCost(tape).count}</strong> · 约 <strong>{tapeMemoryCost(tape).bytesEstimate}</strong> bytes
+              </span>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {tape.map((e, i) => {
+                const readingNow = stepBwdIdx !== null && revOrder[stepBwdIdx] === e.nodeId;
+                return (
+                  <div
+                    key={i}
+                    className={`text-[10px] font-mono px-2 py-1 rounded border ${
+                      readingNow
+                        ? 'bg-amber-100 border-amber-300 text-amber-900'
+                        : 'bg-white border-slate-200 text-slate-700'
+                    }`}
+                    title={readingNow ? '当前反向步正在读取该前向值' : undefined}
+                  >
+                    {e.nodeId}={e.output.toFixed(3)}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {stepBwdDetails.length > 0 && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
             <p className="text-sm font-medium text-red-800">当前反向步详情</p>
@@ -262,22 +300,43 @@ export default function BackpropagationLab() {
           >
             {leafNodes.map((n) => <option key={n.id} value={n.id}>{n.id}</option>)}
           </select>
-          <button onClick={runNumericalCheck} className="px-3 py-2 bg-indigo-100 text-indigo-700 rounded-lg text-sm hover:bg-indigo-200">🔢 数值梯度</button>
+          <button
+            onClick={runNumericalCheck}
+            disabled={!backwardComplete}
+            title={backwardComplete ? '与完整反向传播后的解析梯度对比' : '请先完成完整反向传播'}
+            className="px-3 py-2 bg-indigo-100 text-indigo-700 rounded-lg text-sm hover:bg-indigo-200 disabled:bg-gray-200 disabled:text-gray-500"
+          >
+            🔢 数值梯度
+          </button>
         </div>
 
         {fdGrad !== null && (
           <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
             <p className="text-sm font-medium text-indigo-800">数值梯度校验（中心差分）</p>
             <div className="flex gap-4 text-xs mt-1">
-              <span>变量: <strong className="font-mono">{fdGrad.id}</strong></span>
-              <span>分析: <strong className="font-mono">{(stepBwdIdx !== null ? stepBwdGrads[fdGrad.id] : (bwdResult?.grads[fdGrad.id] ?? 0)).toFixed(6)}</strong></span>
-              <span>差分: <strong className="font-mono">{fdGrad.value.toFixed(6)}</strong></span>
-              <span>误差: <strong className="font-mono">{
-                (() => {
-                  const a = stepBwdIdx !== null ? stepBwdGrads[fdGrad.id] : (bwdResult?.grads[fdGrad.id] ?? 0);
-                  return (Math.abs(fdGrad.value - a) / Math.max(1e-12, Math.abs(fdGrad.value))).toExponential(2);
-                })()
-              }</strong></span>
+              {(() => {
+                const analyticGrad = stepBwdIdx !== null ? stepBwdGrads[fdGrad.id] : bwdResult?.grads[fdGrad.id];
+                return (
+                  <>
+                    <span>变量: <strong className="font-mono">{fdGrad.id}</strong></span>
+                    <span>
+                      分析:{' '}
+                      <strong className="font-mono">
+                        {analyticGrad !== undefined ? analyticGrad.toFixed(6) : '尚未计算'}
+                      </strong>
+                    </span>
+                    <span>差分: <strong className="font-mono">{fdGrad.value.toFixed(6)}</strong></span>
+                    <span>
+                      误差:{' '}
+                      <strong className="font-mono">
+                        {analyticGrad !== undefined
+                          ? (Math.abs(fdGrad.value - analyticGrad) / Math.max(1e-12, Math.abs(fdGrad.value))).toExponential(2)
+                          : '尚未计算'}
+                      </strong>
+                    </span>
+                  </>
+                );
+              })()}
             </div>
           </div>
         )}

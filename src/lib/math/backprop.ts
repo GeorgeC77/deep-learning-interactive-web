@@ -21,6 +21,14 @@ export type StepBwdDetail = {
   newAdjoint: number;
 };
 
+export type TapeEntry = {
+  nodeId: string;
+  op: OpType | 'input' | 'weight';
+  inputs: string[];
+  output: number;
+  inputValues: number[];
+};
+
 export function evalNode(op: OpType, inVals: number[]): number {
   switch (op) {
     case 'add': return inVals.reduce((s, v) => s + v, 0);
@@ -136,6 +144,38 @@ export function computeLocalGrads(
 }
 
 /**
+ * Run full forward pass and produce a tape of intermediate primal values.
+ */
+export function forwardTape(nodes: NodeSpec[]): { values: Record<string, number>; tape: TapeEntry[] } {
+  const values: Record<string, number> = {};
+  const tape: TapeEntry[] = [];
+  const order = topoSort(nodes);
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  for (const id of order) {
+    const n = nodeMap.get(id)!;
+    if (n.op === 'input' || n.op === 'weight') {
+      values[id] = n.value;
+      tape.push({ nodeId: id, op: n.op, inputs: [], output: n.value, inputValues: [] });
+    } else {
+      const inVals = n.inputs.map((inId) => values[inId]);
+      const out = evalNode(n.op as OpType, inVals);
+      values[id] = out;
+      tape.push({ nodeId: id, op: n.op as OpType, inputs: n.inputs, output: out, inputValues: inVals });
+    }
+  }
+  return { values, tape };
+}
+
+/**
+ * Estimate reverse-mode memory cost from a forward tape.
+ * Counts every stored scalar (each output and each saved input value).
+ */
+export function tapeMemoryCost(tape: TapeEntry[]): { count: number; bytesEstimate: number } {
+  const count = tape.reduce((sum, e) => sum + 1 + e.inputValues.length, 0);
+  return { count, bytesEstimate: count * 8 };
+}
+
+/**
  * Advance the step-by-step forward pass by one node.
  */
 export function stepForwardOnce(
@@ -143,14 +183,22 @@ export function stepForwardOnce(
   order: string[],
   stepFwdIdx: number | null,
   stepFwdVals: Record<string, number>,
-): { stepFwdIdx: number; stepFwdVals: Record<string, number> } | null {
+): { stepFwdIdx: number; stepFwdVals: Record<string, number>; tapeEntry: TapeEntry } | null {
   const next = stepFwdIdx === null ? 0 : stepFwdIdx + 1;
   if (next >= order.length) return null;
   const node = nodes.find((n) => n.id === order[next])!;
   const vals: Record<string, number> = {};
-  if (node.op === 'input' || node.op === 'weight') vals[node.id] = node.value;
-  else vals[node.id] = evalNode(node.op as OpType, node.inputs.map((inId) => stepFwdVals[inId]));
-  return { stepFwdIdx: next, stepFwdVals: { ...stepFwdVals, ...vals } };
+  let tapeEntry: TapeEntry;
+  if (node.op === 'input' || node.op === 'weight') {
+    vals[node.id] = node.value;
+    tapeEntry = { nodeId: node.id, op: node.op, inputs: [], output: node.value, inputValues: [] };
+  } else {
+    const inVals = node.inputs.map((inId) => stepFwdVals[inId]);
+    const out = evalNode(node.op as OpType, inVals);
+    vals[node.id] = out;
+    tapeEntry = { nodeId: node.id, op: node.op as OpType, inputs: node.inputs, output: out, inputValues: inVals };
+  }
+  return { stepFwdIdx: next, stepFwdVals: { ...stepFwdVals, ...vals }, tapeEntry };
 }
 
 /**

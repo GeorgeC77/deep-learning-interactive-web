@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { contours as d3Contours } from 'd3-contour';
 import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import { loss, analyticalGrad, stationaryPoint, hessianEigen, type Optimizer, type Landscape, step, type OptState } from '@/lib/math/optimizers';
 
@@ -8,10 +9,20 @@ const GRID = 80; // contour resolution
 const W = 520, H = 420, ML = { t: 15, r: 15, b: 40, l: 55 };
 const PW = W - ML.l - ML.r, PH = H - ML.t - ML.b;
 
+type StartPreset = { key: string; label: string; x: number; y: number };
+
+const START_PRESETS: StartPreset[] = [
+  { key: 'ordinary', label: '常规起点 (1.5, 1.5)', x: 1.5, y: 1.5 },
+  { key: 'nearSaddle', label: '鞍点附近 (0.02, 0.02)', x: 0.02, y: 0.02 },
+  { key: 'exactSaddle', label: '精确鞍点 (0, 0)', x: 0, y: 0 },
+];
+
 const PRESETS = [
   { key: 'good', label: '✅ 恰当步长', lr: 0.05, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
   { key: 'tiny', label: '🐌 步长过小', lr: 0.003, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
-  { key: 'diverge', label: '💥 发散', lr: 0.5, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
+  { key: 'oneStep', label: '🎯 一步到最优', lr: 0.5, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
+  { key: 'critical', label: '〰️ 临界振荡', lr: 1.0, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
+  { key: 'diverge', label: '💥 GD 发散', lr: 1.2, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
   { key: 'illcond', label: '🦴 病态曲率', lr: 0.02, b1: 0.9, b2: 0.999, landscape: 'illcond' as Landscape },
   { key: 'saddle', label: '⛰️ 鞍点', lr: 0.03, b1: 0.9, b2: 0.999, landscape: 'saddle' as Landscape },
   { key: 'rosenbrock', label: '🍌 Rosenbrock', lr: 0.003, b1: 0.9, b2: 0.999, landscape: 'rosenbrock' as Landscape },
@@ -32,7 +43,14 @@ export default function OptimizationLandscapeLab() {
   const [lr, setLr] = useState(0.05);
   const [beta1, setBeta1] = useState(0.9);
   const [beta2, setBeta2] = useState(0.999);
-  const startX = 1.5, startY = 1.5, steps = 30;
+  const [startPreset, setStartPreset] = useState<StartPreset>(START_PRESETS[0]);
+  const [noiseEnabled, setNoiseEnabled] = useState(false);
+  const [noiseScale, setNoiseScale] = useState(0.05);
+  const steps = 30;
+
+  const startX = startPreset.x;
+  const startY = startPreset.y;
+  const effectiveNoise = noiseEnabled ? noiseScale : 0;
 
   const results = useMemo(() => {
     const r: Record<string, { path: [number, number][]; lossPath: number[] }> = {};
@@ -41,7 +59,7 @@ export default function OptimizationLandscapeLab() {
       const path: [number, number][] = [[st.x, st.y]];
       const lossPath: number[] = [loss(st.x, st.y, landscape)];
       for (let i = 0; i < steps; i++) {
-        const { newState } = step(st, landscape, opt, lr, beta1, beta2);
+        const { newState } = step(st, landscape, opt, lr, beta1, beta2, effectiveNoise);
         st = newState;
         path.push([st.x, st.y]);
         lossPath.push(loss(st.x, st.y, landscape));
@@ -49,7 +67,7 @@ export default function OptimizationLandscapeLab() {
       r[opt] = { path, lossPath };
     }
     return r;
-  }, [landscape, lr, beta1, beta2]);
+  }, [landscape, lr, beta1, beta2, startX, startY, effectiveNoise]);
 
   // Real contour grid computed with d3-contour (marching squares).
   const contourData = useMemo(() => {
@@ -80,6 +98,16 @@ export default function OptimizationLandscapeLab() {
   const sp = stationaryPoint(landscape);
   const hessian = hessianEigen(landscape, sp[0], sp[1]);
 
+  const saddleNote = landscape === 'saddle' ? (
+    startPreset.key === 'exactSaddle' && !noiseEnabled
+      ? '精确鞍点 (0,0) + 确定性 GD：梯度为 0，优化器静止不动。'
+      : startPreset.key === 'exactSaddle' && noiseEnabled
+        ? '精确鞍点 + 噪声：随机梯度提供逃离方向，优化器沿负曲率方向（y 轴）离开鞍点。'
+        : startPreset.key === 'nearSaddle' && !noiseEnabled
+          ? '鞍点附近 + 确定性 GD：微小扰动打破平衡，优化器沿负曲率方向（y 轴）逃离。'
+          : '鞍点附近 + 噪声：梯度噪声与局部负曲率共同作用，逃离鞍点。'
+  ) : null;
+
   return (
     <InteractiveDemo title="优化器对比实验室">
       <div className="space-y-5">
@@ -101,7 +129,7 @@ export default function OptimizationLandscapeLab() {
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {[
-            { label: '学习率', val: lr, set: setLr, min: 0.001, max: 1, step: 0.001 },
+            { label: '学习率', val: lr, set: setLr, min: 0.001, max: 1.5, step: 0.001 },
             { label: 'β₁ (Momentum/Adam)', val: beta1, set: setBeta1, min: 0, max: 0.999, step: 0.01 },
             { label: 'β₂ (RMSProp/Adam)', val: beta2, set: setBeta2, min: 0, max: 0.999, step: 0.01 },
           ].map((c) => (
@@ -111,6 +139,36 @@ export default function OptimizationLandscapeLab() {
             </div>
           ))}
         </div>
+
+        <div className="border rounded-lg p-3 bg-gray-50 space-y-3">
+          <div className="text-xs font-medium text-gray-700">起点选择</div>
+          <div className="flex flex-wrap gap-1">
+            {START_PRESETS.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => setStartPreset(p)}
+                className={`px-2 py-1 text-[10px] rounded border ${startPreset.key === p.key ? 'bg-gray-800 text-white border-gray-800' : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'}`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Switch id="noise-toggle" checked={noiseEnabled} onCheckedChange={setNoiseEnabled} />
+              <label htmlFor="noise-toggle" className="text-[10px] text-gray-700 cursor-pointer">mini-batch 梯度噪声</label>
+            </div>
+            <span className="text-[10px] font-mono text-gray-600">σ = {noiseScale.toFixed(3)}</span>
+          </div>
+          <Slider value={[noiseScale]} min={0.001} max={0.5} step={0.001} onValueChange={(v) => setNoiseScale(v[0])} disabled={!noiseEnabled} />
+        </div>
+
+        {saddleNote && (
+          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg p-2">
+            {saddleNote}
+          </div>
+        )}
 
         <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
           <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ maxHeight: 440 }}>
@@ -180,7 +238,7 @@ export default function OptimizationLandscapeLab() {
         </div>
 
         <div className="text-[10px] text-gray-400">
-          {"Momentum: v_t = β·v_{t-1} + g_t（经典定义，非EMA）。Adam 中 β₁ 控制一阶矩估计衰减。相同 learning rate 在不同优化器中不代表相同有效步长。"}
+          {"Momentum: v_t = β·v_{t-1} + g_t（经典定义，非EMA）。Adam 中 β₁ 控制一阶矩估计衰减。相同 learning rate 在不同优化器中不代表相同有效步长。预设“GD 发散”仅指导 vanilla GD 在该学习率下发散；自适应与带动量的优化器行为不同。"}
         </div>
       </div>
     </InteractiveDemo>

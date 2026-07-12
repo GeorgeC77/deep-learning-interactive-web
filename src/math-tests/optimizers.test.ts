@@ -42,6 +42,27 @@ describe('optimizers', () => {
     expect(loss(newState.x, newState.y, 'quadratic')).toBeLessThan(loss(1, 1, 'quadratic'));
   });
 
+  it('quadratic GD with lr=0.5 reaches zero loss in one step from (1.5,1.5)', () => {
+    const st: OptState = { x: 1.5, y: 1.5, vx: 0, vy: 0, sx: 0, sy: 0, t: 0 };
+    const { newState } = step(st, 'quadratic', 'GD', 0.5, 0.9, 0.999);
+    expect(loss(newState.x, newState.y, 'quadratic')).toBeCloseTo(0, 8);
+  });
+
+  it('quadratic GD with lr=1.0 preserves magnitude (critical oscillation)', () => {
+    const st: OptState = { x: 1.5, y: 1.5, vx: 0, vy: 0, sx: 0, sy: 0, t: 0 };
+    const { newState } = step(st, 'quadratic', 'GD', 1.0, 0.9, 0.999);
+    expect(Math.hypot(newState.x, newState.y)).toBeCloseTo(Math.hypot(1.5, 1.5), 8);
+  });
+
+  it('quadratic GD with lr=1.1 diverges after 10 steps', () => {
+    let st: OptState = { x: 1.5, y: 1.5, vx: 0, vy: 0, sx: 0, sy: 0, t: 0 };
+    const initialLoss = loss(st.x, st.y, 'quadratic');
+    for (let i = 0; i < 10; i++) {
+      st = step(st, 'quadratic', 'GD', 1.1, 0.9, 0.999).newState;
+    }
+    expect(loss(st.x, st.y, 'quadratic')).toBeGreaterThan(initialLoss);
+  });
+
   it('Momentum uses classical v=βv+g (not EMA averaging)', () => {
     // Classical momentum: v_t = β v_{t-1} + g_t
     // Our implementation: stepMomentum = beta * vPrev + grad

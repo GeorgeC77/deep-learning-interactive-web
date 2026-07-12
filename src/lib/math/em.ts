@@ -139,6 +139,75 @@ export function emIteration(data: number[][], params: GMMParams, epsilon: number
   return { responsibilities, newMeans: newParams.means, newCovs: newParams.covs, newPis: newParams.pis, newParams, logLikelihood: ll };
 }
 
+/** Hungarian algorithm for a square cost matrix.
+ *  Returns an array `assignment` where `assignment[i] = j` means row i is matched to column j.
+ */
+export function solveAssignment(cost: number[][]): number[] {
+  const n = cost.length;
+  if (n === 0) return [];
+  // The matching code below assumes a square matrix; callers build KxK costs.
+  const u = Array(n + 1).fill(0);
+  const v = Array(n + 1).fill(0);
+  const p = Array(n + 1).fill(0);
+  const way = Array(n + 1).fill(0);
+
+  for (let i = 1; i <= n; i++) {
+    p[0] = i;
+    let j0 = 0;
+    const minv = Array(n + 1).fill(Infinity);
+    const used = Array(n + 1).fill(false);
+    do {
+      used[j0] = true;
+      const i0 = p[j0];
+      let delta = Infinity;
+      let j1 = 0;
+      for (let j = 1; j <= n; j++) {
+        if (used[j]) continue;
+        const cur = cost[i0 - 1][j - 1] - u[i0] - v[j];
+        if (cur < minv[j]) {
+          minv[j] = cur;
+          way[j] = j0;
+        }
+        if (minv[j] < delta) {
+          delta = minv[j];
+          j1 = j;
+        }
+      }
+      for (let j = 0; j <= n; j++) {
+        if (used[j]) {
+          u[p[j]] += delta;
+          v[j] -= delta;
+        } else {
+          minv[j] -= delta;
+        }
+      }
+      j0 = j1;
+    } while (p[j0] !== 0);
+
+    // Augmenting: update the matching along the alternating path.
+    do {
+      const j1 = way[j0];
+      p[j0] = p[j1];
+      j0 = j1;
+    } while (j0);
+  }
+
+  const assignment = Array(n).fill(-1);
+  for (let j = 1; j <= n; j++) {
+    if (p[j] !== 0) assignment[p[j] - 1] = j - 1;
+  }
+  return assignment;
+}
+
+/** Label-invariant mean error using a min-cost (Hungarian) assignment over mean distances. */
+export function labelInvariantMeanError(trueMeans: number[][], estMeans: number[][]) {
+  const cost = trueMeans.map((tm) => estMeans.map((em) => Math.hypot(tm[0] - em[0], tm[1] - em[1])));
+  const assignment = solveAssignment(cost);
+  const perComponent = assignment.map((estIdx, trueIdx) => cost[trueIdx][estIdx]);
+  const total = perComponent.reduce((a, b) => a + b, 0);
+  return { assignment, perComponent, total };
+}
+
 /** Eigen decomposition for 2x2 covariance — returns {vals, vecs} for ellipse.
  *  vals[0] = sqrt(λ_min), vals[1] = sqrt(λ_max).
  *  vecs[0] is the eigenvector for λ_min, vecs[1] for λ_max.

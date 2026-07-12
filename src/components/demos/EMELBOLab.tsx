@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import { eStep, mStep, logLikelihood, elbo, klResponsibilities, eigen2x2, type GMMParams } from '@/lib/math/em';
+import { eStep, mStep, logLikelihood, elbo, klResponsibilities, eigen2x2, emIteration, labelInvariantMeanError, type GMMParams } from '@/lib/math/em';
 
 /* -------------------------------------------------------------------------- */
 /* 固定真值参数                                                               */
@@ -12,6 +12,7 @@ const TRUE_COVS = [
   [[1.0, 0], [0, 1.0]],
 ];
 const TRUE_PIS = [0.4, 0.35, 0.25];
+const K = TRUE_PIS.length;
 
 /* -------------------------------------------------------------------------- */
 /* 从真值生成数据                                                             */
@@ -42,6 +43,24 @@ function badInit(): GMMParams {
     covs: [[[0.5, 0], [0, 0.5]], [[0.5, 0], [0, 0.5]], [[0.5, 0], [0, 0.5]]],
     pis: [1 / 3, 1 / 3, 1 / 3],
   };
+}
+
+function randomInit(seed: number): GMMParams {
+  const rng = mulberry32(seed);
+  const means: number[][] = [];
+  const covs: number[][][] = [];
+  for (let k = 0; k < K; k++) {
+    means.push([rng() * 8 - 4, rng() * 8 - 4]);
+    const sx = 0.5 + rng();
+    const sy = 0.5 + rng();
+    const rho = (rng() - 0.5) * 0.6;
+    const sxy = rho * Math.sqrt(sx * sy);
+    covs.push([
+      [sx, sxy],
+      [sxy, sy],
+    ]);
+  }
+  return { means, covs, pis: Array(K).fill(1 / K) };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -102,7 +121,10 @@ export default function EMELBOLab() {
   const [estPis, setEstPis] = useState<number[]>(() => badInit().pis);
   const [responsibilities, setResponsibilities] = useState<number[][] | null>(null);
   const [iteration, setIteration] = useState(0);
-  const [logLikHistory, setLogLikHistory] = useState<number[]>([]);
+  const [logLikHistory, setLogLikHistory] = useState<number[]>(() => [logLikelihood(data, badInit())]);
+
+  const [showTruth, setShowTruth] = useState(false);
+  const [multiStartResults, setMultiStartResults] = useState<{ seed: number; finalLL: number; iters: number }[] | null>(null);
 
   // ELBO interactive state
   const [selectedPt, setSelectedPt] = useState<number | null>(null);
@@ -111,7 +133,20 @@ export default function EMELBOLab() {
 
   const currentParams: GMMParams = useMemo(() => ({ means: estMeans, covs: estCovs, pis: estPis }), [estMeans, estCovs, estPis]);
 
+  const meanError = useMemo(() => labelInvariantMeanError(TRUE_MEANS, estMeans).total, [estMeans]);
+
   const [phase, setPhase] = useState<'need-e' | 'need-m'>('need-e');
+
+  const pushLogLikelihood = (params: GMMParams) => {
+    const ll = logLikelihood(data, params);
+    setLogLikHistory((prev) => {
+      if (prev.length > 0) {
+        // EM guarantee: a full iteration never decreases log-likelihood (floating-point tolerance).
+        console.assert(ll + 1e-9 >= prev[prev.length - 1], 'EM log-likelihood decreased');
+      }
+      return [...prev, ll];
+    });
+  };
 
   const doEStep = () => {
     if (phase !== 'need-e') return;
@@ -124,8 +159,8 @@ export default function EMELBOLab() {
     if (phase !== 'need-m' || !responsibilities) return;
     const np = mStep(data, responsibilities);
     setEstMeans(np.means); setEstCovs(np.covs); setEstPis(np.pis);
-    setIteration(iteration + 1);
-    setLogLikHistory([...logLikHistory, logLikelihood(data, np)]);
+    setIteration((i) => i + 1);
+    pushLogLikelihood(np);
     setResponsibilities(null); // old responsibilities belong to theta_old
     setPhase('need-e');
   };
@@ -136,8 +171,8 @@ export default function EMELBOLab() {
     const np = mStep(data, resp);
     setEstMeans(np.means); setEstCovs(np.covs); setEstPis(np.pis);
     setResponsibilities(null);
-    setIteration(iteration + 1);
-    setLogLikHistory([...logLikHistory, logLikelihood(data, np)]);
+    setIteration((i) => i + 1);
+    pushLogLikelihood(np);
     setPhase('need-e');
   };
 
@@ -148,8 +183,22 @@ export default function EMELBOLab() {
     setEstPis(bad.pis);
     setResponsibilities(null);
     setIteration(0);
-    setLogLikHistory([]);
+    setLogLikHistory([logLikelihood(data, bad)]);
     setPhase('need-e');
+  };
+
+  const runMultiStart = () => {
+    const seeds = [101, 202, 303, 404, 505];
+    const iters = 20;
+    const results = seeds.map((seed) => {
+      let params: GMMParams = randomInit(seed);
+      for (let i = 0; i < iters; i++) {
+        const r = emIteration(data, params);
+        params = r.newParams;
+      }
+      return { seed, finalLL: logLikelihood(data, params), iters };
+    });
+    setMultiStartResults(results);
   };
 
   const llMin = logLikHistory.length ? Math.min(...logLikHistory) : 0;
@@ -181,12 +230,21 @@ export default function EMELBOLab() {
           椭圆表示协方差矩阵的等高线。
         </p>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
           <button onClick={doEStep} className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">▶ E-step</button>
           <button onClick={doMStep} className="px-3 py-1.5 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium">▶ M-step</button>
           <button onClick={doFullEM} className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">▶ E+M（一次迭代）</button>
           <button onClick={resetBad} className="px-3 py-1.5 text-sm bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200">♻ 坏初始化</button>
           <span className="text-xs text-gray-500 self-center ml-2">迭代 #{iteration}</span>
+          <label className="inline-flex items-center gap-1.5 text-xs text-gray-600 ml-auto cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showTruth}
+              onChange={(e) => setShowTruth(e.target.checked)}
+              className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            />
+            显示真值
+          </label>
         </div>
 
         {/* SVG */}
@@ -216,13 +274,13 @@ export default function EMELBOLab() {
               </g>
             ))}
             {/* True means */}
-            {TRUE_MEANS.map(([mx, my], i) => (
+            {showTruth && TRUE_MEANS.map(([mx, my], i) => (
               <text key={`tm-${i}`} x={toX(mx)} y={toY(my) - 8} textAnchor="middle" className="text-[8px]" fill="#6b7280">★</text>
             ))}
             <rect x={MG.l} y={MG.t} width={PW} height={PH} fill="none" stroke="#d1d5db" strokeWidth={1} />
           </svg>
           <div className="flex justify-center gap-2 pb-1 text-[10px] text-gray-500">
-            <span>★ = 真值中心</span>
+            {showTruth && <span>★ = 真值中心</span>}
             <span>椭圆 = 估计协方差</span>
           </div>
         </div>
@@ -237,8 +295,42 @@ export default function EMELBOLab() {
                 fill="none" stroke="#8b5cf6" strokeWidth={2} />
             </svg>
             <div className="text-[10px] text-gray-500 text-right font-mono">当前: {logLikHistory[logLikHistory.length - 1]?.toFixed(1)}</div>
+            <div className="text-[10px] text-gray-500 mt-1">标签无关平均中心误差: <span className="font-mono">{meanError.toFixed(3)}</span></div>
           </div>
         )}
+
+        {/* Multi-start comparison */}
+        <div className="bg-white rounded-lg border p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-medium text-gray-600">多起点对比（各运行 20 次完整迭代）</div>
+            <button
+              onClick={runMultiStart}
+              className="px-2 py-1 text-[10px] bg-slate-700 text-white rounded hover:bg-slate-800"
+            >
+              运行多起点
+            </button>
+          </div>
+          {multiStartResults ? (
+            <table className="w-full text-[10px]">
+              <thead>
+                <tr className="text-left text-gray-500 border-b">
+                  <th className="pb-1">种子</th>
+                  <th className="pb-1">最终对数似然</th>
+                </tr>
+              </thead>
+              <tbody>
+                {multiStartResults.map(({ seed, finalLL }) => (
+                  <tr key={seed} className="border-b last:border-0">
+                    <td className="py-1 font-mono">{seed}</td>
+                    <td className="py-1 font-mono">{finalLL.toFixed(1)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-[10px] text-gray-400">点击运行查看不同初始化种子的最终对数似然</p>
+          )}
+        </div>
 
         {/* ELBO Interactive Panel */}
         <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3 text-xs">
@@ -292,7 +384,8 @@ export default function EMELBOLab() {
           <p className="mt-1">
             在 E 步中 q(z|x,θ) = p(z|x,θ)，KL(q||p) = 0，ELBO 恰好接触 log p(x|θ)。
             M 步优化完整协方差 Σ_k = (1/Nk) Σ γ_nk (x_n−μ_k)(x_n−μ_k)ᵀ。
-            点击"坏初始化"观察 EM 从远离真值的位置如何通过迭代逐步逼近。
+            EM 保证完整迭代不降低观测数据对数似然，但可能收敛到局部最优，且存在 label switching。
+            点击“坏初始化”可从远离真值的初始参数重新开始；先预测或运行若干次迭代，再切换“显示真值”对照真值。
           </p>
         </div>
       </div>

@@ -3,6 +3,15 @@ import InteractiveDemo from '@/components/InteractiveDemo';
 import { multiHeadAttention, divisors, sinusoidalPE } from '@/lib/math/attention';
 
 type Token = { text: string; pos: number };
+type PermutationType = 'reverse' | 'cyclic' | 'swap' | 'random';
+
+const PERMUTATION_LABELS: Record<PermutationType, string> = {
+  reverse: '反转',
+  cyclic: '循环移位',
+  swap: '交换两 token',
+  random: '随机',
+};
+
 function tokenize(text: string): Token[] {
   const cleaned = text.trim();
   if (!cleaned) return [];
@@ -24,18 +33,55 @@ function buildX(tokens: Token[], dModel: number, usePE: boolean): number[][] {
   });
 }
 
+function getPermutation(type: PermutationType, tokens: Token[]): number[] {
+  const N = tokens.length;
+  if (N === 0) return [];
+  switch (type) {
+    case 'reverse':
+      return Array.from({ length: N }, (_, i) => N - 1 - i);
+    case 'cyclic':
+      return Array.from({ length: N }, (_, i) => (i + 1) % N);
+    case 'swap': {
+      if (N < 2) return Array.from({ length: N }, (_, i) => i);
+      const perm = Array.from({ length: N }, (_, i) => i);
+      [perm[0], perm[1]] = [perm[1], perm[0]];
+      return perm;
+    }
+    case 'random': {
+      const seed = tokens.reduce((h, t) => {
+        let x = h;
+        for (let c = 0; c < t.text.length; c++) x = ((x << 5) - x + t.text.charCodeAt(c)) | 0;
+        return x;
+      }, 0);
+      const perm = Array.from({ length: N }, (_, i) => i);
+      const rng = mulberry32(Math.abs(seed) + 1);
+      for (let i = N - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [perm[i], perm[j]] = [perm[j], perm[i]];
+      }
+      return perm;
+    }
+  }
+}
+
 function computeEquivarianceMetric(
   tokens: Token[],
   dModel: number,
   Ws: { allWQ: number[][][]; allWK: number[][][]; allWV: number[][][]; WO: number[][] },
   usePE: boolean,
   causalMask: boolean,
+  permType: PermutationType,
 ): number | null {
   const N = tokens.length;
   if (N === 0) return null;
 
   const X = buildX(tokens, dModel, usePE);
-  const permutedTokens = [...tokens].reverse().map((t, i) => ({ ...t, pos: i }));
+  const perm = getPermutation(permType, tokens);
+  // Build permuted tokens at their new positions; original token i moves to position perm[i].
+  const permutedTokens = Array.from({ length: N }, (_, newPos) => {
+    const oldIdx = perm.indexOf(newPos);
+    return { ...tokens[oldIdx], pos: newPos };
+  });
   const PX = buildX(permutedTokens, dModel, usePE);
 
   const yX = multiHeadAttention(X, Ws.allWQ, Ws.allWK, Ws.allWV, Ws.WO, causalMask).finalOutput;
@@ -43,7 +89,7 @@ function computeEquivarianceMetric(
 
   let maxErr = 0;
   for (let i = 0; i < N; i++) {
-    const pi = N - 1 - i;
+    const pi = perm[i];
     for (let j = 0; j < dModel; j++) {
       maxErr = Math.max(maxErr, Math.abs(yPX[pi][j] - yX[i][j]));
     }
@@ -69,6 +115,7 @@ export default function AttentionLab() {
   const [dModel, setDModel] = useState(6);
   const [usePE, setUsePE] = useState(false);
   const [causalMask, setCausalMask] = useState(false);
+  const [permType, setPermType] = useState<PermutationType>('reverse');
   const [activeHead, setActiveHead] = useState(0);
   const [clickedCell, setClickedCell] = useState<{ q: number; k: number } | null>(null);
 
@@ -85,6 +132,7 @@ export default function AttentionLab() {
   const togglePE = () => { setUsePE((v) => !v); setClickedCell(null); };
   const toggleCausal = () => { setCausalMask((v) => !v); setClickedCell(null); };
   const selectHead = (h: number) => { setActiveHead(h); setClickedCell(null); };
+  const selectPermutation = (type: PermutationType) => { setPermType(type); setClickedCell(null); };
 
   // W matrices
   const Ws = useMemo(() => {
@@ -105,16 +153,16 @@ export default function AttentionLab() {
   }, [X, Ws, causalMask, N]);
 
   const metricOffOff = useMemo(
-    () => computeEquivarianceMetric(tokens, dModel, Ws, false, false),
-    [tokens, dModel, Ws],
+    () => computeEquivarianceMetric(tokens, dModel, Ws, false, false, permType),
+    [tokens, dModel, Ws, permType],
   );
   const metricPEOn = useMemo(
-    () => computeEquivarianceMetric(tokens, dModel, Ws, true, false),
-    [tokens, dModel, Ws],
+    () => computeEquivarianceMetric(tokens, dModel, Ws, true, false, permType),
+    [tokens, dModel, Ws, permType],
   );
   const metricCausalOn = useMemo(
-    () => computeEquivarianceMetric(tokens, dModel, Ws, false, true),
-    [tokens, dModel, Ws],
+    () => computeEquivarianceMetric(tokens, dModel, Ws, false, true, permType),
+    [tokens, dModel, Ws, permType],
   );
 
   const active = attentionResult ? attentionResult.headOutputs[activeHead] : null;
@@ -272,9 +320,27 @@ export default function AttentionLab() {
         {/* Equivariance metrics */}
         <div className="bg-gray-50 border rounded-lg p-3 text-xs space-y-2">
           <p>
-            <strong>Equivariance 检查：</strong>
-            No positional encoding AND no causal mask 时，self-attention 对任意 token permutation 是 equivariant。
+            <strong>理论陈述：</strong>
+            对任意 permutation P，无 PE 且无 causal mask 时 Y(PX) = P·Y(X)。
           </p>
+          <p>
+            <strong>当前实验：</strong>
+            当前实验使用 {PERMUTATION_LABELS[permType]} permutation。
+          </p>
+
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-xs text-gray-500">选择 permutation：</span>
+            {(Object.keys(PERMUTATION_LABELS) as PermutationType[]).map((type) => (
+              <button
+                key={type}
+                onClick={() => selectPermutation(type)}
+                className={`px-2 py-1 text-xs rounded ${permType === type ? 'bg-indigo-600 text-white' : 'bg-white border hover:bg-gray-100'}`}
+              >
+                {PERMUTATION_LABELS[type]}
+              </button>
+            ))}
+          </div>
+
           <div className="grid sm:grid-cols-3 gap-2">
             <div className="bg-white border rounded p-2">
               <div className="text-[10px] text-gray-500">PE off / Causal off</div>
@@ -290,7 +356,7 @@ export default function AttentionLab() {
             </div>
           </div>
           <p className="text-[10px] text-gray-500">
-            指标：maxAbs(Y(PX) − P·Y(X))，其中 P 为 token 顺序反转。
+            指标：maxAbs(Y(PX) − P·Y(X))，其中 P 为选中的 permutation。
           </p>
         </div>
       </div>

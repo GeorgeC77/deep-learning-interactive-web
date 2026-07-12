@@ -2,12 +2,14 @@ import { describe, it, expect } from 'vitest';
 import {
   topoSort,
   forwardPass,
+  forwardTape,
   backwardPass,
   centralDiff,
   evalNode,
   computeLocalGrads,
   stepForwardOnce,
   stepBackwardOnce,
+  tapeMemoryCost,
   type NodeSpec,
 } from '../lib/math/backprop';
 
@@ -207,5 +209,53 @@ describe('backprop', () => {
       const numGrad = centralDiff(f, [leaf.value], 0, 1e-5);
       expect(numGrad).toBeCloseTo(grads[leaf.id], 6);
     }
+  });
+
+  it('numerical gradient should not be compared against a fake zero analytic gradient', () => {
+    const nodes = JSON.parse(JSON.stringify(graph)) as NodeSpec[];
+    const leaf = nodes.find((n) => n.id === 'w1')!;
+
+    // Before any backward pass, no analytic gradient exists yet.
+    const fwdVals = forwardPass(nodes);
+    const analyticBefore: Record<string, number> = {};
+    expect(analyticBefore['w1']).toBeUndefined();
+
+    // Numerical gradient can still be computed from forward-only values,
+    // but it must not be compared to a fabricated zero.
+    const f = (p: number[]) => {
+      const g = JSON.parse(JSON.stringify(nodes)) as NodeSpec[];
+      g.forEach((n) => {
+        if (n.id === 'w1') n.value = p[0];
+      });
+      return forwardPass(g)['mul2'];
+    };
+    const numGrad = centralDiff(f, [leaf.value], 0, 1e-5);
+    expect(numGrad).not.toBe(0);
+
+    // Only after backwardPass does a real analytic gradient exist.
+    const { grads } = backwardPass(nodes, fwdVals);
+    expect(grads['w1']).toBeDefined();
+    expect(grads['w1']).toBeCloseTo(numGrad, 6);
+  });
+
+  it('tape records expected forward intermediates', () => {
+    const nodes = JSON.parse(JSON.stringify(graph)) as NodeSpec[];
+    const { values, tape } = forwardTape(nodes);
+
+    expect(tape.length).toBe(nodes.length);
+    const byId = new Map(tape.map((e) => [e.nodeId, e]));
+
+    expect(byId.get('x')!.output).toBe(values['x']);
+    expect(byId.get('w1')!.output).toBe(values['w1']);
+    expect(byId.get('mul1')!.op).toBe('multiply');
+    expect(byId.get('mul1')!.inputs).toEqual(['x', 'w1']);
+    expect(byId.get('mul1')!.inputValues).toEqual([values['x'], values['w1']]);
+    expect(byId.get('add1')!.output).toBeCloseTo(values['mul1'] + values['b'], 10);
+    expect(byId.get('sin1')!.output).toBeCloseTo(Math.sin(values['add1']), 10);
+    expect(byId.get('mul2')!.output).toBeCloseTo(values['sin1'] * values['w2'], 10);
+
+    const cost = tapeMemoryCost(tape);
+    expect(cost.count).toBeGreaterThan(0);
+    expect(cost.bytesEstimate).toBe(cost.count * 8);
   });
 });

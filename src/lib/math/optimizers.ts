@@ -119,8 +119,13 @@ export function step(
   lr: number,
   beta1: number,
   beta2: number,
+  noiseScale = 0,
 ): { newState: OptState; dx: number; dy: number } {
-  const [gx, gy] = analyticalGrad(state.x, state.y, landscape);
+  let [gx, gy] = analyticalGrad(state.x, state.y, landscape);
+  if (noiseScale > 0) {
+    gx += randomNormal() * noiseScale;
+    gy += randomNormal() * noiseScale;
+  }
   const { x, y, vx, vy, sx, sy, t } = state;
   let dx = 0, dy = 0, nvx = vx, nvy = vy, nsx = sx, nsy = sy;
 
@@ -161,4 +166,11 @@ export function step(
     newState: { x: x + dx, y: y + dy, vx: nvx, vy: nvy, sx: nsx, sy: nsy, t: t + 1 },
     dx, dy,
   };
+}
+
+/** Box-Muller transform for standard normal noise (mini-batch gradient noise). */
+function randomNormal(): number {
+  const u = 1 - Math.random();
+  const v = Math.random();
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }

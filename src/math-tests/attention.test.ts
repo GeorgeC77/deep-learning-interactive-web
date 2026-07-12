@@ -12,6 +12,74 @@ function makeW(rows: number, cols: number, seed: number): number[][] {
   return Array.from({ length: rows }, () => Array.from({ length: cols }, () => (rng() - 0.5) * 0.4));
 }
 
+function identityPerm(N: number): number[] {
+  return Array.from({ length: N }, (_, i) => i);
+}
+
+function reversePerm(N: number): number[] {
+  return Array.from({ length: N }, (_, i) => N - 1 - i);
+}
+
+function cyclicPerm(N: number, shift = 1): number[] {
+  return Array.from({ length: N }, (_, i) => (i + shift) % N);
+}
+
+function swapPerm(N: number, i = 0, j = 1): number[] {
+  const perm = identityPerm(N);
+  if (N >= 2) [perm[i], perm[j]] = [perm[j], perm[i]];
+  return perm;
+}
+
+function randomPerm(N: number, seed = 123): number[] {
+  const perm = identityPerm(N);
+  const rng = mulberry32(seed);
+  for (let i = N - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [perm[i], perm[j]] = [perm[j], perm[i]];
+  }
+  return perm;
+}
+
+function applyPermutation<T>(arr: T[], perm: number[]): T[] {
+  return Array.from({ length: arr.length }, (_, newPos) => {
+    const oldIdx = perm.indexOf(newPos);
+    return arr[oldIdx];
+  });
+}
+
+function buildXWithPE(base: number[][], perm: number[]): number[][] {
+  const dModel = base[0].length;
+  return Array.from({ length: base.length }, (_, newPos) => {
+    const oldIdx = perm.indexOf(newPos);
+    const pe = sinusoidalPE(newPos, dModel);
+    return base[oldIdx].map((v, j) => v + pe[j]);
+  });
+}
+
+function equivarianceMetric(
+  X: number[][],
+  PX: number[][],
+  perm: number[],
+  wq: number[][][],
+  wk: number[][][],
+  wv: number[][][],
+  wo: number[][],
+  causalMask: boolean,
+): number {
+  const N = X.length;
+  const dModel = X[0].length;
+  const yX = multiHeadAttention(X, wq, wk, wv, wo, causalMask).finalOutput;
+  const yPX = multiHeadAttention(PX, wq, wk, wv, wo, causalMask).finalOutput;
+  let maxErr = 0;
+  for (let i = 0; i < N; i++) {
+    const pi = perm[i];
+    for (let j = 0; j < dModel; j++) {
+      maxErr = Math.max(maxErr, Math.abs(yPX[pi][j] - yX[i][j]));
+    }
+  }
+  return maxErr;
+}
+
 describe('attention', () => {
   it('softmax sums to 1', () => {
     const s = softmax([2, 1, 0.1]);
@@ -126,60 +194,59 @@ describe('attention', () => {
     expect(result.finalOutput).toEqual([]);
   });
 
-  function equivarianceMetric(
-    X: number[][],
-    PX: number[][],
-    wq: number[][][],
-    wk: number[][][],
-    wv: number[][][],
-    wo: number[][],
-    causalMask: boolean,
-  ): number {
-    const N = X.length;
-    const dModel = X[0].length;
-    const yX = multiHeadAttention(X, wq, wk, wv, wo, causalMask).finalOutput;
-    const yPX = multiHeadAttention(PX, wq, wk, wv, wo, causalMask).finalOutput;
-    let maxErr = 0;
-    for (let i = 0; i < N; i++) {
-      const pi = N - 1 - i;
-      for (let j = 0; j < dModel; j++) {
-        maxErr = Math.max(maxErr, Math.abs(yPX[pi][j] - yX[i][j]));
-      }
-    }
-    return maxErr;
-  }
+  const permutationCases: { name: string; perm: (N: number) => number[] }[] = [
+    { name: 'reverse', perm: reversePerm },
+    { name: 'cyclic shift', perm: cyclicPerm },
+    { name: 'swap', perm: (N) => swapPerm(N, 0, 1) },
+    { name: 'random', perm: (N) => randomPerm(N, 123) },
+  ];
 
-  it('maxAbs(Y(PX)-P·Y(X)) is near zero when PE and causal mask are both off', () => {
-    const dModel = 6, dK = 3, N = 4;
-    const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, (_, j) => (i + 1) * (j + 1)));
-    const PX = [...X].reverse();
-    const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
-    const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
-    const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
-    const wo = makeW(dModel, dModel, 7);
-    const metric = equivarianceMetric(X, PX, wq, wk, wv, wo, false);
-    expect(metric).toBeLessThan(1e-8);
+  permutationCases.forEach(({ name, perm }) => {
+    it(`${name} permutation: maxAbs(Y(PX)-P·Y(X)) is near zero when PE and causal mask are both off`, () => {
+      const dModel = 6, dK = 3, N = 4;
+      const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, (_, j) => (i + 1) * (j + 1)));
+      const permutation = perm(N);
+      const PX = applyPermutation(X, permutation);
+      const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
+      const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
+      const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
+      const wo = makeW(dModel, dModel, 7);
+      const metric = equivarianceMetric(X, PX, permutation, wq, wk, wv, wo, false);
+      expect(metric).toBeLessThan(1e-8);
+    });
   });
 
-  it('maxAbs(Y(PX)-P·Y(X)) is non-zero when PE or causal mask is on', () => {
+  it('when PE is on, at least one permutation yields a non-zero metric', () => {
     const dModel = 6, dK = 3, N = 4;
     const base = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, (_, j) => (i + 1) * (j + 1)));
-    const X = base.map((row, i) => {
-      const pe = sinusoidalPE(i, dModel);
-      return row.map((v, j) => v + pe[j]);
-    });
-    const PX = base.map((_, i) => {
-      const pe = sinusoidalPE(i, dModel);
-      return base[N - 1 - i].map((v, j) => v + pe[j]);
-    });
     const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
     const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
     const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
     const wo = makeW(dModel, dModel, 7);
-    const metricPE = equivarianceMetric(X, PX, wq, wk, wv, wo, false);
-    const metricCausal = equivarianceMetric(base, [...base].reverse(), wq, wk, wv, wo, true);
-    expect(metricPE).toBeGreaterThan(1e-6);
-    expect(metricCausal).toBeGreaterThan(1e-6);
+
+    const metrics = permutationCases.map(({ perm }) => {
+      const permutation = perm(N);
+      const X = buildXWithPE(base, identityPerm(N));
+      const PX = buildXWithPE(base, permutation);
+      return equivarianceMetric(X, PX, permutation, wq, wk, wv, wo, false);
+    });
+    expect(Math.max(...metrics)).toBeGreaterThan(1e-6);
+  });
+
+  it('when causal mask is on, at least one permutation yields a non-zero metric', () => {
+    const dModel = 6, dK = 3, N = 4;
+    const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, (_, j) => (i + 1) * (j + 1)));
+    const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
+    const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
+    const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
+    const wo = makeW(dModel, dModel, 7);
+
+    const metrics = permutationCases.map(({ perm }) => {
+      const permutation = perm(N);
+      const PX = applyPermutation(X, permutation);
+      return equivarianceMetric(X, PX, permutation, wq, wk, wv, wo, true);
+    });
+    expect(Math.max(...metrics)).toBeGreaterThan(1e-6);
   });
 });
 
