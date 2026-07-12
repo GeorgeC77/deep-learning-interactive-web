@@ -1,6 +1,6 @@
 # 交互质量审计报告（更新）
 
-> 更新日期：2026-06-29 | 审计范围：旗舰页面 Ch7/8/12/15/20 | 测试：`npm run test:math` 109 passed
+> 更新日期：2026-06-29 | 审计范围：旗舰页面 Ch7/8/12/15/20 + 第二批核心交互 | 测试：`npm run test:math` 152 passed
 
 ## 旗舰页面评级（修复后）
 
@@ -11,6 +11,20 @@
 | Ch12 Attention | **L3** | ❌ | ✅ heatmap+维度+PE | ✅ PE/causal equivariance | ✅ 拖拽重排+多 permutation | AttentionLab | ✅ Vitest |
 | Ch15 EM/ELBO | **L3** | ❌ | ✅ 散点+椭圆+logLik | ✅ 坏初始化+label switching | ❌ | EMELBOLab | ✅ Vitest |
 | Ch20 Diffusion | **L3** | ❌ | ✅ z0/zt/x0pred+score field | ✅ prediction error+conditional vs marginal | ❌ | DiffusionTimelineLab | ✅ Vitest |
+
+## 第二批核心交互审计
+
+| Demo | 主要修复/升级 | 数学测试 |
+|---|---|---|
+| ROCInteractiveDemo | overlap↔AUC 单调性正确；理论/经验 AUC；AUC = P(pos>neg) 解释 | ✅ Vitest |
+| LogisticDecisionBoundaryDemo | w2=0 垂直线；w1=w2=0 均匀分类；scaling experiment | ✅ Vitest |
+| MessagePassingInvariantDemo | round slider 驱动消息传递；k-hop 邻域；置换等变/不变误差；over-smoothing | ✅ Vitest |
+| PolynomialRegressionDemo (BiasVarianceLab) | 多训练集；bias²/variance/noise 分解；正交多项式稳定拟合 | ✅ Vitest |
+| AutoregressiveSamplingDemo | first-order Markov toy；temperature/seed/context；top-k/top-p 过滤概率 | ✅ Vitest |
+| ImportanceSamplingDemo | 可选 f；ESS；max weight share；q 均值/方差调节；尾部不足案例 | ✅ Vitest |
+| MetropolisHastingsDemo | burn-in；trace/ACF/ESS；mode occupancy/switches；presets 强调 ESS 而非接受率 | ✅ Vitest |
+| MaskedAutoencoderDemo | imageSeed/maskSeed 拆分；结构化图像；masked vs all-patch MSE；baselines | ✅ Vitest |
+| ConvolutionSizeDemo | SAME padding 公式 `ceil(I/S)`；左右不对称 padding；移动窗口动画 | ✅ Vitest |
 
 ## 说明
 
@@ -24,6 +38,7 @@
 
 ## 修复完成的底层问题
 
+### 第一批（旗舰页面）
 - ✅ 反向传播输出节点处理
 - ✅ `localGrads: Record<inId, number>`
 - ✅ 数值梯度中心差分
@@ -40,3 +55,14 @@
 - ✅ EM label-invariant 误差、K-means++、收敛披露、数值保护标注
 - ✅ Backprop 步进/一键模式隔离，`canStepBackward` 保护 `Next Bwd`
 - ✅ 新增 `src/pedagogical-tests/` 与 `npm run test:pedagogical`
+
+### 第二批（核心交互）
+- ✅ ROC overlap 与 AUC 单调关系正确；理论 AUC 使用标准正态 CDF
+- ✅ Logistic 决策边界处理垂直/均匀情况；权重缩放实验
+- ✅ GNN 消息传递按 round 计算；置换等变/不变数值验证
+- ✅ Bias-Variance 实验使用多训练集与正交多项式稳定拟合
+- ✅ 自回归采样增加 temperature/seed/context；top-k/top-p 过滤概率可视化
+- ✅ 重要性采样增加多目标函数、ESS、max weight share 与 proposal 尾部诊断
+- ✅ MCMC 增加 burn-in、ACF、ESS、mode 诊断与 preset 对比
+- ✅ MAE 拆分 image/mask seed；结构化图像；masked vs all-patch MSE 区分
+- ✅ 卷积 SAME padding 公式与移动窗口动画
