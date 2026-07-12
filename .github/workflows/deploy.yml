@@ -33,6 +33,9 @@ jobs:
       - name: Math tests
         run: npm run test:math
 
+      - name: Pedagogical tests
+        run: npm run test:pedagogical
+
       - name: Type check
         run: npx tsc -b
 

@@ -6,6 +6,10 @@ import {
   logLikelihood,
   eigen2x2,
   labelInvariantMeanError,
+  meanCenterError,
+  displayMeanCenterError,
+  runEM,
+  kMeansInit,
   type GMMParams,
 } from '../lib/math/em';
 
@@ -220,6 +224,63 @@ describe('em', () => {
     const { assignment, total } = labelInvariantMeanError(trueMeans, estMeans);
     expect(assignment).toEqual([1, 0]);
     expect(total).toBeCloseTo(0.7, 5);
+  });
+
+  it('mean centre error equals total divided by K', () => {
+    const trueMeans = [[0, 0], [10, 0]];
+    const estMeans = [[9.5, 0], [0.2, 0]];
+    const { total } = labelInvariantMeanError(trueMeans, estMeans);
+    expect(meanCenterError(trueMeans, estMeans)).toBeCloseTo(total / trueMeans.length, 10);
+  });
+
+  it('display mean centre error is hidden when showTruth is false', () => {
+    const trueMeans = [[0, 0], [10, 0]];
+    const estMeans = [[9.5, 0], [0.2, 0]];
+    expect(displayMeanCenterError(false, trueMeans, estMeans)).toBeUndefined();
+  });
+
+  it('display mean centre error is shown after reveal truth', () => {
+    const trueMeans = [[0, 0], [10, 0]];
+    const estMeans = [[9.5, 0], [0.2, 0]];
+    const err = displayMeanCenterError(true, trueMeans, estMeans);
+    expect(err).toBeDefined();
+    expect(err!).toBeCloseTo(0.35, 10);
+  });
+
+  it('runEM stops at convergence before maxIter', () => {
+    const poorParams: GMMParams = {
+      means: [[1, 1], [2, 2]],
+      covs: [[[1, 0], [0, 1]], [[1, 0], [0, 1]]],
+      pis: [0.5, 0.5],
+    };
+    const result = runEM(data, poorParams, { tolerance: 1e-6, maxIter: 100 });
+    expect(result.iterations).toBeGreaterThan(0);
+    expect(result.iterations).toBeLessThan(100);
+    expect(result.converged).toBe(true);
+    expect(result.history.length).toBe(result.iterations + 1);
+  });
+
+  it('runEM final likelihood is non-decreasing up to numerical tolerance', () => {
+    const poorParams: GMMParams = {
+      means: [[1, 1], [2, 2]],
+      covs: [[[1, 0], [0, 1]], [[1, 0], [0, 1]]],
+      pis: [0.5, 0.5],
+    };
+    const result = runEM(data, poorParams, { tolerance: 1e-6, maxIter: 50 });
+    const initLL = logLikelihood(data, poorParams);
+    expect(result.logLikelihood).toBeGreaterThanOrEqual(initLL - 1e-9);
+  });
+
+  it('K-means initialization produces valid GMM parameters', () => {
+    const init = kMeansInit(data, 2, 123);
+    expect(init.means.length).toBe(2);
+    expect(init.covs.length).toBe(2);
+    expect(init.pis.length).toBe(2);
+    expect(init.pis.reduce((a, b) => a + b)).toBeCloseTo(1, 8);
+    for (const cov of init.covs) {
+      const det = cov[0][0] * cov[1][1] - cov[0][1] * cov[1][0];
+      expect(det).toBeGreaterThan(0);
+    }
   });
 });
 

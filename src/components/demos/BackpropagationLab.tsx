@@ -10,6 +10,7 @@ import {
   stepBackwardOnce,
   topoSort,
   tapeMemoryCost,
+  canStepBackward as canStepBackwardCheck,
   type NodeSpec,
   type StepBwdDetail,
   type TapeEntry,
@@ -89,22 +90,39 @@ export default function BackpropagationLab() {
   }, [fwdVals, graph]);
 
   const stepForward = useCallback(() => {
+    if (fwdVals !== null) {
+      // Full-forward mode is active; switch cleanly to step mode and restart
+      // from the first node so the one-click and step tapes never mix.
+      setFwdVals(null);
+      setBwdResult(null);
+      setPhase('forward');
+      setStepBwdIdx(null);
+      setStepBwdGrads({});
+      setStepBwdDetails([]);
+      const result = stepForwardOnce(graph, order, null, {});
+      if (!result) return;
+      setStepFwdVals(result.stepFwdVals);
+      setStepFwdIdx(result.stepFwdIdx);
+      setTape([result.tapeEntry]);
+      return;
+    }
     const result = stepForwardOnce(graph, order, stepFwdIdx, stepFwdVals);
     if (!result) return;
     setStepFwdVals(result.stepFwdVals);
     setStepFwdIdx(result.stepFwdIdx);
     setTape((prev) => [...prev, result.tapeEntry]);
-  }, [stepFwdIdx, graph, order, stepFwdVals]);
+  }, [fwdVals, graph, order, stepFwdIdx, stepFwdVals]);
 
-  const canStepBackward = fwdVals !== null || stepFwdIdx === order.length - 1;
+  const canStepBackward = canStepBackwardCheck(fwdVals, stepFwdIdx, order.length);
 
   const stepBackward = useCallback(() => {
+    if (!canStepBackward) return;
     const result = stepBackwardOnce(graph, order, revOrder, stepBwdIdx, stepFwdVals, fwdVals, stepBwdGrads);
     if (!result) return;
     setStepBwdGrads(result.stepBwdGrads);
     setStepBwdDetails(result.details);
     setStepBwdIdx(result.stepBwdIdx);
-  }, [stepBwdIdx, graph, order, revOrder, stepFwdVals, fwdVals, stepBwdGrads]);
+  }, [stepBwdIdx, graph, order, revOrder, stepFwdVals, fwdVals, stepBwdGrads, canStepBackward]);
 
   const resetAll = useCallback(() => {
     setFwdVals(null); setBwdResult(null); setPhase('idle'); setFdGrad(null); setTape([]);

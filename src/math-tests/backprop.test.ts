@@ -10,6 +10,7 @@ import {
   stepForwardOnce,
   stepBackwardOnce,
   tapeMemoryCost,
+  canStepBackward,
   type NodeSpec,
 } from '../lib/math/backprop';
 
@@ -257,5 +258,52 @@ describe('backprop', () => {
     const cost = tapeMemoryCost(tape);
     expect(cost.count).toBeGreaterThan(0);
     expect(cost.bytesEstimate).toBe(cost.count * 8);
+  });
+
+  it('Next Bwd is disabled before forward completion', () => {
+    const nodes = JSON.parse(JSON.stringify(graph)) as NodeSpec[];
+    const order = topoSort(nodes);
+
+    expect(canStepBackward(null, null, order.length)).toBe(false);
+    expect(canStepBackward(null, 0, order.length)).toBe(false);
+    expect(canStepBackward(null, order.length - 2, order.length)).toBe(false);
+    expect(canStepBackward(null, order.length - 1, order.length)).toBe(true);
+    expect(canStepBackward(forwardPass(nodes), null, order.length)).toBe(true);
+  });
+
+  it('starting step-forward after a full forward resets state correctly', () => {
+    const nodes = JSON.parse(JSON.stringify(graph)) as NodeSpec[];
+    const order = topoSort(nodes);
+    const { values, tape: fullTape } = forwardTape(nodes);
+
+    // Simulate component state after a full Forward run (fwdVals populated, tape full).
+    let fwdVals: Record<string, number> | null = values;
+    let tape = fullTape;
+    expect(fwdVals).not.toBeNull();
+    expect(tape.length).toBe(order.length);
+
+    // User clicks Next Fwd: component clears the full tape and fwdVals, then
+    // restarts stepping from the first node.
+    fwdVals = null;
+    tape = [];
+    let stepFwdIdx: number | null = null;
+    let stepFwdVals: Record<string, number> = {};
+    while (true) {
+      const res = stepForwardOnce(nodes, order, stepFwdIdx, stepFwdVals);
+      if (!res) break;
+      stepFwdIdx = res.stepFwdIdx;
+      stepFwdVals = res.stepFwdVals;
+      tape.push(res.tapeEntry);
+    }
+
+    // The stepped tape must be rebuilt from scratch, not mixed with the old one.
+    expect(stepFwdIdx).toBe(order.length - 1);
+    expect(stepFwdVals).toEqual(values);
+    expect(tape.length).toBe(order.length);
+    for (let i = 0; i < order.length; i++) {
+      expect(tape[i].nodeId).toBe(fullTape[i].nodeId);
+      expect(tape[i].output).toBeCloseTo(fullTape[i].output, 10);
+      expect(tape[i].inputValues).toEqual(fullTape[i].inputValues);
+    }
   });
 });

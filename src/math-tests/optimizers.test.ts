@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { contours as d3Contours } from 'd3-contour';
-import { loss, analyticalGrad, stationaryPoint, hessianEigen, step, type OptState, type Landscape } from '../lib/math/optimizers';
+import { loss, analyticalGrad, stationaryPoint, hessianEigen, step, generateNoiseSequence, type OptState, type Landscape, type Optimizer } from '../lib/math/optimizers';
 
 describe('optimizers', () => {
   it('gradient vs central difference (quadratic)', () => {
@@ -117,6 +117,40 @@ describe('optimizers', () => {
     expect(hxx).toBeCloseTo(2, 5);
     expect(hyy).toBeCloseTo(2, 5);
     expect(hxy).toBeCloseTo(0, 5);
+  });
+
+  it('every optimizer receives identical common noise at each step', () => {
+    const base: OptState = { x: 1, y: -0.5, vx: 0, vy: 0, sx: 0, sy: 0, t: 0 };
+    const noiseSeq = generateNoiseSequence(5, 0.1, 42);
+    const optimizers: Optimizer[] = ['GD', 'Momentum', 'RMSProp', 'Adam'];
+
+    for (let i = 0; i < noiseSeq.length; i++) {
+      const grads: [number, number][] = [];
+      for (const opt of optimizers) {
+        const state: OptState = { ...base, t: i };
+        const { grad } = step(state, 'quadratic', opt, 0.1, 0.9, 0.999, noiseSeq[i]);
+        grads.push(grad);
+      }
+      const [gx, gy] = analyticalGrad(base.x, base.y, 'quadratic');
+      for (let k = 1; k < grads.length; k++) {
+        expect(grads[k][0]).toBeCloseTo(grads[0][0], 10);
+        expect(grads[k][1]).toBeCloseTo(grads[0][1], 10);
+      }
+      expect(grads[0][0]).toBeCloseTo(gx + noiseSeq[i][0], 10);
+      expect(grads[0][1]).toBeCloseTo(gy + noiseSeq[i][1], 10);
+    }
+  });
+
+  it('"GD 一步到最优" preset reaches optimum in one step', () => {
+    const st: OptState = { x: 1.5, y: 1.5, vx: 0, vy: 0, sx: 0, sy: 0, t: 0 };
+    const { newState } = step(st, 'quadratic', 'GD', 0.5, 0.9, 0.999);
+    expect(loss(newState.x, newState.y, 'quadratic')).toBeCloseTo(0, 8);
+  });
+
+  it('"GD 临界振荡" preset preserves magnitude', () => {
+    const st: OptState = { x: 1.5, y: 1.5, vx: 0, vy: 0, sx: 0, sy: 0, t: 0 };
+    const { newState } = step(st, 'quadratic', 'GD', 1.0, 0.9, 0.999);
+    expect(Math.hypot(newState.x, newState.y)).toBeCloseTo(Math.hypot(1.5, 1.5), 8);
   });
 });
 

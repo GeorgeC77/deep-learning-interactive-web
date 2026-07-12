@@ -61,19 +61,32 @@ function regularizeCov(cov: number[][], floor: number): number[][] {
 
 /** M-step: update μ, Σ, π from responsibilities */
 export function mStep(data: number[][], responsibilities: number[][], epsilon: number = 1e-6): GMMParams {
+  return mStepDetailed(data, responsibilities, epsilon).params;
+}
+
+export type MStepDetail = {
+  params: GMMParams;
+  emptyCount: number;
+  floorCount: number;
+};
+
+/** M-step with numerical-protection counters. */
+export function mStepDetailed(data: number[][], responsibilities: number[][], epsilon: number = 1e-6): MStepDetail {
   const K = responsibilities[0].length, N = data.length;
+  let emptyCount = 0;
+  let floorCount = 0;
 
   const Nk = responsibilities.reduce((s, r) => { for (let k = 0; k < K; k++) s[k] += r[k]; return s; }, Array(K).fill(0));
 
   const newMeans = Array.from({ length: K }, (_, k) => {
-    if (Nk[k] < 1e-12) return [0, 0];
+    if (Nk[k] < 1e-12) { emptyCount++; return [0, 0]; }
     const mu = [0, 0];
     for (let i = 0; i < N; i++) { mu[0] += responsibilities[i][k] * data[i][0]; mu[1] += responsibilities[i][k] * data[i][1]; }
     return [mu[0] / Nk[k], mu[1] / Nk[k]];
   });
 
   const newCovs = Array.from({ length: K }, (_, k) => {
-    if (Nk[k] < 1e-12) return [[1, 0], [0, 1]] as number[][];
+    if (Nk[k] < 1e-12) { emptyCount++; return [[1, 0], [0, 1]] as number[][]; }
     const mu = newMeans[k];
     let s00 = 0, s01 = 0, s11 = 0;
     for (let i = 0; i < N; i++) {
@@ -83,14 +96,16 @@ export function mStep(data: number[][], responsibilities: number[][], epsilon: n
       s11 += responsibilities[i][k] * dy * dy;
     }
     const raw = [[s00 / Nk[k] + epsilon, s01 / Nk[k]], [s01 / Nk[k], s11 / Nk[k] + epsilon]] as number[][];
-    return regularizeCov(raw, epsilon);
+    const reg = regularizeCov(raw, epsilon);
+    if (reg !== raw) floorCount++;
+    return reg;
   });
 
   const floor = 1e-12;
   const rawPis = Nk.map((n) => Math.max(n / N, floor));
   const sumRaw = rawPis.reduce((a, b) => a + b, 0);
   const newPis = rawPis.map((p) => p / sumRaw);
-  return { means: newMeans, covs: newCovs, pis: newPis };
+  return { params: { means: newMeans, covs: newCovs, pis: newPis }, emptyCount, floorCount };
 }
 
 /** Compute log-likelihood log p(X|θ) */
@@ -137,6 +152,135 @@ export function emIteration(data: number[][], params: GMMParams, epsilon: number
   const newParams = mStep(data, responsibilities, epsilon);
   const ll = logLikelihood(data, newParams);
   return { responsibilities, newMeans: newParams.means, newCovs: newParams.covs, newPis: newParams.pis, newParams, logLikelihood: ll };
+}
+
+/** Full EM iteration with numerical-protection counters. */
+export function emIterationDetailed(data: number[][], params: GMMParams, epsilon: number = 1e-6) {
+  const responsibilities = eStep(data, params);
+  const { params: newParams, emptyCount, floorCount } = mStepDetailed(data, responsibilities, epsilon);
+  const ll = logLikelihood(data, newParams);
+  return { responsibilities, newParams, logLikelihood: ll, emptyCount, floorCount };
+}
+
+export type EMRunResult = {
+  params: GMMParams;
+  logLikelihood: number;
+  iterations: number;
+  converged: boolean;
+  emptyCount: number;
+  floorCount: number;
+  history: number[];
+};
+
+/** Run EM until convergence (relative likelihood change < tolerance) or maxIter. */
+export function runEM(
+  data: number[][],
+  initParams: GMMParams,
+  opts: { tolerance?: number; maxIter?: number; epsilon?: number } = {}
+): EMRunResult {
+  const { tolerance = 1e-6, maxIter = 200, epsilon = 1e-6 } = opts;
+  let params = initParams;
+  let prevLL = logLikelihood(data, params);
+  let iterations = 0;
+  let converged = false;
+  let emptyCount = 0;
+  let floorCount = 0;
+  const history = [prevLL];
+
+  for (let i = 0; i < maxIter; i++) {
+    const result = emIterationDetailed(data, params, epsilon);
+    iterations++;
+    emptyCount += result.emptyCount;
+    floorCount += result.floorCount;
+    const ll = result.logLikelihood;
+    history.push(ll);
+    const relChange = Math.abs((ll - prevLL) / Math.max(Math.abs(prevLL), 1));
+    params = result.newParams;
+    prevLL = ll;
+    if (relChange < tolerance) {
+      converged = true;
+      break;
+    }
+  }
+
+  return { params, logLikelihood: prevLL, iterations, converged, emptyCount, floorCount, history };
+}
+
+/** K-means++ initialization for GMM means, with simple spherical covariances and uniform weights. */
+export function kMeansInit(data: number[][], K: number, seed: number): GMMParams {
+  const rng = mulberry32(seed);
+  const N = data.length;
+  const means: number[][] = [];
+  const firstIdx = Math.floor(rng() * N);
+  means.push([...data[firstIdx]]);
+
+  const distSq = (p: number[], c: number[]) => (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2;
+  const minDists = data.map((p) => distSq(p, means[0]));
+
+  for (let k = 1; k < K; k++) {
+    const total = minDists.reduce((a, b) => a + b, 0);
+    let target = rng() * total;
+    let idx = 0;
+    while (idx < N - 1 && target > minDists[idx]) {
+      target -= minDists[idx];
+      idx++;
+    }
+    means.push([...data[idx]]);
+    for (let i = 0; i < N; i++) {
+      const d = distSq(data[i], means[k]);
+      if (d < minDists[i]) minDists[i] = d;
+    }
+  }
+
+  // A few Lloyd iterations.
+  const assignments = Array(N).fill(0);
+  for (let iter = 0; iter < 20; iter++) {
+    let changed = false;
+    for (let i = 0; i < N; i++) {
+      let best = 0, bestD = distSq(data[i], means[0]);
+      for (let k = 1; k < K; k++) {
+        const d = distSq(data[i], means[k]);
+        if (d < bestD) { bestD = d; best = k; }
+      }
+      if (assignments[i] !== best) { assignments[i] = best; changed = true; }
+    }
+    for (let k = 0; k < K; k++) {
+      let sx = 0, sy = 0, c = 0;
+      for (let i = 0; i < N; i++) {
+        if (assignments[i] === k) { sx += data[i][0]; sy += data[i][1]; c++; }
+      }
+      if (c > 0) means[k] = [sx / c, sy / c];
+    }
+    if (!changed) break;
+  }
+
+  // Spherical covariances from per-cluster variance.
+  const covs: number[][][] = [];
+  const pis = Array(K).fill(1 / K);
+  for (let k = 0; k < K; k++) {
+    const points = data.filter((_, i) => assignments[i] === k);
+    let varSum = 0;
+    if (points.length > 0) {
+      for (const p of points) {
+        varSum += distSq(p, means[k]);
+      }
+      varSum /= points.length;
+    }
+    const s = Math.max(varSum, 0.25);
+    covs.push([[s, 0], [0, s]]);
+    pis[k] = Math.max(points.length / N, 1e-12);
+  }
+  const sumPis = pis.reduce((a, b) => a + b, 0);
+  return { means, covs, pis: pis.map((p) => p / sumPis) };
+}
+
+function mulberry32(a: number) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
 }
 
 /** Hungarian algorithm for a square cost matrix.
@@ -206,6 +350,21 @@ export function labelInvariantMeanError(trueMeans: number[][], estMeans: number[
   const perComponent = assignment.map((estIdx, trueIdx) => cost[trueIdx][estIdx]);
   const total = perComponent.reduce((a, b) => a + b, 0);
   return { assignment, perComponent, total };
+}
+
+/** Average label-invariant centre error (total / K). */
+export function meanCenterError(trueMeans: number[][], estMeans: number[][]): number {
+  return labelInvariantMeanError(trueMeans, estMeans).total / trueMeans.length;
+}
+
+/** Component helper: only reveal truth-dependent error after the user clicks “揭示真值”. */
+export function displayMeanCenterError(
+  showTruth: boolean,
+  trueMeans: number[][] | undefined,
+  estMeans: number[][]
+): number | undefined {
+  if (!showTruth || !trueMeans || trueMeans.length === 0 || estMeans.length === 0) return undefined;
+  return meanCenterError(trueMeans, estMeans);
 }
 
 /** Eigen decomposition for 2x2 covariance — returns {vals, vecs} for ellipse.

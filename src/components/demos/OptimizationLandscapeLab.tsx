@@ -3,7 +3,7 @@ import { contours as d3Contours } from 'd3-contour';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import { loss, analyticalGrad, stationaryPoint, hessianEigen, type Optimizer, type Landscape, step, type OptState } from '@/lib/math/optimizers';
+import { loss, analyticalGrad, stationaryPoint, hessianEigen, generateNoiseSequence, step, type Optimizer, type Landscape, type OptState, type NoiseSequence } from '@/lib/math/optimizers';
 
 const GRID = 80; // contour resolution
 const W = 520, H = 420, ML = { t: 15, r: 15, b: 40, l: 55 };
@@ -11,21 +11,36 @@ const PW = W - ML.l - ML.r, PH = H - ML.t - ML.b;
 
 type StartPreset = { key: string; label: string; x: number; y: number };
 
+type Preset = {
+  key: string;
+  label: string;
+  lr: number;
+  b1: number;
+  b2: number;
+  landscape: Landscape;
+  startPreset?: string;
+  noiseEnabled?: boolean;
+  selectedOptimizer?: Optimizer;
+};
+
 const START_PRESETS: StartPreset[] = [
   { key: 'ordinary', label: '常规起点 (1.5, 1.5)', x: 1.5, y: 1.5 },
   { key: 'nearSaddle', label: '鞍点附近 (0.02, 0.02)', x: 0.02, y: 0.02 },
   { key: 'exactSaddle', label: '精确鞍点 (0, 0)', x: 0, y: 0 },
 ];
 
-const PRESETS = [
-  { key: 'good', label: '✅ 恰当步长', lr: 0.05, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
-  { key: 'tiny', label: '🐌 步长过小', lr: 0.003, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
-  { key: 'oneStep', label: '🎯 一步到最优', lr: 0.5, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
-  { key: 'critical', label: '〰️ 临界振荡', lr: 1.0, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
-  { key: 'diverge', label: '💥 GD 发散', lr: 1.2, b1: 0.9, b2: 0.999, landscape: 'quadratic' as Landscape },
-  { key: 'illcond', label: '🦴 病态曲率', lr: 0.02, b1: 0.9, b2: 0.999, landscape: 'illcond' as Landscape },
-  { key: 'saddle', label: '⛰️ 鞍点', lr: 0.03, b1: 0.9, b2: 0.999, landscape: 'saddle' as Landscape },
-  { key: 'rosenbrock', label: '🍌 Rosenbrock', lr: 0.003, b1: 0.9, b2: 0.999, landscape: 'rosenbrock' as Landscape },
+const PRESETS: Preset[] = [
+  { key: 'good', label: '✅ 恰当步长', lr: 0.05, b1: 0.9, b2: 0.999, landscape: 'quadratic' },
+  { key: 'tiny', label: '🐌 步长过小', lr: 0.003, b1: 0.9, b2: 0.999, landscape: 'quadratic' },
+  { key: 'oneStep', label: 'GD 一步到最优', lr: 0.5, b1: 0.9, b2: 0.999, landscape: 'quadratic', selectedOptimizer: 'GD' },
+  { key: 'critical', label: 'GD 临界振荡', lr: 1.0, b1: 0.9, b2: 0.999, landscape: 'quadratic', selectedOptimizer: 'GD' },
+  { key: 'diverge', label: 'GD 发散', lr: 1.2, b1: 0.9, b2: 0.999, landscape: 'quadratic', selectedOptimizer: 'GD' },
+  { key: 'illcond', label: '🦴 病态曲率', lr: 0.02, b1: 0.9, b2: 0.999, landscape: 'illcond' },
+  { key: 'saddle', label: '⛰️ 鞍点', lr: 0.03, b1: 0.9, b2: 0.999, landscape: 'saddle' },
+  { key: 'saddleExactNoNoise', label: '精确鞍点 + 无噪声', lr: 0.03, b1: 0.9, b2: 0.999, landscape: 'saddle', startPreset: 'exactSaddle', noiseEnabled: false, selectedOptimizer: 'GD' },
+  { key: 'saddleExactNoise', label: '精确鞍点 + 有噪声', lr: 0.03, b1: 0.9, b2: 0.999, landscape: 'saddle', startPreset: 'exactSaddle', noiseEnabled: true, selectedOptimizer: 'GD' },
+  { key: 'saddleNearNoNoise', label: '鞍点附近 + 无噪声', lr: 0.03, b1: 0.9, b2: 0.999, landscape: 'saddle', startPreset: 'nearSaddle', noiseEnabled: false, selectedOptimizer: 'GD' },
+  { key: 'rosenbrock', label: '🍌 Rosenbrock', lr: 0.003, b1: 0.9, b2: 0.999, landscape: 'rosenbrock' },
 ];
 
 const LANDSCAPE_LEVELS: Record<Landscape, number[]> = {
@@ -46,20 +61,39 @@ export default function OptimizationLandscapeLab() {
   const [startPreset, setStartPreset] = useState<StartPreset>(START_PRESETS[0]);
   const [noiseEnabled, setNoiseEnabled] = useState(false);
   const [noiseScale, setNoiseScale] = useState(0.05);
+  const [noiseSeed, setNoiseSeed] = useState(0);
+  const [commonNoise, setCommonNoise] = useState(true);
+  const [selectedOptimizer, setSelectedOptimizer] = useState<Optimizer>('GD');
   const steps = 30;
 
   const startX = startPreset.x;
   const startY = startPreset.y;
-  const effectiveNoise = noiseEnabled ? noiseScale : 0;
+
+  const noiseSequences = useMemo<Record<Optimizer, NoiseSequence | undefined>>(() => {
+    if (!noiseEnabled) {
+      return { GD: undefined, Momentum: undefined, RMSProp: undefined, Adam: undefined };
+    }
+    if (commonNoise) {
+      const seq = generateNoiseSequence(steps, noiseScale, noiseSeed);
+      return { GD: seq, Momentum: seq, RMSProp: seq, Adam: seq };
+    }
+    return {
+      GD: generateNoiseSequence(steps, noiseScale, noiseSeed + 1),
+      Momentum: generateNoiseSequence(steps, noiseScale, noiseSeed + 2),
+      RMSProp: generateNoiseSequence(steps, noiseScale, noiseSeed + 3),
+      Adam: generateNoiseSequence(steps, noiseScale, noiseSeed + 4),
+    };
+  }, [noiseEnabled, commonNoise, noiseSeed, noiseScale, steps]);
 
   const results = useMemo(() => {
-    const r: Record<string, { path: [number, number][]; lossPath: number[] }> = {};
+    const r = {} as Record<Optimizer, { path: [number, number][]; lossPath: number[] }>;
     for (const opt of ALL_OPTS) {
       let st: OptState = { x: startX, y: startY, vx: 0, vy: 0, sx: 0, sy: 0, t: 0 };
       const path: [number, number][] = [[st.x, st.y]];
       const lossPath: number[] = [loss(st.x, st.y, landscape)];
+      const seq = noiseSequences[opt];
       for (let i = 0; i < steps; i++) {
-        const { newState } = step(st, landscape, opt, lr, beta1, beta2, effectiveNoise);
+        const { newState } = step(st, landscape, opt, lr, beta1, beta2, seq?.[i]);
         st = newState;
         path.push([st.x, st.y]);
         lossPath.push(loss(st.x, st.y, landscape));
@@ -67,7 +101,7 @@ export default function OptimizationLandscapeLab() {
       r[opt] = { path, lossPath };
     }
     return r;
-  }, [landscape, lr, beta1, beta2, startX, startY, effectiveNoise]);
+  }, [landscape, lr, beta1, beta2, startX, startY, noiseSequences]);
 
   // Real contour grid computed with d3-contour (marching squares).
   const contourData = useMemo(() => {
@@ -102,7 +136,7 @@ export default function OptimizationLandscapeLab() {
     startPreset.key === 'exactSaddle' && !noiseEnabled
       ? '精确鞍点 (0,0) + 确定性 GD：梯度为 0，优化器静止不动。'
       : startPreset.key === 'exactSaddle' && noiseEnabled
-        ? '精确鞍点 + 噪声：随机梯度提供逃离方向，优化器沿负曲率方向（y 轴）离开鞍点。'
+        ? '随机扰动可提供初始偏离，负曲率随后通常放大该方向。'
         : startPreset.key === 'nearSaddle' && !noiseEnabled
           ? '鞍点附近 + 确定性 GD：微小扰动打破平衡，优化器沿负曲率方向（y 轴）逃离。'
           : '鞍点附近 + 噪声：梯度噪声与局部负曲率共同作用，逃离鞍点。'
@@ -122,7 +156,18 @@ export default function OptimizationLandscapeLab() {
 
         <div className="flex flex-wrap gap-1">
           {PRESETS.map((p) => (
-            <button key={p.key} onClick={() => { setLandscape(p.landscape); setLr(p.lr); setBeta1(p.b1); setBeta2(p.b2); }}
+            <button key={p.key} onClick={() => {
+              setLandscape(p.landscape);
+              setLr(p.lr);
+              setBeta1(p.b1);
+              setBeta2(p.b2);
+              if (p.startPreset) {
+                const spreset = START_PRESETS.find((s) => s.key === p.startPreset);
+                if (spreset) setStartPreset(spreset);
+              }
+              if (p.noiseEnabled !== undefined) setNoiseEnabled(p.noiseEnabled);
+              if (p.selectedOptimizer) setSelectedOptimizer(p.selectedOptimizer);
+            }}
               className="px-2 py-1 text-[10px] bg-gray-100 text-gray-700 rounded hover:bg-gray-200">{p.label}</button>
           ))}
         </div>
@@ -162,6 +207,20 @@ export default function OptimizationLandscapeLab() {
             <span className="text-[10px] font-mono text-gray-600">σ = {noiseScale.toFixed(3)}</span>
           </div>
           <Slider value={[noiseScale]} min={0.001} max={0.5} step={0.001} onValueChange={(v) => setNoiseScale(v[0])} disabled={!noiseEnabled} />
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Switch id="common-noise-toggle" checked={commonNoise} onCheckedChange={setCommonNoise} disabled={!noiseEnabled} />
+              <label htmlFor="common-noise-toggle" className="text-[10px] text-gray-700 cursor-pointer">{commonNoise ? '共同随机数' : '独立噪声'}</label>
+            </div>
+            <button
+              onClick={() => setNoiseSeed((s) => s + 1)}
+              disabled={!noiseEnabled}
+              className="px-2 py-1 text-[10px] bg-white border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              重新采样噪声
+            </button>
+          </div>
         </div>
 
         {saddleNote && (
@@ -192,11 +251,11 @@ export default function OptimizationLandscapeLab() {
             })()}
             {/* Paths */}
             {ALL_OPTS.map((o) => (
-              <polyline key={o} points={results[o].path.map(([x, y]) => `${toX(x)},${toY(y)}`).join(' ')} fill="none" stroke={OPT_COLORS[o]} strokeWidth={1.5} opacity={0.8} />
+              <polyline key={o} points={results[o].path.map(([x, y]) => `${toX(x)},${toY(y)}`).join(' ')} fill="none" stroke={OPT_COLORS[o]} strokeWidth={selectedOptimizer === o ? 2.5 : 1.5} opacity={selectedOptimizer === o ? 1 : 0.8} />
             ))}
             {ALL_OPTS.map((o) => {
               const last = results[o].path[results[o].path.length - 1];
-              return <circle key={o} cx={toX(last[0])} cy={toY(last[1])} r={3.5} fill={OPT_COLORS[o]} />;
+              return <circle key={o} cx={toX(last[0])} cy={toY(last[1])} r={selectedOptimizer === o ? 4.5 : 3.5} fill={OPT_COLORS[o]} />;
             })}
             {/* Stationary point — use eigenvalues to determine type */}
             <circle cx={toX(sp[0])} cy={toY(sp[1])} r={5} fill="none" stroke="#6b7280" strokeWidth={2} />
@@ -209,7 +268,7 @@ export default function OptimizationLandscapeLab() {
             <rect x={ML.l} y={ML.t} width={PW} height={PH} fill="none" stroke="#d1d5db" strokeWidth={1} />
           </svg>
           <div className="flex justify-center gap-3 pb-2 text-[10px]">
-            {ALL_OPTS.map((o) => <span key={o}><span className="inline-block w-3 h-[2px] align-middle mr-1" style={{backgroundColor: OPT_COLORS[o]}} />{o}</span>)}
+            {ALL_OPTS.map((o) => <span key={o} className={`cursor-pointer px-1 rounded ${selectedOptimizer === o ? 'bg-gray-200' : ''}`} onClick={() => setSelectedOptimizer(o)}><span className="inline-block w-3 h-[2px] align-middle mr-1" style={{backgroundColor: OPT_COLORS[o]}} />{o}</span>)}
           </div>
         </div>
 
@@ -224,7 +283,7 @@ export default function OptimizationLandscapeLab() {
               const range = Math.max(globalMax - globalMin, 1e-6);
               return ALL_OPTS.map((o) => {
                 const lp = results[o].lossPath;
-                return <polyline key={o} points={lp.map((l, i) => `${10 + i / steps * 460},${150 - ((l - globalMin) / range) * 140}`).join(' ')} fill="none" stroke={OPT_COLORS[o]} strokeWidth={1.5} opacity={0.8} />;
+                return <polyline key={o} points={lp.map((l, i) => `${10 + i / steps * 460},${150 - ((l - globalMin) / range) * 140}`).join(' ')} fill="none" stroke={OPT_COLORS[o]} strokeWidth={selectedOptimizer === o ? 2.5 : 1.5} opacity={selectedOptimizer === o ? 1 : 0.8} />;
               });
             })()}
           </svg>
@@ -233,7 +292,7 @@ export default function OptimizationLandscapeLab() {
         <div className="grid grid-cols-4 gap-2 text-center">
           {ALL_OPTS.map((o) => {
             const last = results[o].lossPath[results[o].lossPath.length - 1];
-            return <div key={o} className="rounded-lg p-2" style={{backgroundColor: OPT_COLORS[o] + '15'}}><div className="text-[10px] text-gray-600">{o}</div><div className="text-sm font-bold" style={{color: OPT_COLORS[o]}}>{last.toFixed(4)}</div></div>;
+            return <div key={o} onClick={() => setSelectedOptimizer(o)} className={`rounded-lg p-2 cursor-pointer border-2 ${selectedOptimizer === o ? 'border-gray-800' : 'border-transparent'}`} style={{backgroundColor: OPT_COLORS[o] + '15'}}><div className="text-[10px] text-gray-600">{o}</div><div className="text-sm font-bold" style={{color: OPT_COLORS[o]}}>{last.toFixed(4)}</div></div>;
           })}
         </div>
 

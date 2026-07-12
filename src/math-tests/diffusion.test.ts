@@ -4,7 +4,7 @@ import {
   forwardClosed, forwardIncremental, reverseChain, sampleStats,
   fitGaussianMixture2D, gaussianMixtureScore, gaussianMixtureDensity,
   epsilonFromScore, clampPointCloud, sampleMeanVector, sampleCovarianceMatrix,
-  frobeniusDiff, mmdSquaredGaussian,
+  frobeniusDiff, mmdSquaredGaussian, makeSharedHistogram,
 } from '../lib/math/diffusion';
 
 describe('diffusion', () => {
@@ -104,6 +104,105 @@ describe('diffusion', () => {
       const mmd = Math.sqrt(Math.max(0, mmdSquaredGaussian(closed, incremental)));
       expect(Number.isFinite(mmd)).toBe(true);
       expect(mmd).toBeLessThan(0.5);
+    });
+  });
+
+  describe('seed isolation', () => {
+    it('resampling forward noise does not change z0', () => {
+      const dataSeed = 100;
+      const forwardSeedA = 200;
+      const forwardSeedB = 201;
+      const z0A = generatePointCloud('circle', 50, dataSeed);
+      const z0B = generatePointCloud('circle', 50, dataSeed);
+      expect(z0A).toEqual(z0B);
+
+      const epsA = generateGaussianNoise(50, 2, forwardSeedA);
+      const epsB = generateGaussianNoise(50, 2, forwardSeedB);
+      expect(epsA).not.toEqual(epsB);
+
+      // z0 stays the same regardless of forward noise seed.
+      const ab = alphaBar(50, betas);
+      const closedA = forwardClosed(z0A, epsA, ab);
+      const closedB = forwardClosed(z0B, epsB, ab);
+      expect(closedA).not.toEqual(closedB);
+      expect(sampleMeanVector(z0A)).toEqual(sampleMeanVector(z0B));
+    });
+
+    it('data resampling does not force epsilon to change', () => {
+      const forwardSeed = 300;
+      const dataSeedA = 400;
+      const dataSeedB = 401;
+      const z0A = generatePointCloud('circle', 50, dataSeedA);
+      const z0B = generatePointCloud('circle', 50, dataSeedB);
+      expect(z0A).not.toEqual(z0B);
+
+      const epsA = generateGaussianNoise(50, 2, forwardSeed);
+      const epsB = generateGaussianNoise(50, 2, forwardSeed);
+      expect(epsA).toEqual(epsB);
+
+      const ab = alphaBar(50, betas);
+      const closedA = forwardClosed(z0A, epsA, ab);
+      const closedB = forwardClosed(z0B, epsB, ab);
+      expect(closedA).not.toEqual(closedB);
+    });
+  });
+
+  describe('shared histogram', () => {
+    it('makeSharedHistogram produces identical bin edges for both sets', () => {
+      const a = Array.from({ length: 100 }, (_, i) => i - 50);
+      const b = Array.from({ length: 100 }, (_, i) => i);
+      const { sharedEdges, countsA, countsB } = makeSharedHistogram(a, b, 10);
+      expect(sharedEdges.length).toBe(11);
+      expect(countsA.length).toBe(10);
+      expect(countsB.length).toBe(10);
+      expect(countsA.reduce((s, v) => s + v, 0)).toBe(a.length);
+      expect(countsB.reduce((s, v) => s + v, 0)).toBe(b.length);
+      // The two distributions occupy different ranges, so their peak bins differ.
+      const peakA = countsA.indexOf(Math.max(...countsA));
+      const peakB = countsB.indexOf(Math.max(...countsB));
+      expect(peakA).not.toBe(peakB);
+    });
+  });
+
+  describe('conditional distribution consistency (fixed z0)', () => {
+    it('closed-form and incremental statistics match theoretical q(z_t | z0)', () => {
+      const evalT = 100;
+      const ab = alphaBar(evalT, betas);
+      const fixedZ0: [number, number] = [1.2, -0.8];
+      const sqrtAb = Math.sqrt(ab);
+      const theoreticalMean = [sqrtAb * fixedZ0[0], sqrtAb * fixedZ0[1]];
+      const theoreticalCov = [[1 - ab, 0], [0, 1 - ab]];
+
+      const samples = 1000;
+      const closed: number[][] = [];
+      for (let s = 0; s < samples; s++) {
+        const eps = generateGaussianNoise(1, 2, s + 1);
+        closed.push(forwardClosed([fixedZ0], eps, ab)[0]);
+      }
+
+      const incremental: number[][] = [];
+      for (let s = 0; s < samples; s++) {
+        let z: number[] = [...fixedZ0];
+        for (let t = 0; t < evalT; t++) {
+          const epsT = generateGaussianNoise(1, 2, samples + s * evalT + t);
+          z = forwardIncremental([z], epsT, betas[t])[0];
+        }
+        incremental.push(z);
+      }
+
+      const meanClosed = sampleMeanVector(closed);
+      const meanInc = sampleMeanVector(incremental);
+      const meanErrClosed = Math.sqrt(meanClosed.map((v, i) => (v - theoreticalMean[i]) ** 2).reduce((a, b) => a + b, 0));
+      const meanErrInc = Math.sqrt(meanInc.map((v, i) => (v - theoreticalMean[i]) ** 2).reduce((a, b) => a + b, 0));
+      expect(meanErrClosed).toBeLessThan(0.15);
+      expect(meanErrInc).toBeLessThan(0.15);
+
+      const covClosed = sampleCovarianceMatrix(closed);
+      const covInc = sampleCovarianceMatrix(incremental);
+      const covErrClosed = frobeniusDiff(covClosed, theoreticalCov);
+      const covErrInc = frobeniusDiff(covInc, theoreticalCov);
+      expect(covErrClosed).toBeLessThan(0.15);
+      expect(covErrInc).toBeLessThan(0.15);
     });
   });
 

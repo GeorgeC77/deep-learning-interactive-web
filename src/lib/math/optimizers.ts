@@ -4,6 +4,7 @@
 
 export type Optimizer = 'GD' | 'Momentum' | 'RMSProp' | 'Adam';
 export type Landscape = 'quadratic' | 'illcond' | 'saddle' | 'rosenbrock';
+export type NoiseSequence = [number, number][];
 
 export function loss(x: number, y: number, landscape: Landscape): number {
   switch (landscape) {
@@ -119,12 +120,12 @@ export function step(
   lr: number,
   beta1: number,
   beta2: number,
-  noiseScale = 0,
-): { newState: OptState; dx: number; dy: number } {
+  noise?: [number, number],
+): { newState: OptState; dx: number; dy: number; grad: [number, number] } {
   let [gx, gy] = analyticalGrad(state.x, state.y, landscape);
-  if (noiseScale > 0) {
-    gx += randomNormal() * noiseScale;
-    gy += randomNormal() * noiseScale;
+  if (noise) {
+    gx += noise[0];
+    gy += noise[1];
   }
   const { x, y, vx, vy, sx, sy, t } = state;
   let dx = 0, dy = 0, nvx = vx, nvy = vy, nsx = sx, nsy = sy;
@@ -165,12 +166,41 @@ export function step(
   return {
     newState: { x: x + dx, y: y + dy, vx: nvx, vy: nvy, sx: nsx, sy: nsy, t: t + 1 },
     dx, dy,
+    grad: [gx, gy],
   };
 }
 
-/** Box-Muller transform for standard normal noise (mini-batch gradient noise). */
-function randomNormal(): number {
-  const u = 1 - Math.random();
-  const v = Math.random();
-  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+/** Deterministic seeded PRNG (mulberry32). */
+function mulberry32(seed: number): () => number {
+  return () => {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Pre-generate a deterministic [step][dimension] noise sequence. */
+export function generateNoiseSequence(
+  steps: number,
+  scale: number,
+  seed: number,
+): NoiseSequence {
+  const seq: NoiseSequence = [];
+  if (scale === 0) {
+    for (let i = 0; i < steps; i++) seq.push([0, 0]);
+    return seq;
+  }
+
+  const rand = mulberry32(seed);
+  for (let i = 0; i < steps; i++) {
+    // Box-Muller transform for two independent standard normals.
+    const u = 1 - rand();
+    const v = rand();
+    const r = Math.sqrt(-2 * Math.log(u));
+    const z0 = r * Math.cos(2 * Math.PI * v);
+    const z1 = r * Math.sin(2 * Math.PI * v);
+    seq.push([z0 * scale, z1 * scale]);
+  }
+  return seq;
 }

@@ -13,7 +13,8 @@
     "coverage:check": "node scripts/check-coverage.cjs",
     "audit:bishop": "node --experimental-strip-types scripts/audit_bishop_alignment.ts",
     "test": "vitest run",
-    "test:math": "vitest run src/math-tests"
+    "test:math": "vitest run src/math-tests src/pedagogical-tests",
+    "test:pedagogical": "vitest run src/pedagogical-tests"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

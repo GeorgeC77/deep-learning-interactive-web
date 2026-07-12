@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import { eStep, mStep, logLikelihood, elbo, klResponsibilities, eigen2x2, emIteration, labelInvariantMeanError, type GMMParams } from '@/lib/math/em';
+import { eStep, mStep, logLikelihood, elbo, klResponsibilities, eigen2x2, displayMeanCenterError, runEM, kMeansInit, type GMMParams, type EMRunResult } from '@/lib/math/em';
 
 /* -------------------------------------------------------------------------- */
 /* 固定真值参数                                                               */
@@ -110,7 +110,6 @@ function toY(v: number) { return MG.t + PH - ((v + 4) / 8) * PH; }
 
 export default function EMELBOLab() {
   const dataSeed = 42;
-  
 
   // Data generated from TRUE params, never changes
   const data = useMemo(() => generateData(200, dataSeed), []);
@@ -124,7 +123,8 @@ export default function EMELBOLab() {
   const [logLikHistory, setLogLikHistory] = useState<number[]>(() => [logLikelihood(data, badInit())]);
 
   const [showTruth, setShowTruth] = useState(false);
-  const [multiStartResults, setMultiStartResults] = useState<{ seed: number; finalLL: number; iters: number }[] | null>(null);
+  const [multiStartResults, setMultiStartResults] = useState<(EMRunResult & { seed: number; meanError?: number })[] | null>(null);
+  const [initMethod, setInitMethod] = useState<'random' | 'kmeans'>('random');
 
   // ELBO interactive state
   const [selectedPt, setSelectedPt] = useState<number | null>(null);
@@ -133,7 +133,7 @@ export default function EMELBOLab() {
 
   const currentParams: GMMParams = useMemo(() => ({ means: estMeans, covs: estCovs, pis: estPis }), [estMeans, estCovs, estPis]);
 
-  const meanError = useMemo(() => labelInvariantMeanError(TRUE_MEANS, estMeans).total, [estMeans]);
+  const meanError = useMemo(() => displayMeanCenterError(showTruth, TRUE_MEANS, estMeans), [showTruth, estMeans]);
 
   const [phase, setPhase] = useState<'need-e' | 'need-m'>('need-e');
 
@@ -141,8 +141,13 @@ export default function EMELBOLab() {
     const ll = logLikelihood(data, params);
     setLogLikHistory((prev) => {
       if (prev.length > 0) {
-        // EM guarantee: a full iteration never decreases log-likelihood (floating-point tolerance).
-        console.assert(ll + 1e-9 >= prev[prev.length - 1], 'EM log-likelihood decreased');
+        // For the standard exact EM algorithm, a full iteration never decreases
+        // log-likelihood. This demonstration adds numerical protections (covariance
+        // floor, empty-component reset) that can in rare cases produce tiny decreases;
+        // we monitor and report them rather than asserting strict monotonicity.
+        if (ll + 1e-9 < prev[prev.length - 1]) {
+          console.warn('EM log-likelihood decreased (numerical protection may have triggered)');
+        }
       }
       return [...prev, ll];
     });
@@ -187,16 +192,18 @@ export default function EMELBOLab() {
     setPhase('need-e');
   };
 
+  const makeInit = (seed: number): GMMParams => {
+    if (initMethod === 'kmeans') return kMeansInit(data, K, seed);
+    return randomInit(seed);
+  };
+
   const runMultiStart = () => {
     const seeds = [101, 202, 303, 404, 505];
-    const iters = 20;
     const results = seeds.map((seed) => {
-      let params: GMMParams = randomInit(seed);
-      for (let i = 0; i < iters; i++) {
-        const r = emIteration(data, params);
-        params = r.newParams;
-      }
-      return { seed, finalLL: logLikelihood(data, params), iters };
+      const init = makeInit(seed);
+      const result = runEM(data, init, { tolerance: 1e-6, maxIter: 200 });
+      const meanError = displayMeanCenterError(showTruth, TRUE_MEANS, result.params.means);
+      return { seed, meanError, ...result };
     });
     setMultiStartResults(results);
   };
@@ -222,11 +229,14 @@ export default function EMELBOLab() {
     setManualLogits(probsToLogits(elboInfo.posterior as [number, number, number]));
   };
 
+  const anyProtectionTriggered = multiStartResults?.some((r) => r.emptyCount > 0 || r.floorCount > 0) ?? false;
+  const mainProtectionTriggered = logLikHistory.some((_, i) => i > 0 && logLikHistory[i] + 1e-9 < logLikHistory[i - 1]);
+
   return (
     <InteractiveDemo title="EM 算法与 ELBO：高斯混合模型交互实验">
       <div className="space-y-4">
         <p className="text-sm text-gray-600">
-          数据由固定真值参数生成。观察 EM 通过 E-step（计算 responsibility）和 M-step（更新均值和协方差）优化对数似然。
+          这是带数值稳定保护的 EM 演示。数据由固定真值参数生成。观察 EM 通过 E-step（计算 responsibility）和 M-step（更新均值和协方差）优化对数似然。
           椭圆表示协方差矩阵的等高线。
         </p>
 
@@ -236,15 +246,12 @@ export default function EMELBOLab() {
           <button onClick={doFullEM} className="px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">▶ E+M（一次迭代）</button>
           <button onClick={resetBad} className="px-3 py-1.5 text-sm bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200">♻ 坏初始化</button>
           <span className="text-xs text-gray-500 self-center ml-2">迭代 #{iteration}</span>
-          <label className="inline-flex items-center gap-1.5 text-xs text-gray-600 ml-auto cursor-pointer">
-            <input
-              type="checkbox"
-              checked={showTruth}
-              onChange={(e) => setShowTruth(e.target.checked)}
-              className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-            />
-            显示真值
-          </label>
+          <button
+            onClick={() => setShowTruth((v) => !v)}
+            className={`ml-auto px-3 py-1.5 text-xs rounded-lg font-medium ${showTruth ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' : 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'}`}
+          >
+            {showTruth ? '隐藏真值' : '揭示真值'}
+          </button>
         </div>
 
         {/* SVG */}
@@ -295,40 +302,68 @@ export default function EMELBOLab() {
                 fill="none" stroke="#8b5cf6" strokeWidth={2} />
             </svg>
             <div className="text-[10px] text-gray-500 text-right font-mono">当前: {logLikHistory[logLikHistory.length - 1]?.toFixed(1)}</div>
-            <div className="text-[10px] text-gray-500 mt-1">标签无关平均中心误差: <span className="font-mono">{meanError.toFixed(3)}</span></div>
+            {showTruth && meanError !== undefined && (
+              <div className="text-[10px] text-gray-500 mt-1">标签无关平均中心误差: <span className="font-mono">{meanError.toFixed(3)}</span></div>
+            )}
+            {mainProtectionTriggered && (
+              <div className="text-[10px] text-amber-600 mt-1">⚠️ 主运行中监测到似然下降，数值保护可能已触发。</div>
+            )}
           </div>
         )}
 
         {/* Multi-start comparison */}
         <div className="bg-white rounded-lg border p-3">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-xs font-medium text-gray-600">多起点对比（各运行 20 次完整迭代）</div>
-            <button
-              onClick={runMultiStart}
-              className="px-2 py-1 text-[10px] bg-slate-700 text-white rounded hover:bg-slate-800"
-            >
-              运行多起点
-            </button>
+          <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+            <div className="text-xs font-medium text-gray-600">多起点对比（按收敛准则运行）</div>
+            <div className="flex items-center gap-2">
+              <select
+                value={initMethod}
+                onChange={(e) => setInitMethod(e.target.value as 'random' | 'kmeans')}
+                className="text-[10px] border rounded px-2 py-1"
+              >
+                <option value="random">随机初始化</option>
+                <option value="kmeans">K-means 初始化</option>
+              </select>
+              <button
+                onClick={runMultiStart}
+                className="px-2 py-1 text-[10px] bg-slate-700 text-white rounded hover:bg-slate-800"
+              >
+                运行多起点
+              </button>
+            </div>
           </div>
+          {anyProtectionTriggered && (
+            <div className="text-[10px] text-amber-600 mb-2">⚠️ 部分起点触发了数值保护（空成分重置或协方差 floor）。</div>
+          )}
           {multiStartResults ? (
             <table className="w-full text-[10px]">
               <thead>
                 <tr className="text-left text-gray-500 border-b">
                   <th className="pb-1">种子</th>
+                  <th className="pb-1">收敛</th>
+                  <th className="pb-1">迭代</th>
+                  <th className="pb-1">空成分</th>
+                  <th className="pb-1">floor</th>
                   <th className="pb-1">最终对数似然</th>
+                  {showTruth && <th className="pb-1">平均中心误差</th>}
                 </tr>
               </thead>
               <tbody>
-                {multiStartResults.map(({ seed, finalLL }) => (
-                  <tr key={seed} className="border-b last:border-0">
-                    <td className="py-1 font-mono">{seed}</td>
-                    <td className="py-1 font-mono">{finalLL.toFixed(1)}</td>
+                {multiStartResults.map((r) => (
+                  <tr key={r.seed} className="border-b last:border-0">
+                    <td className="py-1 font-mono">{r.seed}</td>
+                    <td className="py-1">{r.converged ? '✓' : '✗'}</td>
+                    <td className="py-1 font-mono">{r.iterations}</td>
+                    <td className="py-1 font-mono">{r.emptyCount}</td>
+                    <td className="py-1 font-mono">{r.floorCount}</td>
+                    <td className="py-1 font-mono">{r.logLikelihood.toFixed(1)}</td>
+                    {showTruth && <td className="py-1 font-mono">{r.meanError?.toFixed(3)}</td>}
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <p className="text-[10px] text-gray-400">点击运行查看不同初始化种子的最终对数似然</p>
+            <p className="text-[10px] text-gray-400">点击运行查看不同初始化种子的收敛结果</p>
           )}
         </div>
 
@@ -384,8 +419,9 @@ export default function EMELBOLab() {
           <p className="mt-1">
             在 E 步中 q(z|x,θ) = p(z|x,θ)，KL(q||p) = 0，ELBO 恰好接触 log p(x|θ)。
             M 步优化完整协方差 Σ_k = (1/Nk) Σ γ_nk (x_n−μ_k)(x_n−μ_k)ᵀ。
-            EM 保证完整迭代不降低观测数据对数似然，但可能收敛到局部最优，且存在 label switching。
-            点击“坏初始化”可从远离真值的初始参数重新开始；先预测或运行若干次迭代，再切换“显示真值”对照真值。
+            标准精确 EM 保证完整迭代不降低观测数据对数似然，但可能收敛到局部最优，且存在 label switching。
+            本演示加入了协方差 floor 与空成分重置等数值稳定保护；当保护触发时，似然可能不再严格单调，我们会监测并提示。
+            点击“坏初始化”可从远离真值的初始参数重新开始；先预测或运行若干次迭代，再点击“揭示真值”对照真值。
           </p>
         </div>
       </div>

@@ -201,6 +201,47 @@ export function histogram(values: number[], bins = 20): { edges: number[]; count
   return { edges, counts };
 }
 
+/**
+ * Build two histograms over *identical* bin edges so overlays are directly comparable.
+ * Returns shared bin edges plus counts for each distribution.
+ */
+export function makeSharedHistogram(
+  valuesA: number[],
+  valuesB: number[],
+  bins = 20,
+): { sharedEdges: number[]; countsA: number[]; countsB: number[] } {
+  let min = Infinity, max = -Infinity;
+  for (const v of [...valuesA, ...valuesB]) {
+    if (Number.isFinite(v)) {
+      if (v < min) min = v;
+      if (v > max) max = v;
+    }
+  }
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min === max) {
+    const edges = Array.from({ length: bins + 1 }, (_, i) => min + i);
+    return { sharedEdges: edges, countsA: new Array(bins).fill(0), countsB: new Array(bins).fill(0) };
+  }
+  const countsA = new Array(bins).fill(0);
+  const countsB = new Array(bins).fill(0);
+  const sharedEdges: number[] = [];
+  for (let i = 0; i <= bins; i++) sharedEdges.push(min + ((max - min) * i) / bins);
+
+  const binIndex = (v: number) => {
+    let idx = Math.floor(((v - min) / (max - min)) * bins);
+    if (idx < 0) idx = 0;
+    if (idx >= bins) idx = bins - 1;
+    return idx;
+  };
+
+  for (const v of valuesA) {
+    if (Number.isFinite(v)) countsA[binIndex(v)]++;
+  }
+  for (const v of valuesB) {
+    if (Number.isFinite(v)) countsB[binIndex(v)]++;
+  }
+  return { sharedEdges, countsA, countsB };
+}
+
 /* -------------------------------------------------------------------------- */
 /* Gaussian mixture score for generation denoiser                             */
 /* -------------------------------------------------------------------------- */
@@ -395,14 +436,23 @@ export function reverseMean(
 export function reverseStep(
   zt: number[][], t: number, epsilonHat: number[][], betas: number[],
   isFinalStep: boolean,
+  seedOrRng?: number | (() => number),
 ): number[][] {
   const betaT = betas[t - 1];
   const noise = isFinalStep ? 0 : Math.sqrt(betaT);
-  // Generate new Gaussian noise for stochastic reverse
-  const rng = mulberry32(t * 12345 + 1);
+  // Use provided RNG/seed so changing reverseNoiseSeed changes the trajectory.
+  // When a function RNG is supplied, every row shares it (stream semantics).
+  // When a numeric seed is supplied, each row gets a deterministic sub-stream
+  // derived from that seed so resampling the global seed changes all rows.
+  const baseRng = typeof seedOrRng === 'function'
+    ? seedOrRng
+    : mulberry32(typeof seedOrRng === 'number' ? seedOrRng : 1);
   return zt.map((row, i) => {
+    const rowRng = typeof seedOrRng === 'function'
+      ? baseRng
+      : mulberry32(typeof seedOrRng === 'number' ? seedOrRng + i * 31 + 7 : 1 + i * 31 + 7);
     const mu = reverseMean(row, t, epsilonHat[i], betas);
-    return mu.map((m) => m + (noise > 0 ? noise * boxMuller(rng) : 0));
+    return mu.map((m) => m + (noise > 0 ? noise * boxMuller(rowRng) : 0));
   });
 }
 
@@ -417,13 +467,19 @@ export function reverseChain(
   betas: number[],
   predictNoise: (z: number[][], t: number) => number[][],
   stochastic: boolean,
+  seedOrRng?: number | (() => number),
 ): number[][][] {
   const path: number[][][] = [zT.map((r) => [...r])];
   let z = zT.map((r) => [...r]);
   for (let t = T; t >= 1; t--) {
     const epsilonHat = predictNoise(z, t);
     const isFinal = (t === 1) || !stochastic;
-    z = reverseStep(z, t, epsilonHat, betas, isFinal);
+    // Per-step seed derived from the global reverse seed so the whole chain is deterministic,
+    // but changing the global seed changes every step.
+    const stepSeed = typeof seedOrRng === 'number'
+      ? seedOrRng + (T - t) * 97
+      : seedOrRng;
+    z = reverseStep(z, t, epsilonHat, betas, isFinal, stepSeed);
     path.push(z.map((r) => [...r]));
   }
   return path;

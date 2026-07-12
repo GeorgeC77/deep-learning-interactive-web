@@ -176,6 +176,18 @@ export function tapeMemoryCost(tape: TapeEntry[]): { count: number; bytesEstimat
 }
 
 /**
+ * Whether backward stepping is currently allowed.
+ * Enabled after a full forward pass or after stepping forward to completion.
+ */
+export function canStepBackward(
+  fwdVals: Record<string, number> | null,
+  stepFwdIdx: number | null,
+  orderLength: number,
+): boolean {
+  return fwdVals !== null || stepFwdIdx === orderLength - 1;
+}
+
+/**
  * Advance the step-by-step forward pass by one node.
  */
 export function stepForwardOnce(

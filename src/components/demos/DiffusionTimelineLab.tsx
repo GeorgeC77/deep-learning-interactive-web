@@ -19,7 +19,7 @@ import {
   frobeniusDiff,
   mmdSquaredGaussian,
   wasserstein2GaussianApprox,
-  histogram,
+  makeSharedHistogram,
 } from '@/lib/math/diffusion';
 
 /* -------------------------------------------------------------------------- */
@@ -53,7 +53,7 @@ const toY = (v: number) => MG.t + PH - ((v + 2.5) / 5) * PH;
 
 const VIEW_MIN = -2.5, VIEW_RANGE = 5;
 
-type Mode = 'closed-forward' | 'incremental-forward' | 'reverse' | 'forward-compare';
+type Mode = 'closed-forward' | 'incremental-forward' | 'reverse' | 'forward-compare' | 'conditional-compare';
 type ReverseDenoiser = 'oracle' | 'generation';
 
 export default function DiffusionTimelineLab() {
@@ -62,15 +62,19 @@ export default function DiffusionTimelineLab() {
   const N = 100;
   const GMM_K = 5;
   const COMPARE_SAMPLES = 120;
+  const CONDITIONAL_SAMPLES = 1000;
 
   const [mode, setMode] = useState<Mode>('closed-forward');
   const [displayT, setDisplayT] = useState(0);
   const [cloudType, setCloudType] = useState<'circle' | 'swiss' | 'moons'>('circle');
-  const [seed, setSeed] = useState(42);
+  const [dataSeed, setDataSeed] = useState(42);
+  const [forwardNoiseSeed, setForwardNoiseSeed] = useState(42);
+  const [reverseNoiseSeed, setReverseNoiseSeed] = useState(42);
+  const [compareSeed, setCompareSeed] = useState(1234);
   const [predictionError, setPredictionError] = useState(false);
   const [stochasticReverse, setStochasticReverse] = useState(true);
   const [reverseDenoiser, setReverseDenoiser] = useState<ReverseDenoiser>('oracle');
-  const [compareSeed, setCompareSeed] = useState(1234);
+  const [fixedZ0Index, setFixedZ0Index] = useState(0);
 
   // Slider step 0..DISPLAY_STEPS-1 maps to progress 0..T.
   // In forward modes this progress is the diffusion time t; in reverse mode it is the reverse progress s.
@@ -80,16 +84,16 @@ export default function DiffusionTimelineLab() {
   const betas = useMemo(() => makeBetaSchedule(T, 1e-4, 0.02), []);
   const abT = useMemo(() => alphaBar(T, betas), [betas]);
 
-  const z0 = useMemo(() => generatePointCloud(cloudType, N, seed), [cloudType, N, seed]);
-  const epsilon = useMemo(() => generateGaussianNoise(N, 2, seed), [N, seed]);
+  const z0 = useMemo(() => generatePointCloud(cloudType, N, dataSeed), [cloudType, N, dataSeed]);
+  const epsilon = useMemo(() => generateGaussianNoise(N, 2, forwardNoiseSeed), [N, forwardNoiseSeed]);
   const gmm = useMemo(() => fitGaussianMixture2D(z0, GMM_K), [z0]);
 
   // epsilon_hat: optional prediction error added to the true noise (used in forward modes).
   const epsilonHat = useMemo(() => {
     const err = predictionError ? 0.3 : 0;
-    const rng = mulberry32(seed + 999);
+    const rng = mulberry32(forwardNoiseSeed + 999);
     return epsilon.map(([ex, ey]) => [ex + (rng() - 0.5) * err, ey + (rng() - 0.5) * err] as [number, number]);
-  }, [epsilon, seed, predictionError]);
+  }, [epsilon, forwardNoiseSeed, predictionError]);
 
   // Closed-form forward: alphaBar(0) = 1 ⇒ displayT=0 gives exactly z0.
   const ztClosed = useMemo(() => forwardClosed(z0, epsilon, alphaBar(realT, betas)), [z0, epsilon, betas, realT]);
@@ -98,11 +102,11 @@ export default function DiffusionTimelineLab() {
   const ztIncremental = useMemo(() => {
     let z: number[][] = z0.map(([x, y]) => [x, y]);
     for (let t = 0; t < realT; t++) {
-      const epsT = generateGaussianNoise(N, 2, seed + t * 200);
+      const epsT = generateGaussianNoise(N, 2, forwardNoiseSeed + t * 200);
       z = forwardIncremental(z, epsT, betas[t]);
     }
     return z;
-  }, [z0, betas, realT, seed]);
+  }, [z0, betas, realT, forwardNoiseSeed]);
 
   // Reverse chain: path[0] = z_T, path[T] = z_0.
   const reversePath = useMemo(() => {
@@ -119,18 +123,18 @@ export default function DiffusionTimelineLab() {
           row.map((v, j) => (v - sqrtAb * z0[i][j]) / sqrt1mAb),
         );
       };
-      return reverseChain(zT, T, betas, oraclePredictNoise, stochasticReverse);
+      return reverseChain(zT, T, betas, oraclePredictNoise, stochasticReverse, reverseNoiseSeed);
     }
 
     // Generation mode: start from fresh noise and use the analytic score of the fitted GMM.
-    const zTGen = generateGaussianNoise(N, 2, seed + 999999);
+    const zTGen = generateGaussianNoise(N, 2, reverseNoiseSeed + 999999);
     const gmmPredictNoise = (z: number[][], t: number) => {
       const ab = alphaBar(t, betas);
       return z.map((row) => epsilonFromScore(gaussianMixtureScore(row, t, betas, gmm), ab));
     };
-    const rawPath = reverseChain(zTGen, T, betas, gmmPredictNoise, stochasticReverse);
+    const rawPath = reverseChain(zTGen, T, betas, gmmPredictNoise, stochasticReverse, reverseNoiseSeed);
     return rawPath.map((step) => clampPointCloud(step, 25));
-  }, [reverseDenoiser, z0, epsilon, betas, T, N, seed, stochasticReverse, gmm]);
+  }, [reverseDenoiser, z0, epsilon, betas, T, N, reverseNoiseSeed, stochasticReverse, gmm]);
 
   // Reverse time-axis mapping: reverseIndex equals reverse progress s and points into reversePath.
   const reverseIndex = reverseS;
@@ -145,7 +149,7 @@ export default function DiffusionTimelineLab() {
 
   // x0 prediction (clean-sample estimate) at time realT.
   const x0Pred = useMemo(() => {
-    if (mode === 'forward-compare') return null;
+    if (mode === 'forward-compare' || mode === 'conditional-compare') return null;
     if (mode !== 'reverse') {
       const ab = alphaBar(realT, betas);
       const sqrtAb = Math.sqrt(Math.max(ab, 1e-10));
@@ -175,7 +179,68 @@ export default function DiffusionTimelineLab() {
   const currentAb = alphaBar(realT, betas);
 
   /* -------------------------------------------------------------------------- */
-  /* Forward distribution consistency experiment                                */
+  /* Conditional distribution consistency experiment (single fixed z0)          */
+  /* -------------------------------------------------------------------------- */
+  const conditionalCompare = useMemo(() => {
+    if (mode !== 'conditional-compare') return null;
+    const fixedZ0 = z0[Math.min(Math.max(0, fixedZ0Index), z0.length - 1)];
+    const ab = alphaBar(realT, betas);
+    const sqrtAb = Math.sqrt(Math.max(ab, 0));
+    const theoreticalMean = [sqrtAb * fixedZ0[0], sqrtAb * fixedZ0[1]];
+    const theoreticalCov = [[1 - ab, 0], [0, 1 - ab]];
+
+    // Closed-form: sample epsilon 1000 times for the same z0.
+    const closed: number[][] = [];
+    for (let s = 0; s < CONDITIONAL_SAMPLES; s++) {
+      const eps = generateGaussianNoise(1, 2, compareSeed + s * 3 + 1);
+      closed.push(forwardClosed([fixedZ0], eps, ab)[0]);
+    }
+
+    // Incremental: run 1000 independent chains from the same z0.
+    const incremental: number[][] = [];
+    for (let s = 0; s < CONDITIONAL_SAMPLES; s++) {
+      let z: number[] = [...fixedZ0];
+      for (let t = 0; t < realT; t++) {
+        const epsT = generateGaussianNoise(1, 2, compareSeed + s * 7 + t + 10000);
+        z = forwardIncremental([z], epsT, betas[t])[0];
+      }
+      incremental.push(z);
+    }
+
+    const empiricalMeanClosed = sampleMeanVector(closed);
+    const empiricalMeanInc = sampleMeanVector(incremental);
+    const meanErrClosed = Math.sqrt(empiricalMeanClosed.map((v, i) => (v - theoreticalMean[i]) ** 2).reduce((a, b) => a + b, 0));
+    const meanErrInc = Math.sqrt(empiricalMeanInc.map((v, i) => (v - theoreticalMean[i]) ** 2).reduce((a, b) => a + b, 0));
+
+    const empiricalCovClosed = sampleCovarianceMatrix(closed);
+    const empiricalCovInc = sampleCovarianceMatrix(incremental);
+    const covErrClosed = frobeniusDiff(empiricalCovClosed, theoreticalCov);
+    const covErrInc = frobeniusDiff(empiricalCovInc, theoreticalCov);
+
+    const xShared = makeSharedHistogram(closed.map((p) => p[0]), incremental.map((p) => p[0]), 24);
+    const yShared = makeSharedHistogram(closed.map((p) => p[1]), incremental.map((p) => p[1]), 24);
+
+    return {
+      fixedZ0,
+      theoreticalMean,
+      theoreticalCov,
+      empiricalMeanClosed,
+      empiricalMeanInc,
+      meanErrClosed,
+      meanErrInc,
+      empiricalCovClosed,
+      empiricalCovInc,
+      covErrClosed,
+      covErrInc,
+      closed,
+      incremental,
+      xShared,
+      yShared,
+    };
+  }, [mode, z0, fixedZ0Index, realT, betas, compareSeed]);
+
+  /* -------------------------------------------------------------------------- */
+  /* Overall marginal distribution comparison (multiple different z0)           */
   /* -------------------------------------------------------------------------- */
   const compare = useMemo(() => {
     if (mode !== 'forward-compare') return null;
@@ -199,6 +264,9 @@ export default function DiffusionTimelineLab() {
     const mmd = Math.sqrt(Math.max(0, mmdSquaredGaussian(closed, incremental)));
     const w2 = Math.sqrt(Math.max(0, wasserstein2GaussianApprox(closed, incremental)));
 
+    const xShared = makeSharedHistogram(closed.map((p) => p[0]), incremental.map((p) => p[0]), 16);
+    const yShared = makeSharedHistogram(closed.map((p) => p[1]), incremental.map((p) => p[1]), 16);
+
     return {
       closed,
       incremental,
@@ -206,10 +274,8 @@ export default function DiffusionTimelineLab() {
       covDiff,
       mmd,
       w2,
-      xHistClosed: histogram(closed.map((p) => p[0]), 16),
-      xHistInc: histogram(incremental.map((p) => p[0]), 16),
-      yHistClosed: histogram(closed.map((p) => p[1]), 16),
-      yHistInc: histogram(incremental.map((p) => p[1]), 16),
+      xShared,
+      yShared,
     };
   }, [mode, cloudType, compareSeed, realT, betas]);
 
@@ -258,8 +324,10 @@ export default function DiffusionTimelineLab() {
       label: mode === 'reverse'
         ? `z_t reverse (s=${reverseS}, t=${realT})`
         : mode === 'forward-compare'
-          ? '对比模式'
-          : `z_t（t=${realT}）`,
+          ? '总体边缘分布比较'
+          : mode === 'conditional-compare'
+            ? '条件分布比较'
+            : `z_t（t=${realT}）`,
       pts: displayPts,
       color: '#f59e0b',
     },
@@ -276,6 +344,33 @@ export default function DiffusionTimelineLab() {
 
   const highlightedIndex = 0;
 
+  const renderSharedHistogram = (
+    title: string,
+    shared: { sharedEdges: number[]; countsA: number[]; countsB: number[] },
+  ) => {
+    const maxCount = Math.max(...shared.countsA, ...shared.countsB, 1);
+    const bins = shared.countsA.length;
+    const binW = PW / 2 / bins;
+    const chartH = H / 4;
+    return (
+      <div className="bg-white rounded border p-2">
+        <div className="text-[10px] text-gray-500 mb-1">{title}</div>
+        <svg viewBox={`0 0 ${W / 2} ${chartH}`} className="w-full" style={{ maxHeight: 120 }}>
+          {shared.countsA.map((c, i) => (
+            <rect key={`c-${i}`} x={i * binW} y={chartH * (1 - c / maxCount)} width={binW * 0.45} height={chartH * (c / maxCount)} fill="#3b82f6" opacity={0.7} />
+          ))}
+          {shared.countsB.map((c, i) => (
+            <rect key={`i-${i}`} x={i * binW + binW * 0.45} y={chartH * (1 - c / maxCount)} width={binW * 0.45} height={chartH * (c / maxCount)} fill="#f59e0b" opacity={0.7} />
+          ))}
+        </svg>
+        <div className="flex justify-between text-[9px] text-gray-500 mt-0.5">
+          <span>{shared.sharedEdges[0].toFixed(2)}</span>
+          <span>{shared.sharedEdges[shared.sharedEdges.length - 1].toFixed(2)}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <InteractiveDemo title="扩散模型时间线实验：forward + reverse">
       <div className="space-y-4">
@@ -290,9 +385,11 @@ export default function DiffusionTimelineLab() {
               {t === 'circle' ? '⭕ 圆' : t === 'swiss' ? '🥐 Swiss Roll' : '🌙 Moons'}
             </button>
           ))}
-          <button onClick={() => setSeed(Math.floor(Math.random() * 10000))} className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">🔄 ε 重采样</button>
-          {mode === 'forward-compare' && (
-            <button onClick={() => setCompareSeed(Math.floor(Math.random() * 10000))} className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">🔄 对比样本重采样</button>
+          <button onClick={() => setDataSeed(Math.floor(Math.random() * 10000))} className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">🔄 重新生成数据</button>
+          <button onClick={() => setForwardNoiseSeed(Math.floor(Math.random() * 10000))} className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">🔄 重采样前向 ε</button>
+          <button onClick={() => setReverseNoiseSeed(Math.floor(Math.random() * 10000))} className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">🔄 重采样反向随机项</button>
+          {(mode === 'forward-compare' || mode === 'conditional-compare') && (
+            <button onClick={() => setCompareSeed(Math.floor(Math.random() * 10000))} className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">🔄 重采样统计实验</button>
           )}
           <label className="flex items-center gap-1 text-xs text-gray-600">
             <input type="checkbox" checked={predictionError} onChange={() => setPredictionError(!predictionError)} /> prediction error
@@ -301,10 +398,14 @@ export default function DiffusionTimelineLab() {
 
         {/* Mode selector */}
         <div className="flex flex-wrap gap-1 items-center">
-          {(['closed-forward', 'incremental-forward', 'reverse', 'forward-compare'] as const).map((m) => (
+          {(['closed-forward', 'incremental-forward', 'reverse', 'forward-compare', 'conditional-compare'] as const).map((m) => (
             <button key={m} onClick={() => { setMode(m); setDisplayT(0); }}
               className={`px-3 py-1 text-xs rounded-lg ${mode === m ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700'}`}>
-              {m === 'closed-forward' ? '闭式前向' : m === 'incremental-forward' ? '增量前向' : m === 'reverse' ? '反向采样' : '前向分布一致性'}
+              {m === 'closed-forward' ? '闭式前向'
+                : m === 'incremental-forward' ? '增量前向'
+                  : m === 'reverse' ? '反向采样'
+                    : m === 'forward-compare' ? '总体边缘分布比较'
+                      : '条件分布一致性'}
             </button>
           ))}
           {mode === 'reverse' && (
@@ -341,6 +442,16 @@ export default function DiffusionTimelineLab() {
           </div>
         )}
 
+        {mode === 'conditional-compare' && (
+          <div>
+            <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
+              <span>固定 z₀ 索引</span>
+              <span>{fixedZ0Index} / {N - 1}</span>
+            </div>
+            <Slider value={[fixedZ0Index]} min={0} max={N - 1} step={1} onValueChange={(v) => setFixedZ0Index(v[0])} />
+          </div>
+        )}
+
         <div>
           <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
             <span>{mode === 'reverse' ? '反向进度 s' : '扩散时间 t'}</span>
@@ -357,9 +468,51 @@ export default function DiffusionTimelineLab() {
           </div>
         </div>
 
+        {mode === 'conditional-compare' && conditionalCompare && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs space-y-3">
+            <p><strong>🎓 条件分布一致性实验：</strong>固定单个 z₀，比较闭式与增量前向得到的 q(z_t | z₀)。same distribution, not same realization。</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
+              <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">mean err 闭式</div><div>{conditionalCompare.meanErrClosed.toFixed(4)}</div></div>
+              <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">mean err 增量</div><div>{conditionalCompare.meanErrInc.toFixed(4)}</div></div>
+              <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">cov err 闭式</div><div>{conditionalCompare.covErrClosed.toFixed(4)}</div></div>
+              <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">cov err 增量</div><div>{conditionalCompare.covErrInc.toFixed(4)}</div></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[10px] text-gray-600">
+              <div className="bg-white rounded p-2">
+                <div className="font-medium mb-1">理论 mean</div>
+                <div>[{conditionalCompare.theoreticalMean.map((v) => v.toFixed(4)).join(', ')}]</div>
+              </div>
+              <div className="bg-white rounded p-2">
+                <div className="font-medium mb-1">理论 cov</div>
+                <div>[[{conditionalCompare.theoreticalCov[0].map((v) => v.toFixed(4)).join(', ')}], [{conditionalCompare.theoreticalCov[1].map((v) => v.toFixed(4)).join(', ')}]]</div>
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              {[
+                { label: `闭式前向 t=${realT}`, pts: conditionalCompare.closed, color: '#3b82f6' },
+                { label: `增量前向 t=${realT}`, pts: conditionalCompare.incremental, color: '#f59e0b' },
+              ].map((view, vi) => (
+                <div key={vi} className="bg-gray-50 rounded-lg border overflow-hidden">
+                  <div className="text-center text-[9px] font-medium text-gray-600 pt-1">{view.label}</div>
+                  <svg viewBox={`0 0 ${W / 2} ${H / 2}`} className="w-full" style={{ maxHeight: 180 }}>
+                    {view.pts.map(([x, y], i) => (
+                      <circle key={i} cx={toX(x) / 2} cy={toY(y) / 2} r={1.5} fill={view.color} opacity={0.6} />
+                    ))}
+                    <rect x={MG.l / 2} y={MG.t / 2} width={PW / 2} height={PH / 2} fill="none" stroke="#d1d5db" strokeWidth={1} />
+                  </svg>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {renderSharedHistogram('x 边缘分布', conditionalCompare.xShared)}
+              {renderSharedHistogram('y 边缘分布', conditionalCompare.yShared)}
+            </div>
+          </div>
+        )}
+
         {mode === 'forward-compare' && compare && (
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs space-y-3">
-            <p><strong>🎓 前向分布一致性实验：</strong>same distribution, not the same realization。</p>
+            <p><strong>🎓 总体边缘分布比较：</strong>same distribution, not the same realization。</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
               <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">mean diff (L2)</div><div>{compare.meanDiff.toFixed(4)}</div></div>
               <div className="bg-white rounded p-2"><div className="text-[10px] text-gray-500">cov diff (Frob)</div><div>{compare.covDiff.toFixed(4)}</div></div>
@@ -383,31 +536,13 @@ export default function DiffusionTimelineLab() {
               ))}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {[
-                { title: 'x 边缘分布', closed: compare.xHistClosed, inc: compare.xHistInc },
-                { title: 'y 边缘分布', closed: compare.yHistClosed, inc: compare.yHistInc },
-              ].map((h, hi) => {
-                const maxCount = Math.max(...h.closed.counts, ...h.inc.counts, 1);
-                const binW = PW / 2 / h.closed.counts.length;
-                return (
-                  <div key={hi} className="bg-white rounded border p-2">
-                    <div className="text-[10px] text-gray-500 mb-1">{h.title}</div>
-                    <svg viewBox={`0 0 ${W / 2} ${H / 4}`} className="w-full" style={{ maxHeight: 120 }}>
-                      {h.closed.counts.map((c, i) => (
-                        <rect key={`c-${i}`} x={i * binW} y={(H / 4) * (1 - c / maxCount)} width={binW * 0.45} height={(H / 4) * (c / maxCount)} fill="#3b82f6" opacity={0.7} />
-                      ))}
-                      {h.inc.counts.map((c, i) => (
-                        <rect key={`i-${i}`} x={i * binW + binW * 0.45} y={(H / 4) * (1 - c / maxCount)} width={binW * 0.45} height={(H / 4) * (c / maxCount)} fill="#f59e0b" opacity={0.7} />
-                      ))}
-                    </svg>
-                  </div>
-                );
-              })}
+              {renderSharedHistogram('x 边缘分布', compare.xShared)}
+              {renderSharedHistogram('y 边缘分布', compare.yShared)}
             </div>
           </div>
         )}
 
-        {mode !== 'forward-compare' && (
+        {mode !== 'forward-compare' && mode !== 'conditional-compare' && (
           <div className={`grid gap-3 ${x0Pred ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
             {views.map((view, vi) => (
               <div key={vi} className="bg-gray-50 rounded-lg border overflow-hidden">
