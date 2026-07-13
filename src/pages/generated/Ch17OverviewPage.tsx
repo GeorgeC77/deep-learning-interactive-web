@@ -63,7 +63,7 @@ export default function Ch17OverviewPage() {
             "把无条件生成变为确定性生成。",
           ],
           correctIndex: 0,
-          explanation: "无分类器引导通过插值条件与无条件分数，增强条件控制强度。",
+          explanation: "无分类器引导在 0≤w≤1 时插值条件与无条件预测；w=1 是普通条件预测，w>1 则是向条件方向外推，从而增强条件控制强度。",
         },
       ]}
       bishopMapping={{

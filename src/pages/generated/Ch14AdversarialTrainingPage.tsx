@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import GANGradientLab from '@/components/demos/GANGradientLab';
 import { Scale } from 'lucide-react';
 
 export default function Ch14AdversarialTrainingPage() {
@@ -60,7 +61,7 @@ export default function Ch14AdversarialTrainingPage() {
             "0.1",
           ],
           correctIndex: 0,
-          explanation: "-ln(0.1)=ln(10)≈2.302；数值越小，说明生成样本被判别为假的概率越高，损失越大。",
+          explanation: "-ln(0.1)=ln(10)≈2.302。D(G(z)) 越小，说明生成样本被判为假的概率越高，non-saturating loss −ln D(G(z)) 就越大。",
         },
         {
           question: "训练后期生成器只输出少数几类样本，判别器对这些样本给出高置信度，这最可能是？",
@@ -106,6 +107,7 @@ export default function Ch14AdversarialTrainingPage() {
         }),
         formula: String.raw`L_G = -\ln D(G(z))`,
       }}
+      interactiveDemo={<GANGradientLab />}
     />
   );
 }

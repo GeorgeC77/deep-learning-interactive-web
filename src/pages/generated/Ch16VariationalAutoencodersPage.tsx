@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import VAELatentCloudLab from '@/components/demos/VAELatentCloudLab';
 import { Sparkles } from 'lucide-react';
 
 export default function Ch16VariationalAutoencodersPage() {
@@ -24,6 +25,11 @@ export default function Ch16VariationalAutoencodersPage() {
           formula: String.raw`\mathcal{L}(\theta, \phi) = \mathbb{E}_{q_\phi(\mathbf{z} \mid \mathbf{x})}[\ln p_\theta(\mathbf{x} \mid \mathbf{z})] - D_{KL}(q_\phi(\mathbf{z} \mid \mathbf{x}) \| p(\mathbf{z}))`,
         },
         {
+          title: "β-VAE 目标",
+          description: "β-VAE 在 KL 项前引入可调权重 β，有意修改优化目标以获得更可解释的隐空间。β=1 退化为标准 ELBO；β>1 仍是似然的下界，但不再是标准 ELBO；0<β<1 时整体目标不再保证是下界。",
+          formula: String.raw`\mathcal{L}_\beta = \mathbb{E}_{q_\phi}[\ln p_\theta(\mathbf{x} \mid \mathbf{z})] - \beta D_{KL}(q_\phi(\mathbf{z} \mid \mathbf{x}) \| p(\mathbf{z}))`,
+        },
+        {
           title: "隐空间先验",
           description: "通常取标准高斯，使解码器能从采样得到的 z 生成新数据。",
         },
@@ -32,11 +38,12 @@ export default function Ch16VariationalAutoencodersPage() {
         "理解变分后验 q(z|x) 与生成模型 p(x|z) 的角色。",
         "掌握重参数化技巧为什么能估计梯度。",
         "能写出 VAE 的 ELBO 并解释两项的权衡。",
+        "理解 β-VAE 与标准 ELBO 的区别：β 改变目标函数，不再保证标准下界。",
       ]}
-      coreIntuition={"VAE 把每个数据点编码成隐空间上的一朵‘云’而不是一个点；KL 项约束这朵云既不能太散，也不能离标准高斯太远。"}
+      coreIntuition={"VAE 把每个数据点编码成隐空间上的一朵‘云’而不是一个点；KL 项约束这朵云既不能太散，也不能离标准高斯太远。β-VAE 则通过调节 KL 权重，让这朵云在可解释性与重构能力之间重新取舍。"}
       commonMistakes={[
         "把 VAE 的编码器输出当成确定性隐变量，忽视其分布含义。",
-        "在 KL 项前错误地添加可调权重（β-VAE 除外），破坏 ELBO 的下界性质。",
+        "混淆 β-VAE 与标准 ELBO：β=1 时两者相同；β>1 仍是似然的下界，但不再是标准 ELBO 目标；0<β<1 时不再保证是下界。β-VAE 是故意修改目标函数以获得可解释性，而不是在保持原 ELBO 的前提下做微调。",
         "用重参数化时直接对 z 采样后试图对 σ 求导，而不通过 μ+σε 的显式路径。",
         "忽视 posterior collapse：解码器过强时 q(z|x) 可能退化为先验，隐变量不再携带信息。",
       ]}
@@ -87,13 +94,13 @@ export default function Ch16VariationalAutoencodersPage() {
           "ELBO derivation",
           "β-VAE"
         ],
-        formulas: ["q_φ(z|x)", "z=μ+σε", "ELBO"],
+        formulas: ["q_φ(z|x)", "z=μ+σε", "ELBO", "L_β = E[log p(x|z)] − β KL"],
         algorithms: ["VAE", "重参数化技巧"],
-        exercises: ["推导对角高斯后验与标准高斯先验的 KL 散度。", "说明为什么重参数化技巧能得到无偏梯度估计。"],
+        exercises: ["推导对角高斯后验与标准高斯先验的 KL 散度。", "说明为什么重参数化技巧能得到无偏梯度估计。", "比较 β=1、β>1 与 0<β<1 时目标函数的下界性质。"]
       }}
       demo={{
-        title: "KL 散度随 σ 变化",
-        label: "后验标准差 σ",
+        title: "KL 散度随 (μ, σ) 变化",
+        label: "后验标准差 σ（μ 固定为 0）",
         param: 1,
         min: 0.1,
         max: 3,
@@ -105,6 +112,7 @@ export default function Ch16VariationalAutoencodersPage() {
         }),
         formula: String.raw`D_{KL}\bigl(\mathcal{N}(\mu,\sigma^2) \| \mathcal{N}(0,1)\bigr) = \frac{1}{2}\left(\sigma^2 - \ln \sigma^2 - 1 + \mu^2\right)`,
       }}
+      interactiveDemo={<VAELatentCloudLab />}
     />
   );
 }

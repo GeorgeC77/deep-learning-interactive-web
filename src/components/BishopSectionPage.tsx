@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BookOpen,
@@ -20,7 +20,7 @@ import { getAllSections, getSectionByPath, type Section } from '@/course/manifes
 
 export type ConceptItem = {
   title: string;
-  description: React.ReactNode;
+  description: ReactNode;
   formula?: string;
 };
 
@@ -44,9 +44,10 @@ export type BishopMapping = {
 
 export type BishopSectionPageProps = {
   sectionPath: string;
-  heroIcon?: React.ReactNode;
-  summary: React.ReactNode;
+  heroIcon?: ReactNode;
+  summary: ReactNode;
   concepts: ConceptItem[];
+  /** Legacy single-slider scalar demo. Kept for backward compatibility. */
   demo?: {
     title: string;
     label: string;
@@ -57,12 +58,14 @@ export type BishopSectionPageProps = {
     compute: (value: number) => { label: string; value: number; display: string };
     formula: string;
   };
+  /** Fully custom interactive surface (multi-control, charts, prediction gates, etc.). */
+  interactiveDemo?: ReactNode;
   learningObjectives?: string[];
-  coreIntuition?: React.ReactNode;
+  coreIntuition?: ReactNode;
   commonMistakes?: string[];
   quiz?: QuizItem[];
   bishopMapping?: BishopMapping;
-  extraContent?: React.ReactNode;
+  extraContent?: ReactNode;
 };
 
 export default function BishopSectionPage({
@@ -71,6 +74,7 @@ export default function BishopSectionPage({
   summary,
   concepts,
   demo,
+  interactiveDemo,
   learningObjectives,
   coreIntuition,
   commonMistakes,
@@ -85,12 +89,33 @@ export default function BishopSectionPage({
   const nextSection: Section | null = allSections[currentIndex + 1] ?? null;
 
   const [param, setParam] = useState(demo?.param ?? 0.5);
-  const [quizAnswers, setQuizAnswers] = useState<Record<number, number | null>>({});
+
+  const [quizStates, setQuizStates] = useState<
+    { selected: number | null; submitted: boolean }[]
+  >(() => (quiz ?? []).map(() => ({ selected: null, submitted: false })));
 
   const demoResult = useMemo(() => {
     if (!demo) return null;
     return demo.compute(param);
   }, [demo, param]);
+
+  const selectOption = (qIdx: number, oIdx: number) => {
+    setQuizStates((prev) =>
+      prev.map((state, idx) => (idx === qIdx && !state.submitted ? { ...state, selected: oIdx } : state)),
+    );
+  };
+
+  const submitQuiz = (qIdx: number) => {
+    setQuizStates((prev) =>
+      prev.map((state, idx) => (idx === qIdx ? { ...state, submitted: true } : state)),
+    );
+  };
+
+  const resetQuiz = (qIdx: number) => {
+    setQuizStates((prev) =>
+      prev.map((state, idx) => (idx === qIdx ? { selected: null, submitted: false } : state)),
+    );
+  };
 
   if (!section) return null;
 
@@ -202,7 +227,7 @@ export default function BishopSectionPage({
         )}
       </section>
 
-      {/* Interactive demo */}
+      {/* Legacy scalar interactive demo */}
       {demo && (
         <InteractiveDemo title={demo.title}>
           <div className="space-y-6">
@@ -238,6 +263,13 @@ export default function BishopSectionPage({
         </InteractiveDemo>
       )}
 
+      {/* Custom interactive demo surface */}
+      {interactiveDemo && (
+        <InteractiveDemo title="交互探索">
+          {interactiveDemo}
+        </InteractiveDemo>
+      )}
+
       {/* Common mistakes */}
       {commonMistakes && commonMistakes.length > 0 && (
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -264,45 +296,68 @@ export default function BishopSectionPage({
             <h2 className="text-2xl font-bold text-gray-900">小测题</h2>
           </div>
           <div className="space-y-6">
-            {quiz.map((q, qIdx) => (
-              <div key={qIdx} className="border border-gray-200 rounded-lg p-4">
-                <div className="font-medium text-gray-900 mb-3">
-                  {qIdx + 1}. {q.question}
-                </div>
-                <div className="space-y-2">
-                  {q.options.map((opt, oIdx) => {
-                    const answered = quizAnswers[qIdx] !== undefined;
-                    const isSelected = quizAnswers[qIdx] === oIdx;
-                    const isCorrect = oIdx === q.correctIndex;
-                    let btnClass = 'w-full text-left px-3 py-2 rounded-md text-sm border transition-colors ';
-                    if (answered) {
-                      if (isCorrect) btnClass += 'bg-emerald-50 border-emerald-300 text-emerald-800';
-                      else if (isSelected) btnClass += 'bg-red-50 border-red-300 text-red-800';
-                      else btnClass += 'bg-gray-50 border-gray-200 text-gray-500';
-                    } else {
-                      btnClass += 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700';
-                    }
-                    return (
-                      <button
-                        key={oIdx}
-                        type="button"
-                        disabled={answered}
-                        className={btnClass}
-                        onClick={() => setQuizAnswers((prev) => ({ ...prev, [qIdx]: oIdx }))}
-                      >
-                        {String.fromCharCode(65 + oIdx)}. {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-                {quizAnswers[qIdx] !== undefined && (
-                  <div className="mt-3 text-sm text-gray-700 bg-slate-50 p-3 rounded-md">
-                    <span className="font-medium">解析：</span>
-                    {q.explanation}
+            {quiz.map((q, qIdx) => {
+              const { selected, submitted } = quizStates[qIdx];
+              return (
+                <div key={qIdx} className="border border-gray-200 rounded-lg p-4">
+                  <div className="font-medium text-gray-900 mb-3">
+                    {qIdx + 1}. {q.question}
                   </div>
-                )}
-              </div>
-            ))}
+                  <div className="space-y-2">
+                    {q.options.map((opt, oIdx) => {
+                      const isSelected = selected === oIdx;
+                      const isCorrect = oIdx === q.correctIndex;
+                      let btnClass = 'w-full text-left px-3 py-2 rounded-md text-sm border transition-colors ';
+                      if (submitted) {
+                        if (isCorrect) btnClass += 'bg-emerald-50 border-emerald-300 text-emerald-800';
+                        else if (isSelected) btnClass += 'bg-red-50 border-red-300 text-red-800';
+                        else btnClass += 'bg-gray-50 border-gray-200 text-gray-500';
+                      } else {
+                        btnClass += isSelected
+                          ? 'bg-violet-50 border-violet-300 text-violet-800'
+                          : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700';
+                      }
+                      return (
+                        <button
+                          key={oIdx}
+                          type="button"
+                          disabled={submitted}
+                          className={btnClass}
+                          onClick={() => selectOption(qIdx, oIdx)}
+                        >
+                          {String.fromCharCode(65 + oIdx)}. {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled={selected === null || submitted}
+                      onClick={() => submitQuiz(qIdx)}
+                      className="px-3 py-1.5 text-sm bg-violet-600 text-white rounded-lg hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      提交答案
+                    </button>
+                    {submitted && (
+                      <button
+                        type="button"
+                        onClick={() => resetQuiz(qIdx)}
+                        className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                      >
+                        重置
+                      </button>
+                    )}
+                  </div>
+                  {submitted && (
+                    <div className="mt-3 text-sm text-gray-700 bg-slate-50 p-3 rounded-md">
+                      <span className="font-medium">解析：</span>
+                      {q.explanation}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

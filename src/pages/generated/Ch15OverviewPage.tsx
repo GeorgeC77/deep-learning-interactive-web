@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import FlowArchitectureLab from '@/components/demos/FlowArchitectureLab';
 import { ArrowLeftRight } from 'lucide-react';
 
 export default function Ch15OverviewPage() {
@@ -81,6 +82,7 @@ export default function Ch15OverviewPage() {
         algorithms: ["RealNVP", "MAF/IAF", "Neural ODE flows"],
         exercises: ["从 f(z)=2z 推导一维变量替换公式。", "比较三种流架构的采样与密度评估复杂度。"],
       }}
+      interactiveDemo={<FlowArchitectureLab />}
     />
   );
 }

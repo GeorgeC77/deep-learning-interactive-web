@@ -11,7 +11,7 @@ export default function Ch17GuidedDiffusionPage() {
         {
           title: "分类器引导",
           description: "利用预训练分类器对带噪样本的类别梯度调整分数，增强条件对齐；可能牺牲样本多样性。",
-          formula: String.raw`\hat{s}(x_t) = s(x_t) + \gamma \nabla_{x_t} \ln p(c \mid x_t)`,
+          formula: String.raw`\hat{s}(x_t) = s(x_t) + \gamma \nabla_{x_t} \ln p(c \mid x_t, t)`,
         },
         {
           title: "无分类器引导",
@@ -20,7 +20,7 @@ export default function Ch17GuidedDiffusionPage() {
         },
         {
           title: "引导强度 w",
-          description: "权重 w 越大，生成样本与条件越一致，但多样性越低；w=1 对应普通条件采样。",
+          description: "当 0≤w≤1 时，ε_hat 是条件预测与无条件预测之间的插值；w=1 退化为普通条件预测；w>1 则是向条件方向外推，超出原始条件预测。",
         },
         {
           title: "文本与属性条件",
@@ -29,14 +29,14 @@ export default function Ch17GuidedDiffusionPage() {
       ]}
       learningObjectives={[
         "理解分类器引导与无分类器引导的区别。",
-        "能解释无分类器引导公式中 w 的作用。",
+        "能解释无分类器引导公式中 w 的作用：插值、普通条件预测与外推。",
         "了解引导强度与多样性之间的权衡。",
       ]}
-      coreIntuition={"无分类器引导像一个‘方向盘’：先看模型无条件时会往哪走，再把方向往条件目标多掰一点；掰得越狠，越听话，但画面也越雷同。"}
+      coreIntuition={"无分类器引导像一个‘方向盘’：先看模型无条件时会往哪走，再把方向往条件目标多掰一点。w=1 只是正常按条件开；w>1 是把方向盘继续往外打，属于外推。掰得越狠，越听话，但画面也越雷同，甚至出现过饱和或伪影。"}
       commonMistakes={[
-        "认为 w 越大总是越好；过高 w 会导致过饱和或模式坍塌。",
+        "认为 w 越大总是越好；过高 w 通常降低多样性，并可能造成过饱和、失真或伪影。",
         "混淆分类器引导与无分类器引导：前者需要额外训练分类器，后者在训练时随机丢弃条件即可。",
-        "忽视 w=1 只是普通条件采样，额外引导来自 w>1 的插值。",
+        "忽视 w=1 只是普通条件采样；0≤w≤1 才是插值，w>1 是外推。",
       ]}
       quiz={[
         {
@@ -48,7 +48,7 @@ export default function Ch17GuidedDiffusionPage() {
             "1.0",
           ],
           correctIndex: 0,
-          explanation: "ε_hat = ε_unc + w(ε_cond - ε_unc) = 0.2 + 2×(0.5-0.2) = 0.8。",
+          explanation: "ε_hat = ε_unc + w(ε_cond - ε_unc) = 0.2 + 2×(0.5-0.2) = 0.8。注意 w=2 已经超出普通条件预测，属于外推。",
         },
         {
           question: "增大引导权重 w 时，conditional alignment 和 sample diversity 如何变化？",
@@ -59,7 +59,7 @@ export default function Ch17GuidedDiffusionPage() {
             "两者都下降",
           ],
           correctIndex: 0,
-          explanation: "w 越大，采样方向越偏向条件预测，条件对齐越好，但分布多样性越低，过高会导致模式坍塌。",
+          explanation: "w 越大，采样方向越偏向条件预测，条件对齐越好，但分布多样性越低。过高 w 会降低多样性，并可能造成过饱和、失真或伪影。",
         },
         {
           question: "分类器引导与无分类器引导的主要区别是？",
@@ -84,9 +84,9 @@ export default function Ch17GuidedDiffusionPage() {
         supplementalTopics: [
           "guidance strength trade-off"
         ],
-        formulas: ["分类器引导", "无分类器引导公式"],
+        formulas: ["分类器引导", "无分类器引导公式", "w 的插值/外推解释"],
         algorithms: ["Classifier guidance", "Classifier-free guidance"],
-        exercises: ["比较两种引导方式对多样性的影响。", "推导无分类器引导公式在 w=1 时的退化形式。"],
+        exercises: ["比较两种引导方式对多样性的影响。", "推导无分类器引导公式在 w=1 时的退化形式。", "说明 w>1 为何是外推而非插值。"]
       }}
       demo={{
         title: "无分类器引导强度",

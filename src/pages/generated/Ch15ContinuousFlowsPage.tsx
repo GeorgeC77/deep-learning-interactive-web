@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ContinuousFlowLab from '@/components/demos/ContinuousFlowLab';
 import { Waves } from 'lucide-react';
 
 export default function Ch15ContinuousFlowsPage() {
@@ -9,9 +10,14 @@ export default function Ch15ContinuousFlowsPage() {
       summary={"连续流将离散层之间的变换推广到连续时间，用神经网络参数化的常微分方程描述状态演化。通过瞬时变量替换公式，可以在 ODE 求解器精度范围内计算 log 密度。"}
       concepts={[
         {
-          title: "神经 ODE",
-          description: "隐藏状态 h(t) 随连续时间 t 演化，导数由神经网络 f 决定。从 t=0 到 t=1 的解定义了一个可逆变换。",
+          title: "神经 ODE 与向量场",
+          description: "隐藏状态 h(t) 随连续时间 t 演化，其导数由神经网络 f 决定。向量场 f 本身不必是双射；它只需要满足正则条件（如 Lipschitz），使得 ODE 的解存在且唯一。",
           formula: String.raw`\frac{d\mathbf{h}(t)}{dt} = f(\mathbf{h}(t), t, \theta)`,
+        },
+        {
+          title: "流映射（Flow map）",
+          description: "从 t=0 到 t=1 的 ODE 解定义了流映射 φ。正向积分得到 φ，反向积分得到其逆 φ⁻¹，因此流映射是可逆变换。可逆性来自 ODE 解的唯一性，而非 f 自身的双射性。",
+          formula: String.raw`\mathbf{h}(1) = \phi(\mathbf{h}(0)), \quad \mathbf{h}(0) = \phi^{-1}(\mathbf{h}(1))`,
         },
         {
           title: "瞬时变量替换",
@@ -24,19 +30,22 @@ export default function Ch15ContinuousFlowsPage() {
         },
         {
           title: "FFJORD",
-          description: "用 Hutchinson 迹估计替代精确 Jacobian 迹，将连续流扩展到高维数据。",
+          description: "用 Hutchinson 迹估计替代精确 Jacobian 迹，将连续流扩展到高维数据。FFJORD 的核心优势在于 f 可以是自由形式神经网络，不必设计可逆层。",
         },
       ]}
       learningObjectives={[
         "理解连续流与离散归一化流的联系与区别。",
         "掌握瞬时变量替换公式及其与 Jacobian 的关系。",
         "了解伴随敏感性和 FFJORD 如何解决高维连续流的计算问题。",
+        "区分向量场 f 与流映射 φ，明确可逆性的来源。",
       ]}
-      coreIntuition={"把离散层的拉伸压缩想象成电影的一帧帧画面；连续流让画面变成平滑的动画，并用‘每秒体积收缩率’追踪概率密度的变化。"}
+      coreIntuition={"把离散层的拉伸压缩想象成电影的一帧帧画面；连续流让画面变成平滑的动画，并用‘每秒体积收缩率’追踪概率密度的变化。向量场 f 只是‘瞬时速度场’，真正可逆的是它积分出来的流映射。"}
       commonMistakes={[
         "把神经 ODE 的 f 直接当作 x 对 z 的导数而忽略时间维度。",
+        "认为 f 本身必须可逆；实际上 f 不必是双射，可逆的是由 ODE 积分产生的流映射。",
         "忘记 log 密度的 ODE 右端有负号：密度随体积膨胀而下降。",
         "在维度较高时仍试图精确计算 Jacobian 迹，而忽略了 FFJORD 的随机迹估计。",
+        "误以为连续流需要三角或对角 Jacobian；FFJORD 允许自由形式架构。",
       ]}
       quiz={[
         {
@@ -51,15 +60,15 @@ export default function Ch15ContinuousFlowsPage() {
           explanation: "d/dt ln p(h(t)) = -tr(∂f/∂h)，即负散度。体积膨胀时密度减小。",
         },
         {
-          question: "神经 ODE 相比离散归一化流，主要优势不包括以下哪项？",
+          question: "关于神经 ODE 中的向量场 f 与流映射 φ，下列说法正确的是？",
           options: [
-            "可以用任意非可逆神经网络作为 f。",
-            "ODE 求解器可以自适应精度。",
-            "前向和反向都可以通过伴随方程完成。",
-            "模型复杂度由网络容量决定，而非固定层数。",
+            "f 本身不必可逆；只要满足正则条件，ODE 积分得到的流映射 φ 就是可逆的。",
+            "f 必须是双射，否则无法定义可逆流。",
+            "流映射的逆需要通过额外训练一个反向网络得到。",
+            "连续流的 Jacobian 必须是三角矩阵。",
           ],
           correctIndex: 0,
-          explanation: "f 仍需要保证 ODE 可解且可逆，通常选择 Lipschitz 连续的网络；非可逆会破坏流的定义。",
+          explanation: "向量场 f 只需要满足 Lipschitz 等保证解存在且唯一的正则条件。流映射 φ 通过正向 ODE 积分得到，其逆通过反向积分得到，因此可逆性来自 ODE 理论而非 f 自身的双射性。",
         },
         {
           question: "FFJORD 中 Hutchinson 迹估计的作用是？",
@@ -70,7 +79,7 @@ export default function Ch15ContinuousFlowsPage() {
             "计算两个分布之间的 Wasserstein 距离。",
           ],
           correctIndex: 0,
-          explanation: "Hutchinson 估计用 v^T (∂f/∂h) v 近似 tr(∂f/∂h)，将 O(D²) 迹计算降到 O(D)。",
+          explanation: "Hutchinson 估计用 v^T (∂f/∂h) v 近似 tr(∂f/∂h)，将 O(D²) 迹计算降到 O(D)，使得 f 可以是自由形式网络。",
         },
       ]}
       bishopMapping={{
@@ -86,10 +95,11 @@ export default function Ch15ContinuousFlowsPage() {
           "FFJORD",
           "Hutchinson trace estimator"
         ],
-        formulas: ["dh/dt=f(h,t,θ)", "d/dt ln p(h)=-tr(∂f/∂h)"],
+        formulas: ["dh/dt=f(h,t,θ)", "d/dt ln p(h)=-tr(∂f/∂h)", "flow map φ and inverse by reverse integration"],
         algorithms: ["Neural ODE", "Adjoint sensitivity", "FFJORD"],
-        exercises: ["解释为什么 d/dt ln p 等于负散度。", "比较 FFJORD 与离散流在计算 Jacobian 上的复杂度差异。"],
+        exercises: ["解释为什么 d/dt ln p 等于负散度。", "比较 FFJORD 与离散流在计算 Jacobian 上的复杂度差异。", "说明向量场 f 不必可逆为什么仍能得到可逆流映射。"]
       }}
+      interactiveDemo={<ContinuousFlowLab />}
     />
   );
 }
