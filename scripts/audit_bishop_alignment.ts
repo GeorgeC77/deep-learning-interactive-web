@@ -32,6 +32,16 @@ const TEMPLATE_REGEXES: RegExp[] = [
   /只记忆公式形式/,
 ];
 
+const SEMANTIC_TEMPLATE_REGEXES: RegExp[] = [
+  /只是术语，没有独立建模意义/,
+  /忽视其前提假设/,
+  /结果与预期不符应优先排查前提/,
+  /介绍.*的定义、关键公式与典型应用场景/,
+  /只是.*术语/,
+  /不需要任何.*假设即可/,
+  /只要.*足够.*就不重要/,
+];
+
 const WRONG_FORMULA_REGEXES = [
   /p_x\s*=\s*p_z\s*-\s*ln\s*\|\s*det\s*J\s*\|/i,
   /p_x\(x\)\s*=\s*p_z\(z\)\s*-\s*ln\s*\|\s*det\s*J\s*\|/i,
@@ -100,6 +110,13 @@ function containsChinese(s: string): boolean {
 
 function hasTemplatePhrase(s: string): string | null {
   for (const re of TEMPLATE_REGEXES) {
+    if (re.test(s)) return re.source;
+  }
+  return null;
+}
+
+function hasSemanticTemplatePhrase(s: string): string | null {
+  for (const re of SEMANTIC_TEMPLATE_REGEXES) {
     if (re.test(s)) return re.source;
   }
   return null;
@@ -181,6 +198,7 @@ const generatedFiles = fs.readdirSync(generatedDir).filter((f) => f.endsWith('.t
 
 type InvalidSubsectionRow = { componentFile: string; routePath: string; subsection: string };
 type TemplateRow = { componentFile: string; routePath: string; phrase: string; context: string };
+type SemanticTemplateRow = { componentFile: string; routePath: string; phrase: string; context: string };
 type WrongFormulaRow = { componentFile: string; routePath: string; snippet: string };
 type ConceptCoverageRow = { componentFile: string; routePath: string; note: string };
 type SupplementalTopicRow = { componentFile: string; routePath: string; topic: string; note: string };
@@ -189,6 +207,7 @@ type MissingExpectedRow = { componentFile: string; routePath: string; missing: s
 
 const invalidSubsectionRows: InvalidSubsectionRow[] = [];
 const templateRows: TemplateRow[] = [];
+const semanticTemplateRows: SemanticTemplateRow[] = [];
 const wrongFormulaRows: WrongFormulaRow[] = [];
 const conceptCoverageRows: ConceptCoverageRow[] = [];
 const supplementalTopicRows: SupplementalTopicRow[] = [];
@@ -254,6 +273,19 @@ for (const file of generatedFiles) {
     }
   }
   const conceptCount = conceptTitles.length;
+
+  // Flag concept titles that duplicate English textbook subsection titles (placeholder cards).
+  const subsectionTitleSet = new Set(subsections.map((s) => s.toLowerCase().trim()));
+  for (const title of conceptTitles) {
+    if (subsectionTitleSet.has(title.toLowerCase().trim())) {
+      semanticTemplateRows.push({
+        componentFile: `src/pages/generated/${file}`,
+        routePath,
+        phrase: 'concept title duplicates textbook subsection title',
+        context: `[concept title] ${title.slice(0, 120)}`,
+      });
+    }
+  }
   const leafSubsectionCount = enforceSubsections
     ? subsections.filter((s) => /^\d+\.\d+\.\d+/.test(s)).length
     : 0;
@@ -270,6 +302,10 @@ for (const file of generatedFiles) {
       const phrase = hasTemplatePhrase(s);
       if (phrase) {
         templateRows.push({ componentFile: `src/pages/generated/${file}`, routePath, phrase, context: `[${source}] ${s.slice(0, 120)}` });
+      }
+      const semanticPhrase = hasSemanticTemplatePhrase(s);
+      if (semanticPhrase) {
+        semanticTemplateRows.push({ componentFile: `src/pages/generated/${file}`, routePath, phrase: semanticPhrase, context: `[${source}] ${s.slice(0, 120)}` });
       }
     }
   }
@@ -317,6 +353,15 @@ for (const file of generatedFiles) {
         componentFile: `src/pages/generated/${file}`,
         routePath,
         phrase,
+        context: `[coreIntuition] ${coreIntuitionMatch[1].slice(0, 120)}`,
+      });
+    }
+    const semanticPhrase = hasSemanticTemplatePhrase(coreIntuitionMatch[1]);
+    if (semanticPhrase) {
+      semanticTemplateRows.push({
+        componentFile: `src/pages/generated/${file}`,
+        routePath,
+        phrase: semanticPhrase,
         context: `[coreIntuition] ${coreIntuitionMatch[1].slice(0, 120)}`,
       });
     }
@@ -402,6 +447,16 @@ const invalidMd = [
       ]
     : ['None.']),
   '',
+  '### Semantic template warnings',
+  'These patterns indicate generic or placeholder content that should be reviewed, but they are treated as warnings rather than fatal audit failures.',
+  ...(semanticTemplateRows.length
+    ? [
+        '| componentFile | routePath | phrase | context |',
+        '|---------------|-----------|--------|---------|',
+        ...semanticTemplateRows.map((r) => `| ${r.componentFile} | ${r.routePath} | ${r.phrase} | ${r.context.replace(/\|/g, '\\|')} |`),
+      ]
+    : ['None.']),
+  '',
   '### supplementalTopics containing subsection-style entries',
   ...(supplementalTopicRows.length
     ? [
@@ -460,6 +515,7 @@ const coverageMd = [
   `Missing expected subsections: ${missingExpectedRows.length}`,
   `Wrong density formulas: ${wrongFormulaRows.length}`,
   `Template phrase occurrences: ${templateRows.length}`,
+  `Semantic template warnings: ${semanticTemplateRows.length}`,
   `Supplemental topic issues: ${supplementalTopicRows.length}`,
   `Old chapter references: ${oldTitleRows.length}`,
   `Concept coverage warnings: ${conceptCoverageRows.length}`,
@@ -480,6 +536,7 @@ console.log(`Invalid subsections: ${invalidSubsectionRows.length}`);
 console.log(`Missing expected subsections: ${missingExpectedRows.length}`);
 console.log(`Wrong formulas: ${wrongFormulaRows.length}`);
 console.log(`Template phrases: ${templateRows.length}`);
+console.log(`Semantic template warnings: ${semanticTemplateRows.length}`);
 console.log(`Supplemental topic issues: ${supplementalTopicRows.length}`);
 console.log(`Old chapter references: ${oldTitleRows.length}`);
 console.log(`Concept coverage warnings: ${conceptCoverageRows.length}`);

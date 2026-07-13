@@ -1,6 +1,7 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
-import { Scale } from 'lucide-react';
+import ClassificationCostLab from '@/components/demos/ClassificationCostLab';
 import ROCInteractiveDemo from '@/components/demos/ROCInteractiveDemo';
+import { Scale } from 'lucide-react';
 
 export default function Ch02DecisionTheoryPage() {
   return (
@@ -8,7 +9,7 @@ export default function Ch02DecisionTheoryPage() {
       sectionPath="/ch02/decision-theory"
       heroIcon={<Scale className="w-9 h-9 text-blue-600" />}
       summary={
-        "分类中的决策理论比回归更丰富——错误类型不再是一个连续值，而是 K×K 损失矩阵的离散结构。本节覆盖误分类率、期望损失最小化、拒绝选项、推断与决策的分离，以及 ROC 曲线等实用评估工具（§5.2.1–5.2.6）。"
+        "分类中的决策理论比回归更丰富——错误类型不再是连续值，而是 K×K 损失矩阵的离散结构。本节覆盖误分类率、期望损失最小化、代价敏感阈值、拒绝选项、推断与决策的分离，以及 ROC 曲线等实用评估工具（§5.2.1–5.2.6）。"
       }
       concepts={[
         {
@@ -19,6 +20,11 @@ export default function Ch02DecisionTheoryPage() {
           title: "期望损失（Expected loss）",
           description: "引入 K×K 损失矩阵 L，L_{kj} 表示将真实类别 k 判为 j 的代价。对每个候选决策 j，计算 Σ_k L_{kj}·p(C_k|x)，选择最小期望代价对应的 j。这比 0-1 损失更通用。",
           formula: String.raw`\mathbb{E}[L]_j = \sum_{k=1}^{K} L_{kj} \, p(\mathcal{C}_k \mid \mathbf{x})`,
+        },
+        {
+          title: "代价敏感阈值",
+          description: "二分类中，设 p = P(C₁|x)。将样本判为正类的条件是其期望风险更低：c_FP·(1−p) < c_FN·p，即 p > c_FP/(c_FP+c_FN)。用 log-odds 表示即为 log(p/(1−p)) > log(c_FP/c_FN)。",
+          formula: String.raw`p > \frac{C_{FP}}{C_{FP}+C_{FN}} \quad \Longleftrightarrow \quad \ln\frac{p}{1-p} > \ln\frac{C_{FP}}{C_{FN}}`,
         },
         {
           title: "拒绝选项（Reject option）",
@@ -32,26 +38,23 @@ export default function Ch02DecisionTheoryPage() {
           title: "分类器准确率与ROC曲线",
           description: "准确率（accuracy）是 0-1 损失的正确率经验估计，对类别不平衡可能误导。ROC 曲线以假正例率（FPR）为横轴、真正例率（TPR=召回率）为纵轴，AUC 衡量分类器在所有阈值下的平均表现。",
         },
-        {
-          title: "代价敏感决策",
-          description: "实际应用中不同错误往往对应不同代价。通过损失矩阵将业务代价形式化后，最小期望损失决策可以显著降低总体风险。代价敏感学习是决策理论在工程中的直接落地。",
-        },
       ]}
       learningObjectives={[
         "能写出分类问题的期望损失表达式并解释损失矩阵的含义",
-        "在给定后验概率和损失矩阵时，手算各类决策的期望代价，选出最优",
+        "在给定后验概率和损失矩阵时，能计算最优决策与代价敏感阈值",
         "理解 0-1 损失下贝叶斯最优分类就是最大后验类别",
         "解释拒绝选项如何降低高风险应用中的错误代价",
         "绘制并解读 ROC 曲线，理解 AUC 与分类器排序能力的关系",
       ]}
       coreIntuition={
-        "医疗诊断最能体现决策理论的精髓：先根据检查结果推断疾病概率（后验），再权衡误诊和漏诊的成本（损失矩阵），最后决定是把病人转诊还是继续观察。拒绝选项就是在概率不够确定时选择'转给专家'。"
+        "医疗诊断最能体现决策理论的精髓：先根据检查结果推断疾病概率（后验），再权衡误诊和漏诊的成本（损失矩阵），最后决定是把病人转诊还是继续观察。代价敏感阈值告诉你：当疾病后验高于误诊漏诊的相对代价时，才应给出阳性判断。"
       }
       commonMistakes={[
         "默认使用 accuracy 作为评估指标，在类别不平衡时（如 99:1）准确率 99% 可能毫无意义",
         "假设所有错误代价相同（0-1 损失），忽视实际业务中漏诊和误诊代价的天壤之别",
         "混淆分类准确率与 ROC-AUC：前者依赖阈值选择，后者评估所有阈值的综合排序能力",
         "在多分类中直接逐类计算 ROC——ROC 本质是二分类工具，多分类需用 micro/macro 平均或一对一",
+        "使用 0.5 作为决策阈值时忽略损失矩阵——最优阈值应由 c_FP/(c_FP+c_FN) 决定",
       ]}
       quiz={[
         {
@@ -66,15 +69,15 @@ export default function Ch02DecisionTheoryPage() {
           explanation: "E[选C₁] = 0·0.3 + 1·0.7 = 0.7, E[选C₂] = 10·0.3 + 0·0.7 = 3.0。0.7 < 3.0，选 C₁。虽然后验低，但高代价推动了决策。",
         },
         {
-          question: "拒绝选项的阈值 θ 控制什么？",
+          question: "二分类代价敏感决策中，选择正类的最优概率阈值是？",
           options: [
-            "当 max_k p(C_k|x) < θ 时拒绝决策",
-            "当训练准确率 < θ 时重新训练",
-            "当样本数 < θ 时不进行分类",
-            "当特征维度 > θ 时降维",
+            "p > C_FP / (C_FP + C_FN)",
+            "p > 0.5",
+            "p > C_FN / (C_FP + C_FN)",
+            "p > 1/(C_FP + C_FN)",
           ],
           correctIndex: 0,
-          explanation: "θ 越大，更多样本被拒绝；θ 越小，更少拒绝。选择 θ 是在覆盖率和风险之间权衡。",
+          explanation: "比较两种风险 R(positive)=C_FP(1−p) 与 R(negative)=C_FN·p，正类更优当且仅当 p > C_FP/(C_FP+C_FN)。",
         },
         {
           question: "ROC 曲线下面积 AUC = 1 意味着什么？",
@@ -101,13 +104,18 @@ export default function Ch02DecisionTheoryPage() {
           "5.2.5 Classifier accuracy",
           "5.2.6 ROC curve",
         ],
-        formulas: ["expected loss ΣL_{kj}p(C_k|x)", "ROC: TPR vs FPR"],
+        formulas: [
+          "expected loss ΣL_{kj}p(C_k|x)",
+          "cost-sensitive threshold p* = C_FP/(C_FP+C_FN)",
+          "ROC: TPR vs FPR",
+        ],
         exercises: [
           "给定损失矩阵和两个后验概率向量，分别计算期望损失并选最优决策",
           "推导 0-1 损失下最优决策与最大后验的等价性",
           "画出不同分类器在同数据上的 ROC 曲线并比较 AUC",
         ],
       }}
+      interactiveDemo={<ClassificationCostLab />}
       extraContent={<ROCInteractiveDemo />}
     />
   );

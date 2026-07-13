@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ParameterSharingLab from '@/components/demos/ParameterSharingLab';
 import { Share2 } from 'lucide-react';
 
 export default function Ch06ParameterSharingPage() {
@@ -6,75 +7,106 @@ export default function Ch06ParameterSharingPage() {
     <BishopSectionPage
       sectionPath="/ch06/parameter-sharing"
       heroIcon={<Share2 className="w-9 h-9 text-blue-600" />}
-      summary={"参数共享让同一组权重在多个位置复用，显著减少参数量并强制定义不变性或局部性先验。"}
+      summary={
+        "参数共享让同一组权重在多个位置复用，显著减少参数量并强制定义不变性或局部性先验。卷积是最常见的共享形式，它与全连接、局部连接在连接数、参数量与自由度上有本质区别。"
+      }
       concepts={[
-    {
-      title: "软权重共享",
-      description: "通过正则化鼓励参数彼此接近，而非强制相等，保留一定柔性。",
-    },
-    {
-      title: "卷积中的共享",
-      description: "卷积核在整张特征图上滑动，天然实现平移等变性与局部连接。",
-    },
-    {
-      title: "参数量与统计效率",
-      description: "共享使模型需要的训练数据更少，同时降低过拟合风险。",
-    }
+        {
+          title: "软权重共享",
+          description: "通过正则化鼓励参数彼此接近，而非强制相等，保留一定柔性。",
+        },
+        {
+          title: "卷积中的共享",
+          description: "卷积核在整张特征图上滑动，天然实现平移等变性与局部连接。共享后许多连接引用同一个 parameter。",
+          formula: String.raw`\text{Conv params} = K_h K_w C_{in} C_{out} + C_{out}`,
+        },
+        {
+          title: "局部连接（Locally connected）",
+          description: "每个输出位置拥有独立的核权重，保持局部连接但不共享。参数量是卷积的 H_out·W_out 倍。",
+          formula: String.raw`\text{Locally connected params} = H_{out} W_{out} K_h K_w C_{in} C_{out} + H_{out} W_{out} C_{out}`,
+        },
+        {
+          title: "全连接（Dense）",
+          description: "每个输入单元与每个输出单元都有独立权重。当把空间维度也视为输入/输出大小时，参数量远高于卷积。",
+          formula: String.raw`\text{Dense params} = H_{in} W_{in} C_{in} \cdot H_{out} W_{out} C_{out} + H_{out} W_{out} C_{out}`,
+        },
+        {
+          title: "连接数、参数量与自由度",
+          description: "连接数是前向计算中的连接总数；参数量是实际存储的独立标量个数；自由度通常等于参数量（无正则/共享约束时）。卷积通过共享大幅降低参数量，但连接数与局部连接相同。",
+          formula: String.raw`\text{Connections} = H_{out} W_{out} C_{out} \cdot K_h K_w C_{in}`,
+        },
+        {
+          title: "平移等变性",
+          description: "同一卷积核作用于平移后的输入，输出也相应平移。局部连接由于位置相关权重，不保证此性质。",
+        },
       ]}
       learningObjectives={[
-      "理解 软权重共享 的含义与作用。",
-      "理解 卷积中的共享 的含义与作用。",
-      "理解 参数量与统计效率 的含义与作用。"
-    ]}
-      coreIntuition={"参数共享让同一组权重在多个位置复用，显著减少参数量并强制定义不变性或局部性先验。"}
-      commonMistakes={[
-      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
-      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
-    ]}
-      quiz={[
-      {
-        question: "下列关于“软权重共享”的叙述，哪一项最准确？",
-        options: ["通过正则化鼓励参数彼此接近，而非强制相等，保留一定柔性。", "软权重共享 只是术语，没有独立建模意义。", "软权重共享 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。通过正则化鼓励参数彼此接近，而非强制相等，保留一定柔性。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“卷积中的共享”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要模型足够复杂，数据分布的形状就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。卷积中的共享 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“参数量与统计效率”的结果与预期不符，应优先排查哪些前提？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。参数量与统计效率 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
+        "能分别写出卷积、局部连接、全连接的参数量公式",
+        "区分连接数、参数量与自由度",
+        "理解参数共享如何把连接数与参数量解耦",
+        "解释卷积为何具有平移等变性而局部连接不一定",
+      ]}
+      coreIntuition={
+        "卷积像用同一枚印章在整张纸上盖图案：印章只保存一次（参数少），但盖了很多次（连接多），而且把纸平移后图案也平移。局部连接则每处都用不同的印章，虽然连接一样多，但要保存的印章数量大增。"
       }
-    ]}
+      commonMistakes={[
+        "把 H² 当作全连接与卷积的参数比——它实际上是局部连接与卷积的参数比",
+        "混淆连接数与参数量：卷积连接数与局部连接相同，但参数量少得多",
+        "认为卷积和局部连接表达能力相同——卷积的共享约束强加了平移等变性",
+        "忽视偏置项 C_out 在参数量公式中的贡献",
+      ]}
+      quiz={[
+        {
+          question: "卷积层的参数量公式是？",
+          options: [
+            "K_h K_w C_in C_out + C_out",
+            "H_out W_out K_h K_w C_in C_out",
+            "H_in W_in C_in H_out W_out C_out",
+            "K_h K_w C_in C_out",
+          ],
+          correctIndex: 0,
+          explanation: "卷积核权重为 K_h·K_w·C_in·C_out，加上每个输出通道一个偏置。",
+        },
+        {
+          question: "局部连接与卷积相比，参数量大约相差多少倍？",
+          options: [
+            "H_out·W_out 倍（即空间位置数）",
+            "K_h·K_w 倍",
+            "C_in·C_out 倍",
+            "相同",
+          ],
+          correctIndex: 0,
+          explanation: "局部连接为每个输出位置保存独立核，因此参数量是卷积的 H_out·W_out 倍。",
+        },
+        {
+          question: "为什么卷积具有平移等变性？",
+          options: [
+            "同一组权重在所有空间位置复用",
+            "连接数更少",
+            "使用了 softmax",
+            "输出通道数更多",
+          ],
+          correctIndex: 0,
+          explanation: "参数共享意味着输入平移后，同一核仍以相同方式与局部 patch 作用，只是作用位置平移，因此输出也平移。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 9",
-      section: "9.4",
-      pages: "Ch 9",
-      textbookSubsections: [
-          "9.4 Parameter Sharing",
-          "9.4.1 Soft weight sharing"
+        chapter: "Ch 9",
+        section: "9.4",
+        pages: "Ch 9",
+        textbookSubsections: ["9.4 Parameter Sharing", "9.4.1 Soft weight sharing"],
+        formulas: [
+          "Conv params = Kh Kw Cin Cout + Cout",
+          "Locally connected params = Hout Wout Kh Kw Cin Cout + Hout Wout Cout",
+          "Dense params = Hin Win Cin Hout Wout Cout + Hout Wout Cout",
         ],
-      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
-    }}
-          demo={{
-      title: "共享参数数量对比",
-      label: "特征图边长 H",
-      param: 16,
-      min: 4,
-      max: 64,
-      step: 4,
-      compute: (h) => ({
-        label: '全连接 / 卷积 参数量比',
-        value: h * h,
-        display: String.raw`\frac{K^2H^2}{K^2}=${(h * h).toFixed(0)}`,
-      }),
-      formula: String.raw`\frac{\text{全连接}}{\text{卷积}} = H^2`,
-    }}
+        exercises: [
+          "分别推导卷积、局部连接、全连接的参数量",
+          "解释为何卷积的连接数与局部连接相同但参数量更少",
+          "用数值例子验证平移等变性",
+        ],
+      }}
+      interactiveDemo={<ParameterSharingLab />}
     />
   );
 }

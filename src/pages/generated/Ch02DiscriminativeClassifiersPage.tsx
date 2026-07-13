@@ -1,6 +1,7 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
-import { Activity } from 'lucide-react';
+import LinkFunctionLab from '@/components/demos/LinkFunctionLab';
 import LogisticDecisionBoundaryDemo from '@/components/demos/LogisticDecisionBoundaryDemo';
+import { Activity } from 'lucide-react';
 
 export default function Ch02DiscriminativeClassifiersPage() {
   return (
@@ -32,7 +33,7 @@ export default function Ch02DiscriminativeClassifiersPage() {
         },
         {
           title: "Probit 回归",
-          description: "用标准正态累积分布函数 Φ(a) 代替 sigmoid，源自潜在变量阈值模型。probit 对异常值比逻辑回归更鲁棒（因为正态分布的尾部比 sigmoid 更薄），但在数据量大时两者差异很小。",
+          description: "用标准正态累积分布函数 Φ(a) 代替 sigmoid，源自潜在变量阈值模型。probit 与 logit 的预测概率形状相似，但 score（对数似然对 a 的梯度）行为不同：对于远离真实标签的异常点，probit 的梯度幅度大致随 |a| 增长，而 logistic 的梯度有界。因此不能仅凭概率尾部更薄就认为 probit 更鲁棒。",
           formula: String.raw`p(\mathcal{C}_1 \mid \mathbf{x}) = \Phi(a) = \int_{-\infty}^{a} \mathcal{N}(z \mid 0, 1) \, dz`,
         },
         {
@@ -45,7 +46,7 @@ export default function Ch02DiscriminativeClassifiersPage() {
         "能写出逻辑回归的似然函数和交叉熵损失",
         "推导逻辑回归的梯度下降更新式",
         "理解 softmax 如何确保多类后验非负且和为 1",
-        "对比 probit 和逻辑回归在异常值鲁棒性上的差异",
+        "对比 probit 与 logistic 在 score（梯度）行为上的差异，而非仅比较概率尾部",
         "了解规范链接函数在 GLM 框架中的作用",
       ]}
       coreIntuition={
@@ -56,7 +57,8 @@ export default function Ch02DiscriminativeClassifiersPage() {
         "在多分类中用 K 个独立的二分类 sigmoid 代替 softmax——概率和不等于 1，模型之间无法比较",
         "忽视特征缩放对梯度下降收敛的影响——逻辑回归的 loss landscape 对尺度敏感",
         "在类别完全线性可分时不加正则化——最大似然会使权重发散到无穷大（'完美分离问题'），需要加 L2 正则化",
-        "混淆 probit 和 logit——probit 使用正态 CDF，logit 使用 sigmoid；两者形状相似但尾部行为不同",
+        "混淆 probit 和 logit——probit 使用正态 CDF，logit 使用 sigmoid；更关键的是，极端误分类时 probit 的 score 可能更大",
+        "仅凭概率尾部更薄就断言 probit 更鲁棒：鲁棒性取决于 score 是否有界，而不是尾部衰减速度",
       ]}
       quiz={[
         {
@@ -80,17 +82,6 @@ export default function Ch02DiscriminativeClassifiersPage() {
           ],
           correctIndex: 0,
           explanation: "exp 确保非负，除以总和确保归一化——这就是 softmax 作为概率映射的核心机制。",
-        },
-        {
-          question: "数据中存在异常值时，probit 和逻辑回归哪个更鲁棒？为什么？",
-          options: [
-            "probit，因为正态 CDF 的尾部比 sigmoid 更薄，异常值的反传梯度更小",
-            "逻辑回归，因为 sigmoid 曲线更平滑",
-            "两者完全一样鲁棒",
-            "都不能处理异常值",
-          ],
-          correctIndex: 0,
-          explanation: "sigmoid 尾部以 exp(−a) 衰减，probit 以 exp(−a²/2) 衰减。对于大幅度异常值，probit 的梯度更快趋零，影响更小。",
         },
         {
           question: "在多类分类中，以下哪个损失函数是正确且凸的？",
@@ -117,14 +108,26 @@ export default function Ch02DiscriminativeClassifiersPage() {
           "5.4.5 Probit regression",
           "5.4.6 Canonical link functions",
         ],
-        formulas: ["sigmoid σ(a)", "softmax", "cross-entropy loss", "probit Φ(a)", "canonical link (GLM)"],
-        algorithms: ["logistic regression", "softmax regression", "gradient descent", "Newton-Raphson"],
+        formulas: [
+          "sigmoid σ(a)",
+          "softmax",
+          "cross-entropy loss",
+          "probit Φ(a)",
+          "canonical link (GLM)",
+        ],
+        algorithms: [
+          "logistic regression",
+          "softmax regression",
+          "gradient descent",
+          "Newton-Raphson",
+        ],
         exercises: [
           "推导逻辑回归的梯度下降更新式并与线性回归的对比",
           "实现 softmax 多分类并可视化决策边界",
-          "在含异常值的数据上比较逻辑回归和 probit 的决策边界",
+          "在含异常值的数据上比较逻辑回归和 probit 的 score 行为",
         ],
       }}
+      interactiveDemo={<LinkFunctionLab />}
       extraContent={<LogisticDecisionBoundaryDemo />}
     />
   );

@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import MomentumTrajectoryLab from '@/components/demos/MomentumTrajectoryLab';
 import { Zap } from 'lucide-react';
 
 export default function Ch04ConvergencePage() {
@@ -6,79 +7,108 @@ export default function Ch04ConvergencePage() {
     <BishopSectionPage
       sectionPath="/ch04/convergence"
       heroIcon={<Zap className="w-9 h-9 text-blue-600" />}
-      summary={"加速收敛需要利用梯度历史：动量累积速度、自适应方法按维度缩放步长，学习率调度控制长期精细搜索。"}
+      summary={
+        "加速收敛需要利用梯度历史：动量累积速度、自适应方法按维度缩放步长，学习率调度控制长期精细搜索。动量的稳态放大因子依赖于具体约定与梯度是否恒定。"
+      }
       concepts={[
-    {
-      title: "动量法",
-      description: "引入速度变量，使更新方向平滑并加速穿越一致梯度方向。",
-      formula: String.raw`v^{(\tau+1)} = \mu v^{(\tau)} - \eta \nabla E \quad ; \quad w^{(\tau+1)} = w^{(\tau)} + v^{(\tau+1)}`,
-    },
-    {
-      title: "RMSProp / Adam",
-      description: "维护梯度平方的指数移动平均，为每个参数自适应调整学习率。",
-    },
-    {
-      title: "学习率衰减",
-      description: "步长随 epoch 递减，保证理论上收敛到局部极小值附近。",
-    }
+        {
+          title: "动量法",
+          description: "引入速度变量，使更新方向平滑并加速穿越一致梯度方向。在 classical momentum 约定下，恒定梯度的稳态速度为 −ηg/(1−μ)。",
+          formula: String.raw`v^{(\tau+1)} = \mu v^{(\tau)} + g^{(\tau)}, \quad w^{(\tau+1)} = w^{(\tau)} - \eta v^{(\tau+1)}`,
+        },
+        {
+          title: "有限时间动量累积",
+          description: "第 t 步的速度是历史梯度的加权和，权重按 μ 的幂次衰减。",
+          formula: String.raw`v_t = -\eta \sum_{j=0}^{t-1} \mu^j g_{t-1-j}`,
+        },
+        {
+          title: "Classical vs EMA momentum",
+          description: "Classical momentum 使用 v = μv + g，恒定梯度稳态放大因子为 1/(1−μ)。EMA momentum 使用 v = μv + (1−μ)g，稳态放大因子为 1。两种约定下同一 μ 的等效步长不同。",
+          formula: String.raw`\text{classical: } \frac{1}{1-\mu},\quad \text{EMA: } 1`,
+        },
+        {
+          title: "RMSProp / Adam",
+          description: "维护梯度平方的指数移动平均，为每个参数自适应调整学习率。",
+        },
+        {
+          title: "学习率衰减",
+          description: "在特定光滑性、有界梯度与适当步长假设下，学习率衰减有助于随机优化收敛；对一般非凸深度网络，它不无条件保证收敛到局部极小值附近。",
+        },
       ]}
       learningObjectives={[
-      "理解 动量法 的含义与作用。",
-      "理解 RMSProp / Adam 的含义与作用。",
-      "理解 学习率衰减 的含义与作用。"
-    ]}
-      coreIntuition={"加速收敛需要利用梯度历史：动量累积速度、自适应方法按维度缩放步长，学习率调度控制长期精细搜索。"}
-      commonMistakes={[
-      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
-      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
-    ]}
-      quiz={[
-      {
-        question: "下列关于“动量法”的叙述，哪一项最准确？",
-        options: ["引入速度变量，使更新方向平滑并加速穿越一致梯度方向。", "动量法 只是术语，没有独立建模意义。", "动量法 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。引入速度变量，使更新方向平滑并加速穿越一致梯度方向。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“RMSProp / Adam”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要模型足够复杂，数据分布的形状就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。RMSProp / Adam 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“学习率衰减”的结果与预期不符，应优先排查哪些前提？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。学习率衰减 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
+        "能写出动量法的速度与位置更新公式",
+        "推导恒定梯度下 classical momentum 的稳态放大因子",
+        "区分 classical momentum 与 EMA momentum 的稳态尺度",
+        "理解 RMSProp/Adam 按维度缩放学习率的思想",
+        "认识到学习率收敛结论需要前提假设，而非无条件成立",
+      ]}
+      coreIntuition={
+        "动量就像一个滚下斜坡的球：同一方向持续受力时速度越来越快（有效步长被 1/(1−μ) 放大），但遇到方向相反的梯度时不会立即掉头，而是靠惯性平滑过渡。不同的 momentum 约定就像给球不同的质量定义，稳态速度自然不同。"
       }
-    ]}
+      commonMistakes={[
+        "把 1/(1−μ) 当作普适的'有效学习率倍数'——它只在 classical momentum 与恒定梯度假设下成立",
+        "混淆 classical momentum（v=μv+g）与 EMA momentum（v=μv+(1−μ)g）的尺度",
+        "认为动量越大越好——μ 接近 1 时会导致振荡加剧",
+        "把学习率衰减视为非凸网络无条件收敛的保证——实际收敛需要光滑性、步长、随机性等假设",
+      ]}
+      quiz={[
+        {
+          question: "在 classical momentum v=μv+g、恒定梯度 g 下，稳态速度是多少？",
+          options: [
+            "−ηg/(1−μ)",
+            "−ηg",
+            "−ηg·(1−μ)",
+            "−ηg/μ",
+          ],
+          correctIndex: 0,
+          explanation: "稳态满足 v = μv + g ⇒ v = g/(1−μ)，位置更新为 −ηv = −ηg/(1−μ)。",
+        },
+        {
+          question: "EMA momentum v=μv+(1−μ)g 在恒定梯度下的稳态放大因子是多少？",
+          options: [
+            "1",
+            "1/(1−μ)",
+            "1−μ",
+            "μ",
+          ],
+          correctIndex: 0,
+          explanation: "EMA 约定把梯度按 (1−μ) 缩放，稳态时 v=g，位置更新为 −ηg，放大因子为 1。",
+        },
+        {
+          question: "关于学习率衰减的收敛保证，下列说法最准确的是？",
+          options: [
+            "在特定光滑性、步长和随机梯度假设下，适当衰减有助于收敛；对一般非凸网络不提供无条件保证",
+            "只要学习率衰减，就能保证收敛到全局最优",
+            "学习率衰减只对凸问题有效",
+            "学习率衰减能消除所有局部极小值",
+          ],
+          correctIndex: 0,
+          explanation: "学习率衰减的收敛结论依赖前提假设；深度非凸网络的优化理论尚无如此强的一般保证。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 7",
-      section: "7.3",
-      pages: "Ch 7",
-      textbookSubsections: [
+        chapter: "Ch 7",
+        section: "7.3",
+        pages: "Ch 7",
+        textbookSubsections: [
           "7.3 Convergence",
           "7.3.1 Momentum",
           "7.3.2 Learning rate schedule",
-          "7.3.3 RMSProp and Adam"
+          "7.3.3 RMSProp and Adam",
         ],
-      formulas: ["动量法公式"],
-      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
-    }}
-          demo={{
-      title: "动量系数对有效步长的影响",
-      label: "动量系数 μ",
-      param: 0.9,
-      min: 0,
-      max: 0.99,
-      step: 0.01,
-      compute: (mu) => ({
-        label: '有效累积因子',
-        value: 1 / (1 - mu),
-        display: String.raw`\frac{1}{1-${mu.toFixed(2)}}=${(1 / (1 - mu)).toFixed(1)}`,
-      }),
-      formula: String.raw`\text{有效累积} = \frac{1}{1-\mu}`,
-    }}
+        formulas: [
+          "momentum update",
+          "v_t = -η Σ μ^j g_{t-1-j}",
+          "classical steady-state factor 1/(1−μ)",
+          "EMA steady-state factor 1",
+        ],
+        exercises: [
+          "推导 classical momentum 在恒定梯度下的稳态速度",
+          "比较 classical 与 EMA momentum 的有效步长",
+          "讨论学习率衰减收敛结论所需的前提假设",
+        ],
+      }}
+      interactiveDemo={<MomentumTrajectoryLab />}
     />
   );
 }

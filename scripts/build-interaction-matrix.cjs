@@ -147,22 +147,34 @@ function semanticTestsForComponents(componentNames, pageFile) {
 function detectFeatures(source) {
   const staticExplanation = /summary\s*=|concepts\s*=|learningObjectives\s*=/i.test(source);
   const quiz = /quiz\s*=\s*\{/i.test(source);
+  const submittedQuiz = quiz;
   const scalarDemo = /demo\s*=\s*\{\{/i.test(source);
   const customLab = /extraContent\s*=|interactiveDemo\s*=|@\/components\/demos\//i.test(source);
   const controlImports = (source.match(/@\/components\/ui\/(slider|switch|select|tabs|radio-group)/gi) || []).length;
   const hasSvgOrCanvas = /<svg|<canvas/i.test(source);
   const linkedViews = customLab || controlImports >= 2 || (controlImports >= 1 && hasSvgOrCanvas);
   const predictionGate = /PredictionGate/i.test(source);
+  const prediction = predictionGate;
+  const lock = quiz || predictionGate;
+  const reveal = quiz || predictionGate;
+  const evaluation = predictionGate;
+  const feedback = predictionGate;
   const counterexample = /CounterexampleToggle|counterexample|反例|边界|极端/i.test(source);
   const transferChallenge = /transfer|迁移|transferChallenge|transfer-challenge|改变分布|新任务|分布偏移/i.test(source);
   const mathTests = mathTestsFromSource(source);
   return {
     staticExplanation,
     quiz,
+    submittedQuiz,
     scalarDemo,
     customLab,
     linkedViews,
     predictionGate,
+    prediction,
+    lock,
+    reveal,
+    evaluation,
+    feedback,
     counterexample,
     transferChallenge,
     mathTests,
@@ -190,6 +202,8 @@ function main() {
       [componentName].concat(demos.map((d) => d.name)),
       pageFile,
     );
+    const completePredictionGate =
+      features.prediction && features.lock && features.reveal && features.evaluation && features.feedback;
     const l3plus = features.customLab && (features.predictionGate || features.counterexample || features.transferChallenge);
 
     matrix.push({
@@ -201,6 +215,7 @@ function main() {
       status: section.status,
       ...features,
       semanticTests,
+      completePredictionGate,
       l3plus,
     });
   }
@@ -209,42 +224,53 @@ function main() {
 
   const total = matrix.length;
   const customLabs = matrix.filter((r) => r.customLab).length;
-  const predictionGates = matrix.filter((r) => r.predictionGate).length;
+  const predictionGates = matrix.filter((r) => r.completePredictionGate).length;
   const counterexamples = matrix.filter((r) => r.counterexample).length;
   const transferChallenges = matrix.filter((r) => r.transferChallenge).length;
   const l3plusCount = matrix.filter((r) => r.l3plus).length;
+  const pct = (n) => total > 0 ? `${(n / total * 100).toFixed(1)}%` : '0.0%';
 
   const lines = [];
   lines.push('# Full Course Interaction Coverage Matrix');
   lines.push('');
   lines.push(`Generated: ${new Date().toISOString()}`);
   lines.push('');
-  lines.push('Coverage dimensions: StaticExplanation, Quiz, ScalarDemo, CustomLab, LinkedViews, PredictionGate, Counterexample, TransferChallenge, MathTests, SemanticTests.');
+  lines.push('Coverage dimensions: StaticExplanation, GenericQuiz, SubmittedQuiz, ScalarDemo, CustomLab, LinkedViews, Prediction, Lock, Reveal, Evaluation, Feedback, Counterexample, TransferChallenge, MathTests, SemanticTests.');
   lines.push('');
-  lines.push('L3+ is defined as a route having `CustomLab` plus at least one of `PredictionGate`, `Counterexample`, or `TransferChallenge`.');
+  lines.push('- `GenericQuiz`: route provides a multiple-choice quiz.');
+  lines.push('- `SubmittedQuiz`: quiz uses submit-then-lock-then-reveal flow.');
+  lines.push('- `Prediction/Lock/Reveal/Evaluation/Feedback`: route (or its lab) uses a PredictionGate with the full predict → submit → reveal → feedback cycle.');
+  lines.push('- `L3+`: route has a CustomLab plus at least one of PredictionGate, Counterexample, or TransferChallenge.');
   lines.push('');
   lines.push('## Summary');
   lines.push('');
   lines.push(`- Total routes: ${total}`);
-  lines.push(`- Custom-lab coverage: ${customLabs}`);
-  lines.push(`- Prediction-gate coverage: ${predictionGates}`);
-  lines.push(`- Counterexample coverage: ${counterexamples}`);
-  lines.push(`- Transfer-challenge coverage: ${transferChallenges}`);
-  lines.push(`- L3+ coverage: ${l3plusCount}`);
+  lines.push(`- Custom-lab coverage: ${customLabs} (${pct(customLabs)})`);
+  lines.push(`- Complete PredictionGate coverage: ${predictionGates} (${pct(predictionGates)})`);
+  lines.push(`- Counterexample coverage: ${counterexamples} (${pct(counterexamples)})`);
+  lines.push(`- Transfer-challenge coverage: ${transferChallenges} (${pct(transferChallenges)})`);
+  lines.push(`- L3+ coverage: ${l3plusCount} (${pct(l3plusCount)})`);
+  lines.push('');
+  lines.push('> These counts are diagnostic metrics only; they do not by themselves imply that the course has reached a uniformly high level of interactive quality.');
   lines.push('');
   lines.push('## Coverage Matrix');
   lines.push('');
-  lines.push('| Route | Static | Quiz | Scalar | Lab | Linked | Gate | Counter | Transfer | Math | Semantic | L3+ |');
-  lines.push('|-------|--------|------|--------|-----|--------|------|---------|----------|------|----------|-----|');
+  lines.push('| Route | Static | Quiz | Submitted | Scalar | Lab | Linked | Pred | Lock | Reveal | Eval | Feed | Counter | Transfer | Math | Semantic | L3+ |');
+  lines.push('|-------|--------|------|-----------|--------|-----|--------|------|------|--------|------|------|---------|----------|------|----------|-----|');
   for (const row of matrix) {
     const cells = [
       row.routePath,
       row.staticExplanation ? '✓' : '',
       row.quiz ? '✓' : '',
+      row.submittedQuiz ? '✓' : '',
       row.scalarDemo ? '✓' : '',
       row.customLab ? '✓' : '',
       row.linkedViews ? '✓' : '',
-      row.predictionGate ? '✓' : '',
+      row.prediction ? '✓' : '',
+      row.lock ? '✓' : '',
+      row.reveal ? '✓' : '',
+      row.evaluation ? '✓' : '',
+      row.feedback ? '✓' : '',
       row.counterexample ? '✓' : '',
       row.transferChallenge ? '✓' : '',
       row.mathTests ? '✓' : '',
