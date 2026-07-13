@@ -2,16 +2,21 @@ import { useState } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import KaTeX from '@/components/KaTeX';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import {
   computeUNetSizes,
   buildUNetStages,
   checkSkipCompatibility,
   requiredInputAlignment,
   computePaddedInputSize,
+  computeOutputCrop,
+  type UpsampleMode,
 } from '@/lib/math/unet';
 
 const INPUT_PRESETS = [250, 255, 256, 257];
+
+type OutputStrategy = 'crop-logits' | 'pad-labels';
 
 export default function UnetDemo() {
   const [levels, setLevels] = useState(3);
@@ -19,6 +24,8 @@ export default function UnetDemo() {
   const [baseChannels, setBaseChannels] = useState(64);
   const [growth, setGrowth] = useState(2);
   const [numClasses, setNumClasses] = useState(21);
+  const [outputStrategy, setOutputStrategy] = useState<OutputStrategy>('crop-logits');
+  const [upsampleMode, setUpsampleMode] = useState<UpsampleMode>('bilinear-conv');
 
   const alignment = requiredInputAlignment(levels);
   const { paddedSize, totalPadding, top, bottom, left, right } =
@@ -26,9 +33,11 @@ export default function UnetDemo() {
   const isAligned = totalPadding === 0;
 
   const { bottleneckSize } = computeUNetSizes(paddedSize, levels);
-  const stages = buildUNetStages(paddedSize, levels, baseChannels, growth);
+  const stages = buildUNetStages(paddedSize, levels, baseChannels, growth, upsampleMode);
   const decoderStages = [...stages].reverse();
   const bottleneckChannels = baseChannels * Math.pow(growth, levels);
+
+  const crop = computeOutputCrop(inputSize, paddedSize);
 
   const lastEncoder = stages[levels - 1].encoderPosition;
   const firstDecoder = decoderStages[0].decoderPosition;
@@ -95,6 +104,51 @@ export default function UnetDemo() {
             <span>{numClasses}</span>
           </div>
           <Slider value={[numClasses]} min={2} max={100} step={1} onValueChange={(v) => setNumClasses(v[0])} />
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+          <div className="space-y-2">
+            <Label className="font-medium">上采样方式</Label>
+            <RadioGroup
+              value={upsampleMode}
+              onValueChange={(value) => setUpsampleMode(value as UpsampleMode)}
+              className="flex items-center gap-4"
+            >
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="bilinear-conv" id="bilinear-conv" />
+                <Label htmlFor="bilinear-conv" className="text-sm text-gray-700">
+                  bilinear + 1×1 conv
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="transposed" id="transposed" />
+                <Label htmlFor="transposed" className="text-sm text-gray-700">
+                  transposed conv
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
+          <div className="space-y-2">
+            <Label className="font-medium">非对齐输出策略</Label>
+            <RadioGroup
+              value={outputStrategy}
+              onValueChange={(value) => setOutputStrategy(value as OutputStrategy)}
+              className="flex items-center gap-4"
+            >
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="crop-logits" id="crop-logits" />
+                <Label htmlFor="crop-logits" className="text-sm text-gray-700">
+                  crop logits 回原始尺寸
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="pad-labels" id="pad-labels" />
+                <Label htmlFor="pad-labels" className="text-sm text-gray-700">
+                  pad labels 并忽略填充像素
+                </Label>
+              </div>
+            </RadioGroup>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -287,12 +341,12 @@ export default function UnetDemo() {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="px-4 py-2">阶段</th>
-                  <th className="px-4 py-2">Encoder H×W</th>
-                  <th className="px-4 py-2">Decoder H×W</th>
-                  <th className="px-4 py-2">Skip 通道</th>
-                  <th className="px-4 py-2">Upsampled</th>
+                  <th className="px-4 py-2">Decoder input</th>
+                  <th className="px-4 py-2">Upsample</th>
+                  <th className="px-4 py-2">Skip</th>
                   <th className="px-4 py-2">Concat</th>
                   <th className="px-4 py-2">Output</th>
+                  <th className="px-4 py-2">模式</th>
                   <th className="px-4 py-2">Skip 兼容</th>
                 </tr>
               </thead>
@@ -300,23 +354,33 @@ export default function UnetDemo() {
                 {stages.map((stage, i) => (
                   <tr key={`stage-row-${i}`} className="border-t">
                     <td className="px-4 py-2">{i + 1}</td>
-                    <td className="px-4 py-2">{stage.encoderSpatial[0].toFixed(0)}×{stage.encoderSpatial[1].toFixed(0)}</td>
-                    <td className="px-4 py-2">{stage.decoderSpatial[0].toFixed(0)}×{stage.decoderSpatial[1].toFixed(0)}</td>
-                    <td className="px-4 py-2">{stage.skipChannels}</td>
-                    <td className="px-4 py-2">{stage.upsampledChannels}</td>
-                    <td className="px-4 py-2">{stage.concatChannels}</td>
-                    <td className="px-4 py-2">{stage.outputChannels}</td>
+                    <td className="px-4 py-2">
+                      {stage.decoderInputSpatial[0].toFixed(0)}×{stage.decoderInputSpatial[1].toFixed(0)}×{stage.decoderInputChannels}
+                    </td>
+                    <td className="px-4 py-2">
+                      {stage.decoderSpatial[0].toFixed(0)}×{stage.decoderSpatial[1].toFixed(0)}×{stage.upsampledChannels}
+                    </td>
+                    <td className="px-4 py-2">
+                      {stage.encoderSpatial[0].toFixed(0)}×{stage.encoderSpatial[1].toFixed(0)}×{stage.skipChannels}
+                    </td>
+                    <td className="px-4 py-2">
+                      {stage.decoderSpatial[0].toFixed(0)}×{stage.decoderSpatial[1].toFixed(0)}×{stage.concatChannels}
+                    </td>
+                    <td className="px-4 py-2">
+                      {stage.decoderSpatial[0].toFixed(0)}×{stage.decoderSpatial[1].toFixed(0)}×{stage.outputChannels}
+                    </td>
+                    <td className="px-4 py-2">{stage.upsampleMode === 'bilinear-conv' ? 'bilinear+conv' : 'transposed'}</td>
                     <td className="px-4 py-2">{checkSkipCompatibility(stage) ? '是' : '否'}</td>
                   </tr>
                 ))}
                 <tr className="border-t bg-yellow-50">
                   <td className="px-4 py-2">Bottleneck</td>
-                  <td className="px-4 py-2">{bottleneckSize.toFixed(0)}×{bottleneckSize.toFixed(0)}</td>
-                  <td className="px-4 py-2">{bottleneckSize.toFixed(0)}×{bottleneckSize.toFixed(0)}</td>
                   <td className="px-4 py-2">-</td>
                   <td className="px-4 py-2">-</td>
                   <td className="px-4 py-2">-</td>
-                  <td className="px-4 py-2">{bottleneckChannels}</td>
+                  <td className="px-4 py-2">-</td>
+                  <td className="px-4 py-2">{bottleneckSize.toFixed(0)}×{bottleneckSize.toFixed(0)}×{bottleneckChannels}</td>
+                  <td className="px-4 py-2">-</td>
                   <td className="px-4 py-2">-</td>
                 </tr>
               </tbody>
@@ -326,28 +390,33 @@ export default function UnetDemo() {
 
         <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
           <div>
-            <strong>结构说明</strong>
+            <strong>上采样通道链</strong>
             <ul className="list-disc pl-5 mt-1 space-y-1">
-              <li>Encoder 逐步下采样提取高层语义；</li>
-              <li>Bottleneck 位于最低分辨率，只绘制一次；</li>
-              <li>Decoder 从 bottleneck 向右上恢复分辨率；</li>
-              <li>Skip connection 将相同分辨率的编码器特征直接拼接到解码器，保留细节。</li>
+              <li>
+                <strong>bilinear + conv：</strong>
+                <span className="font-mono">H/2×W/2×2C → 上采样 H×W×2C → 1×1 conv → H×W×C</span>
+              </li>
+              <li>
+                <strong>transposed conv：</strong>
+                <span className="font-mono">H/2×W/2×2C → ConvTranspose → H×W×C</span>
+                （空间与通道变化同时进行）
+              </li>
+              <li>Skip 将同分辨率的 encoder 特征拼接到 decoder；</li>
+              <li>Concat 后通过 conv block 输出 H×W×C。</li>
             </ul>
           </div>
           <div>
-            <strong>拼接与分类头</strong>
+            <strong>输出对齐链</strong>
             <p className="mt-1">
-              解码器上采样后的特征图与对应编码器特征在通道维度拼接：
+              从原始输入到最终分割图的完整流程：
             </p>
-            <KaTeX
-              math={String.raw`H \times W \times C_{\text{up}} \;\|\; H \times W \times C_{\text{skip}} = H \times W \times (C_{\text{up}} + C_{\text{skip}})`}
-            />
+            <p className="font-mono text-xs bg-gray-50 rounded p-2 mt-1">
+              {inputSize}×{inputSize}×3 → 填充 → {paddedSize}×{paddedSize}×3 → U-Net → {paddedSize}×{paddedSize}×{numClasses} → {outputStrategy === 'crop-logits' ? '裁剪' : 'pad labels + loss mask'} → {inputSize}×{inputSize}×{numClasses}
+            </p>
             <p className="mt-2">
-              最后通过 1×1 卷积将通道数映射到类别数，并在每个像素上做 softmax：
+              裁剪索引：top={crop.cropTop}, bottom={crop.cropBottom}, left={crop.cropLeft}, right={crop.cropRight}。
+              有效区域大小：{crop.finalHeight}×{crop.finalWidth}。
             </p>
-            <KaTeX
-              math={String.raw`C_{\text{final}} \xrightarrow{\;1\times1\;} K \;\text{classes}, \quad p_k(x,y) = \frac{e^{z_k(x,y)}}{\sum_j e^{z_j(x,y)}}`}
-            />
           </div>
         </div>
 
@@ -365,8 +434,18 @@ export default function UnetDemo() {
         </div>
 
         {!isAligned && (
-          <div className="text-sm text-gray-700 space-y-1">
-            <p className="font-medium">每层空间尺寸（按填充后计算）</p>
+          <div className="text-sm text-gray-700 space-y-3">
+            <p className="font-medium">非对齐处理细节</p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-orange-50 border border-orange-200 rounded p-3">
+                <p className="font-medium text-orange-900">填充区域</p>
+                <p>灰色虚线框表示为对齐网络而填充的像素；这些位置没有真实标签。</p>
+              </div>
+              <div className="bg-green-50 border border-green-200 rounded p-3">
+                <p className="font-medium text-green-900">有效区域</p>
+                <p>绿色实线框表示原始图像范围内的像素；{outputStrategy === 'crop-logits' ? '最终 logits 会被裁剪回该区域' : '训练时标签也会被填充，但 loss 只计算有效区域'}。</p>
+              </div>
+            </div>
             <div className="flex flex-wrap gap-2">
               {stages.map((stage, i) => (
                 <span key={`size-${i}`} className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs">

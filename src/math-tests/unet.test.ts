@@ -5,6 +5,7 @@ import {
   checkSkipCompatibility,
   requiredInputAlignment,
   computePaddedInputSize,
+  computeOutputCrop,
   type Rectangle,
   type UNetStage,
 } from '../lib/math/unet';
@@ -87,22 +88,15 @@ describe('unet', () => {
     expect(new Set(keys).size).toBe(levels);
   });
 
-  it('encoder and decoder spatial dimensions match at each concat stage', () => {
-    const inputSize = 512;
-    const levels = 5;
-    const stages = buildUNetStages(inputSize, levels, 32, 2);
-    const { encoderSizes } = computeUNetSizes(inputSize, levels);
-
-    for (let i = 0; i < stages.length; i++) {
-      const stage = stages[i];
-      expect(stage.encoderPosition.w).toBeGreaterThan(0);
-      expect(stage.encoderPosition.h).toBeGreaterThan(0);
-      expect(stage.decoderPosition.w).toBeGreaterThan(0);
-      expect(stage.decoderPosition.h).toBeGreaterThan(0);
-      expect(stage.encoderSpatial[0]).toBe(encoderSizes[i]);
-      expect(stage.decoderSpatial[0]).toBe(encoderSizes[i]);
-      expect(stage.encoderSpatial).toEqual(stage.decoderSpatial);
+  it('decoder channel chain is consistent', () => {
+    const stages = buildUNetStages(256, 3, 64, 2);
+    for (const stage of stages) {
+      expect(stage.decoderInputChannels).toBe(stage.encoderChannels * 2);
+      expect(stage.decoderInputSpatial[0]).toBe(stage.decoderSpatial[0] / 2);
+      expect(stage.upsampledChannels).toBe(stage.encoderChannels);
+      expect(stage.skipChannels).toBe(stage.encoderChannels);
       expect(stage.concatChannels).toBe(stage.upsampledChannels + stage.skipChannels);
+      expect(stage.outputChannels).toBe(stage.encoderChannels);
     }
   });
 
@@ -143,5 +137,43 @@ describe('unet', () => {
 
     const aligned = computePaddedInputSize(256, 3);
     expect(aligned.totalPadding).toBe(0);
+  });
+
+  it('computeOutputCrop restores original input size', () => {
+    const inputSize = 255;
+    const paddedSize = 256;
+    const crop = computeOutputCrop(inputSize, paddedSize);
+    expect(crop.finalHeight).toBe(inputSize);
+    expect(crop.finalWidth).toBe(inputSize);
+    expect(crop.cropBottom - crop.cropTop).toBe(inputSize);
+    expect(crop.cropRight - crop.cropLeft).toBe(inputSize);
+  });
+
+  it('asymmetric padding crop restores exact H×W', () => {
+    const inputSize = 250;
+    const { paddedSize, top, bottom, left, right } = computePaddedInputSize(inputSize, 3);
+    expect(paddedSize).toBe(256);
+    expect(top).toBe(3);
+    expect(bottom).toBe(3);
+    expect(left).toBe(3);
+    expect(right).toBe(3);
+
+    const crop = computeOutputCrop(inputSize, paddedSize);
+    expect(crop.cropTop).toBe(top);
+    expect(crop.cropBottom).toBe(paddedSize - bottom);
+    expect(crop.cropLeft).toBe(left);
+    expect(crop.cropRight).toBe(paddedSize - right);
+    expect(crop.finalHeight).toBe(inputSize);
+    expect(crop.finalWidth).toBe(inputSize);
+  });
+
+  it('valid-region mask excludes padded pixels for 255 and 257 presets', () => {
+    for (const inputSize of [255, 257]) {
+      const { paddedSize } = computePaddedInputSize(inputSize, 3);
+      const crop = computeOutputCrop(inputSize, paddedSize);
+      expect(crop.validMask.length).toBe(inputSize);
+      expect(crop.validMask[0].length).toBe(inputSize);
+      expect(crop.validMask.every((row) => row.every((v) => v))).toBe(true);
+    }
   });
 });

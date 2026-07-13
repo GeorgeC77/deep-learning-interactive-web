@@ -1,8 +1,14 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Lightbulb, ChevronRight } from 'lucide-react';
 
+export type Evaluation = {
+  correct: boolean;
+  category?: string;
+  feedback: ReactNode;
+};
+
 type PredictionGateProps = {
-  /** A key that, when changed, resets the prediction text. */
+  /** A key that, when changed, resets the prediction text and hides hints. */
   resetKey: string | number;
   /** Current prediction text (controlled). */
   prediction: string;
@@ -14,15 +20,38 @@ type PredictionGateProps = {
   onSubmit: () => void;
   /** Whether the answer is revealed. */
   revealed: boolean;
-  /** Called when the user requests to reveal the answer. */
+  /** Called when the user requests to reveal or hide the answer. */
   onReveal: () => void;
   /** Reveal is only allowed after the prediction is submitted. */
   canReveal: boolean;
   question: string;
   hint?: string;
   revealContent: ReactNode;
+  /** Optional correctness evaluation; when provided, feedback is rendered after reveal. */
+  evaluatePrediction?: (prediction: string) => Evaluation;
   children?: ReactNode;
 };
+
+function HintPanel({ hint }: { hint?: string }) {
+  const [open, setOpen] = useState(false);
+  if (!hint) return null;
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen((s) => !s)}
+        className="px-3 py-1.5 text-sm bg-violet-100 text-violet-700 rounded-lg hover:bg-violet-200 transition-colors"
+      >
+        {open ? '隐藏提示' : '💡 需要提示'}
+      </button>
+      {open && (
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+          {hint}
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function PredictionGate({
   resetKey,
@@ -36,16 +65,16 @@ export default function PredictionGate({
   question,
   hint,
   revealContent,
+  evaluatePrediction,
   children,
 }: PredictionGateProps) {
   useEffect(() => {
     onPredictionChange('');
   }, [resetKey, onPredictionChange]);
 
-  const [showHint, setShowHint] = useState(false);
-
   const canSubmit = prediction.trim().length > 0 && !submitted;
-  const revealDisabled = !canReveal || revealed;
+  const revealDisabled = !canReveal;
+  const evaluation = revealed ? evaluatePrediction?.(prediction) : undefined;
 
   return (
     <div className="border-2 border-violet-300 rounded-xl bg-violet-50 p-6 space-y-4">
@@ -67,15 +96,7 @@ export default function PredictionGate({
       />
 
       <div className="flex flex-wrap gap-2">
-        {hint && (
-          <button
-            type="button"
-            onClick={() => setShowHint((s) => !s)}
-            className="px-3 py-1.5 text-sm bg-violet-100 text-violet-700 rounded-lg hover:bg-violet-200 transition-colors"
-          >
-            {showHint ? '隐藏提示' : '💡 需要提示'}
-          </button>
-        )}
+        <HintPanel key={resetKey} hint={hint} />
         <button
           type="button"
           onClick={() => onSubmit()}
@@ -94,21 +115,34 @@ export default function PredictionGate({
         </button>
       </div>
 
-      {showHint && hint && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-          {hint}
-        </div>
-      )}
-
       {revealed && (
-        <div className="bg-white border border-violet-200 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="bg-white border border-violet-200 rounded-lg p-4 space-y-4">
+          <div className="flex items-center gap-2">
             <ChevronRight className="w-4 h-4 text-violet-600" />
             <span className="text-sm font-medium text-violet-800">解释</span>
           </div>
+
+          {evaluation && (
+            <div
+              className={`rounded-lg p-3 text-sm ${
+                evaluation.correct
+                  ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+                  : 'bg-red-50 text-red-900 border border-red-200'
+              }`}
+              data-testid="evaluation-feedback"
+            >
+              <p className="font-medium">
+                {evaluation.correct ? '✅ 回答正确' : '❌ 回答不正确'}
+                {evaluation.category ? ` · ${evaluation.category}` : ''}
+              </p>
+              <div className="mt-1">{evaluation.feedback}</div>
+            </div>
+          )}
+
           {revealContent}
+
           {prediction && (
-            <div className="mt-3 pt-3 border-t border-gray-200">
+            <div className="pt-3 border-t border-gray-200">
               <p className="text-xs text-gray-500">你的预测：{prediction}</p>
             </div>
           )}

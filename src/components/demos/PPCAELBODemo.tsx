@@ -8,8 +8,12 @@ import {
   eig2x2,
   ppcaClosedFormML,
   posteriorReconstruction,
+  posteriorMean,
   pcaOrthogonalProjection,
   ppcaLogLikelihood,
+  ppcaCovariance,
+  rotationMatrix,
+  rotateW,
 } from '@/lib/math/ppca';
 
 const N = 80;
@@ -20,6 +24,7 @@ const TRUE_W = [[2], [1]]; // D x M
 export default function PPCAELBODemo({ initialM = 1 }: { initialM?: number } = {}) {
   const [M, setM] = useState(initialM);
   const [userSigma2, setUserSigma2] = useState(0.5);
+  const [rotationPhi, setRotationPhi] = useState(0);
 
   const data = useMemo(
     () => generatePPCAData(N, SEED, TRUE_W, TRUE_SIGMA),
@@ -35,6 +40,9 @@ export default function PPCAELBODemo({ initialM = 1 }: { initialM?: number } = {
     msePCA,
     llUser,
     llML,
+    covarianceDiff,
+    zBase,
+    zRot,
   } = useMemo(() => {
     const mean = sampleMean(data);
     const centered = data.map((row) => row.map((v, i) => v - mean[i]));
@@ -43,15 +51,19 @@ export default function PPCAELBODemo({ initialM = 1 }: { initialM?: number } = {
 
     const ml = ppcaClosedFormML(S, M);
 
-    // W evaluated at the user-chosen σ² (for comparison with the ML solution).
+    // Base W evaluated at the user-chosen σ² (for comparison with the ML solution).
     const D = TRUE_W.length;
-    const userW: number[][] = Array.from({ length: D }, () => []);
+    const baseW: number[][] = Array.from({ length: D }, () => []);
     for (let i = 0; i < M; i++) {
       const scale = Math.sqrt(Math.max(0, eigenvalues[i] - userSigma2));
       for (let d = 0; d < D; d++) {
-        userW[d][i] = eigenvectors[i][d] * scale;
+        baseW[d][i] = eigenvectors[i][d] * scale;
       }
     }
+
+    // Apply an arbitrary orthogonal rotation R to demonstrate non-identifiability.
+    const R = rotationMatrix(M, rotationPhi);
+    const userW = rotateW(baseW, R);
 
     const ppcaRecons = data.map((x) =>
       posteriorReconstruction(x, userW, userSigma2, mean),
@@ -81,21 +93,38 @@ export default function PPCAELBODemo({ initialM = 1 }: { initialM?: number } = {
       ? NaN
       : ppcaLogLikelihood(S, ml.Wml, ml.sigma2ml, N);
 
+    // Invariants under orthogonal rotation of W.
+    const Cbase = ppcaCovariance(baseW, userSigma2);
+    const Crot = ppcaCovariance(userW, userSigma2);
+    const covarianceDiff = Math.abs(Cbase[0][0] - Crot[0][0]) + Math.abs(Cbase[0][1] - Crot[0][1]) + Math.abs(Cbase[1][1] - Crot[1][1]);
+
+    // Latent coordinate of the first sample before and after rotation.
+    const firstCentered = [data[0][0] - mean[0], data[0][1] - mean[1]];
+    const zBase = posteriorMean(firstCentered, baseW, userSigma2);
+    const zRot = posteriorMean(firstCentered, userW, userSigma2);
+
     return {
       mean,
       ml,
+      userW,
+      baseW,
+      R,
       ppcaRecons,
       pcaRecons,
       msePPCA,
       msePCA,
       llUser,
       llML,
+      covarianceDiff,
+      zBase,
+      zRot,
     };
-  }, [data, M, userSigma2]);
+  }, [data, M, userSigma2, rotationPhi]);
 
   const reset = () => {
     setM(initialM);
     setUserSigma2(0.5);
+    setRotationPhi(0);
   };
 
   return (
@@ -136,6 +165,21 @@ export default function PPCAELBODemo({ initialM = 1 }: { initialM?: number } = {
             className="mt-2"
           />
         </div>
+        {M >= 1 && (
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              正交旋转角 φ：{(rotationPhi * 180 / Math.PI).toFixed(0)}°
+            </label>
+            <Slider
+              value={[rotationPhi]}
+              min={-Math.PI}
+              max={Math.PI}
+              step={Math.PI / 36}
+              onValueChange={([v]) => setRotationPhi(v)}
+              className="mt-2"
+            />
+          </div>
+        )}
         <div className="flex justify-end">
           <Button variant="outline" onClick={reset}>
             重置
@@ -178,9 +222,16 @@ export default function PPCAELBODemo({ initialM = 1 }: { initialM?: number } = {
           <span className="font-mono">Λ_M</span>，有
         </p>
         <p className="font-mono bg-gray-50 rounded p-2">
-          W_ML = U_M (Λ_M − σ²_ML I)^{1/2}
+          W_ML = U_M (Λ_M − σ²_ML I)^{1/2} R
           <br />
           σ²_ML = (λ_{M+1} + … + λ_D) / (D − M)
+        </p>
+        <p>
+          其中 <span className="font-mono">R</span> 是任意{' '}
+          <span className="font-mono">M × M</span> 正交矩阵。本页默认取{' '}
+          <span className="font-mono">R = I</span> 作为代表；当 M = 1 时仍有 ±
+          符号不确定性，当 M ≥ 2 时还存在潜在空间的旋转不确定性。这种不可辨识性在{' '}
+          <span className="font-mono">M &lt; D</span> 时就已经存在，不只在 M = D 边界。
         </p>
         <p>
           这里 <span className="font-mono">σ²_ML</span> 是被丢弃方向的平均方差。
@@ -207,8 +258,33 @@ export default function PPCAELBODemo({ initialM = 1 }: { initialM?: number } = {
           <p className="text-green-700 bg-green-50 rounded p-2">
             <span className="font-medium">M = 1：</span>
             标准的二维 → 一维 PPCA 降维。后验均值给出沿主方向的收缩投影，
-            与 PCA 正交投影略有不同（σ² 越大收缩越明显）。
+            与 PCA 正交投影略有不同（σ² 越大收缩越明显）。此时 W 只有 ± 两种符号选择，
+            旋转角 φ 用来演示这一符号不确定性。
           </p>
+        )}
+        {M >= 1 && (
+          <div className="bg-indigo-50 rounded-lg p-3 text-sm text-indigo-900 space-y-1">
+            <p className="font-medium">旋转不变量实验</p>
+            <p>
+              改变 φ 会让 W 旋转，但以下量保持不变：
+            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>
+                <span className="font-mono">W Wᵀ</span> 差异：{covarianceDiff.toExponential(2)}
+              </li>
+              <li>
+                <span className="font-mono">C = W Wᵀ + σ²I</span> 不变 ⇒ 对数似然不变（当前：{llUser.toFixed(3)}）
+              </li>
+              <li>
+                观测空间重构不变（见上图绿色点）
+              </li>
+              <li>
+                隐空间坐标反向旋转：Rᵀ E[z|x] 保持一致
+                （示例点 z_base = [{zBase.map((v) => v.toFixed(2)).join(', ')}]，
+                z_rot = [{zRot.map((v) => v.toFixed(2)).join(', ')}]）
+              </li>
+            </ul>
+          </div>
         )}
         {ml.boundary && (
           <p className="text-amber-700 bg-amber-50 rounded p-2">

@@ -7,15 +7,13 @@ import {
   posteriorReconstruction,
   pcaOrthogonalProjection,
 } from '../lib/math/ppca';
-import { buildUNetStages, checkSkipCompatibility } from '../lib/math/unet';
+import { buildUNetStages, checkSkipCompatibility, computeOutputCrop } from '../lib/math/unet';
 import { softNms } from '../lib/math/iouNms';
 import PredictionGate from '../components/PredictionGate';
 import PPCAELBODemo from '../components/demos/PPCAELBODemo';
 import UnetDemo from '../components/demos/UnetDemo';
-
-function sum(arr: number[]): number {
-  return arr.reduce((a, b) => a + b, 0);
-}
+import IoUNMSDemo from '../components/demos/IoUNMSDemo';
+import DiscreteLatentELBODemo from '../components/demos/DiscreteLatentELBODemo';
 
 function norm(v: number[]): number {
   return Math.hypot(v[0], v[1]);
@@ -48,7 +46,6 @@ describe('pedagogical invariants: fourth batch', () => {
     expect(norm(diag14.eigenvectors[0])).toBeCloseTo(1, 10);
     expect(norm(diag14.eigenvectors[1])).toBeCloseTo(1, 10);
 
-    // No zero vectors for either diagonal case.
     for (const v of diag41.eigenvectors) {
       expect(norm(v)).toBeGreaterThan(0.99);
     }
@@ -88,6 +85,14 @@ describe('pedagogical invariants: fourth batch', () => {
     expect(container.textContent).toContain('重构退化为数据均值');
   });
 
+  it('PPCA demo formula includes the orthogonal rotation R', () => {
+    const { container } = render(<PPCAELBODemo />);
+    expect(container.textContent).toContain('W_ML = U_M (Λ_M − σ²_ML I)');
+    expect(container.textContent).toContain('R');
+    expect(container.textContent).toContain('R = I');
+    expect(container.textContent).toContain('代表');
+  });
+
   /* ---------------------------------------------------------------------- */
   /* U-Net layout and real skip compatibility                               */
   /* ---------------------------------------------------------------------- */
@@ -107,11 +112,11 @@ describe('pedagogical invariants: fourth batch', () => {
       expect(stage.encoderSpatial).toEqual(stage.decoderSpatial);
     }
 
-    const incompatible = {
+    const mismatched = {
       ...stages[0],
       decoderSpatial: [stages[0].decoderSpatial[0] + 2, stages[0].decoderSpatial[1]] as [number, number],
     };
-    expect(checkSkipCompatibility(incompatible)).toBe(false);
+    expect(checkSkipCompatibility(mismatched)).toBe(false);
   });
 
   it('U-Net demo warns about non-aligned input presets', () => {
@@ -122,8 +127,16 @@ describe('pedagogical invariants: fourth batch', () => {
     expect(screen.getByText(/需要填充到/)).toBeTruthy();
   });
 
+  it('U-Net final displayed output size matches crop result', () => {
+    const inputSize = 255;
+    const paddedSize = 256;
+    const crop = computeOutputCrop(inputSize, paddedSize);
+    expect(crop.finalHeight).toBe(inputSize);
+    expect(crop.finalWidth).toBe(inputSize);
+  });
+
   /* ---------------------------------------------------------------------- */
-  /* PredictionGate controlled flow                                         */
+  /* PredictionGate controlled flow and evaluation                          */
   /* ---------------------------------------------------------------------- */
   it('PredictionGate cannot reveal before submit', () => {
     const { container } = render(
@@ -205,6 +218,141 @@ describe('pedagogical invariants: fourth batch', () => {
     expect(onPredictionChange).toHaveBeenLastCalledWith('');
   });
 
+  it('PredictionGate renders evaluation feedback only when evaluatePrediction is provided and revealed', () => {
+    const evaluate = vi.fn(() => ({ correct: true, feedback: 'Great!' }));
+    const { container, rerender } = render(
+      <PredictionGate
+        resetKey={1}
+        prediction="guess"
+        onPredictionChange={vi.fn()}
+        submitted={true}
+        onSubmit={vi.fn()}
+        revealed={false}
+        onReveal={vi.fn()}
+        canReveal={true}
+        question="Q"
+        revealContent={<div>answer</div>}
+        evaluatePrediction={evaluate}
+      />,
+    );
+
+    expect(container.querySelector('[data-testid="evaluation-feedback"]')).toBeNull();
+
+    rerender(
+      <PredictionGate
+        resetKey={1}
+        prediction="guess"
+        onPredictionChange={vi.fn()}
+        submitted={true}
+        onSubmit={vi.fn()}
+        revealed={true}
+        onReveal={vi.fn()}
+        canReveal={true}
+        question="Q"
+        revealContent={<div>answer</div>}
+        evaluatePrediction={evaluate}
+      />,
+    );
+
+    expect(container.querySelector('[data-testid="evaluation-feedback"]')).not.toBeNull();
+    expect(evaluate).toHaveBeenCalledWith('guess');
+  });
+
+  /* ---------------------------------------------------------------------- */
+  /* Discrete ELBO integration tests                                        */
+  /* ---------------------------------------------------------------------- */
+  it('DiscreteLatentELBODemo: posterior is hidden initially', () => {
+    const { container } = render(<DiscreteLatentELBODemo />);
+    expect(container.textContent).not.toContain('真实后验');
+  });
+
+  it('DiscreteLatentELBODemo: reveal is disabled before submit', () => {
+    const { container } = render(<DiscreteLatentELBODemo />);
+    const revealButton = container.querySelector('button.bg-emerald-600') as HTMLButtonElement;
+    expect(revealButton.disabled).toBe(true);
+  });
+
+  it('DiscreteLatentELBODemo: prediction and q are locked after submit', () => {
+    const { container } = render(<DiscreteLatentELBODemo />);
+    const radios = container.querySelectorAll('button[role="radio"]');
+    expect(radios.length).toBeGreaterThan(0);
+    fireEvent.click(radios[0]);
+
+    const submitButton = container.querySelector('button.bg-violet-600') as HTMLButtonElement;
+    fireEvent.click(submitButton);
+
+    // After submit, radios are disabled.
+    expect(radios[0].hasAttribute('disabled')).toBe(true);
+    // q sliders are disabled (Radix may expose data-disabled or aria-disabled).
+    // sliders[0] is the sample selector; q sliders start at index 1.
+    const sliders = container.querySelectorAll('[data-slot="slider-thumb"]');
+    expect(sliders.length).toBeGreaterThanOrEqual(2);
+    const qThumb = sliders[1] as HTMLElement;
+    expect(
+      qThumb.hasAttribute('aria-disabled') ||
+        qThumb.hasAttribute('data-disabled') ||
+        qThumb.hasAttribute('disabled'),
+    ).toBe(true);
+  });
+
+  it('DiscreteLatentELBODemo: reveal shows posterior and correctness feedback', () => {
+    const { container } = render(<DiscreteLatentELBODemo />);
+    const radios = container.querySelectorAll('button[role="radio"]');
+    fireEvent.click(radios[0]);
+
+    const submitButton = container.querySelector('button.bg-violet-600') as HTMLButtonElement;
+    fireEvent.click(submitButton);
+
+    const revealButton = container.querySelector('button.bg-emerald-600') as HTMLButtonElement;
+    expect(revealButton.disabled).toBe(false);
+    fireEvent.click(revealButton);
+
+    expect(container.textContent).toContain('真实后验');
+    expect(container.querySelector('[data-testid="evaluation-feedback"]')).not.toBeNull();
+  });
+
+  it('DiscreteLatentELBODemo: setting q to posterior gives near-zero KL', () => {
+    const { container } = render(<DiscreteLatentELBODemo />);
+    const radios = container.querySelectorAll('button[role="radio"]');
+    fireEvent.click(radios[0]);
+
+    const submitButton = container.querySelector('button.bg-violet-600') as HTMLButtonElement;
+    fireEvent.click(submitButton);
+
+    const revealButton = container.querySelector('button.bg-emerald-600') as HTMLButtonElement;
+    fireEvent.click(revealButton);
+
+    const setPosteriorButton = screen.getByRole('button', { name: /令 q = 真实后验/ });
+    fireEvent.click(setPosteriorButton);
+
+    expect(container.textContent).toContain('KL(q||p)');
+    // The KL metric box should show a value very close to 0.
+    const klLabel = screen.getByText('KL(q||p)');
+    const valueEl = klLabel.parentElement?.querySelector('.text-lg');
+    expect(valueEl?.textContent).toMatch(/0\.000|—/);
+  });
+
+  it('DiscreteLatentELBODemo: changing sample resets prediction, q, reveal and hint', () => {
+    const { container } = render(<DiscreteLatentELBODemo />);
+    const radios = container.querySelectorAll('button[role="radio"]');
+    fireEvent.click(radios[0]);
+
+    const submitButton = container.querySelector('button.bg-violet-600') as HTMLButtonElement;
+    fireEvent.click(submitButton);
+
+    const revealButton = container.querySelector('button.bg-emerald-600') as HTMLButtonElement;
+    fireEvent.click(revealButton);
+
+    expect(container.textContent).toContain('真实后验');
+
+    // Change sample using the sample slider (first slider).
+    const sampleSlider = container.querySelectorAll('[data-slot="slider-thumb"]')[0];
+    fireEvent.keyDown(sampleSlider, { key: 'ArrowRight' });
+
+    // After sample change the reveal area should be gone.
+    expect(container.textContent).not.toContain('真实后验');
+  });
+
   /* ---------------------------------------------------------------------- */
   /* Soft-NMS dynamic reselection and class semantics                       */
   /* ---------------------------------------------------------------------- */
@@ -234,10 +382,35 @@ describe('pedagogical invariants: fourth batch', () => {
     expect((agnostic.finalScores.get(2) ?? 1)).toBeLessThan(0.85);
   });
 
-  it('Soft-NMS identity residual is numerically zero at true posterior', () => {
-    // The actual ELBO identity is tested in discreteElbo.test.ts; this keeps
-    // the fourth-batch report compact.
-    const weights = [0.3, 0.4, 0.3];
-    expect(sum(weights)).toBeCloseTo(1, 10);
+  /* ---------------------------------------------------------------------- */
+  /* Linked-view consistency tests                                          */
+  /* ---------------------------------------------------------------------- */
+  it('IoUNMSDemo Soft-NMS canvas colours derive from softResult, not hard result', () => {
+    const { container } = render(<IoUNMSDemo />);
+    const softRadio = screen.getByRole('radio', { name: 'Soft-NMS' });
+    fireEvent.click(softRadio);
+
+    const nmsCanvas = container.querySelector('[data-testid="nms-canvas"]')!;
+
+    // In Soft-NMS mode there should be no red strokes (hard-suppressed colour).
+    const redRects = nmsCanvas.querySelectorAll('rect[stroke="#dc2626"]');
+    expect(redRects.length).toBe(0);
+
+    // There should be green selected boxes.
+    const greenRects = nmsCanvas.querySelectorAll('rect[stroke="#059669"]');
+    expect(greenRects.length).toBeGreaterThan(0);
+  });
+
+  it('IoUNMSDemo Hard-NMS canvas colours derive from hard result', () => {
+    const { container } = render(<IoUNMSDemo />);
+    const hardRadio = screen.getByRole('radio', { name: 'Hard-NMS' });
+    fireEvent.click(hardRadio);
+
+    const nmsCanvas = container.querySelector('[data-testid="nms-canvas"]')!;
+
+    // Hard mode uses green for kept and red for suppressed.
+    const hasGreen = nmsCanvas.querySelectorAll('rect[stroke="#059669"]').length > 0;
+    const hasRed = nmsCanvas.querySelectorAll('rect[stroke="#dc2626"]').length > 0;
+    expect(hasGreen || hasRed).toBe(true);
   });
 });

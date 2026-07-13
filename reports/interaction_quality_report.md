@@ -1,23 +1,25 @@
 # 交互质量审计报告（更新）
 
-> 更新日期：2026-07-12 | 审计范围：旗舰页面 + 第二批核心交互 + 第三批数学/教学语义修复 | 测试：`npm run test:math` 230 passed
+> 更新日期：2026-07-12 | 审计范围：旗舰页面 + 第二批核心交互 + 第三/四/五批数学/教学语义修复 | 测试：`npm run test:math` 246 passed
 
-## 第三批修复摘要
+## 第五批修复摘要
 
-| Demo | 关键修复 | PredictionGate | 数学测试 |
+| Demo | 关键修复 | Prediction → Lock → Reveal → Evaluation → Feedback | 数学测试 |
 |---|---|---|---|
-| PPCAELBODemo | 稳定 `eig2x2`（atan2 + Rayleigh quotient）；删除 `E[x\|x]`；正确写出 `E[z\|x]` 与 `x̂_post = μ + W E[z\|x]`；M=0/1/2 分段解释 | ❌（无预测门） | ✅ Vitest |
-| UnetDemo | encoder/decoder 同分辨率同 centreY；skip compatibility 比较真实 `encoderSpatial` 与 `decoderSpatial`；输入尺寸 step=1 + 250/255/256/257 预设；红色未对齐警告与填充详情 | ❌ | ✅ Vitest |
-| DiscreteLatentELBODemo | PredictionGate 完全受控：预测 → 提交锁定 → 揭晓 → 反馈；hint 不再泄露答案索引；sample 切换重置 q/prediction/submitted/revealed；真实后验按钮仅在揭晓后出现 | ✅ | ✅ Vitest |
-| IoUNMSDemo | Hard NMS class-aware/class-agnostic + scoreThreshold + trace；Soft-NMS 每轮按更新后分数重选最大值，支持 mode 与 scoreThreshold，完整 trace | ❌ | ✅ Vitest |
+| PPCAELBODemo | 闭式解显式写出正交旋转矩阵 `R`：`W_ML = U_M (Λ_M − σ²_ML I)^{1/2} R`；新增旋转角 φ 实验与旋转不变量指标（`‖W Wᵀ − W_rot W_rotᵀ‖`、`C` 不变、似然不变、重构不变） | ❌（无预测门） | ✅ Vitest |
+| UnetDemo | 补充最终输出裁剪链（output → crop → target-size），显式 `crop-top/bottom/left/right`；支持 `crop-logits` / `pad-labels` loss-mask 策略；decoder 通道链可视化：`upsample → projection → skip → concat → conv` | ❌ | ✅ Vitest |
+| DiscreteLatentELBODemo | PredictionGate 新增 `evaluatePrediction` 结构化评估；预测拆分为“分类 k=0/1/2”与“q 分布”两步；提交后两者同时锁定；揭晓后显示正确性/KL 差距与真实后验；`令 q = 真实后验` 按钮在揭晓后可用 | ✅ | ✅ Vitest |
+| IoUNMSDemo | Soft-NMS 新增 `hard` / `soft` / `side-by-side` 三种视图；Soft-NMS 画布颜色完全基于 `softResult`（绿=选中保留、橙=被衰减、灰虚=阈值以下），不再混用 hard-NMS 颜色 | ❌ | ✅ Vitest |
 
-## 第三批教学不变量（新增 `src/pedagogical-tests/fourth-batch.test.tsx`）
+## 教学不变量（`src/pedagogical-tests/fourth-batch.test.tsx`）
 
 - PPCA `eig2x2` 对 `diag(4,1)` / `diag(1,4)` / `diag(2,2)` / 旋转协方差返回正确特征对；特征向量单位长且正交；不会出现零向量。
-- PPCA 页面不出现 `E[x\|x]`，出现 `E[z\|x]`；M=0 有明确 baseline 说明。
-- U-Net 同分辨率 encoder/decoder 共享 centreY；skip compatibility 基于真实空间尺寸；非对齐输入预设触发红色警告。
-- PredictionGate：未提交时 reveal 禁用；提交后 reveal 可用并触发回调；resetKey 变化清空 prediction。
+- PPCA 页面不出现 `E[x|x]`，出现 `E[z|x]`；M=0 有明确 baseline 说明；公式包含正交旋转 `R` 并说明 `R = I` 为代表元。
+- U-Net 同分辨率 encoder/decoder 共享 centreY；skip compatibility 基于真实空间尺寸；非对齐输入预设触发红色警告；最终输出裁剪结果与 `computeOutputCrop` 一致。
+- PredictionGate：未提交时 reveal 禁用；提交后 reveal 可用并触发回调；resetKey 变化清空 prediction；提供 `evaluatePrediction` 时揭晓后渲染结构化 feedback。
+- 离散 ELBO：posterior 初始隐藏；提交前 reveal 禁用；提交后 prediction 与 q 锁定；揭晓后显示 posterior 与正确性反馈；`令 q = 真实后验` 使 KL 严格为 0；切换 sample 重置所有状态。
 - Soft-NMS：按更新后分数动态重选最大值；class-aware 不跨类衰减；class-agnostic 跨类衰减；阈值过滤作用于衰减后分数；trace 可复现最终分数；σ 越小高 IoU 框衰减越强。
+- Linked-view：Soft-NMS 画布颜色来自 softResult，不存在 hard-NMS 的红色抑制色；Hard-NMS 画布颜色来自 hard result。
 
 ## 旗舰页面评级（修复后）
 
@@ -45,7 +47,8 @@
 
 ## 说明
 
-- **PredictionGate** 在 `DiscreteLatentELBODemo` 中已实现真正的“先预测 → 提交锁定 → 揭晓 → 反馈”流程，标记为 ✅。其余页面未使用 PredictionGate。
+- **PredictionGate** 在 `DiscreteLatentELBODemo` 中已实现真正的“先预测 → 提交锁定 → 揭晓 → 评估 → 反馈”完整流程，标记为 ✅。其余页面未使用 PredictionGate。
+- PredictionGate 的 checklist 已细化为：Prediction / Lock / Reveal / Evaluation / Feedback 五项，当前全部满足。
 
 ## L4 晋升条件
 
@@ -83,12 +86,16 @@
 - ✅ MAE 拆分 image/mask seed；结构化图像；masked vs all-patch MSE 区分
 - ✅ 卷积 SAME padding 公式与移动窗口动画
 
-### 第三批（数学/教学语义）
+### 第三/四/五批（数学/教学语义）
 - ✅ PPCA `eig2x2` 稳定特征分解，修复 `diag(1,4)` 零向量问题
-- ✅ PPCA 后验均值公式正确化，删除 `E[x\|x]`，补充 M=0/1/2 语义
+- ✅ PPCA 后验均值公式正确化，删除 `E[x|x]`，补充 M=0/1/2 语义
+- ✅ PPCA 闭式解显式写出正交旋转矩阵 `R` 并提供旋转不变量实验
 - ✅ U-Net 同分辨率 stage 同 centreY，skip compatibility 比较真实 H×W
 - ✅ U-Net 输入对齐实验可触发红色警告（step=1 + 250/255/257 预设）
-- ✅ PredictionGate 完全受控，流程为预测 → 提交锁定 → 揭晓 → 反馈
+- ✅ U-Net 最终输出裁剪链、loss-mask 策略与 decoder 通道链可视化
+- ✅ PredictionGate 完全受控，流程为 Prediction → Lock → Reveal → Evaluation → Feedback
 - ✅ 离散 ELBO 答案防泄露：hint 无答案索引，真实后验按钮仅揭晓后可见
+- ✅ 离散 ELBO 分类预测与 q 预测同时锁定，揭晓后提供正确性/KL 反馈
 - ✅ Soft-NMS 每轮按更新后分数重选最大值，支持 mode 与 scoreThreshold
+- ✅ Soft-NMS 多视图模式（hard/soft/side-by-side）与基于 softResult 的 canvas 颜色
 - ✅ 新增/更新 `ppca/unet/discreteElbo/iouNms` math 测试与 `fourth-batch` 教学不变量测试

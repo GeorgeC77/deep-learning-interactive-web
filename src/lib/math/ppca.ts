@@ -279,6 +279,63 @@ export function pcaOrthogonalProjection(
 }
 
 /**
+ * Build an M×M orthogonal rotation matrix R(φ).
+ *
+ * For M = 1 the only orthogonal transformations are ±1, so the returned
+ * matrix is [[sign(cos φ)]] (a simple sign flip).
+ * For M = 2 the matrix is the usual 2-D rotation.
+ */
+export function rotationMatrix(M: number, phi: number): number[][] {
+  if (M === 0) return [];
+  if (M === 1) {
+    const sign = Math.cos(phi) >= 0 ? 1 : -1;
+    return [[sign]];
+  }
+  const c = Math.cos(phi);
+  const s = Math.sin(phi);
+  return [
+    [c, -s],
+    [s, c],
+  ];
+}
+
+/**
+ * Multiply a D×M loading matrix W by an M×M orthogonal matrix R.
+ */
+export function rotateW(W: number[][], R: number[][]): number[][] {
+  const D = W.length;
+  const M = W[0]?.length ?? 0;
+  const out: number[][] = Array.from({ length: D }, () => new Array(M).fill(0));
+  for (let d = 0; d < D; d++) {
+    for (let j = 0; j < M; j++) {
+      let sum = 0;
+      for (let i = 0; i < M; i++) {
+        sum += W[d][i] * R[i][j];
+      }
+      out[d][j] = sum;
+    }
+  }
+  return out;
+}
+
+/** Compute the observed-space covariance C = W Wᵀ + σ²I. */
+export function ppcaCovariance(W: number[][], sigma2: number): number[][] {
+  const D = W.length;
+  const C = Array.from({ length: D }, (_, i) =>
+    Array.from({ length: D }, (_, j) => (i === j ? sigma2 : 0)),
+  );
+  const M = W[0]?.length ?? 0;
+  for (let d = 0; d < D; d++) {
+    for (let e = 0; e < D; e++) {
+      for (let m = 0; m < M; m++) {
+        C[d][e] += W[d][m] * W[e][m];
+      }
+    }
+  }
+  return C;
+}
+
+/**
  * Log-likelihood of centered data covariance S under C = WWᵀ + σ²I.
  *
  * ll = -N/2 [ D log(2π) + log|C| + tr(C^{-1} S) ]

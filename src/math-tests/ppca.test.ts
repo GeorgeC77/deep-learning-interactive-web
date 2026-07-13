@@ -8,6 +8,10 @@ import {
   posteriorReconstruction,
   pcaOrthogonalProjection,
   ppcaLogLikelihood,
+  rotationMatrix,
+  rotateW,
+  ppcaCovariance,
+  posteriorMean,
 } from '../lib/math/ppca';
 
 const N = 200;
@@ -92,6 +96,96 @@ describe('ppca', () => {
     expect(ml.Wml[1]).toHaveLength(0);
     expect(ml.sigma2ml).toBeCloseTo((eigenvalues[0] + eigenvalues[1]) / 2, 5);
     expect(ml.boundary).toBe(false);
+  });
+
+  it('rotation preserves W W^T, covariance, likelihood and reconstruction', () => {
+    const data = generatePPCAData(80, 123, [[2], [1]], 0.4);
+    const mean = sampleMean(data);
+    const centered = data.map((row) => row.map((v, i) => v - mean[i]));
+    const S = sampleCovariance(centered);
+    const ml = ppcaClosedFormML(S, 1);
+
+    const angles = [-1.2, -0.5, 0, 0.7, 2.1];
+    for (const phi of angles) {
+      const R = rotationMatrix(1, phi);
+      const Wrot = rotateW(ml.Wml, R);
+
+      // R^T R = I
+      expect(R[0][0] * R[0][0]).toBeCloseTo(1, 10);
+
+      // W W^T invariant
+      const Cbase = ppcaCovariance(ml.Wml, ml.sigma2ml);
+      const Crot = ppcaCovariance(Wrot, ml.sigma2ml);
+      for (let i = 0; i < 2; i++) {
+        for (let j = 0; j < 2; j++) {
+          expect(Cbase[i][j]).toBeCloseTo(Crot[i][j], 10);
+        }
+      }
+
+      // Likelihood invariant
+      expect(ppcaLogLikelihood(S, Wrot, ml.sigma2ml, 1)).toBeCloseTo(
+        ppcaLogLikelihood(S, ml.Wml, ml.sigma2ml, 1),
+        10,
+      );
+
+      // Reconstruction invariant
+      const rBase = posteriorReconstruction(data[0], ml.Wml, ml.sigma2ml, mean);
+      const rRot = posteriorReconstruction(data[0], Wrot, ml.sigma2ml, mean);
+      expect(Math.hypot(rBase[0] - rRot[0], rBase[1] - rRot[1])).toBeCloseTo(0, 10);
+    }
+  });
+
+  it('M=1 sign flip does not change the model', () => {
+    const data = generatePPCAData(80, 123, [[2], [1]], 0.4);
+    const mean = sampleMean(data);
+    const centered = data.map((row) => row.map((v, i) => v - mean[i]));
+    const S = sampleCovariance(centered);
+    const ml = ppcaClosedFormML(S, 1);
+
+    const R = [[-1]];
+    const Wneg = rotateW(ml.Wml, R);
+
+    // Latent coordinate flips sign
+    const x = [data[0][0] - mean[0], data[0][1] - mean[1]];
+    const zPos = posteriorMean(x, ml.Wml, ml.sigma2ml);
+    const zNeg = posteriorMean(x, Wneg, ml.sigma2ml);
+    expect(zPos[0] + zNeg[0]).toBeCloseTo(0, 10);
+
+    // Observed reconstruction unchanged
+    const rPos = posteriorReconstruction(data[0], ml.Wml, ml.sigma2ml, mean);
+    const rNeg = posteriorReconstruction(data[0], Wneg, ml.sigma2ml, mean);
+    expect(Math.hypot(rPos[0] - rNeg[0], rPos[1] - rNeg[1])).toBeCloseTo(0, 10);
+  });
+
+  it('M=2 rotation preserves W W^T', () => {
+    const S = [
+      [3, 1],
+      [1, 2],
+    ];
+    const ml = ppcaClosedFormML(S, 2);
+    const phi = Math.PI / 7;
+    const R = rotationMatrix(2, phi);
+    const Wrot = rotateW(ml.Wml, R);
+
+    // R^T R = I
+    const RtR = [
+      [R[0][0] * R[0][0] + R[1][0] * R[1][0], R[0][0] * R[0][1] + R[1][0] * R[1][1]],
+      [R[0][1] * R[0][0] + R[1][1] * R[1][0], R[0][1] * R[0][1] + R[1][1] * R[1][1]],
+    ];
+    expect(RtR[0][0]).toBeCloseTo(1, 10);
+    expect(RtR[1][1]).toBeCloseTo(1, 10);
+    expect(RtR[0][1]).toBeCloseTo(0, 10);
+
+    // At the M = D boundary the standard noise estimator is undefined; use
+    // sigma^2 = 0 so that C = W W^T and the invariance under rotation is exact.
+    const sigma2 = 0;
+    const Cbase = ppcaCovariance(ml.Wml, sigma2);
+    const Crot = ppcaCovariance(Wrot, sigma2);
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 2; j++) {
+        expect(Cbase[i][j]).toBeCloseTo(Crot[i][j], 10);
+      }
+    }
   });
 
   describe('eig2x2', () => {

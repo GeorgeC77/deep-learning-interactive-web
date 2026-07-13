@@ -2,6 +2,8 @@
 /* U-Net architecture helpers                                                  */
 /* -------------------------------------------------------------------------- */
 
+export type UpsampleMode = 'bilinear-conv' | 'transposed';
+
 export interface UNetSizeResult {
   encoderSizes: number[];
   bottleneckSize: number;
@@ -21,8 +23,14 @@ export interface UNetStage {
   /** Decoder spatial size as [H, W] before concatenation. */
   decoderSpatial: [number, number];
   encoderChannels: number;
-  /** Channels after upsampling inside the decoder block. */
+  /** Channels entering this decoder block from the lower-resolution path. */
+  decoderInputChannels: number;
+  /** Spatial size of the lower-resolution decoder input. */
+  decoderInputSpatial: [number, number];
+  /** Channels after upsampling + channel projection (equals encoderChannels). */
   upsampledChannels: number;
+  /** Upsampling implementation used for this stage. */
+  upsampleMode: UpsampleMode;
   /** Channels brought in by the skip connection. */
   skipChannels: number;
   /** Channels after skip concatenation. */
@@ -67,11 +75,15 @@ export function buildUNetStages(
   levels: number,
   baseChannels: number,
   growth: number,
+  upsampleMode: UpsampleMode = 'bilinear-conv',
 ): UNetStage[] {
   const stages: UNetStage[] = [];
   for (let i = 0; i < levels; i++) {
     const spatialSize = inputSize / Math.pow(2, i);
     const encoderChannels = baseChannels * Math.pow(growth, i);
+    // The decoder input comes from the previous (lower) decoder level, which has
+    // the same channel count as the next encoder level.
+    const decoderInputChannels = encoderChannels * growth;
     const upsampledChannels = encoderChannels;
     const skipChannels = encoderChannels;
     const concatChannels = upsampledChannels + skipChannels;
@@ -81,7 +93,10 @@ export function buildUNetStages(
       encoderSpatial: [spatialSize, spatialSize],
       decoderSpatial: [spatialSize, spatialSize],
       encoderChannels,
+      decoderInputChannels,
+      decoderInputSpatial: [spatialSize / 2, spatialSize / 2],
       upsampledChannels,
+      upsampleMode,
       skipChannels,
       concatChannels,
       outputChannels,
@@ -161,5 +176,47 @@ export function computePaddedInputSize(
     bottom,
     left: top,
     right: bottom,
+  };
+}
+
+/**
+ * Compute the crop indices needed to recover the original input size from the
+ * padded network output, plus a binary valid-region mask of the original size.
+ */
+export function computeOutputCrop(
+  inputSize: number,
+  paddedSize: number,
+): {
+  cropTop: number;
+  cropBottom: number;
+  cropLeft: number;
+  cropRight: number;
+  finalHeight: number;
+  finalWidth: number;
+  validMask: boolean[][];
+} {
+  const totalPadding = paddedSize - inputSize;
+  const top = Math.floor(totalPadding / 2);
+  const bottom = totalPadding - top;
+  const left = top;
+  const right = bottom;
+
+  const validMask: boolean[][] = [];
+  for (let y = 0; y < inputSize; y++) {
+    const row: boolean[] = [];
+    for (let x = 0; x < inputSize; x++) {
+      row.push(true);
+    }
+    validMask.push(row);
+  }
+
+  return {
+    cropTop: top,
+    cropBottom: paddedSize - bottom,
+    cropLeft: left,
+    cropRight: paddedSize - right,
+    finalHeight: inputSize,
+    finalWidth: inputSize,
+    validMask,
   };
 }

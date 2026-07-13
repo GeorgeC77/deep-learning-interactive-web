@@ -82,8 +82,8 @@ export default function IoUNMSDemo() {
   const [nmsThreshold, setNmsThreshold] = useState(0.5);
   const [scoreThreshold, setScoreThreshold] = useState(0.5);
   const [mode, setMode] = useState<'class-aware' | 'class-agnostic'>('class-aware');
-  const [showSoftNms, setShowSoftNms] = useState(false);
   const [softSigma, setSoftSigma] = useState(0.5);
+  const [viewMode, setViewMode] = useState<'hard' | 'soft' | 'side-by-side'>('hard');
 
   const candidates = useMemo(
     () => scoreThresholdFilter(boxes, scoreThreshold).sort((a, b) => b.score - a.score || b.id - a.id),
@@ -100,9 +100,94 @@ export default function IoUNMSDemo() {
     [candidates, softSigma, mode, scoreThreshold],
   );
 
-  const keptSet = useMemo(() => new Set(result.kept), [result.kept]);
-  const suppressedSet = useMemo(() => new Set(result.suppressed), [result.suppressed]);
   const candidateSet = useMemo(() => new Set(candidates.map((b) => b.id)), [candidates]);
+
+  function BoxVisualization({ mode }: { mode: 'hard' | 'soft' }) {
+    const isHard = mode === 'hard';
+    const selectedSet = isHard
+      ? new Set(result.kept)
+      : new Set(softResult.selectedOrder);
+    const removedSet = isHard
+      ? new Set(result.suppressed)
+      : new Set(softResult.removedByThreshold);
+
+    return (
+      <svg viewBox="0 0 200 200" className="w-full h-64 bg-gray-50 border rounded-lg">
+        {boxes.map((box) => {
+          const isCandidate = candidateSet.has(box.id);
+          if (!isCandidate) {
+            return (
+              <g key={box.id}>
+                <rect
+                  x={box.x}
+                  y={box.y}
+                  width={box.w}
+                  height={box.h}
+                  fill="rgba(156,163,175,0.1)"
+                  stroke="#9ca3af"
+                  strokeWidth={1}
+                  strokeDasharray="4 2"
+                />
+                <text x={box.x + 4} y={box.y + 14} fontSize={10} fill="#9ca3af">
+                  {box.id}:{box.score.toFixed(2)} (c{box.classId})
+                </text>
+              </g>
+            );
+          }
+
+          const finalScore = softResult.finalScores.get(box.id) ?? box.score;
+          const isSelected = selectedSet.has(box.id);
+          const isRemoved = removedSet.has(box.id);
+          const isDecayed = !isHard && finalScore < box.score - 1e-9;
+
+          let fill: string;
+          let stroke: string;
+          let strokeDasharray: string | undefined;
+          let strokeWidth = 2;
+
+          if (isRemoved) {
+            fill = 'rgba(156,163,175,0.1)';
+            stroke = '#9ca3af';
+            strokeDasharray = '4 2';
+            strokeWidth = 1;
+          } else if (isSelected) {
+            fill = 'rgba(16,185,129,0.3)';
+            stroke = '#059669';
+            strokeWidth = 2 + finalScore;
+          } else if (isDecayed) {
+            fill = `rgba(249,115,22,${0.15 + 0.5 * (finalScore / Math.max(box.score, 1e-6))})`;
+            stroke = '#f97316';
+            strokeWidth = 1 + finalScore;
+          } else {
+            fill = 'rgba(59,130,246,0.15)';
+            stroke = '#2563eb';
+          }
+
+          const label = isHard
+            ? `${box.id}:${box.score.toFixed(2)} (c${box.classId})`
+            : `${box.id}:${box.score.toFixed(2)}→${finalScore.toFixed(2)} (c${box.classId})`;
+
+          return (
+            <g key={box.id}>
+              <rect
+                x={box.x}
+                y={box.y}
+                width={box.w}
+                height={box.h}
+                fill={fill}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+                strokeDasharray={strokeDasharray}
+              />
+              <text x={box.x + 4} y={box.y + 14} fontSize={10} fill={isRemoved ? '#9ca3af' : '#111827'}>
+                {label}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+    );
+  }
 
   const applyPreset = (preset: Box[]) => {
     setBoxes(preset);
@@ -184,7 +269,7 @@ export default function IoUNMSDemo() {
               size="sm"
               onClick={() => {
                 applyPreset(CROWDED_SAME_CLASS);
-                setShowSoftNms(true);
+                setViewMode('side-by-side');
               }}
             >
               Soft-NMS 对比
@@ -193,52 +278,24 @@ export default function IoUNMSDemo() {
               重置
             </Button>
           </div>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mt-6">
-          <svg viewBox="0 0 200 200" className="w-full h-64 bg-gray-50 border rounded-lg">
-            {boxes.map((box) => {
-              const isCandidate = candidateSet.has(box.id);
-              const isKept = keptSet.has(box.id);
-              const isSuppressed = suppressedSet.has(box.id);
-              const fill = isSuppressed
-                ? 'rgba(239,68,68,0.2)'
-                : isKept
-                  ? 'rgba(16,185,129,0.3)'
-                  : isCandidate
-                    ? 'rgba(59,130,246,0.15)'
-                    : 'rgba(156,163,175,0.1)';
-              const stroke = isSuppressed
-                ? '#dc2626'
-                : isKept
-                  ? '#059669'
-                  : isCandidate
-                    ? '#2563eb'
-                    : '#9ca3af';
-              return (
-                <g key={box.id}>
-                  <rect
-                    x={box.x}
-                    y={box.y}
-                    width={box.w}
-                    height={box.h}
-                    fill={fill}
-                    stroke={stroke}
-                    strokeWidth={2}
-                    strokeDasharray={isCandidate ? undefined : '4 2'}
-                  />
-                  <text
-                    x={box.x + 4}
-                    y={box.y + 14}
-                    fontSize={10}
-                    fill={isSuppressed ? '#dc2626' : '#111827'}
-                  >
-                    {box.id}:{box.score.toFixed(2)} (c{box.classId})
-                  </text>
-                </g>
-              );
-            })}
-          </svg>
+        <div className="grid md:grid-cols-2 gap-6 mt-6" data-testid="nms-canvas">
+          <div className="space-y-3">
+            {viewMode === 'side-by-side' ? (
+              <>
+                <div>
+                  <h5 className="text-xs font-medium text-gray-500 mb-1">Hard NMS</h5>
+                  <BoxVisualization mode="hard" />
+                </div>
+                <div>
+                  <h5 className="text-xs font-medium text-gray-500 mb-1">Soft NMS</h5>
+                  <BoxVisualization mode="soft" />
+                </div>
+              </>
+            ) : (
+              <BoxVisualization mode={viewMode} />
+            )}
+          </div>
 
           <div className="space-y-5">
             <div>
@@ -308,10 +365,45 @@ export default function IoUNMSDemo() {
               </div>
             </div>
 
+            <div>
+              <Label className="text-sm font-medium text-gray-700">显示模式</Label>
+              <RadioGroup
+                value={viewMode}
+                onValueChange={(value) => setViewMode(value as 'hard' | 'soft' | 'side-by-side')}
+                className="flex flex-wrap items-center gap-4 mt-2"
+              >
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem value="hard" id="view-hard" />
+                  <Label htmlFor="view-hard" className="text-sm text-gray-700">Hard-NMS</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem value="soft" id="view-soft" />
+                  <Label htmlFor="view-soft" className="text-sm text-gray-700">Soft-NMS</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem value="side-by-side" id="view-side" />
+                  <Label htmlFor="view-side" className="text-sm text-gray-700">并排对比</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
             <p className="text-sm text-gray-700">
-              绿色框被保留，红色框被抑制，虚线框未通过置信度阈值。当前保留编号：
-              {result.kept.join(', ') || '无'}；抑制编号：
-              {result.suppressed.join(', ') || '无'}。
+              {viewMode === 'hard' ? (
+                <>
+                  绿色框被保留，红色框被抑制，虚线框未通过置信度阈值。当前保留编号：
+                  {result.kept.join(', ') || '无'}；抑制编号：
+                  {result.suppressed.join(', ') || '无'}。
+                </>
+              ) : viewMode === 'soft' ? (
+                <>
+                  绿色框被 Soft-NMS 选中并保留；橙色框分数被衰减但仍高于阈值；灰色虚线框已被衰减至阈值以下。
+                  选择顺序：{softResult.selectedOrder.join(' → ') || '无'}。
+                </>
+              ) : (
+                <>
+                  左侧为 Hard-NMS（绿=保留，灰虚=抑制/阈值以下），右侧为 Soft-NMS（绿=选中保留，橙=被衰减，灰虚=阈值以下）。
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -362,16 +454,9 @@ export default function IoUNMSDemo() {
         </div>
 
         <div className="mt-6">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowSoftNms((s) => !s)}
-          >
-            {showSoftNms ? '隐藏 Soft-NMS 对比' : '显示 Soft-NMS 对比'}
-          </Button>
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Soft-NMS 详情</h4>
 
-          {showSoftNms && (
-            <div className="mt-4 space-y-4">
+          <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
                   <span>Soft-NMS σ</span>
@@ -462,7 +547,7 @@ export default function IoUNMSDemo() {
                 </Table>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </InteractiveDemo>
     </div>
