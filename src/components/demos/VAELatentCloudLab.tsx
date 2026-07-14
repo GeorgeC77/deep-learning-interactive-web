@@ -288,11 +288,13 @@ export default function VAELatentCloudLab() {
         </div>
 
         <div className="text-xs text-gray-600">
-          样本均值：[
-          {stats.mean.map((v) => v.toFixed(2)).join(', ')}]
+          样本均值：[{stats.mean.map((v) => v.toFixed(2)).join(', ')}]
           {' · '}
-          样本标准差：[
-          {stats.cov.map((row) => Math.sqrt(row[0]).toFixed(2)).join(', ')}]
+          std_x = {Math.sqrt(Math.max(stats.cov[0]?.[0] ?? 0, 0)).toFixed(2)}
+          {' · '}
+          std_y = {Math.sqrt(Math.max(stats.cov[1]?.[1] ?? 0, 0)).toFixed(2)}
+          {' · '}
+          cov_xy = {(stats.cov[0]?.[1] ?? 0).toFixed(2)}
         </div>
 
         <PredictionGate

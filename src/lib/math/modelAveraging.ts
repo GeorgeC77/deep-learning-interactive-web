@@ -3,6 +3,24 @@
 /* -------------------------------------------------------------------------- */
 
 /**
+ * Minimum feasible average pairwise correlation for an ensemble of M models
+ * with equal individual variance. The averaged-error variance stays non-negative
+ * exactly when rho >= -1/(M-1) (for M > 1). For M <= 1 the correlation is
+ * irrelevant and we return -1 as a harmless lower bound.
+ */
+export function minimumFeasibleCorrelation(M: number): number {
+  if (M <= 1) return -1;
+  return -1 / (M - 1);
+}
+
+/**
+ * Check whether a given average pairwise correlation is feasible for M models.
+ */
+export function isFeasibleRho(M: number, rho: number): boolean {
+  return rho >= minimumFeasibleCorrelation(M) && rho <= 1;
+}
+
+/**
  * Variance of the average prediction error for an ensemble of M correlated models.
  *
  * Each individual model has error variance sigma^2 and the pairwise correlation

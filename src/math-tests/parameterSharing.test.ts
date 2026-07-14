@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import {
   convParams,
+  convWeightParams,
+  convConnectionCount,
   locallyConnectedParams,
+  locallyConnectedWeightParams,
+  locallyConnectedConnectionCount,
   denseParams,
+  denseBiasParams,
+  denseConnectionCount,
   connectionCount,
 } from '../lib/math/parameterSharing';
 
@@ -19,14 +25,14 @@ describe('parameterSharing', () => {
     }
   });
 
-  it('locallyConnectedParams / convParams equals Hout*Wout', () => {
+  it('locallyConnectedParams / conv weight params equals Hout*Wout', () => {
     const cases = [
       { Hout: 6, Wout: 6, Kh: 3, Kw: 3, Cin: 1, Cout: 1 },
       { Hout: 14, Wout: 14, Kh: 3, Kw: 3, Cin: 3, Cout: 8 },
       { Hout: 7, Wout: 7, Kh: 5, Kw: 5, Cin: 64, Cout: 128 },
     ];
     for (const c of cases) {
-      const local = locallyConnectedParams(
+      const localWeights = locallyConnectedWeightParams(
         c.Hout,
         c.Wout,
         c.Kh,
@@ -34,9 +40,8 @@ describe('parameterSharing', () => {
         c.Cin,
         c.Cout,
       );
-      const conv = convParams(c.Kh, c.Kw, c.Cin, c.Cout);
-      expect(local).toBe(c.Hout * c.Wout * conv);
-      expect(local / conv).toBeCloseTo(c.Hout * c.Wout, 10);
+      const convWeights = convWeightParams(c.Kh, c.Kw, c.Cin, c.Cout);
+      expect(localWeights).toBe(c.Hout * c.Wout * convWeights);
     }
   });
 
@@ -55,7 +60,20 @@ describe('parameterSharing', () => {
     }
   });
 
-  it('connectionCount is independent of sharing scheme', () => {
+  it('conv and locally-connected layers have the same connection count', () => {
+    const cases = [
+      { Hout: 6, Wout: 6, Kh: 3, Kw: 3, Cin: 1, Cout: 1 },
+      { Hout: 14, Wout: 14, Kh: 3, Kw: 3, Cin: 3, Cout: 8 },
+      { Hout: 7, Wout: 7, Kh: 5, Kw: 5, Cin: 64, Cout: 128 },
+    ];
+    for (const c of cases) {
+      expect(convConnectionCount(c.Hout, c.Wout, c.Cout, c.Kh, c.Kw, c.Cin)).toBe(
+        locallyConnectedConnectionCount(c.Hout, c.Wout, c.Cout, c.Kh, c.Kw, c.Cin),
+      );
+    }
+  });
+
+  it('dense connections use the full flattened input dimension', () => {
     const Hin = 8;
     const Win = 8;
     const Cin = 3;
@@ -65,25 +83,57 @@ describe('parameterSharing', () => {
     const Kh = 3;
     const Kw = 3;
 
-    const connections = connectionCount(
-      Hin,
-      Win,
-      Cin,
-      Hout,
-      Wout,
-      Cout,
-      Kh,
-      Kw,
-    );
+    const denseConn = denseConnectionCount(Hin, Win, Cin, Hout, Wout, Cout);
+    const localConn = locallyConnectedConnectionCount(Hout, Wout, Cout, Kh, Kw, Cin);
 
-    // Each output unit connects to Kh*Kw*Cin input units.
-    const perOutput = Kh * Kw * Cin;
-    const outputs = Hout * Wout * Cout;
-    expect(connections).toBe(perOutput * outputs);
+    expect(denseConn).toBe(Hin * Win * Cin * Hout * Wout * Cout);
+    expect(denseConn).toBeGreaterThan(localConn);
+  });
 
-    // Same value for convolution, locally-connected, or dense semantics.
-    expect(connections).toBe(
-      Hout * Wout * Cout * Kh * Kw * Cin,
+  it('dense total params never exceed dense connections plus biases', () => {
+    const Hin = 8;
+    const Win = 8;
+    const Cin = 3;
+    const Hout = 6;
+    const Wout = 6;
+    const Cout = 8;
+
+    const params = denseParams(Hin, Win, Cin, Hout, Wout, Cout);
+    const conns = denseConnectionCount(Hin, Win, Cin, Hout, Wout, Cout);
+    const biases = denseBiasParams(Hout, Wout, Cout);
+    expect(params).toBe(conns + biases);
+    expect(params).toBeLessThanOrEqual(conns + biases);
+  });
+
+  it('changing kernel size affects local/conv connections but not dense connections', () => {
+    const Hin = 10;
+    const Win = 10;
+    const Cin = 2;
+    const Hout = 8;
+    const Wout = 8;
+    const Cout = 4;
+
+    const denseConn3 = denseConnectionCount(Hin, Win, Cin, Hout, Wout, Cout);
+    const denseConn5 = denseConnectionCount(Hin, Win, Cin, Hout, Wout, Cout);
+    expect(denseConn3).toBe(denseConn5);
+
+    const localConn3 = locallyConnectedConnectionCount(Hout, Wout, Cout, 3, 3, Cin);
+    const localConn5 = locallyConnectedConnectionCount(Hout, Wout, Cout, 5, 5, Cin);
+    expect(localConn5).toBeGreaterThan(localConn3);
+  });
+
+  it('connectionCount backward-compatible formula matches local/conv wiring', () => {
+    const Hin = 8;
+    const Win = 8;
+    const Cin = 3;
+    const Hout = 6;
+    const Wout = 6;
+    const Cout = 8;
+    const Kh = 3;
+    const Kw = 3;
+
+    expect(connectionCount(Hin, Win, Cin, Hout, Wout, Cout, Kh, Kw)).toBe(
+      convConnectionCount(Hout, Wout, Cout, Kh, Kw, Cin),
     );
   });
 });

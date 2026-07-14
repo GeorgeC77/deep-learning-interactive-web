@@ -2,9 +2,13 @@
  * Continuous normalizing flows and ODE-based flow maps.
  *
  * The key pedagogical point: the vector field f does **not** need to be
- * bijective. As long as it is regular enough (locally Lipschitz), the induced
- * flow map is invertible on a finite time horizon by integrating the same
- * field backwards.
+ * bijective. Local Lipschitz continuity guarantees local existence and uniqueness
+ * of solutions, but it is **not** sufficient for invertibility over an arbitrary
+ * finite horizon: the solution must exist on the whole target interval.
+ *
+ * Counter-example: dx/dt = x² has solution x(t) = x₀/(1 - x₀ t), which blows
+ * up at t = 1/x₀. A safe example is a globally Lipschitz field such as a
+ * rotation field, whose solutions exist for all time.
  */
 
 export type Vector2D = [number, number];
@@ -25,14 +29,25 @@ export function sinField(h: number[], _t: number): number[] {
   return [Math.sin(y), x];
 }
 
+/**
+ * A field with finite-time blow-up: f([x,y]) = [x², 0].
+ * Starting from x₀ > 0, the solution x(t) = x₀/(1 - x₀ t) blows up at t = 1/x₀.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function blowUpField(h: number[], _t: number): number[] {
+  const [x] = h;
+  return [x * x, 0];
+}
+
 /** A small catalogue of fields for the lab UI. */
 export const FLOW_PRESETS = [
   {
     id: 'rotation',
-    name: '旋转场 (Rotation)',
+    name: '旋转场 (Rotation, 全局 Lipschitz)',
     latex: 'f([x,y]) = [y, -x]',
     field: rotationField,
     volumePreserving: true,
+    invertibleGlobally: true,
   },
   {
     id: 'sin',
@@ -40,6 +55,15 @@ export const FLOW_PRESETS = [
     latex: 'f([x,y]) = [\\sin(y), x]',
     field: sinField,
     volumePreserving: false,
+    invertibleGlobally: true,
+  },
+  {
+    id: 'blowup',
+    name: '有限时间爆破场 (x²)',
+    latex: 'f([x,y]) = [x^2, 0]',
+    field: blowUpField,
+    volumePreserving: false,
+    invertibleGlobally: false,
   },
 ] as const;
 

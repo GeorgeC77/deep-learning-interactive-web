@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   rotationField,
   sinField,
+  blowUpField,
   eulerStep,
   rk4Step,
   flowMapForward,
@@ -91,5 +92,25 @@ describe('continuousFlow', () => {
     const result = rk4Step(h, rotationField, 0, 0.1);
     expect(result[0]).toBeCloseTo(Math.cos(0.1), 6);
     expect(result[1]).toBeCloseTo(-Math.sin(0.1), 6);
+  });
+
+  it('locally Lipschitz field x² can blow up in finite time', () => {
+    // dx/dt = x^2 has exact solution x(t) = x0 / (1 - x0 t), blow-up at t = 1/x0.
+    const x0 = 1.0;
+    const tBlowUp = 1 / x0;
+    const forward = flowMapForward([x0, 0], blowUpField, 0, tBlowUp + 0.1, 0.01, 'rk4');
+    const lastFinite = forward.trajectory.filter(
+      (p) => Number.isFinite(p[0]) && Number.isFinite(p[1]),
+    );
+    expect(lastFinite.length).toBeLessThan(forward.trajectory.length);
+  });
+
+  it('global Lipschitz rotation field remains invertible over long horizons', () => {
+    const t0 = 0;
+    const t1 = 5;
+    const dt = 0.01;
+    const forward = flowMapForward(start, rotationField, t0, t1, dt, 'rk4');
+    const backward = flowMapInverse(forward.final, rotationField, t1, t0, dt, 'rk4');
+    expect(distance(start, backward.final)).toBeLessThan(1e-4);
   });
 });

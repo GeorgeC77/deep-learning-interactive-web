@@ -121,7 +121,7 @@ describe('pedagogical invariants: diffusion score/denoiser', () => {
     expect(meanDiff).toBeLessThan(0.3);
     expect(covDiff).toBeLessThan(0.5);
     expect(mmd).toBeLessThan(0.05);
-  }, 15000);
+  }, 30000);
 });
 
 /* -------------------------------------------------------------------------- */

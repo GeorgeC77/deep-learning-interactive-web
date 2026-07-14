@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import NormalizationLab from '@/components/demos/NormalizationLab';
 import { Scale } from 'lucide-react';
 
 export default function Ch04NormalizationPage() {
@@ -6,79 +7,93 @@ export default function Ch04NormalizationPage() {
     <BishopSectionPage
       sectionPath="/ch04/normalization"
       heroIcon={<Scale className="w-9 h-9 text-blue-600" />}
-      summary={"归一化稳定输入分布与内部激活，使网络可以使用更大学习率、更快收敛，并降低对初始化的敏感度。"}
+      summary={"归一化在许多实践中可以帮助稳定训练、允许使用更大学习率，但其效果依赖网络结构、批量大小与任务。BatchNorm 在推理时使用移动统计量，小批量时估计可能不准；LayerNorm 的稳定性也依赖特征维度假设。"}
       concepts={[
-    {
-      title: "数据归一化",
-      description: "将输入特征缩放为零均值、单位方差，使各维度对损失的贡献均衡。",
-      formula: String.raw`\hat{x} = \frac{x - \mu}{\sigma}`,
-    },
-    {
-      title: "批归一化",
-      description: "对每个 mini-batch 的激活做归一化，并通过可学习的缩放平移恢复表达能力。",
-    },
-    {
-      title: "层归一化",
-      description: "沿特征维度归一化，不依赖 batch 大小，广泛用于 RNN 与 Transformer。",
-    }
+        {
+          title: "数据归一化",
+          description: "将输入特征缩放为零均值、单位方差，使各维度对损失的贡献均衡。常用于预处理，但不改变特征间的相关性。",
+          formula: "\\hat{x} = \\frac{x - \\mu}{\\sigma}",
+        },
+        {
+          title: "批归一化",
+          description: "对每个 mini-batch 的激活按特征维度做归一化，并通过可学习的缩放平移恢复表达能力。推理时通常使用训练阶段累积的移动统计量。",
+          formula: "\\hat{x}_{n,c} = \\frac{x_{n,c} - \\mu_B}{\\sigma_B + \\epsilon}, \\quad y_{n,c} = \\gamma_c \\hat{x}_{n,c} + \\beta_c",
+        },
+        {
+          title: "层归一化",
+          description: "沿特征维度对每个样本单独归一化，不依赖 batch 大小，广泛用于 RNN 与 Transformer。",
+          formula: "\\hat{x}_{n,d} = \\frac{x_{n,d} - \\mu_n}{\\sigma_n + \\epsilon}, \\quad y_{n,d} = \\gamma_d \\hat{x}_{n,d} + \\beta_d",
+        },
       ]}
       learningObjectives={[
-      "理解 数据归一化 的含义与作用。",
-      "理解 批归一化 的含义与作用。",
-      "理解 层归一化 的含义与作用。"
-    ]}
-      coreIntuition={"归一化稳定输入分布与内部激活，使网络可以使用更大学习率、更快收敛，并降低对初始化的敏感度。"}
+        "理解数据归一化、BatchNorm 与 LayerNorm 的计算方式。",
+        "能区分 BatchNorm（跨 batch 的特征维度）与 LayerNorm（跨特征维度的单样本）。",
+        "认识归一化的效果依赖任务与超参数，并非无条件保证更快收敛。",
+      ]}
+      coreIntuition={"归一化通过重新调整数值尺度来稳定前向激活分布，但它不是万能药：BatchNorm 受批量统计量质量影响，LayerNorm 受特征维度假设限制，且不同网络结构受益程度不同。"}
       commonMistakes={[
-      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
-      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
-    ]}
+        "把归一化当成无条件提升性能的工具，忽略批量大小、网络深度与任务的影响。",
+        "混淆 BatchNorm 与 LayerNorm 的归一化维度。",
+        "在推理时使用 batch 统计量而不是训练好的移动统计量。",
+        "认为归一化后就不需要仔细初始化或学习率调参。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“数据归一化”的叙述，哪一项最准确？",
-        options: ["将输入特征缩放为零均值、单位方差，使各维度对损失的贡献均衡。", "数据归一化 只是术语，没有独立建模意义。", "数据归一化 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。将输入特征缩放为零均值、单位方差，使各维度对损失的贡献均衡。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“批归一化”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要模型足够复杂，数据分布的形状就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。批归一化 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“层归一化”的结果与预期不符，应优先排查哪些前提？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。层归一化 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "BatchNorm 与 LayerNorm 的主要区别在于？",
+          options: [
+            "BatchNorm 沿 batch 维度对每个特征归一化，LayerNorm 沿特征维度对每个样本归一化",
+            "BatchNorm 只用于 CNN，LayerNorm 只用于 RNN",
+            "两者完全相同",
+            "BatchNorm 不需要 γ、β 参数",
+          ],
+          correctIndex: 0,
+          explanation: "BatchNorm 计算每个特征在 mini-batch 上的均值/方差；LayerNorm 对每个样本单独在特征维度上计算。",
+        },
+        {
+          question: "推理时 BatchNorm 通常使用什么统计量？",
+          options: [
+            "训练阶段累积的移动平均统计量",
+            "当前 batch 的统计量",
+            "全局数据集的精确统计量",
+            "随机初始化统计量",
+          ],
+          correctIndex: 0,
+          explanation: "推理时 batch 可能只有一个样本，因此使用训练期间维护的 moving mean / moving variance。",
+        },
+        {
+          question: "关于归一化的效果，下列说法最准确的是？",
+          options: [
+            "通常有助于训练稳定，但效果依赖网络、任务与批量大小",
+            "一定能让网络使用任意大的学习率",
+            "在所有任务上都优于未归一化网络",
+            "可以完全替代权重初始化",
+          ],
+          correctIndex: 0,
+          explanation: "归一化是强有力的启发式，但不是无条件保证；小批量、不合适的任务或结构仍可能失效。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 7",
-      section: "7.4",
-      pages: "Ch 7",
-      textbookSubsections: [
+        chapter: "Ch 7",
+        section: "7.4",
+        pages: "Ch 7",
+        textbookSubsections: [
           "7.4 Normalization",
           "7.4.1 Data normalization",
           "7.4.2 Batch normalization",
-          "7.4.3 Layer normalization"
+          "7.4.3 Layer normalization",
         ],
-      formulas: ["数据归一化公式"],
-      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
-    }}
-          demo={{
-      title: "标准化后的取值",
-      label: "原始标准差 σ",
-      param: 2,
-      min: 0.2,
-      max: 5,
-      step: 0.1,
-      compute: (sigma) => ({
-        label: 'x=3 标准化后',
-        value: 3 / sigma,
-        display: String.raw`\hat{x}=\frac{3}{${sigma.toFixed(1)}}=${(3 / sigma).toFixed(2)}`,
-      }),
-      formula: String.raw`\hat{x} = \frac{x - \mu}{\sigma}`,
-    }}
+        formulas: [
+          "\\hat{x} = (x - \\mu)/\\sigma",
+          "BatchNorm",
+          "LayerNorm",
+        ],
+        exercises: [
+          "给定一个 mini-batch，手工计算 BatchNorm 输出。",
+          "比较 BatchNorm 与 LayerNorm 的归一化维度差异。",
+          "讨论小批量对 BatchNorm 统计量估计的影响。",
+        ],
+      }}
+      interactiveDemo={<NormalizationLab />}
     />
   );
 }

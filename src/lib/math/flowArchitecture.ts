@@ -193,7 +193,16 @@ export function samplingCost(architecture: FlowArchitecture, dim: number): CostR
 
 /**
  * Density-evaluation complexity for each architecture.
- * Triangular Jacobians make log-det O(D); continuous flows need trace estimation.
+ *
+ * Coupling and autoregressive flows have triangular Jacobians, so the log-determinant
+ * is a cheap product of diagonal entries — the saving comes from structure, not from
+ * having only O(D) non-zeros in the full D×D matrix.
+ *
+ * Continuous flows: an explicit dense Jacobian costs O(D³) for a determinant (or O(D²)
+ * per ODE step). FFJORD avoids materialising the full Jacobian by using a Hutchinson
+ * trace estimator. The toy explicit-matrix implementation below costs O(M·D²) because
+ * it forms J and computes Jv; a real autodiff implementation costs O(M·C_f), where
+ * C_f is the cost of one vector-field JVP/VJP.
  */
 export function densityEvalCost(architecture: FlowArchitecture, dim: number): CostResult {
   switch (architecture) {
@@ -201,19 +210,19 @@ export function densityEvalCost(architecture: FlowArchitecture, dim: number): Co
       return {
         bigO: 'O(D)',
         operations: dim,
-        description: 'Log-det = product of diagonal blocks (lower-triangular Jacobian).',
+        description: 'Log-det = product of diagonal blocks; full Jacobian can still have O(D²) non-zeros.',
       };
     case 'autoregressive':
       return {
         bigO: 'O(D)',
         operations: dim,
-        description: 'Log-det = product of conditional-scale diagonals (triangular Jacobian).',
+        description: 'Log-det = product of conditional-scale diagonals; triangular part has D(D+1)/2 slots.',
       };
     case 'continuous':
       return {
-        bigO: 'O(M · D²)',
+        bigO: 'O(M·D²) toy / O(M·C_f) real',
         operations: dim * dim * 10,
-        description: 'Exact Jacobian is O(D²); Hutchinson trace estimate reduces to O(M · D) per step.',
+        description: 'Explicit determinant is O(D³); Hutchinson trace estimate avoids forming the full Jacobian.',
       };
   }
 }
@@ -223,6 +232,35 @@ export function trace(J: number[][]): number {
   let t = 0;
   for (let i = 0; i < J.length; i++) t += J[i][i];
   return t;
+}
+
+/** Total number of entries in a square D×D Jacobian. */
+export function totalEntries(J: number[][]): number {
+  return J.length * J.length;
+}
+
+/** Number of diagonal entries in a square Jacobian. */
+export function diagonalEntries(J: number[][]): number {
+  return J.length;
+}
+
+/** Number of non-zero entries (above tolerance) in a matrix. */
+export function nonzeroCount(J: number[][], tol = DEFAULT_TOL): number {
+  return J.flat().filter((v) => Math.abs(v) > tol).length;
+}
+
+/** Maximum possible non-zero entries in a strictly lower-triangular D×D matrix. */
+export function maxTriangularNonzeros(dim: number): number {
+  return (dim * (dim + 1)) / 2;
+}
+
+/** Maximum possible non-zero entries in a block-lower-triangular coupling Jacobian with a split. */
+export function maxCouplingNonzeros(dim: number): number {
+  const split = Math.floor(dim / 2);
+  // First split dimensions: identity diagonal only.
+  // Second split dimensions: each depends on all first-split inputs plus its own diagonal.
+  const secondHalf = dim - split;
+  return split + secondHalf * (split + 1);
 }
 
 /**

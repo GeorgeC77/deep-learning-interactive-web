@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import DSeparationLab from '@/components/demos/DSeparationLab';
 import { Unlink } from 'lucide-react';
 
 export default function Ch08ConditionalIndependencePage() {
@@ -6,73 +7,92 @@ export default function Ch08ConditionalIndependencePage() {
     <BishopSectionPage
       sectionPath="/ch08/conditional-independence"
       heroIcon={<Unlink className="w-9 h-9 text-blue-600" />}
-      summary={"条件独立性是图模型的核心；d-分离提供了一套基于图结构判断独立性的完备规则。"}
+      summary={"条件独立性是图模型的核心语义；d-分离给出了一套仅依据图结构判断条件独立的完备准则。"}
       concepts={[
-    {
-      title: "三种基本结构",
-      description: "链式、分岔与汇聚会以不同方式决定条件独立关系。",
-    },
-    {
-      title: "解释消除",
-      description: "观测到共同结果时，两个原本独立的父节点可能变得相关。",
-    },
-    {
-      title: "d-分离",
-      description: "若所有路径都被某个观测节点阻断，则称两变量在给定条件下 d-分离。",
-    },
-      
-    {
-      title: "Three example graphs",
-      description: "介绍 Three example graphs 的定义、关键公式与典型应用场景。",
-    },
-    {
-      title: "Explaining away",
-      description: "介绍 Explaining away 的定义、关键公式与典型应用场景。",
-    },
-    {
-      title: "D-separation",
-      description: "介绍 D-separation 的定义、关键公式与典型应用场景。",
-    },
-    {
-      title: "Naive Bayes",
-      description: "介绍 Naive Bayes 的定义、关键公式与典型应用场景。",
-    },
-  ]}
+        {
+          title: "链式结构",
+          description: "A → B → C 中，B 是中间节点。无条件时 A 与 C 相关；给定 B 后路径被阻断，A 与 C 条件独立。",
+          formula: "A \\not\\bot C, \\quad A \\bot C \\bigm| B",
+        },
+        {
+          title: "分岔结构",
+          description: "A ← B → C 中，B 是共同原因。无条件时 A 与 C 相关；给定 B 后二者条件独立。",
+          formula: "A \\not\\bot C, \\quad A \\bot C \\bigm| B",
+        },
+        {
+          title: "汇聚结构 / 解释消除",
+          description: "A → B ← C 中，B 是共同结果。无条件时 A 与 C 独立；给定 B（或其任意子孙）后二者相关，称为 explaining away。",
+          formula: "A \\bot C, \\quad A \\not\\bot C \\bigm| B",
+        },
+        {
+          title: "d-分离判定规则",
+          description: "一条路径被阻断，当且仅当其中存在链或分岔的中间节点被条件化，或存在汇聚节点且该节点及其所有子孙均未被条件化。",
+          formula: "X \\bot_D Y \\bigm| Z \\text{ 当且仅当 } X,Y \\text{ 间的所有路径均被 } Z \\text{ 阻断}",
+        },
+        {
+          title: "朴素贝叶斯",
+          description: "类别节点作为所有特征节点的共同父节点；在类别条件下特征相互独立，使联合分布简化为 p(c)∏p(x_i|c)。",
+        },
+        {
+          title: "马尔可夫毯",
+          description: "一个节点的马尔可夫毯包括其父节点、子节点以及子节点的其他父节点；给定毯后该节点与图中其余节点条件独立。",
+        },
+        {
+          title: "图作为分布滤波器",
+          description: "同一 DAG 对应一族满足相同 d-分离关系的分布；图结构滤掉了不满足这些条件独立性的分布。",
+        },
+      ]}
       learningObjectives={[
-      "理解 三种基本结构 的含义与作用。",
-      "理解 解释消除 的含义与作用。",
-      "理解 d-分离 的含义与作用。"
-    ]}
-      coreIntuition={"条件独立性是图模型的核心；d-分离提供了一套基于图结构判断独立性的完备规则。"}
+        "能区分链式、分岔、汇聚三种基本结构对条件独立的影响。",
+        "理解解释消除（explaining away）现象及其图结构来源。",
+        "能应用 d-分离规则判断给定条件下两个节点是否独立。",
+      ]}
+      coreIntuition={"d-分离把‘条件独立’翻译成‘图上的路径阻断’：观察某些节点会关闭或打开变量之间的信息通道。"}
       commonMistakes={[
-      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
-      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
-    ]}
+        "认为‘给定中间节点’在所有三种结构中都会阻断路径，忽略汇聚结构反而会开通路径。",
+        "忽略条件化汇聚节点的子孙也会解除阻断。",
+        "把 d-分离的图结构结论直接等同于因果论断。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“三种基本结构”的叙述，哪一项最准确？",
-        options: ["链式、分岔与汇聚会以不同方式决定条件独立关系。", "三种基本结构 只是术语，没有独立建模意义。", "三种基本结构 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。链式、分岔与汇聚会以不同方式决定条件独立关系。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“解释消除”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要模型足够复杂，数据分布的形状就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。解释消除 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“d-分离”的结果与预期不符，应优先排查哪些前提？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。d-分离 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "在链式结构 A → B → C 中，给定 B 后 A 与 C 的关系是？",
+          options: [
+            "条件独立",
+            "仍然相关",
+            "一定因果相关",
+            "无法判断",
+          ],
+          correctIndex: 0,
+          explanation: "B 是链的中间节点，条件化 B 阻断了 A 与 C 之间的唯一路径，因此 A ⊥ C | B。",
+        },
+        {
+          question: "在汇聚结构 A → B ← C 中，什么情况下 A 与 C 会变得相关？",
+          options: [
+            "给定 B 或 B 的某个子孙",
+            "给定 A 或 C",
+            "不条件化任何节点",
+            "删除 B 节点",
+          ],
+          correctIndex: 0,
+          explanation: "汇聚节点在无条件时被阻断；一旦条件化 B 或其子孙，路径被开通，A 与 C 相关（解释消除）。",
+        },
+        {
+          question: "d-分离规则可以用来判断什么？",
+          options: [
+            "在 DAG 中给定某节点集合后，另两个节点是否条件独立",
+            "变量之间的因果关系方向",
+            "联合分布的精确数值",
+            "模型参数的显著性",
+          ],
+          correctIndex: 0,
+          explanation: "d-分离是图结构准则，用于推断条件独立性，不直接给出因果方向或数值。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 11",
-      section: "11.2",
-      pages: "Ch 11",
-      textbookSubsections: [
+        chapter: "Ch 11",
+        section: "11.2",
+        pages: "Ch 11",
+        textbookSubsections: [
           "11.2 Conditional Independence",
           "11.2.1 Three example graphs",
           "11.2.2 Explaining away",
@@ -80,11 +100,15 @@ export default function Ch08ConditionalIndependencePage() {
           "11.2.4 Naive Bayes",
           "11.2.5 Generative models",
           "11.2.6 Markov blanket",
-          "11.2.7 Graphs as filters"
+          "11.2.7 Graphs as filters",
         ],
-      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
-    }}
-
+        exercises: [
+          "对链式、分岔、汇聚三种结构分别写出条件独立关系。",
+          "给定一个四节点图，判断某对节点在条件集 Z 下是否 d-分离。",
+          "解释‘条件化 collider 的子孙也会开通路径’的原因。",
+        ],
+      }}
+      interactiveDemo={<DSeparationLab />}
     />
   );
 }

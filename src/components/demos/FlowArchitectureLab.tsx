@@ -17,6 +17,11 @@ import {
   estimatedLogDetChange,
   samplingCost,
   densityEvalCost,
+  totalEntries,
+  nonzeroCount,
+  diagonalEntries,
+  maxTriangularNonzeros,
+  maxCouplingNonzeros,
 } from '@/lib/math/flowArchitecture';
 
 const ARCHITECTURE_OPTIONS: { value: FlowArchitecture; label: string }[] = [
@@ -144,7 +149,7 @@ export default function FlowArchitectureLab() {
               <span>{dim}</span>
             </div>
             <Slider value={[dim]} min={2} max={12} step={1} onValueChange={([v]) => handleDimChange(v)} />
-            <div className="text-xs text-gray-500">Coupling / Autoregressive 的 Jacobian 条目随 D 线性增长；Continuous 随 D² 增长。</div>
+            <div className="text-xs text-gray-500">完整 Jacobian 都有 D² 个条目；Coupling / Autoregressive 利用三角/块三角结构让 log-det 只需对角元。</div>
           </div>
 
           <div className="space-y-2">
@@ -210,7 +215,23 @@ export default function FlowArchitectureLab() {
               )}
               <div className="bg-gray-50 rounded p-2">
                 <div className="text-xs text-gray-500">Jacobian 条目数</div>
-                <div className="font-mono font-medium">{dim * dim}</div>
+                <div className="font-mono font-medium">{totalEntries(J)}</div>
+              </div>
+              <div className="bg-gray-50 rounded p-2">
+                <div className="text-xs text-gray-500">非零条目数</div>
+                <div className="font-mono font-medium">{nonzeroCount(J)}</div>
+              </div>
+              <div className="bg-gray-50 rounded p-2">
+                <div className="text-xs text-gray-500">logdet 使用的对角元</div>
+                <div className="font-mono font-medium">{diagonalEntries(J)}</div>
+              </div>
+              <div className="bg-gray-50 rounded p-2">
+                <div className="text-xs text-gray-500">一般行列式成本</div>
+                <div className="font-mono font-medium">O(D³)</div>
+              </div>
+              <div className="bg-gray-50 rounded p-2">
+                <div className="text-xs text-gray-500">结构化 logdet 成本</div>
+                <div className="font-mono font-medium">{architecture === 'continuous' ? 'Hutchinson' : 'O(D)'}</div>
               </div>
             </div>
 
@@ -261,6 +282,10 @@ export default function FlowArchitectureLab() {
               })}
             </tbody>
           </table>
+          <div className="text-xs text-gray-500 mt-2">
+            对 autoregressive flow，复杂度与方向有关：MAF（数据顺序）密度评估快、采样慢；IAF（反向）采样快、对任意 x 求密度慢。
+            Coupling 通常也按固定方向设计，改变方向会改变哪一端是“快”的。
+          </div>
         </div>
 
         <div className="text-sm text-gray-700 space-y-2">
@@ -324,8 +349,11 @@ export default function FlowArchitectureLab() {
                   </div>
                 </div>
                 <div className="mt-2">
-                  虽然三种架构的完整 Jacobian 都有 D² 个元素，但 coupling/autoregressive 的非零元素只有 O(D) 个，
-                  而 continuous flow 是稠密的。FFJORD 用 trace 估计把每次 ODE 步的 Jacobian 开销从 O(D²) 降到 O(M·D)。
+                  三种架构的完整 Jacobian 都有 D² 个元素。Coupling 的块下三角最多可有 O(D²) 个非零元素
+                  （本例约 {maxCouplingNonzeros(dim)} 个 slot），autoregressive 三角最多有 D(D+1)/2 ={' '}
+                  {maxTriangularNonzeros(dim)} 个 slot，continuous flow 则是稠密的。它们的 log-det 成本低是因为
+                  只需要对角元（或对角块），而不是因为完整矩阵只有 O(D) 个非零。FFJORD 用 Hutchinson trace
+                  估计避免显式构造 full Jacobian：玩具实现显式计算 Jv 为 O(M·D²)，真实自动微分实现为 O(M·C_f)。
                 </div>
               </div>
             </div>

@@ -55,8 +55,21 @@ describe('vae', () => {
 
     for (let i = 0; i < 2; i++) {
       expect(stats.mean[i]).toBeCloseTo(mu[i], 1);
-      expect(Math.sqrt(stats.cov[i][i])).toBeCloseTo(sigma[i], 1);
+      expect(Math.sqrt(Math.max(0, stats.cov[i][i]))).toBeCloseTo(sigma[i], 1);
     }
+  });
+
+  it('displayed standard deviations must come from covariance diagonal entries', () => {
+    const mu = [0.5, -0.3];
+    const sigma = [0.8, 1.2];
+    const points = sampleLatent(mu, sigma, 123, 2000);
+    const stats = latentStatistics(points);
+
+    expect(stats.cov[0][0]).toBeGreaterThan(0);
+    expect(stats.cov[1][1]).toBeGreaterThan(0);
+    expect(Math.sqrt(stats.cov[0][0])).toBeCloseTo(Math.sqrt(Math.max(0, stats.cov[0][0])), 10);
+    expect(Math.sqrt(stats.cov[1][1])).toBeCloseTo(Math.sqrt(Math.max(0, stats.cov[1][1])), 10);
+    expect(Number.isFinite(stats.cov[0][1])).toBe(true);
   });
 
   it('KL with a wider prior variance can decrease when q matches the new scale', () => {

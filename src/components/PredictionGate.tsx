@@ -7,6 +7,11 @@ export type Evaluation = {
   feedback: ReactNode;
 };
 
+type Option = {
+  value: string;
+  label: string;
+};
+
 type PredictionGateProps = {
   /** A key that, when changed, resets the prediction text and hides hints. */
   resetKey: string | number;
@@ -30,6 +35,11 @@ type PredictionGateProps = {
   /** Optional correctness evaluation; when provided, feedback is rendered after reveal. */
   evaluatePrediction?: (prediction: string) => Evaluation;
   children?: ReactNode;
+  /**
+   * Optional structured options. When provided, a radio group is shown instead of
+   * a free-text textarea, and the answer is auto-evaluated on submit.
+   */
+  options?: Option[];
 };
 
 function HintPanel({ hint }: { hint?: string }) {
@@ -67,12 +77,21 @@ export default function PredictionGate({
   revealContent,
   evaluatePrediction,
   children,
+  options,
 }: PredictionGateProps) {
   useEffect(() => {
     onPredictionChange('');
   }, [resetKey, onPredictionChange]);
 
-  const canSubmit = prediction.trim().length > 0 && !submitted;
+  // For structured options, auto-reveal the evaluation after submission.
+  useEffect(() => {
+    if (options && submitted && !revealed) {
+      onReveal();
+    }
+  }, [options, submitted, revealed, onReveal]);
+
+  const canSubmit =
+    (options ? prediction.length > 0 : prediction.trim().length > 0) && !submitted;
   const revealDisabled = !canReveal;
   const evaluation = revealed ? evaluatePrediction?.(prediction) : undefined;
 
@@ -86,14 +105,42 @@ export default function PredictionGate({
 
       {children}
 
-      <textarea
-        className="w-full border border-violet-200 rounded-lg p-3 text-sm bg-white resize-none disabled:bg-gray-100 disabled:text-gray-500"
-        rows={2}
-        placeholder="写下你的预测或直觉..."
-        value={prediction}
-        disabled={submitted}
-        onChange={(e) => onPredictionChange(e.target.value)}
-      />
+      {options ? (
+        <div className="space-y-2">
+          {options.map((opt) => (
+            <label
+              key={opt.value}
+              className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${
+                submitted ? 'cursor-not-allowed opacity-70' : 'hover:bg-violet-50'
+              } ${
+                prediction === opt.value
+                  ? 'bg-violet-50 border-violet-300'
+                  : 'bg-white border-violet-200'
+              }`}
+            >
+              <input
+                type="radio"
+                name={`prediction-${resetKey}`}
+                value={opt.value}
+                checked={prediction === opt.value}
+                disabled={submitted}
+                onChange={() => onPredictionChange(opt.value)}
+                className="text-violet-600 focus:ring-violet-500"
+              />
+              <span className="text-sm text-gray-700">{opt.label}</span>
+            </label>
+          ))}
+        </div>
+      ) : (
+        <textarea
+          className="w-full border border-violet-200 rounded-lg p-3 text-sm bg-white resize-none disabled:bg-gray-100 disabled:text-gray-500"
+          rows={2}
+          placeholder="写下你的预测或直觉..."
+          value={prediction}
+          disabled={submitted}
+          onChange={(e) => onPredictionChange(e.target.value)}
+        />
+      )}
 
       <div className="flex flex-wrap gap-2">
         <HintPanel key={resetKey} hint={hint} />

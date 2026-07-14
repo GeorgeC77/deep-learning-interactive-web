@@ -9,7 +9,7 @@ import { ganMetrics } from '@/lib/math/gan';
 const PRESETS = [
   { label: 'discriminator too strong', labelZh: '判别器过强（D≈0）', a: -5 },
   { label: 'balanced game', labelZh: '势均力敌（D≈0.5）', a: 0 },
-  { label: 'generator collapse to one mode', labelZh: '生成器坍缩到单一模式（D≈1）', a: 5 },
+  { label: 'discriminator confident real', labelZh: '判别器确信生成样本为真（D≈1）', a: 5 },
 ];
 
 const A_MIN = -5;
@@ -68,32 +68,24 @@ export default function GANGradientLab() {
   };
 
   const evaluateMainPrediction = (pred: string): Evaluation => {
-    const lower = pred.toLowerCase();
-    const choseNs =
-      lower.includes('non') ||
-      lower.includes('ns') ||
-      lower.includes('不饱和') ||
-      lower.includes('饱和');
-    const choseMm = lower.includes('minimax') || lower.includes('mm');
-
-    if (choseNs && !choseMm) {
+    if (pred === 'non-saturating') {
       return {
         correct: true,
         category: '正确',
-        feedback: '答对了。当 D 接近 0 时，non-saturating 损失的梯度约为 -1，而 minimax 损失梯度接近 0。',
+        feedback: '答对了。当 D 接近 0 时，non-saturating 损失的导数约为 -1，而 minimax 导数接近 0。',
       };
     }
-    if (choseMm && !choseNs) {
+    if (pred === 'minimax') {
       return {
         correct: false,
         category: '方向相反',
-        feedback: '当 D 接近 0 时，minimax 梯度 -D 也接近 0，反而会消失；non-saturating 梯度 -(1-D) 仍接近 -1。',
+        feedback: '当 D 接近 0 时，minimax 导数 -D 也接近 0，梯度会消失；non-saturating 导数 -(1-D) 仍接近 -1。',
       };
     }
     return {
       correct: false,
       category: '需要更明确',
-      feedback: '请明确指出是 minimax 还是 non-saturating。正确答案是 non-saturating。',
+      feedback: '请选择 minimax 或 non-saturating。正确答案是 non-saturating。',
     };
   };
 
@@ -190,11 +182,13 @@ export default function GANGradientLab() {
                 <tr className="text-xs text-gray-500 border-b border-gray-200">
                   <th className="py-2 pr-4">损失</th>
                   <th className="py-2 pr-4">
-                    生成器梯度 <KaTeX math={String.raw`\partial L/\partial a`} />
+                    导数 <KaTeX math={String.raw`\partial L/\partial a`} />
                   </th>
                   <th className="py-2 pr-4">
-                    判别器输出梯度 <KaTeX math={String.raw`\partial L/\partial D`} />
+                    下降方向 <KaTeX math={String.raw`-\partial L/\partial a`} />
                   </th>
+                  <th className="py-2 pr-4">期望 Δa</th>
+                  <th className="py-2 pr-4">期望 ΔD</th>
                 </tr>
               </thead>
               <tbody>
@@ -204,8 +198,10 @@ export default function GANGradientLab() {
                     <MagnitudeBar value={metrics.gradMinimaxLogit} colorClass="bg-rose-500" />
                   </td>
                   <td className="py-2 pr-4">
-                    <MagnitudeBar value={metrics.gradMinimaxD} colorClass="bg-amber-500" />
+                    <MagnitudeBar value={-metrics.gradMinimaxLogit} colorClass="bg-rose-300" />
                   </td>
+                  <td className="py-2 pr-4 font-mono text-xs">{fmt(-metrics.gradMinimaxLogit)}</td>
+                  <td className="py-2 pr-4 font-mono text-xs">{fmt(metrics.D * (1 - metrics.D) * (-metrics.gradMinimaxLogit))}</td>
                 </tr>
                 <tr>
                   <td className="py-2 pr-4 font-medium">non-saturating</td>
@@ -213,14 +209,16 @@ export default function GANGradientLab() {
                     <MagnitudeBar value={metrics.gradNonSaturatingLogit} colorClass="bg-emerald-500" />
                   </td>
                   <td className="py-2 pr-4">
-                    <MagnitudeBar value={metrics.gradNonSaturatingD} colorClass="bg-cyan-500" />
+                    <MagnitudeBar value={-metrics.gradNonSaturatingLogit} colorClass="bg-emerald-300" />
                   </td>
+                  <td className="py-2 pr-4 font-mono text-xs">{fmt(-metrics.gradNonSaturatingLogit)}</td>
+                  <td className="py-2 pr-4 font-mono text-xs">{fmt(metrics.D * (1 - metrics.D) * (-metrics.gradNonSaturatingLogit))}</td>
                 </tr>
               </tbody>
             </table>
           </div>
           <div className="text-xs text-gray-500">
-            条形长度表示梯度绝对值；数值前的负号表示该损失让生成器朝“降低 D”的方向更新。
+            负导数意味着梯度下降会提高 logit a，从而提高 D(G(z))。 descent direction = -∂L/∂a。
           </div>
         </div>
 
@@ -233,9 +231,13 @@ export default function GANGradientLab() {
           revealed={revealed}
           onReveal={() => setRevealed((r) => !r)}
           canReveal={submitted}
-          question="当 D(G(z)) 接近 0 时，哪种生成器损失的梯度更大：minimax 还是 non-saturating？"
-          hint="观察左侧表格在 D 接近 0 时的梯度数值：minimax 是 -D，non-saturating 是 -(1-D)。"
+          question="当 D(G(z)) 接近 0 时，哪种生成器损失的导数 ∂L/∂a 更负：minimax 还是 non-saturating？"
+          hint="观察左侧表格在 D 接近 0 时的导数：minimax 是 -D，non-saturating 是 -(1-D)。"
           evaluatePrediction={evaluateMainPrediction}
+          options={[
+            { value: 'non-saturating', label: 'non-saturating' },
+            { value: 'minimax', label: 'minimax' },
+          ]}
           revealContent={
             <div className="space-y-3 text-sm text-gray-700">
               <div>

@@ -4,9 +4,9 @@ import InteractiveDemo from '@/components/InteractiveDemo';
 import KaTeX from '@/components/KaTeX';
 import {
   ensembleVariance,
-  ensembleStd,
   marginalGain,
   limitingVariance,
+  minimumFeasibleCorrelation,
 } from '@/lib/math/modelAveraging';
 
 const MAX_M = 50;
@@ -17,17 +17,26 @@ const MARGIN = { t: 10, r: 20, b: 40, l: 50 };
 const INNER_W = PLOT_W - MARGIN.l - MARGIN.r;
 const INNER_H = PLOT_H - MARGIN.t - MARGIN.b;
 
+type RhoMode = 'fixed' | 'scaled';
+
 interface Preset {
   label: string;
-  value: number;
+  mode: RhoMode;
+  rho?: number;
+  gamma?: number;
   description: string;
 }
 
 const PRESETS: Preset[] = [
-  { label: '独立', value: 0, description: 'ρ = 0：模型误差互不相关' },
-  { label: '中等相关', value: 0.5, description: 'ρ = 0.5' },
-  { label: '完全相同', value: 1, description: 'ρ = 1：所有模型犯同样的错误' },
-  { label: '负相关', value: -0.2, description: 'ρ = -0.2' },
+  { label: '独立', mode: 'fixed', rho: 0, description: 'ρ = 0：模型误差互不相关' },
+  { label: '中等相关', mode: 'fixed', rho: 0.5, description: 'ρ = 0.5' },
+  { label: '完全相同', mode: 'fixed', rho: 1, description: 'ρ = 1：所有模型犯同样的错误' },
+  {
+    label: '负相关',
+    mode: 'scaled',
+    gamma: 0.8,
+    description: 'ρ_M = -0.8/(M-1)，随 M 缩放保证可行',
+  },
 ];
 
 interface MetricCardProps {
@@ -46,25 +55,57 @@ function MetricCard({ label, value, color, bg }: MetricCardProps) {
   );
 }
 
+function clamp(n: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, n));
+}
+
+function formatFinite(n: number, digits = 4): string {
+  if (!Number.isFinite(n)) return '—';
+  return n.toFixed(digits);
+}
+
 export default function ModelAveragingLab() {
   const [sigma, setSigma] = useState(1.0);
   const [M, setM] = useState(10);
+  const [mode, setMode] = useState<RhoMode>('fixed');
   const [rho, setRho] = useState(0.0);
+  const [gamma, setGamma] = useState(0.8);
 
-  const variance = ensembleVariance(sigma, M, rho);
-  const std = ensembleStd(sigma, M, rho);
-  const gain = marginalGain(sigma, M, rho);
-  const limit = limitingVariance(sigma, rho);
+  const rhoMin = minimumFeasibleCorrelation(M);
+
+  // Effective rho for the currently selected M.
+  const effectiveRho = useMemo(() => {
+    if (mode === 'scaled') {
+      return M <= 1 ? 0 : -gamma / (M - 1);
+    }
+    return clamp(rho, 0, 1);
+  }, [mode, M, gamma, rho]);
+
+  // When M changes, make sure the fixed rho remains feasible (it is always >=0).
+  // When switching to scaled mode, keep gamma.
+  const handleModeChange = (next: RhoMode) => {
+    setMode(next);
+    if (next === 'fixed') {
+      setRho(clamp(effectiveRho, 0, 1));
+    }
+  };
+
+  const variance = Math.max(0, ensembleVariance(sigma, M, effectiveRho));
+  const std = Math.sqrt(variance);
+  const gain = Math.max(0, marginalGain(sigma, M, effectiveRho));
+  const limit = Math.max(0, limitingVariance(sigma, effectiveRho));
 
   const curve = useMemo(() => {
     const points: { m: number; std: number }[] = [];
     for (let m = 1; m <= MAX_M; m++) {
-      points.push({ m, std: ensembleStd(sigma, m, rho) });
+      const r = mode === 'scaled' ? (m <= 1 ? 0 : -gamma / (m - 1)) : clamp(rho, 0, 1);
+      const v = Math.max(0, ensembleVariance(sigma, m, r));
+      points.push({ m, std: Math.sqrt(v) });
     }
     return points;
-  }, [sigma, rho]);
+  }, [sigma, rho, gamma, mode]);
 
-  const yMax = Math.max(sigma, 0.1);
+  const yMax = Math.max(sigma, ...curve.map((p) => p.std), 0.1);
 
   const xScale = (m: number): number => {
     return MARGIN.l + ((m - 1) / (MAX_M - 1)) * INNER_W;
@@ -92,7 +133,7 @@ export default function ModelAveragingLab() {
           模型平均后的误差方差为{' '}
           <KaTeX math="\sigma^2\bigl(\rho + \frac{1-\rho}{M}\bigr)" />。
           当 <KaTeX math="M\to\infty" /> 时，方差收敛到{' '}
-          <KaTeX math="\sigma^2\rho" />，说明相关误差是无法通过平均消除的偏差。
+          <KaTeX math="\sigma^2\rho" />，说明正相关误差保留共同方差成分；即使误差均值为零，相关性也不等同于 bias。
         </p>
 
         {/* Controls */}
@@ -137,32 +178,100 @@ export default function ModelAveragingLab() {
 
           <div>
             <div className="flex justify-between text-xs font-medium text-gray-700 mb-0.5">
+              <span>ρ 模式</span>
+              <span className="font-mono">
+                {mode === 'fixed' ? '固定非负 ρ' : '按 M 缩放负相关'}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => handleModeChange('fixed')}
+                className={`flex-1 px-2 py-1 text-xs rounded-lg border transition-colors ${
+                  mode === 'fixed'
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                固定 ρ ≥ 0
+              </button>
+              <button
+                type="button"
+                onClick={() => handleModeChange('scaled')}
+                className={`flex-1 px-2 py-1 text-xs rounded-lg border transition-colors ${
+                  mode === 'scaled'
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                ρ_M = -γ/(M-1)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {mode === 'fixed' ? (
+          <div>
+            <div className="flex justify-between text-xs font-medium text-gray-700 mb-0.5">
               <span>
-                两两相关系数 <KaTeX math="\rho" />
+                固定两两相关系数 <KaTeX math="\rho" />
               </span>
               <span className="font-mono">{rho.toFixed(2)}</span>
             </div>
             <Slider
               value={[rho]}
-              min={-0.2}
+              min={0}
               max={1.0}
               step={0.05}
               onValueChange={(v) => setRho(Math.round(v[0] * 20) / 20)}
             />
             <p className="text-[10px] text-gray-400 mt-0.5">
-              模型误差的平均 pairwise 相关系数
+              固定模式下 ρ 被限制为非负，防止 M 增大时方差变负。
             </p>
           </div>
+        ) : (
+          <div>
+            <div className="flex justify-between text-xs font-medium text-gray-700 mb-0.5">
+              <span>
+                负相关强度 <KaTeX math="\gamma" /> (ρ_M = -γ/(M-1))
+              </span>
+              <span className="font-mono">{gamma.toFixed(2)}</span>
+            </div>
+            <Slider
+              value={[gamma]}
+              min={0}
+              max={1.0}
+              step={0.05}
+              onValueChange={(v) => setGamma(Math.round(v[0] * 20) / 20)}
+            />
+            <p className="text-[10px] text-gray-400 mt-0.5">
+              缩放模式保证任意 M &gt; 1 下 ρ_M 都可下界 -1/(M-1)。
+            </p>
+          </div>
+        )}
+
+        <div className="text-xs text-gray-600 bg-slate-50 rounded p-2">
+          当前 <KaTeX math={`M=${M}`} /> 的可行下界：
+          <KaTeX math={`\\rho_{\\min}=${rhoMin.toFixed(3)}`} />；
+          当前有效 <KaTeX math={`\\rho=${effectiveRho.toFixed(3)}`} />。
         </div>
 
         {/* Presets */}
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((preset) => {
-            const active = Math.abs(rho - preset.value) < 1e-6;
+            const active =
+              mode === preset.mode &&
+              (preset.rho !== undefined
+                ? Math.abs(rho - preset.rho) < 1e-6
+                : Math.abs(gamma - (preset.gamma ?? 0)) < 1e-6);
             return (
               <button
                 key={preset.label}
-                onClick={() => setRho(preset.value)}
+                onClick={() => {
+                  setMode(preset.mode);
+                  if (preset.rho !== undefined) setRho(preset.rho);
+                  if (preset.gamma !== undefined) setGamma(preset.gamma);
+                }}
                 title={preset.description}
                 className={`px-3 py-1.5 text-xs rounded-lg transition-colors ${
                   active
@@ -170,7 +279,7 @@ export default function ModelAveragingLab() {
                     : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
                 }`}
               >
-                {preset.label} <KaTeX math={`\\rho=${preset.value}`} />
+                {preset.label}
               </button>
             );
           })}
@@ -180,25 +289,25 @@ export default function ModelAveragingLab() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center">
           <MetricCard
             label={<KaTeX math="\text{Ensemble Variance}" />}
-            value={variance.toFixed(4)}
+            value={formatFinite(variance)}
             color="text-blue-700"
             bg="bg-blue-50"
           />
           <MetricCard
             label={<KaTeX math="\text{Ensemble Std}" />}
-            value={std.toFixed(4)}
+            value={formatFinite(std)}
             color="text-emerald-700"
             bg="bg-emerald-50"
           />
           <MetricCard
             label={<KaTeX math="\text{Marginal Gain}(M\to M+1)" />}
-            value={gain.toFixed(4)}
+            value={formatFinite(gain)}
             color="text-purple-700"
             bg="bg-purple-50"
           />
           <MetricCard
             label={<KaTeX math="\lim_{M\to\infty}\text{Variance}" />}
-            value={limit.toFixed(4)}
+            value={formatFinite(limit)}
             color="text-amber-700"
             bg="bg-amber-50"
           />
@@ -372,7 +481,8 @@ export default function ModelAveragingLab() {
             </li>
             <li>
               负相关（<KaTeX math="\rho&lt;0" />）可以让集成方差低于{' '}
-              <KaTeX math="\sigma^2/M" />，但实际中很难实现。
+              <KaTeX math="\sigma^2/M" />，但必须满足{' '}
+              <KaTeX math="\rho\ge -1/(M-1)" /> 以保证方差非负。
             </li>
           </ul>
         </div>

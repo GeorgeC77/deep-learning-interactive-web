@@ -27,14 +27,15 @@ export function nonSaturatingLoss(D: number): number {
 }
 
 /**
- * Gradient of the minimax generator loss with respect to the discriminator logit a.
+ * Derivative of the minimax generator loss with respect to the discriminator logit a.
  *
+ *   L_MM = log(1 - D)
  *   dL_MM / da = dL_MM / dD * dD / da
- *              = (1 / (1 - D)) * (D * (1 - D))
- *              = D
+ *              = (1 / (1 - D)) * (-D * (1 - D))
+ *              = -D
  *
- * The generator moves to increase D, so the update direction is the negative
- * of this value: -D.
+ * Gradient descent updates a <- a - eta * dL_MM/da = a + eta*D, which raises
+ * the logit and therefore raises D(G(z)).
  */
 export function gradMinimaxLogit(D: number): number {
   return -D;

@@ -1,21 +1,21 @@
 import SectionMetadata from '@/components/SectionMetadata';
 import { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import type React from 'react';
-import { ShieldAlert, Target, CheckCircle2, RefreshCw, Play, SkipForward, MousePointer2 , Circle} from 'lucide-react';
+import { ShieldAlert, Target, CheckCircle2, RefreshCw, Play, SkipForward, MousePointer2, Circle } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
 import { Slider } from '@/components/ui/slider';
-
-interface Point {
-  x: number;
-  y: number;
-  cluster: number;
-}
-
-interface Centroid {
-  x: number;
-  y: number;
-}
+import {
+  assignStep,
+  updateStep,
+  computeDistortion,
+  randomInit,
+  hasConverged,
+  getAssignments,
+  mulberry32,
+  type Point,
+  type Centroid,
+} from '@/lib/math/kmeans';
 
 const WIDTH = 600;
 const HEIGHT = 480;
@@ -37,26 +37,21 @@ function unscaleY(py: number): number {
   return ((HEIGHT - PADDING - py) / (HEIGHT - 2 * PADDING)) * 10;
 }
 
-function dist2(a: { x: number; y: number }, b: { x: number; y: number }): number {
-  return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2);
-}
-
 const palette = ['#2563eb', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
 export default function KMeansPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       <section className="text-center py-8 bg-white rounded-2xl shadow-sm border border-gray-200">
-        <div className="text-sm font-medium text-blue-600 mb-2 tracking-wide uppercase">
-          聚类
-        </div>
+        <div className="text-sm font-medium text-blue-600 mb-2 tracking-wide uppercase">聚类</div>
         <h1 className="text-3xl font-bold text-gray-900 mb-3">K-means 算法</h1>
         <p className="text-gray-600 max-w-2xl mx-auto px-4">
           K-means 是最经典的聚类算法之一。它通过交替执行“分配样本到最近质心”和“更新质心为簇内均值”两个步骤，
           逐步最小化失真函数。
         </p>
-
-        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
+        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2">
+          <ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。
+        </p>
       </section>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -67,27 +62,19 @@ export default function KMeansPage() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
             <h3 className="font-semibold text-blue-800 mb-2">1. 初始化</h3>
-            <p className="text-sm text-gray-700">
-              随机选择 K 个样本作为初始质心，或手动指定。
-            </p>
+            <p className="text-sm text-gray-700">随机选择 K 个样本作为初始质心，或手动指定。</p>
           </div>
           <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
             <h3 className="font-semibold text-emerald-800 mb-2">2. 分配步骤</h3>
-            <p className="text-sm text-gray-700">
-              每个样本被分配到距离最近的质心所在的簇。
-            </p>
+            <p className="text-sm text-gray-700">每个样本被分配到距离最近的质心所在的簇。</p>
           </div>
           <div className="bg-violet-50 rounded-lg p-4 border border-violet-200">
             <h3 className="font-semibold text-violet-800 mb-2">3. 更新步骤</h3>
-            <p className="text-sm text-gray-700">
-              每个质心被更新为所在簇所有样本的均值坐标。
-            </p>
+            <p className="text-sm text-gray-700">每个质心被更新为所在簇所有样本的均值坐标。</p>
           </div>
           <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
             <h3 className="font-semibold text-amber-800 mb-2">4. 收敛</h3>
-            <p className="text-sm text-gray-700">
-              重复分配与更新，直到质心位置不再变化或变化极小。
-            </p>
+            <p className="text-sm text-gray-700">重复分配与更新，直到质心位置不再变化或变化极小。</p>
           </div>
         </div>
       </section>
@@ -99,13 +86,8 @@ export default function KMeansPage() {
         </p>
         <FormulaCard
           title="失真函数"
-          formula={
-            <KaTeX
-              math={String.raw`J(c, \mu) = \sum_{i=1}^n \bigl\|x^{(i)} - \mu_{c^{(i)}}\bigr\|^2`}
-              display
-            />
-          }
-          description="在有限样本且平局、空簇处理规则固定时，分配步骤和更新步骤都会使 J 单调不增，通常在有限次迭代后达到稳定分配；但结果依赖初始化，且只保证局部最优或固定点。"
+          formula={<KaTeX math="J(c, \\mu) = \\sum_{i=1}^n \\bigl\\|x^{(i)} - \\mu_{c^{(i)}}\\bigr\\|^2" display />}
+          description="在规则固定时，一次标准的 Lloyd 迭代（先分配、再更新）不会增加 J；算法通常在有限步后达到稳定分配。结果依赖于初始化，且只保证局部最优或固定点。"
         />
       </section>
 
@@ -124,41 +106,59 @@ export default function KMeansPage() {
         </h3>
         <ul className="space-y-2 text-sm text-blue-800">
           <li className="flex items-start gap-2">
-            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>K-means 交替执行分配与更新两步，最小化失真函数。</span>
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-1" />
+            <span>K-means 按“分配 → 更新”的顺序交替执行，最小化失真函数。</span>
           </li>
           <li className="flex items-start gap-2">
-            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-1" />
             <span>在规则固定时目标函数单调不增，通常在有限步后稳定；结果依赖于初始质心，只保证局部最优或固定点。</span>
           </li>
           <li className="flex items-start gap-2">
-            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
+            <Circle className="w-2 h-2 fill-current text-blue-500 mt-1" />
             <span>多次随机初始化并选择失真函数最小的结果是常用策略。</span>
           </li>
         </ul>
       </section>
-    
+
       <SectionMetadata
-        bishopChapter={"Ch 15"}
-        bishopSection={"0.5"}
-        learningObjectives={["理解 K Means Clustering 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
+        bishopChapter="Ch 15"
+        bishopSection="0.5"
+        learningObjectives={[
+          "理解 K Means Clustering 的核心概念与直观含义。",
+          "掌握与本小节相关的关键公式与算法流程。",
+          "能够在简单示例中应用所学方法并识别常见误区。",
+        ]}
+        commonMistakes={[
+          "只记忆公式而忽略其背后的概率或优化假设。",
+          "混淆相近概念的定义与适用场景。",
+          "在应用时忽视数据分布与模型假设的匹配。",
+        ]}
         quiz={[
-      {
-        question: "关于“K Means Clustering”，下列说法最准确的是？",
-        options: ["它是本小节需要掌握的核心主题。", "它与当前章节完全无关。", "它只适用于无限大数据集。", "它不需要任何数学基础。"],
-        correctIndex: 0,
-        explanation: "K Means Clustering 是本小节的核心内容，理解其动机、公式与应用场景是学习目标。",
-      },
-      {
-        question: "学习本小节时，最重要的提醒是什么？",
-        options: ["只看结论，忽略推导。", "理解概念背后的直觉与假设。", "直接套用代码，不必关心理论。", "只记忆英文术语。"],
-        correctIndex: 1,
-        explanation: "理解直觉和假设有助于在遇到新问题时正确选择与扩展方法。",
-      }
+          {
+            question: "标准 Lloyd K-means 的一次迭代顺序是？",
+            options: [
+              "先分配样本到最近质心，再更新质心为簇内均值",
+              "先更新质心，再重新分配样本",
+              "同时随机分配和更新",
+              "只更新不分配",
+            ],
+            correctIndex: 0,
+            explanation: "标准 Lloyd 算法：分配步骤固定质心重新划分样本，更新步骤固定分配重新计算均值。",
+          },
+          {
+            question: "K-means 收敛时，下列哪一项通常成立？",
+            options: [
+              "样本分配和质心位置都不再变化（或变化极小）",
+              "失真函数一定达到全局最小值",
+              "所有簇的大小相等",
+              "质心一定等于某个真实样本点",
+            ],
+            correctIndex: 0,
+            explanation: "K-means 通常收敛到局部最优或固定点，而非全局最优，且簇大小不必相等。",
+          },
         ]}
       />
-</div>
+    </div>
   );
 }
 
@@ -172,57 +172,11 @@ function KMeansDemo() {
   const [iterations, setIterations] = useState(0);
   const [distortion, setDistortion] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
+  const [converged, setConverged] = useState(false);
   const runningRef = useRef(false);
-  const pointsRef = useRef(points);
-  const centroidsRef = useRef(centroids);
-
-  useEffect(() => {
-    pointsRef.current = points;
-  }, [points]);
-
-  useEffect(() => {
-    centroidsRef.current = centroids;
-  }, [centroids]);
 
   const generateRandomCentroids = useCallback((pts: Point[], count: number): Centroid[] => {
-    if (pts.length < count) return [];
-    const copy = [...pts];
-    // Fisher-Yates shuffle 取前 count 个
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy.slice(0, count).map((p) => ({ x: p.x, y: p.y }));
-  }, []);
-
-  const assignStep = useCallback((pts: Point[], cents: Centroid[]): Point[] => {
-    return pts.map((p) => {
-      let best = 0;
-      let bestDist = Infinity;
-      cents.forEach((c, idx) => {
-        const d = dist2(p, c);
-        if (d < bestDist) {
-          bestDist = d;
-          best = idx;
-        }
-      });
-      return { ...p, cluster: best };
-    });
-  }, []);
-
-  const updateStep = useCallback((pts: Point[], cents: Centroid[]): Centroid[] => {
-    return cents.map((_, idx) => {
-      const clusterPoints = pts.filter((p) => p.cluster === idx);
-      if (clusterPoints.length === 0) return cents[idx];
-      return {
-        x: clusterPoints.reduce((sum, p) => sum + p.x, 0) / clusterPoints.length,
-        y: clusterPoints.reduce((sum, p) => sum + p.y, 0) / clusterPoints.length,
-      };
-    });
-  }, []);
-
-  const computeDistortion = useCallback((pts: Point[], cents: Centroid[]): number => {
-    return pts.reduce((sum, p) => sum + dist2(p, cents[p.cluster]), 0);
+    return randomInit(pts, count, mulberry32(Date.now() % 100000));
   }, []);
 
   const reset = useCallback(() => {
@@ -232,19 +186,39 @@ function KMeansDemo() {
     setPoints(assigned);
     setIterations(0);
     setDistortion(computeDistortion(assigned, cents));
-  }, [points, k, generateRandomCentroids, assignStep, computeDistortion]);
+    setConverged(false);
+    setIsRunning(false);
+  }, [points, k, generateRandomCentroids]);
 
   const doOneStep = useCallback(() => {
-    const currentPoints = pointsRef.current;
-    const currentCentroids = centroidsRef.current;
-    if (currentCentroids.length === 0) return;
-    const newCentroids = updateStep(currentPoints, currentCentroids);
-    const newPoints = assignStep(currentPoints, newCentroids);
+    if (centroids.length === 0 || converged) return;
+
+    const prevAssignments = getAssignments(points);
+    const prevCentroids = centroids.map((c) => ({ ...c }));
+
+    // Standard Lloyd: assign then update
+    const assigned = assignStep(points, centroids);
+    const newCentroids = updateStep(assigned, centroids);
+    const newDistortion = computeDistortion(assigned, newCentroids);
+
+    setPoints(assigned);
     setCentroids(newCentroids);
-    setPoints(newPoints);
-    setDistortion(computeDistortion(newPoints, newCentroids));
+    setDistortion(newDistortion);
     setIterations((it) => it + 1);
-  }, [assignStep, updateStep, computeDistortion]);
+
+    if (
+      hasConverged(
+        prevAssignments,
+        getAssignments(assigned),
+        prevCentroids,
+        newCentroids,
+        1e-9,
+      )
+    ) {
+      setConverged(true);
+      setIsRunning(false);
+    }
+  }, [points, centroids, converged]);
 
   useEffect(() => {
     if (!isRunning) {
@@ -262,6 +236,15 @@ function KMeansDemo() {
     return () => clearInterval(interval);
   }, [isRunning, doOneStep]);
 
+  const handleKChange = useCallback((newK: number) => {
+    setK(newK);
+    setIsRunning(false);
+    setConverged(false);
+    setCentroids([]);
+    setIterations(0);
+    setDistortion(0);
+  }, []);
+
   const handleSvgClick = (e: React.MouseEvent<SVGSVGElement>) => {
     if (isRunning) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -272,6 +255,7 @@ function KMeansDemo() {
     setCentroids([]);
     setIterations(0);
     setDistortion(0);
+    setConverged(false);
   };
 
   const regenerateData = () => {
@@ -281,6 +265,7 @@ function KMeansDemo() {
     setCentroids([]);
     setIterations(0);
     setDistortion(0);
+    setConverged(false);
   };
 
   const clearPoints = () => {
@@ -289,6 +274,7 @@ function KMeansDemo() {
     setCentroids([]);
     setIterations(0);
     setDistortion(0);
+    setConverged(false);
   };
 
   return (
@@ -296,7 +282,7 @@ function KMeansDemo() {
       <div className="grid md:grid-cols-3 gap-4">
         <div className="md:col-span-1 space-y-5">
           <ControlRow label={`聚类数 K: ${k}`}>
-            <Slider value={[k]} min={2} max={8} step={1} onValueChange={(v) => setK(v[0])} />
+            <Slider value={[k]} min={2} max={8} step={1} onValueChange={(v) => handleKChange(v[0])} />
           </ControlRow>
 
           <div className="grid grid-cols-2 gap-2">
@@ -310,7 +296,7 @@ function KMeansDemo() {
             </button>
             <button
               onClick={doOneStep}
-              disabled={centroids.length === 0 || isRunning}
+              disabled={centroids.length === 0 || isRunning || converged}
               className="flex items-center justify-center gap-2 px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-300 transition-colors text-sm"
             >
               <SkipForward className="w-4 h-4" />
@@ -318,7 +304,7 @@ function KMeansDemo() {
             </button>
             <button
               onClick={() => setIsRunning((r) => !r)}
-              disabled={centroids.length === 0}
+              disabled={centroids.length === 0 || converged}
               className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-white transition-colors text-sm ${
                 isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-violet-600 hover:bg-violet-700'
               } disabled:bg-gray-300`}
@@ -355,11 +341,14 @@ function KMeansDemo() {
               <span className="text-gray-600">失真函数 J:</span>
               <span className="font-mono font-medium text-blue-700">{distortion.toFixed(6)}</span>
             </div>
+            <div className={converged ? 'text-emerald-700 font-medium' : 'text-gray-500'}>
+              {converged ? '已收敛' : '未收敛'}
+            </div>
           </div>
 
           <div className="text-xs text-gray-500 flex items-start gap-2">
             <MousePointer2 className="w-4 h-4 flex-shrink-0" />
-            点击画布可手动添加数据点。选择 K 后点击“重置质心”开始算法。
+            点击画布可手动添加数据点。选择 K 后点击“重置质心”开始算法。空簇将保持原质心位置。
           </div>
         </div>
 
@@ -385,7 +374,7 @@ function KMeansDemo() {
                 cx={scaleX(p.x)}
                 cy={scaleY(p.y)}
                 r={centroids.length > 0 ? 6 : 4}
-                fill={centroids.length > 0 ? palette[p.cluster % palette.length] : '#6b7280'}
+                fill={centroids.length > 0 ? palette[(p.cluster ?? 0) % palette.length] : '#6b7280'}
                 opacity={0.75}
                 stroke="white"
                 strokeWidth={1}

@@ -51,4 +51,23 @@ describe('gan', () => {
     expect(gradMinimaxLogit(D)).toBeCloseTo(0, 6);
     expect(gradNonSaturatingLogit(D)).toBeCloseTo(-1, 6);
   });
+
+  it('negative derivative increases logit a and D under gradient descent', () => {
+    // For a logit a, gradient descent a_new = a - eta * dL/da.
+    // When dL/da < 0, a_new > a, so D_new = sigmoid(a_new) > D.
+    const a = -1.0;
+    const D = sigmoid(a);
+    const eta = 0.1;
+
+    const dMinimax = gradMinimaxLogit(D);
+    const dNonSaturating = gradNonSaturatingLogit(D);
+
+    expect(dMinimax).toBeLessThan(0);
+    expect(dNonSaturating).toBeLessThan(0);
+
+    const aNewMm = a - eta * dMinimax;
+    const aNewNs = a - eta * dNonSaturating;
+    expect(sigmoid(aNewMm)).toBeGreaterThan(D);
+    expect(sigmoid(aNewNs)).toBeGreaterThan(D);
+  });
 });

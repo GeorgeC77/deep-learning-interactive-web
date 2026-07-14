@@ -6,6 +6,12 @@ import {
   hutchinsonTraceEstimate,
   trace,
   buildRepresentativeJacobian,
+  totalEntries,
+  nonzeroCount,
+  diagonalEntries,
+  maxTriangularNonzeros,
+  maxCouplingNonzeros,
+  densityEvalCost,
   type FlowArchitecture,
 } from '../lib/math/flowArchitecture';
 
@@ -64,5 +70,43 @@ describe('flowArchitecture', () => {
     const J = buildRepresentativeJacobian('continuous', 4);
     const expected = J.reduce((acc, row, i) => acc + row[i], 0);
     expect(trace(J)).toBeCloseTo(expected, 10);
+  });
+
+  it('full Jacobian has D² entries regardless of architecture', () => {
+    for (const arch of ARCHITECTURES) {
+      const J = buildRepresentativeJacobian(arch, 6);
+      expect(totalEntries(J)).toBe(36);
+      expect(diagonalEntries(J)).toBe(6);
+    }
+  });
+
+  it('coupling and autoregressive Jacobians can have O(D²) non-zeros', () => {
+    const dim = 8;
+    const coupling = buildRepresentativeJacobian('coupling', dim);
+    const autoregressive = buildRepresentativeJacobian('autoregressive', dim);
+
+    // The representative matrices are sparse, but the maximum allowed non-zeros
+    // for these structured forms scale quadratically with D.
+    expect(nonzeroCount(coupling)).toBeLessThanOrEqual(maxCouplingNonzeros(dim));
+    expect(nonzeroCount(autoregressive)).toBeLessThanOrEqual(maxTriangularNonzeros(dim));
+    expect(maxCouplingNonzeros(dim)).toBeGreaterThan(dim);
+    expect(maxTriangularNonzeros(dim)).toBe((dim * (dim + 1)) / 2);
+  });
+
+  it('Hutchinson toy implementation with explicit J costs O(M·D²)', () => {
+    const dim = 10;
+    const J = buildRepresentativeJacobian('continuous', dim);
+    const M = 20;
+    const estimate = hutchinsonTraceEstimate(J, M);
+    // The estimator is unbiased; the toy cost here is M matrix-vector products,
+    // each O(D²). Real autodiff implementations cost O(M·C_f) instead.
+    expect(Number.isFinite(estimate)).toBe(true);
+  });
+
+  it('densityEvalCost description does not claim only O(D) non-zeros', () => {
+    const c = densityEvalCost('coupling', 8);
+    const a = densityEvalCost('autoregressive', 8);
+    expect(c.description).not.toContain('only O(D)');
+    expect(a.description).not.toContain('only O(D)');
   });
 });

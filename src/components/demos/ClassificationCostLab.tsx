@@ -47,30 +47,32 @@ export default function ClassificationCostLab() {
   const logOdds = useMemo(() => logOddsThreshold(cFP, cFN), [cFP, cFN]);
   const action = useMemo(() => optimalAction(p, cFP, cFN), [p, cFP, cFN]);
 
+  const maxRisk = useMemo(
+    () => Math.max(cFP, cFN, 0.1),
+    [cFP, cFN],
+  );
+
   const plotData = useMemo(() => {
     const steps = 200;
     const posPts: string[] = [];
     const negPts: string[] = [];
-    let maxRisk = 0;
 
     for (let i = 0; i <= steps; i++) {
       const pi = P_MIN + ((P_MAX - P_MIN) * i) / steps;
       const rp = riskPositive(pi, cFP, cFN);
       const rn = riskNegative(pi, cFP, cFN);
-      posPts.push(`${toX(pi)},${toY(rp, 1)}`);
-      negPts.push(`${toX(pi)},${toY(rn, 1)}`);
-      maxRisk = Math.max(maxRisk, rp, rn);
+      posPts.push(`${toX(pi)},${toY(rp, maxRisk)}`);
+      negPts.push(`${toX(pi)},${toY(rn, maxRisk)}`);
     }
 
     return {
       posPts: posPts.join(' '),
       negPts: negPts.join(' '),
-      maxRisk,
     };
-  }, [cFP, cFN]);
+  }, [cFP, cFN, maxRisk]);
 
-  const currentYPos = toY(rPos, plotData.maxRisk || 1);
-  const currentYNeg = toY(rNeg, plotData.maxRisk || 1);
+  const currentYPos = toY(rPos, maxRisk);
+  const currentYNeg = toY(rNeg, maxRisk);
 
   return (
     <InteractiveDemo title="分类代价敏感决策">
@@ -193,6 +195,32 @@ export default function ClassificationCostLab() {
               stroke="#f43f5e"
               strokeWidth={2}
             />
+            {/* Y-axis ticks */}
+            {[0, 0.25, 0.5, 0.75, 1].map((t) => {
+              const y = toY(t * maxRisk, maxRisk);
+              return (
+                <g key={`yt-${t}`}>
+                  <line
+                    x1={M.l}
+                    y1={y}
+                    x2={M.l - 5}
+                    y2={y}
+                    stroke="#9ca3af"
+                    strokeWidth={1}
+                  />
+                  <text
+                    x={M.l - 8}
+                    y={y + 3}
+                    textAnchor="end"
+                    className="text-[9px]"
+                    fill="#6b7280"
+                  >
+                    {(t * maxRisk).toFixed(2)}
+                  </text>
+                </g>
+              );
+            })}
+
             {/* Threshold line */}
             <line
               x1={toX(threshold)}

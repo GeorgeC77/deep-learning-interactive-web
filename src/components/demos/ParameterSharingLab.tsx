@@ -4,9 +4,17 @@ import InteractiveDemo from '@/components/InteractiveDemo';
 import KaTeX from '@/components/KaTeX';
 import {
   convParams,
+  convConnectionCount,
+  convWeightParams,
+  convBiasParams,
   locallyConnectedParams,
+  locallyConnectedConnectionCount,
+  locallyConnectedWeightParams,
+  locallyConnectedBiasParams,
   denseParams,
-  connectionCount,
+  denseConnectionCount,
+  denseWeightParams,
+  denseBiasParams,
 } from '@/lib/math/parameterSharing';
 
 const MAX_SPATIAL = 16;
@@ -170,9 +178,17 @@ export default function ParameterSharingLab() {
     setShift((s) => Math.min(s, Math.max(1, Hin - 1)));
   }, [Hin]);
 
-  const connections = useMemo(
-    () => connectionCount(Hin, Win, Cin, Hout, Wout, Cout, Kh, Kw),
-    [Hin, Win, Cin, Hout, Wout, Cout, Kh, Kw],
+  const convConnections = useMemo(
+    () => convConnectionCount(Hout, Wout, Cout, Kh, Kw, Cin),
+    [Hout, Wout, Cout, Kh, Kw, Cin],
+  );
+  const localConnections = useMemo(
+    () => locallyConnectedConnectionCount(Hout, Wout, Cout, Kh, Kw, Cin),
+    [Hout, Wout, Cout, Kh, Kw, Cin],
+  );
+  const denseConnections = useMemo(
+    () => denseConnectionCount(Hin, Win, Cin, Hout, Wout, Cout),
+    [Hin, Win, Cin, Hout, Wout, Cout],
   );
   const convP = useMemo(
     () => convParams(Kh, Kw, Cin, Cout),
@@ -377,12 +393,12 @@ export default function ParameterSharingLab() {
 
         <div className="space-y-4">
           <div className="bg-blue-50 rounded-lg p-4 text-center">
-            <div className="text-sm text-gray-600">连接数</div>
+            <div className="text-sm text-gray-600">当前连接数（卷积 / 局部）</div>
             <div className="text-3xl font-bold text-blue-700">
-              {connections.toLocaleString()}
+              {convConnections.toLocaleString()}
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              与共享方式无关
+              Dense 连接数使用完整输入维度：{denseConnections.toLocaleString()}
             </div>
           </div>
 
@@ -391,19 +407,23 @@ export default function ParameterSharingLab() {
               <thead>
                 <tr className="bg-gray-100 text-left">
                   <th className="p-2 border">层类型</th>
-                  <th className="p-2 border text-right">连接数</th>
-                  <th className="p-2 border text-right">参数量</th>
-                  <th className="p-2 border text-right">自由度</th>
+                  <th className="p-2 border text-right">Connections</th>
+                  <th className="p-2 border text-right">Weight params</th>
+                  <th className="p-2 border text-right">Bias params</th>
+                  <th className="p-2 border text-right">Total params</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b hover:bg-gray-50">
                   <td className="p-2 border font-medium">卷积 Conv</td>
                   <td className="p-2 border text-right font-mono">
-                    {connections.toLocaleString()}
+                    {convConnections.toLocaleString()}
                   </td>
                   <td className="p-2 border text-right font-mono">
-                    {convP.toLocaleString()}
+                    {convWeightParams(Kh, Kw, Cin, Cout).toLocaleString()}
+                  </td>
+                  <td className="p-2 border text-right font-mono">
+                    {convBiasParams(Cout).toLocaleString()}
                   </td>
                   <td className="p-2 border text-right font-mono">
                     {convP.toLocaleString()}
@@ -412,10 +432,13 @@ export default function ParameterSharingLab() {
                 <tr className="border-b hover:bg-gray-50">
                   <td className="p-2 border font-medium">局部连接</td>
                   <td className="p-2 border text-right font-mono">
-                    {connections.toLocaleString()}
+                    {localConnections.toLocaleString()}
                   </td>
                   <td className="p-2 border text-right font-mono">
-                    {localP.toLocaleString()}
+                    {locallyConnectedWeightParams(Hout, Wout, Kh, Kw, Cin, Cout).toLocaleString()}
+                  </td>
+                  <td className="p-2 border text-right font-mono">
+                    {locallyConnectedBiasParams(Hout, Wout, Cout).toLocaleString()}
                   </td>
                   <td className="p-2 border text-right font-mono">
                     {localP.toLocaleString()}
@@ -424,10 +447,13 @@ export default function ParameterSharingLab() {
                 <tr className="border-b hover:bg-gray-50">
                   <td className="p-2 border font-medium">全连接 Dense</td>
                   <td className="p-2 border text-right font-mono">
-                    {connections.toLocaleString()}
+                    {denseConnections.toLocaleString()}
                   </td>
                   <td className="p-2 border text-right font-mono">
-                    {denseP.toLocaleString()}
+                    {denseWeightParams(Hin, Win, Cin, Hout, Wout, Cout).toLocaleString()}
+                  </td>
+                  <td className="p-2 border text-right font-mono">
+                    {denseBiasParams(Hout, Wout, Cout).toLocaleString()}
                   </td>
                   <td className="p-2 border text-right font-mono">
                     {denseP.toLocaleString()}
@@ -453,6 +479,10 @@ export default function ParameterSharingLab() {
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+            <div className="text-xs text-gray-600 mb-2">
+              连接数（ wiring ）与参数量（ learnable scalars ）不同：Conv 与 Local 有相同的局部连接图，
+              但 Conv 跨空间共享权重，因此 Weight params 远小于 Local；Dense 使用全连接图，连接数更多。
+            </div>
             <KaTeX
               math={String.raw`P_{\mathrm{conv}} = K_h K_w C_{\mathrm{in}} C_{\mathrm{out}} + C_{\mathrm{out}}`}
             />
@@ -463,7 +493,10 @@ export default function ParameterSharingLab() {
               math={String.raw`P_{\mathrm{dense}} = H_{\mathrm{in}} W_{\mathrm{in}} C_{\mathrm{in}} H_{\mathrm{out}} W_{\mathrm{out}} C_{\mathrm{out}} + H_{\mathrm{out}} W_{\mathrm{out}} C_{\mathrm{out}}`}
             />
             <KaTeX
-              math={String.raw`\# \mathrm{connections} = H_{\mathrm{out}} W_{\mathrm{out}} C_{\mathrm{out}} K_h K_w C_{\mathrm{in}}`}
+              math={String.raw`\# \mathrm{connections}_{\mathrm{conv/local}} = H_{\mathrm{out}} W_{\mathrm{out}} C_{\mathrm{out}} K_h K_w C_{\mathrm{in}}`}
+            />
+            <KaTeX
+              math={String.raw`\# \mathrm{connections}_{\mathrm{dense}} = H_{\mathrm{in}} W_{\mathrm{in}} C_{\mathrm{in}} H_{\mathrm{out}} W_{\mathrm{out}} C_{\mathrm{out}}`}
             />
           </div>
         </div>

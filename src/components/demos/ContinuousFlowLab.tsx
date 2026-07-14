@@ -65,7 +65,13 @@ export default function ContinuousFlowLab() {
     [forward.final, field, t1, t0, dt, solver],
   );
 
-  const reconstructionError = distance(point, backward.final);
+  const forwardFinite = forward.trajectory.filter(
+    (p) => Number.isFinite(p[0]) && Number.isFinite(p[1]),
+  );
+  const forwardBlowup = forwardFinite.length < forward.trajectory.length;
+  const backwardValid =
+    Number.isFinite(forward.final[0]) && Number.isFinite(forward.final[1]);
+  const reconstructionError = backwardValid ? distance(point, backward.final) : NaN;
 
   const density = useMemo(
     () => logDensityChange(field, forward.trajectory, dt),
@@ -131,14 +137,24 @@ export default function ContinuousFlowLab() {
     return items;
   }, [field]);
 
-  const trajectoryPoly = forward.trajectory.map(([x, y]) => `${toSvg(x, y).x},${toSvg(x, y).y}`).join(' ');
-  const backwardPoly = backward.trajectory
+  const trajectoryPoly = forwardFinite
     .map(([x, y]) => `${toSvg(x, y).x},${toSvg(x, y).y}`)
     .join(' ');
+  const backwardPoly = backwardValid
+    ? backward.trajectory
+        .filter((p) => Number.isFinite(p[0]) && Number.isFinite(p[1]))
+        .map(([x, y]) => `${toSvg(x, y).x},${toSvg(x, y).y}`)
+        .join(' ')
+    : '';
 
   const startPos = toSvg(point[0], point[1]);
-  const endPos = toSvg(forward.final[0], forward.final[1]);
-  const backPos = toSvg(backward.final[0], backward.final[1]);
+  const endPos = toSvg(
+    Number.isFinite(forward.final[0]) ? forward.final[0] : point[0],
+    Number.isFinite(forward.final[1]) ? forward.final[1] : point[1],
+  );
+  const backPos = backwardValid
+    ? toSvg(backward.final[0], backward.final[1])
+    : startPos;
 
   const evaluatePrediction = (value: string) => {
     const text = value.toLowerCase();
@@ -151,9 +167,9 @@ export default function ContinuousFlowLab() {
       correct,
       category: correct ? '理解流映射的可逆性' : ' misconception',
       feedback: correct ? (
-        <span>正确。流映射的可逆性取决于向量场的正则性（Lipschitz），而不是逐点双射。</span>
+        <span>正确。局部 Lipschitz 是必要的，但还不够：解必须在整个目标时间区间内存在，才能定义可逆流映射。</span>
       ) : (
-        <span>再想想：积分是沿曲线“前进”，返回时只需沿同一曲线倒退。即使 f 不是双射，短时间内的流映射仍是可逆的。</span>
+        <span>再想想：积分是沿曲线“前进”，返回时只需沿同一曲线倒退。但反向积分只在解未爆破的区间上有定义；局部 Lipschitz 不保证全局存在性。</span>
       ),
     };
   };
@@ -162,7 +178,10 @@ export default function ContinuousFlowLab() {
     <InteractiveDemo title="连续流实验：非双射向量场也能产生可逆流映射">
       <div className="space-y-5">
         <div className="text-sm text-gray-600">
-          通过数值积分观察向量场生成的流映射。即使向量场 f 本身不是双射，只要在有限时间内满足 Lipschitz 条件，正向与反向积分仍能相互还原。
+          通过数值积分观察向量场生成的流映射。局部 Lipschitz 条件保证积分曲线的局部唯一性，
+          但可逆流映射还需要解在整个目标时间区间内存在。
+          例如 <KaTeX math="dx/dt=x^2" /> 的解 <KaTeX math="x(t)=x_0/(1-x_0 t)" /> 在 <KaTeX math="t=1/x_0" /> 处爆破；
+          全局 Lipschitz 场（如旋转场）则对所有时间都存在。
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -229,13 +248,17 @@ export default function ContinuousFlowLab() {
           <div className="bg-slate-50 border rounded-lg p-3">
             <div className="text-slate-500">正向终点</div>
             <div className="font-mono text-slate-800">
-              [{forward.final[0].toFixed(3)}, {forward.final[1].toFixed(3)}]
+              {Number.isFinite(forward.final[0]) && Number.isFinite(forward.final[1])
+                ? `[${forward.final[0].toFixed(3)}, ${forward.final[1].toFixed(3)}]`
+                : 'N/A（解已爆破）'}
             </div>
           </div>
           <div className="bg-slate-50 border rounded-lg p-3">
             <div className="text-slate-500">反向还原误差</div>
-            <div className={`font-mono font-bold ${reconstructionError < 1e-3 ? 'text-emerald-600' : 'text-amber-600'}`}>
-              {reconstructionError.toExponential(2)}
+            <div className={`font-mono font-bold ${!forwardBlowup && reconstructionError < 1e-3 ? 'text-emerald-600' : 'text-amber-600'}`}>
+              {Number.isFinite(reconstructionError)
+                ? reconstructionError.toExponential(2)
+                : 'N/A（解已爆破）'}
             </div>
           </div>
           <div className="bg-slate-50 border rounded-lg p-3">
@@ -284,8 +307,13 @@ export default function ContinuousFlowLab() {
                 </div>
               </RadioGroup>
               <div className="text-xs text-gray-500">
-                切换积分器可比较 forward-backward 重构误差（Transfer Challenge）。
+                切换积分器可比较 forward-backward 重构误差。选择“有限时间爆破场”可观察区间存在性不足时无法定义可逆流映射。
               </div>
+              {forwardBlowup && (
+                <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded p-2 mt-2">
+                  检测到数值发散：当前向量场在目标时间区间内发生有限时间爆破，无法定义可逆流映射。
+                </div>
+              )}
             </div>
           </div>
 
@@ -367,20 +395,21 @@ export default function ContinuousFlowLab() {
           revealContent={
             <div className="space-y-3 text-sm text-gray-700">
               <div>
-                <strong>答案：不一定。</strong> 流映射的可逆性由向量场的正则性决定，而不是 f 是否为一一映射。
+                <strong>答案：不一定。</strong> 流映射的可逆性取决于向量场是否局部 Lipschitz <strong>并且</strong> 解在整个目标区间上存在，而不是 f 是否为一一映射。
               </div>
               <div>
-                对自治 ODE <KaTeX math="\frac{dh}{dt}=f(h)" />，只要 f 是局部 Lipschitz 的，Picard–Lindelöf 定理保证存在唯一的积分曲线。正向流映射
-                <KaTeX math="\phi_t(h_0)" /> 的逆就是反向积分：
+                对自治 ODE <KaTeX math="\frac{dh}{dt}=f(h)" />，局部 Lipschitz 保证 Picard–Lindelöf 局部唯一解。正向流映射
+                <KaTeX math="\phi_t(h_0)" /> 的逆是反向积分，但它只在解存在的区间上有定义：
               </div>
               <div className="bg-slate-50 border rounded p-2">
                 <KaTeX math="\phi_{-t}(h_1)=h_0\quad\text{其中}\quad \frac{dh}{d\tau}=-f(h),\ h(0)=h_1" display />
               </div>
               <div>
-                下方实验中，非线性场 <KaTeX math="f([x,y])=[\sin y, x]" /> 显然不是双射（例如 sin 是周期函数），但在有限时间 horizon 内，正向+反向积分仍能几乎完美地回到起点。
+                反例： <KaTeX math="dx/dt=x^2" /> 的解 <KaTeX math="x(t)=x_0/(1-x_0 t)" /> 在 <KaTeX math="t=1/x_0" /> 爆破，
+                因此无法定义超过该时刻的可逆流映射。全局 Lipschitz 场（如旋转场）才保证任意有限/无限区间的存在性。
               </div>
               <div>
-                这也说明了连续标准化流（CNF）的关键思想：我们不需要构造可逆的神经网络层，只需要学习一个正则的向量场，就能通过 ODE 积分得到可逆的生成映射。
+                下方实验中，非线性场 <KaTeX math="f([x,y])=[\sin y, x]" /> 显然不是双射（例如 sin 是周期函数），但在解存在的有限时间 horizon 内，正向+反向积分仍能几乎完美地回到起点。
               </div>
             </div>
           }

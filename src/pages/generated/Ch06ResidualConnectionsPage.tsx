@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ResidualJacobianLab from '@/components/demos/ResidualJacobianLab';
 import { Layers } from 'lucide-react';
 
 export default function Ch06ResidualConnectionsPage() {
@@ -6,77 +7,83 @@ export default function Ch06ResidualConnectionsPage() {
     <BishopSectionPage
       sectionPath="/ch06/residual-connections"
       heroIcon={<Layers className="w-9 h-9 text-blue-600" />}
-      summary={"残差连接通过跳跃映射让网络学习残差函数 F(x)=H(x)-x，缓解深层网络的梯度消失与退化问题。"}
+      summary={"残差连接通过跳跃映射让网络学习残差函数 F(x)=H(x)-x，其 Jacobian 为 I + ∂F/∂x。当 ∂F/∂x 较小时，Jacobian 接近单位阵，有助于缓解深层网络的梯度消失，但这并不是无条件保证。"}
       concepts={[
-    {
-      title: "残差块",
-      description: "输出为输入与变换后的特征相加，保留恒等映射的梯度传播路径。",
-      formula: String.raw`y = \mathcal{F}(x, \{W_i\}) + x`,
-    },
-    {
-      title: "缓解梯度消失",
-      description: "反向传播时梯度可直接沿跳跃连接回传，避免被多个非线性层连续收缩。",
-    },
-    {
-      title: "深层网络训练",
-      description: "ResNet 等架构借助残差连接成功训练数百甚至上千层网络。",
-    }
+        {
+          title: "残差块",
+          description: "输出为输入与变换后的特征相加，保留恒等映射的梯度传播路径。",
+          formula: "y = \\mathcal{F}(x, \\{W_i\\}) + x",
+        },
+        {
+          title: "残差 Jacobian",
+          description: "对输入求导得到 I + ∂F/∂x。其特征值在 1 附近时，梯度在反向传播中不易衰减；但若 F≈-x，整体 Jacobian 仍可能退化。",
+          formula: "\\frac{\\partial y}{\\partial x} = I + \\frac{\\partial \\mathcal{F}}{\\partial x}",
+        },
+        {
+          title: "深层网络训练",
+          description: "ResNet 等架构借助残差连接成功训练数百甚至上千层网络，但仍需配合合适的初始化、优化器与正则化。",
+        },
       ]}
       learningObjectives={[
-      "理解 残差块 的含义与作用。",
-      "理解 缓解梯度消失 的含义与作用。",
-      "理解 深层网络训练 的含义与作用。"
-    ]}
-      coreIntuition={"残差连接通过跳跃映射让网络学习残差函数 F(x)=H(x)-x，缓解深层网络的梯度消失与退化问题。"}
+        "理解残差块的前向形式与 Jacobian 结构。",
+        "能解释为什么 I + ∂F/∂x 有助于保持梯度幅值。",
+        "认识残差连接并非万能，存在退化分支等反例。",
+      ]}
+      coreIntuition={"残差连接把学习目标从‘直接逼近 H(x)’变成‘逼近残差 F(x)=H(x)-x’；其 Jacobian 保留一个单位阵项，使梯度多了一条稳定回传路径。"}
       commonMistakes={[
-      "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
-      "只关注公式写法，却不检验推导前提或代入具体数值验证。"
-    ]}
+        "把残差连接当成无条件解决梯度消失的方案，忽略 F≈-x 时 Jacobian 退化的可能性。",
+        "只记住 y=x+F(x) 的公式，而不理解 I+∂F/∂x 的 Jacobian 含义。",
+        "认为加入残差连接后就不需要关注初始化或学习率。",
+      ]}
       quiz={[
-      {
-        question: "下列关于“残差块”的叙述，哪一项最准确？",
-        options: ["输出为输入与变换后的特征相加，保留恒等映射的梯度传播路径。", "残差块 只是术语，没有独立建模意义。", "残差块 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。输出为输入与变换后的特征相加，保留恒等映射的梯度传播路径。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“缓解梯度消失”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要模型足够复杂，数据分布的形状就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。缓解梯度消失 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“深层网络训练”的结果与预期不符，应优先排查哪些前提？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。深层网络训练 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
+        {
+          question: "残差块 y = x + F(x) 对输入的 Jacobian 是什么？",
+          options: [
+            "I + ∂F/∂x",
+            "∂F/∂x",
+            "I - ∂F/∂x",
+            "F(x)/x",
+          ],
+          correctIndex: 0,
+          explanation: "对 y = x + F(x) 求导，单位阵来自 x 的梯度，再加上 F 的 Jacobian。",
+        },
+        {
+          question: "为什么残差 Jacobian 有助于缓解梯度消失？",
+          options: [
+            "它保留了一个单位阵项，使梯度可以沿跳跃连接直接回传",
+            "它自动把激活值缩放到 0 附近",
+            "它消除了所有非线性",
+            "它让网络层数不再重要",
+          ],
+          correctIndex: 0,
+          explanation: "I + ∂F/∂x 的特征值在 1 附近时，连乘后的梯度幅值不易指数衰减。",
+        },
+        {
+          question: "残差连接是否总是有效？",
+          options: [
+            "不是；若 F≈-x，整体 Jacobian 接近 0，梯度仍可能消失",
+            "是，只要使用残差连接就绝不会梯度消失",
+            "只对 CNN 有效",
+            "只在浅层网络有效",
+          ],
+          correctIndex: 0,
+          explanation: "残差连接提供了梯度稳定的可能性，但不是无条件保证；退化分支就是一个反例。",
+        },
+      ]}
       bishopMapping={{
-      chapter: "Ch 9",
-      section: "9.5",
-      pages: "Ch 9",
-      textbookSubsections: [
-          "9.5 Residual Connections"
+        chapter: "Ch 9",
+        section: "9.5",
+        pages: "Ch 9",
+        textbookSubsections: ["9.5 Residual Connections"],
+        formulas: ["y = F(x) + x", "\\partial y/\\partial x = I + \\partial F/\\partial x"],
+        algorithms: ["深层网络训练"],
+        exercises: [
+          "推导残差块的 Jacobian。",
+          "对比堆叠残差块与无残差块的回传梯度范数。",
+          "讨论 F≈-x 时残差连接为何失效。",
         ],
-      formulas: ["残差块公式"],
-      algorithms: ["深层网络训练"],
-      exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
-    }}
-          demo={{
-      title: "残差块的恒等梯度",
-      label: "层数 L",
-      param: 10,
-      min: 1,
-      max: 50,
-      step: 1,
-      compute: (L) => ({
-        label: '普通梯度衰减',
-        value: 0.9 ** L,
-        display: String.raw`0.9^{${L.toFixed(0)}}=${(0.9 ** L).toFixed(4)}`,
-      }),
-      formula: String.raw`\text{普通梯度} \propto \alpha^L`,
-    }}
+      }}
+      interactiveDemo={<ResidualJacobianLab />}
     />
   );
 }

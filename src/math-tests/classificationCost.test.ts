@@ -41,4 +41,19 @@ describe('classificationCost', () => {
   it('predicts negative when false-positive cost dominates', () => {
     expect(optimalAction(0.7, 9, 1)).toBe('negative');
   });
+
+  it('risk curves stay within the common y-scale [0, max(cFP, cFN)]', () => {
+    const cFP = 5;
+    const cFN = 1;
+    const maxRisk = Math.max(cFP, cFN);
+    for (let i = 0; i <= 20; i++) {
+      const p = i / 20;
+      const rp = riskPositive(p, cFP, cFN);
+      const rn = riskNegative(p, cFP, cFN);
+      expect(rp).toBeGreaterThanOrEqual(0);
+      expect(rn).toBeGreaterThanOrEqual(0);
+      expect(rp).toBeLessThanOrEqual(maxRisk);
+      expect(rn).toBeLessThanOrEqual(maxRisk);
+    }
+  });
 });

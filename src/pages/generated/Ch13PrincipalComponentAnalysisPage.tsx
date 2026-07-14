@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import PCALab from '@/components/demos/PCALab';
 import { Shrink } from 'lucide-react';
 
 export default function Ch13PrincipalComponentAnalysisPage() {
@@ -15,12 +16,12 @@ export default function Ch13PrincipalComponentAnalysisPage() {
         {
           title: "特征分解",
           description: "PCA 等价于对数据协方差矩阵做特征分解，特征向量即主方向，特征值即方差。",
-          formula: String.raw`S \mathbf{u}_i = \lambda_i \mathbf{u}_i`,
+          formula: "S \\mathbf{u}_i = \\lambda_i \\mathbf{u}_i",
         },
         {
           title: "最小重构误差",
           description: "保留前 M 个主成分时，重构误差最小，等于被丢弃特征值之和。",
-          formula: String.raw`J_M = \sum_{i=M+1}^{D} \lambda_i`,
+          formula: "J_M = \\sum_{i=M+1}^{D} \\lambda_i",
         },
         {
           title: "数据白化",
@@ -36,7 +37,7 @@ export default function Ch13PrincipalComponentAnalysisPage() {
         "能通过对协方差矩阵特征分解得到主成分。",
         "了解 PCA 在降维、去噪与白化中的应用。",
       ]}
-      coreIntuition={"PCA 把数据‘压扁’到最能区分样本的方向上；方向越重要，数据在该方向上展开得越开。"}
+      coreIntuition={"PCA 把数据‘压扁’到方差最大的方向上；方向越重要，数据在该方向上展开得越开。它并不保证保留对下游任务最有判别性的信息。"}
       commonMistakes={[
         "在使用 PCA 前忘记对数据中心化，导致主方向偏移。",
         "把 PCA 当作有监督特征选择方法；它是无监督的。",
@@ -82,11 +83,12 @@ export default function Ch13PrincipalComponentAnalysisPage() {
           "16.1.2 Minimum-error formulation",
           "16.1.3 Data compression",
           "16.1.4 Data whitening",
-          "16.1.5 High-dimensional data"
+          "16.1.5 High-dimensional data",
         ],
         formulas: ["S u_i = λ_i u_i", "J_M = Σ_{i>M} λ_i"],
         exercises: ["证明最大方差方向与最小重构误差方向一致。", "对二维相关高斯数据计算主成分。"],
       }}
+      interactiveDemo={<PCALab />}
     />
   );
 }

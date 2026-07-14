@@ -19,8 +19,14 @@ export default function Ch15AutoregressiveFlowsPage() {
           formula: String.raw`\ln \left|\det \frac{\partial \mathbf{x}}{\partial \mathbf{z}}\right| = \sum_{i=1}^{D} \ln \left|\frac{\partial x_i}{\partial z_i}\right|`,
         },
         {
-          title: "MAF 与 IAF",
-          description: "MAF 按数据维度顺序建模，密度估计只需一次前向传播；IAF 反序从基变量生成数据，采样并行高效。",
+          title: "MAF：密度估计方向快",
+          description: "Masked Autoregressive Flow 沿数据维度顺序 x_i = μ_i(x_{<i}) + σ_i(x_{<i}) z_i 建模。对给定数据 x，所有条件概率可并行计算，因此密度估计高效；采样需要逐维顺序生成。",
+          formula: String.raw`x_i = \mu_i(\mathbf{x}_{<i}) + \sigma_i(\mathbf{x}_{<i})\,z_i`,
+        },
+        {
+          title: "IAF：采样方向快",
+          description: "Inverse Autoregressive Flow 反用同一依赖结构从基变量 z 并行生成数据 x；但对任意 x 求密度需要按生成顺序逐个求逆，因此密度评估是串行的。",
+          formula: String.raw`x_i = \mu_i(\mathbf{z}_{<i}) + \sigma_i(\mathbf{z}_{<i})\,z_i`,
         },
         {
           title: "Masked 自回归网络",
