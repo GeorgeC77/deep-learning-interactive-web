@@ -248,6 +248,132 @@ describe('attention', () => {
     });
     expect(Math.max(...metrics)).toBeGreaterThan(1e-6);
   });
+
+  it('each head score uses its own d_k (single 4D head divides by sqrt(4))', () => {
+    const X = [[1, 0, 0, 0], [0, 1, 0, 0]];
+    const wq = [[[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]];
+    const wk = [[[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]];
+    const wv = [[[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]];
+    const wo = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
+    const result = multiHeadAttention(X, wq, wk, wv, wo, false);
+    const score00 = result.headOutputs[0].scores[0][0];
+    // Q[0] = [1,0,0,0], K[0] = [1,0,0,0] => dot = 1, scaled by sqrt(4)=2 => 0.5
+    expect(score00).toBeCloseTo(0.5, 8);
+  });
+
+  it('each head score uses its own d_k (two 2D heads divide by sqrt(2))', () => {
+    const X = [[1, 0, 0, 0], [0, 1, 0, 0]];
+    const wq = [
+      [[1, 0], [0, 1], [0, 0], [0, 0]],
+      [[0, 0], [0, 0], [1, 0], [0, 1]],
+    ];
+    const wk = [
+      [[1, 0], [0, 1], [0, 0], [0, 0]],
+      [[0, 0], [0, 0], [1, 0], [0, 1]],
+    ];
+    const wv = [
+      [[1, 0], [0, 1], [0, 0], [0, 0]],
+      [[0, 0], [0, 0], [1, 0], [0, 1]],
+    ];
+    const wo = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]];
+    const result = multiHeadAttention(X, wq, wk, wv, wo, false);
+    // head 0: Q[0]=[1,0], K[0]=[1,0] => dot=1, scaled by sqrt(2) => ~0.7071
+    expect(result.headOutputs[0].scores[0][0]).toBeCloseTo(1 / Math.sqrt(2), 8);
+    // head 1: Q[0]=[0,0], K[0]=[0,0] => dot=0
+    expect(result.headOutputs[1].scores[0][0]).toBeCloseTo(0, 8);
+  });
+
+  it('changing head 1 weights does not directly change head 2 attention', () => {
+    const dModel = 4, dK = 2, N = 3;
+    const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, (_, j) => (i + 1) * (j + 1) / 10));
+    const baseWQ1 = makeW(dModel, dK, 1);
+    const baseWQ2 = makeW(dModel, dK, 2);
+    const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
+    const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
+    const wo = makeW(dModel, dModel, 7);
+
+    const r1 = multiHeadAttention(X, [baseWQ1, baseWQ2], wk, wv, wo, false);
+    const r2 = multiHeadAttention(X, [baseWQ1, makeW(dModel, dK, 99)], wk, wv, wo, false);
+
+    // Head 0 attention should be identical; head 1 attention should differ.
+    expect(r1.headOutputs[0].attention).toEqual(r2.headOutputs[0].attention);
+    let maxDiff = 0;
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < N; j++) {
+        maxDiff = Math.max(maxDiff, Math.abs(r1.headOutputs[1].attention[i][j] - r2.headOutputs[1].attention[i][j]));
+      }
+    }
+    expect(maxDiff).toBeGreaterThan(1e-6);
+  });
+
+  it('output equals concat(head outputs) multiplied by W_O', () => {
+    const dModel = 6, dK = 3, N = 4;
+    const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, () => (i + 1) / 10));
+    const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
+    const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
+    const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
+    const wo = makeW(dModel, dModel, 7);
+    const result = multiHeadAttention(X, wq, wk, wv, wo, false);
+    const concat: number[][] = [];
+    for (let i = 0; i < N; i++) {
+      concat.push([...result.headOutputs[0].headOut[i], ...result.headOutputs[1].headOut[i]]);
+    }
+    const expected = matMul(concat, wo);
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < dModel; j++) {
+        expect(result.finalOutput[i][j]).toBeCloseTo(expected[i][j], 8);
+      }
+    }
+  });
+
+  it('implementation matches a manual numerical example', () => {
+    // N=2, dModel=2, H=2, dK=1.
+    // X = [[1,0],[0,1]], identity projection weights per head.
+    const X = [[1, 0], [0, 1]];
+    const wq = [[[1], [0]], [[0], [1]]];
+    const wk = [[[1], [0]], [[0], [1]]];
+    const wv = [[[1], [0]], [[0], [1]]];
+    const wo = [[1, 0], [0, 1]];
+
+    const result = multiHeadAttention(X, wq, wk, wv, wo, false);
+    const sigmoid = (x: number) => 1 / (1 + Math.exp(-x));
+    // head 0: token 0 attends [sigmoid(1), sigmoid(-1)]; token 1 attends [0.5, 0.5].
+    expect(result.headOutputs[0].attention[0][0]).toBeCloseTo(sigmoid(1), 8);
+    expect(result.headOutputs[0].attention[0][1]).toBeCloseTo(sigmoid(-1), 8);
+    expect(result.headOutputs[0].attention[1][0]).toBeCloseTo(0.5, 8);
+    expect(result.headOutputs[0].attention[1][1]).toBeCloseTo(0.5, 8);
+    // head 0 outputs (V selects first dimension)
+    expect(result.headOutputs[0].headOut[0][0]).toBeCloseTo(sigmoid(1), 8);
+    expect(result.headOutputs[0].headOut[1][0]).toBeCloseTo(0.5, 8);
+    // head 1 is symmetric on the second dimension and uses its own weights
+    expect(result.headOutputs[1].attention[0][0]).toBeCloseTo(0.5, 8);
+    expect(result.headOutputs[1].attention[0][1]).toBeCloseTo(0.5, 8);
+    expect(result.headOutputs[1].attention[1][0]).toBeCloseTo(sigmoid(-1), 8);
+    expect(result.headOutputs[1].attention[1][1]).toBeCloseTo(sigmoid(1), 8);
+    expect(result.headOutputs[1].headOut[0][0]).toBeCloseTo(0.5, 8);
+    expect(result.headOutputs[1].headOut[1][0]).toBeCloseTo(sigmoid(1), 8);
+    // final output = concat * W_O
+    expect(result.finalOutput[0][0]).toBeCloseTo(sigmoid(1), 8);
+    expect(result.finalOutput[0][1]).toBeCloseTo(0.5, 8);
+    expect(result.finalOutput[1][0]).toBeCloseTo(0.5, 8);
+    expect(result.finalOutput[1][1]).toBeCloseTo(sigmoid(1), 8);
+  });
+
+  it('formula and code agree: Q equals X multiplied by W_Q (column convention)', () => {
+    const dModel = 4, dK = 2, N = 3;
+    const X = Array.from({ length: N }, (_, i) => Array.from({ length: dModel }, (_, j) => (i + 1) * (j + 1)));
+    const wq = [makeW(dModel, dK, 1), makeW(dModel, dK, 2)];
+    const wk = [makeW(dModel, dK, 3), makeW(dModel, dK, 4)];
+    const wv = [makeW(dModel, dK, 5), makeW(dModel, dK, 6)];
+    const wo = makeW(dModel, dModel, 7);
+    const result = multiHeadAttention(X, wq, wk, wv, wo, false);
+    const expectedQ0 = matMul(X, wq[0]);
+    for (let i = 0; i < N; i++) {
+      for (let j = 0; j < dK; j++) {
+        expect(result.headOutputs[0].Q[i][j]).toBeCloseTo(expectedQ0[i][j], 8);
+      }
+    }
+  });
 });
 
 function mulberry32(a: number) {

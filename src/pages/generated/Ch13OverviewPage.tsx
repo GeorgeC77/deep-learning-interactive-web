@@ -1,12 +1,53 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { Shrink } from 'lucide-react';
 
+const ModelComparisonTable = () => (
+  <div className="overflow-x-auto">
+    <table className="w-full text-sm border-collapse">
+      <thead>
+        <tr className="bg-gray-50">
+          <th className="border px-2 py-1 text-left">模型</th>
+          <th className="border px-2 py-1 text-left">推断（Inference）</th>
+          <th className="border px-2 py-1 text-left">生成（Generation）</th>
+          <th className="border px-2 py-1 text-left">是否需要可逆映射</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td className="border px-2 py-1">VAE</td>
+          <td className="border px-2 py-1">编码器近似后验 q(z|x)</td>
+          <td className="border px-2 py-1">解码器 p_θ(x|z)</td>
+          <td className="border px-2 py-1">否</td>
+        </tr>
+        <tr>
+          <td className="border px-2 py-1">GAN</td>
+          <td className="border px-2 py-1">通常无显式编码器</td>
+          <td className="border px-2 py-1">生成器 G(z)</td>
+          <td className="border px-2 py-1">否</td>
+        </tr>
+        <tr>
+          <td className="border px-2 py-1">Normalizing Flow</td>
+          <td className="border px-2 py-1">z = f^{-1}(x)</td>
+          <td className="border px-2 py-1">x = f(z)</td>
+          <td className="border px-2 py-1">是</td>
+        </tr>
+        <tr>
+          <td className="border px-2 py-1">Autoregressive</td>
+          <td className="border px-2 py-1">{'逐维度推断 p(x_i|x_{<i})'}</td>
+          <td className="border px-2 py-1">逐维度采样</td>
+          <td className="border px-2 py-1">否</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+
 export default function Ch13OverviewPage() {
   return (
     <BishopSectionPage
       sectionPath="/ch13/overview"
       heroIcon={<Shrink className="w-9 h-9 text-blue-600" />}
-      summary={"连续隐变量模型假设观测数据由低维连续隐变量经线性或非线性变换生成。PCA、因子分析、概率 PCA 与 VAE 都属此框架。"}
+      summary={"连续隐变量模型假设观测数据由低维连续隐变量经线性或非线性变换生成。PCA、因子分析、概率 PCA 与 VAE 都属此框架；推断与生成不必互为逆映射。"}
       concepts={[
         {
           title: "隐变量动机",
@@ -24,17 +65,23 @@ export default function Ch13OverviewPage() {
           title: "非线性扩展",
           description: "神经网络可参数化非线性编码器与解码器，形成 VAE 等深度生成模型。",
         },
+        {
+          title: "推断与生成",
+          description: <ModelComparisonTable />,
+        },
       ]}
       learningObjectives={[
         "理解连续隐变量模型的基本假设。",
         "区分线性隐变量模型与非线性深度生成模型。",
         "了解隐变量模型在降维与生成中的统一视角。",
+        "认识编码器与解码器不必互为逆映射。",
       ]}
-      coreIntuition={"连续隐变量模型把高维数据点看成低维隐空间经过某种映射并加噪声后的投影；降维就是找映射，生成就是逆映射。"}
+      coreIntuition={"连续隐变量模型把高维数据点看成低维隐空间经过某种映射并加噪声后的投影。推断是从观测估计或采样隐变量；生成是从先验采样隐变量再通过模型生成观测。解码器可以是随机的，也只有标准化流才要求可逆映射。"}
       commonMistakes={[
         "把 PCA 与概率 PCA 混为一谈；前者是确定性优化，后者是概率模型。",
         "认为隐变量模型一定需要可计算的 p(x)；VAE 用 ELBO 近似处理难解积分。",
         "忽视线性模型对非线性流形数据的局限性。",
+        "把降维/生成立刻等同于“找映射/逆映射”；多数深度生成模型中编码器与解码器并不互逆。",
       ]}
       quiz={[
         {
@@ -60,15 +107,26 @@ export default function Ch13OverviewPage() {
           explanation: "PCA 寻找最大方差方向；概率 PCA 假设线性高斯生成过程，可导出似然函数。",
         },
         {
-          question: "当数据分布在高维空间的非线性流形上时，哪种方法更合适？",
+          question: "下列哪类生成模型必须具有可逆映射？",
           options: [
-            "非线性隐变量模型，如 VAE。",
-            "标准 PCA。",
-            "线性回归。",
-            "k-means 聚类。",
+            "标准化流（Normalizing Flow）。",
+            "VAE。",
+            "GAN。",
+            "自回归模型。",
           ],
           correctIndex: 0,
-          explanation: "非线性模型通过神经网络参数化复杂映射，能捕捉线性方法无法表示的流形结构。",
+          explanation: "只有标准化流通过可逆变换直接计算 p(x)；VAE、GAN 与自回归模型都不要求编码器/生成器可逆。",
+        },
+        {
+          question: "在 VAE 中，推断与生成通常由什么完成？",
+          options: [
+            "编码器近似 q(z|x)，解码器定义 p_θ(x|z)。",
+            "编码器与解码器必须互为逆函数。",
+            "解码器直接给出 p(z|x)。",
+            "编码器直接生成样本。",
+          ],
+          correctIndex: 0,
+          explanation: "VAE 用编码器近似后验，用解码器定义生成分布；二者不必互逆。",
         },
       ]}
       bishopMapping={{

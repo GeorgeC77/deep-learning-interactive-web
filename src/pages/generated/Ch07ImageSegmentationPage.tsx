@@ -1,5 +1,7 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import UnetDemo from '@/components/demos/UnetDemo';
+import TranslationEquivarianceLab from '@/components/demos/TranslationEquivarianceLab';
+import { outputSizeFormulaLatex, frameworkSameFormulaLatex } from '@/lib/math/conv';
 import { Scissors } from 'lucide-react';
 
 export default function Ch07ImageSegmentationPage() {
@@ -7,7 +9,7 @@ export default function Ch07ImageSegmentationPage() {
     <BishopSectionPage
       sectionPath="/ch07/image-segmentation"
       heroIcon={<Scissors className="w-9 h-9 text-blue-600" />}
-      summary={"图像分割为每个像素分配类别标签。全卷积网络用卷积替代全连接层，可接受任意尺寸输入；U-Net 通过编码器-解码器结构与跳跃连接恢复精细边界。"}
+      summary={"图像分割为每个像素分配类别标签。全卷积网络用卷积、池化与上采样替代全连接层，可接受可变空间尺寸输入；U-Net 通过编码器-解码器结构与跳跃连接恢复精细边界。"}
       concepts={[
         {
           title: "全卷积网络 FCN",
@@ -22,13 +24,13 @@ export default function Ch07ImageSegmentationPage() {
           description: "编码器下采样提取语义，解码器上采样恢复空间，跳跃连接保留高分辨率细节。",
         },
         {
-          title: "置换等变与任意尺寸",
-          description: "由于只含卷积操作，网络对输入尺寸的依赖是线性的，卷积核数量固定。",
-          formula: String.raw`H_{\text{out}} = \left\lfloor \frac{H_{\text{in}} + 2P - K}{S} \right\rfloor + 1`,
+          title: "平移等变与可变空间尺寸",
+          description: "卷积在兼容边界条件下具有平移等变性；池化、步幅、填充与裁剪会破坏精确等变性。FCN 包含卷积、池化与上采样，可处理可变空间尺寸，但任意像素置换不是其对称性。",
+          formula: outputSizeFormulaLatex,
         },
       ]}
       learningObjectives={[
-        "理解全卷积网络为何能处理任意尺寸输入。",
+        "理解全卷积网络为何能处理可变空间尺寸输入。",
         "能描述 U-Net 的编码器-解码器-跳跃连接结构。",
         "区分语义分割与实例分割的评价指标。",
       ]}
@@ -37,10 +39,11 @@ export default function Ch07ImageSegmentationPage() {
         "在分割网络末尾保留全连接层，导致只能接受固定尺寸输入。",
         "认为上采样只是简单插值，忽略转置卷积可学习参数的作用。",
         "跳跃连接把编码器与解码器特征直接相加而不考虑通道对齐。",
+        "把 CNN 的平移等变性错误地推广为任意像素置换等变性。",
       ]}
       quiz={[
         {
-          question: "FCN 能处理任意尺寸输入的根本原因是？",
+          question: "FCN 能处理可变尺寸输入的根本原因是？",
           options: [
             "网络只包含卷积、池化与上采样，没有全连接层。",
             "输入图像总是先被缩放到固定尺寸。",
@@ -78,10 +81,11 @@ export default function Ch07ImageSegmentationPage() {
           "10.5.2 Up-sampling",
           "10.5.4 The U-net architecture"
         ],
-        formulas: ["卷积输出尺寸公式", "上采样分辨率关系"],
+        formulas: [outputSizeFormulaLatex, frameworkSameFormulaLatex, "上采样分辨率关系"],
         algorithms: ["全卷积网络 FCN", "U-Net 编码器-解码器"],
         exercises: ["画出 U-Net 的结构框图并标注 skip connection。", "用不同输入尺寸测试 FCN 输出尺寸。"],
       }}
+      interactiveDemo={<TranslationEquivarianceLab />}
       extraContent={<UnetDemo />}
     />
   );

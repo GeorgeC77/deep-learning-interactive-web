@@ -17,6 +17,14 @@ export function computeOutputSize(I: number, K: number, P: number, S: number): n
   return Math.floor((I + 2 * P - K) / S) + 1;
 }
 
+export const outputSizeFormulaLatex = String.raw`O = \left\lfloor \frac{I + 2P - K}{S} \right\rfloor + 1`;
+
+/**
+ * "Classic" SAME convolution: stride 1 and output equals input.
+ * This is the mathematical special case, not the framework convention.
+ */
+export const classicSameFormulaLatex = String.raw`O = I \quad (S=1,\ P = \frac{K-1}{2}\ \text{当 } K \text{ 为奇数})`;
+
 /**
  * TensorFlow / PyTorch SAME padding for 1D convolution.
  *   O = ceil(I / S)
@@ -30,6 +38,13 @@ export function computeSamePadding(I: number, K: number, S: number): SamePadding
   const left = Math.floor(total / 2);
   const right = total - left;
   return { left, right, total, outputSize };
+}
+
+export const frameworkSameFormulaLatex = String.raw`O = \left\lceil \frac{I}{S} \right\rceil`;
+
+export function frameworkSamePaddingFormulaLatex(I: number, K: number, S: number): string {
+  const { outputSize, total, left, right } = computeSamePadding(I, K, S);
+  return String.raw`O=${outputSize},\ P_{\text{total}}=${total},\ P_{\text{left}}=${left},\ P_{\text{right}}=${right}`;
 }
 
 export interface CustomPadding {

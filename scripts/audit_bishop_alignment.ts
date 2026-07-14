@@ -42,6 +42,15 @@ const SEMANTIC_TEMPLATE_REGEXES: RegExp[] = [
   /只要.*足够.*就不重要/,
 ];
 
+const P0_SEMANTIC_REGEXES: RegExp[] = [
+  /降维就是找映射，生成就是逆映射/,
+  /定位对分类决策最重要的区域/,
+  /置换等变与任意尺寸/,
+  /由于只含卷积操作/,
+  /若不整除才出现下采样/,
+  /伪多头/,
+];
+
 const WRONG_FORMULA_REGEXES = [
   /p_x\s*=\s*p_z\s*-\s*ln\s*\|\s*det\s*J\s*\|/i,
   /p_x\(x\)\s*=\s*p_z\(z\)\s*-\s*ln\s*\|\s*det\s*J\s*\|/i,
@@ -204,6 +213,7 @@ type ConceptCoverageRow = { componentFile: string; routePath: string; note: stri
 type SupplementalTopicRow = { componentFile: string; routePath: string; topic: string; note: string };
 type OldTitleRow = { componentFile: string; routePath: string; match: string };
 type MissingExpectedRow = { componentFile: string; routePath: string; missing: string };
+type P0SemanticRow = { componentFile: string; routePath: string; pattern: string };
 
 const invalidSubsectionRows: InvalidSubsectionRow[] = [];
 const templateRows: TemplateRow[] = [];
@@ -213,6 +223,7 @@ const conceptCoverageRows: ConceptCoverageRow[] = [];
 const supplementalTopicRows: SupplementalTopicRow[] = [];
 const oldTitleRows: OldTitleRow[] = [];
 const missingExpectedRows: MissingExpectedRow[] = [];
+const p0SemanticRows: P0SemanticRow[] = [];
 
 for (const file of generatedFiles) {
   const fullPath = path.join(generatedDir, file);
@@ -378,6 +389,12 @@ for (const file of generatedFiles) {
       oldTitleRows.push({ componentFile: `src/pages/generated/${file}`, routePath, match: match[0] });
     }
   }
+
+  for (const re of P0_SEMANTIC_REGEXES) {
+    if (re.test(text)) {
+      p0SemanticRows.push({ componentFile: `src/pages/generated/${file}`, routePath, pattern: re.source });
+    }
+  }
 }
 
 // ---------- Write route audit report ----------
@@ -483,6 +500,15 @@ const invalidMd = [
         ...conceptCoverageRows.map((r) => `| ${r.componentFile} | ${r.routePath} | ${r.note} |`),
       ]
     : ['None.']),
+  '',
+  '### P0 semantic issues',
+  ...(p0SemanticRows.length
+    ? [
+        '| componentFile | routePath | pattern |',
+        '|---------------|-----------|---------|',
+        ...p0SemanticRows.map((r) => `| ${r.componentFile} | ${r.routePath} | ${r.pattern} |`),
+      ]
+    : ['None.']),
 ].join('\n');
 fs.writeFileSync('reports/invalid_bishop_subsections_report.md', invalidMd, 'utf8');
 
@@ -494,6 +520,17 @@ for (const sec of getAllSections()) {
   statusSummary[sec.status] = (statusSummary[sec.status] ?? 0) + 1;
 }
 
+const teachingReadyPaths = new Set(getAllSections().filter((s) => s.status === 'teaching-ready').map((s) => s.path));
+
+function isTeachingReadyRoute(routePath: string): boolean {
+  return teachingReadyPaths.has(routePath);
+}
+
+const teachingReadySemanticFatal =
+  p0SemanticRows.length +
+  semanticTemplateRows.filter((r) => isTeachingReadyRoute(r.routePath)).length +
+  conceptCoverageRows.filter((r) => isTeachingReadyRoute(r.routePath)).length;
+
 const fatalIssues =
   invalidSubsectionRows.length +
   missingExpectedRows.length +
@@ -501,7 +538,8 @@ const fatalIssues =
   templateRows.length +
   supplementalTopicRows.length +
   oldTitleRows.length +
-  seriousRouteIssues;
+  seriousRouteIssues +
+  teachingReadySemanticFatal;
 
 const coverageMd = [
   '# Coverage Report',
@@ -519,6 +557,8 @@ const coverageMd = [
   `Supplemental topic issues: ${supplementalTopicRows.length}`,
   `Old chapter references: ${oldTitleRows.length}`,
   `Concept coverage warnings: ${conceptCoverageRows.length}`,
+  `P0 semantic issues: ${p0SemanticRows.length}`,
+  `Teaching-ready semantic fatal issues: ${teachingReadySemanticFatal}`,
   '',
   '## Status Summary',
   '',
@@ -540,6 +580,8 @@ console.log(`Semantic template warnings: ${semanticTemplateRows.length}`);
 console.log(`Supplemental topic issues: ${supplementalTopicRows.length}`);
 console.log(`Old chapter references: ${oldTitleRows.length}`);
 console.log(`Concept coverage warnings: ${conceptCoverageRows.length}`);
+console.log(`P0 semantic issues: ${p0SemanticRows.length}`);
+console.log(`Teaching-ready semantic fatal issues: ${teachingReadySemanticFatal}`);
 
 if (fatalIssues > 0) {
   process.exit(1);

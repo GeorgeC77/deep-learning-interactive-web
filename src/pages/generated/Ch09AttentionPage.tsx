@@ -7,6 +7,7 @@ import InteractiveDemo from '@/components/InteractiveDemo';
 import KaTeX from '@/components/KaTeX';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { multiHeadAttention } from '@/lib/math/attention';
 import { getSectionByPath, getAllSections } from '@/course/manifest';
 import { Link } from 'react-router-dom';
 
@@ -18,60 +19,59 @@ const EMBEDDINGS = [
   [0.2, 1.0, 0.3, 0.1],
   [0.1, 0.3, 1.0, 0.2],
 ];
+const D_MODEL = 4;
 const D_K = 2;
 const H = 2;
 
-// Fixed learned projection weights for the advanced demo (D x D)
-const W_Q = [
-  [0.5, -0.2, 0.1, 0.0],
-  [0.3, 0.4, -0.1, 0.2],
-  [-0.1, 0.2, 0.6, 0.1],
-  [0.0, 0.1, -0.2, 0.5],
+// Per-head projection matrices: each W is dModel x dK.
+const WQ_HEADS = [
+  [
+    [0.5, -0.2],
+    [0.3, 0.4],
+    [-0.1, 0.2],
+    [0.0, 0.1],
+  ],
+  [
+    [0.2, 0.1],
+    [-0.1, 0.3],
+    [0.4, -0.2],
+    [0.1, 0.5],
+  ],
 ];
-const W_K = [
+const WK_HEADS = [
+  [
+    [0.4, 0.1],
+    [-0.2, 0.5],
+    [0.1, -0.1],
+    [0.2, 0.0],
+  ],
+  [
+    [0.1, -0.1],
+    [0.0, 0.4],
+    [0.3, 0.2],
+    [-0.1, 0.3],
+  ],
+];
+const WV_HEADS = [
+  [
+    [0.6, 0.0],
+    [0.1, 0.5],
+    [-0.1, 0.1],
+    [0.0, 0.2],
+  ],
+  [
+    [0.3, -0.1],
+    [0.2, 0.4],
+    [0.5, 0.0],
+    [-0.2, 0.6],
+  ],
+];
+const WO = [
   [0.4, 0.1, -0.1, 0.2],
-  [-0.2, 0.5, 0.1, 0.0],
-  [0.1, -0.1, 0.4, 0.2],
-  [0.2, 0.0, 0.1, 0.5],
+  [-0.1, 0.5, 0.2, 0.0],
+  [0.2, 0.0, 0.3, 0.1],
+  [0.0, 0.1, -0.1, 0.4],
 ];
-const W_V = [
-  [0.6, 0.0, 0.1, -0.1],
-  [0.1, 0.5, 0.2, 0.0],
-  [-0.1, 0.1, 0.6, 0.2],
-  [0.0, 0.2, -0.1, 0.5],
-];
-
-function matMul(A: number[][], B: number[][]): number[][] {
-  const n = A.length;
-  const m = B[0].length;
-  const p = B.length;
-  const C = Array.from({ length: n }, () => Array(m).fill(0));
-  for (let i = 0; i < n; i++) {
-    for (let j = 0; j < m; j++) {
-      for (let k = 0; k < p; k++) {
-        C[i][j] += A[i][k] * B[k][j];
-      }
-    }
-  }
-  return C;
-}
-
-function transpose(A: number[][]): number[][] {
-  return A[0].map((_, j) => A.map((row) => row[j]));
-}
-
-function softmaxRows(A: number[][]): number[][] {
-  return A.map((row) => {
-    const max = Math.max(...row);
-    const exps = row.map((v) => Math.exp(v - max));
-    const sum = exps.reduce((a, b) => a + b, 0);
-    return exps.map((e) => e / sum);
-  });
-}
-
-function scaleMatrix(A: number[][], s: number): number[][] {
-  return A.map((row) => row.map((v) => v * s));
-}
 
 function formatMatrix(A: number[][], digits = 2) {
   return A.map((row) => row.map((v) => v.toFixed(digits)).join(' ')).join(' \\ ');
@@ -90,9 +90,12 @@ export default function Ch09AttentionPage() {
   const [advanced, setAdvanced] = useState(false);
   const [seqLen, setSeqLen] = useState(8);
   const [embedDim, setEmbedDim] = useState(64);
-  const [quizAnswers, setQuizAnswers] = useState<Record<number, number | null>>({});
 
-  // Toy scalar demo
+  const [quizStates, setQuizStates] = useState(
+    Array.from({ length: 3 }, () => ({ selected: null as number | null, submitted: false })),
+  );
+
+  // Toy scalar demo: single head with d_k = 3.
   const { attnMatrix: toyAttn, outputs: toyOutputs } = useMemo(() => {
     const queries = EMBEDDINGS.map((e) => e.slice(0, 3).map((v) => v * wq));
     const keys = EMBEDDINGS.map((e) => e.slice(0, 3).map((v) => v * wk));
@@ -118,29 +121,11 @@ export default function Ch09AttentionPage() {
 
   const maxWeight = Math.max(...toyAttn.flat(), 0.01);
 
-  // Advanced matrix demo
-  const advancedResults = useMemo(() => {
-    const Q = matMul(EMBEDDINGS, transpose(W_Q));
-    const K = matMul(EMBEDDINGS, transpose(W_K));
-    const V = matMul(EMBEDDINGS, transpose(W_V));
-    const scores = matMul(Q, transpose(K));
-    const scaledScores = scaleMatrix(scores, 1 / Math.sqrt(D_K));
-    const attn = softmaxRows(scaledScores);
-    const out = matMul(attn, V);
-
-    // Multi-head split: D=4, H=2 => each head D_k=2
-    const headQ = Array.from({ length: H }, (_, h) =>
-      Q.map((row) => row.slice(h * D_K, (h + 1) * D_K))
-    );
-    const headK = Array.from({ length: H }, (_, h) =>
-      K.map((row) => row.slice(h * D_K, (h + 1) * D_K))
-    );
-    const headV = Array.from({ length: H }, (_, h) =>
-      V.map((row) => row.slice(h * D_K, (h + 1) * D_K))
-    );
-
-    return { Q, K, V, scores: scaledScores, attn, out, headQ, headK, headV };
-  }, []);
+  // Advanced matrix demo: real per-head attention using the shared math library.
+  const advancedResults = useMemo(
+    () => multiHeadAttention(EMBEDDINGS, WQ_HEADS, WK_HEADS, WV_HEADS, WO, false),
+    [],
+  );
 
   const quiz = [
     {
@@ -162,6 +147,24 @@ export default function Ch09AttentionPage() {
       explanation: '每个 token 都要与其他所有 token 计算相似度，因此主要计算复杂度为 O(N²D)。',
     },
   ];
+
+  const selectOption = (qIdx: number, oIdx: number) => {
+    setQuizStates((prev) =>
+      prev.map((state, idx) => (idx === qIdx && !state.submitted ? { ...state, selected: oIdx } : state)),
+    );
+  };
+
+  const submitQuiz = (qIdx: number) => {
+    setQuizStates((prev) =>
+      prev.map((state, idx) => (idx === qIdx ? { ...state, submitted: true } : state)),
+    );
+  };
+
+  const resetQuiz = (qIdx: number) => {
+    setQuizStates((prev) =>
+      prev.map((state, idx) => (idx === qIdx ? { selected: null, submitted: false } : state)),
+    );
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
@@ -271,7 +274,7 @@ export default function Ch09AttentionPage() {
         <FormulaCard
           title="缩放点积注意力"
           formula={String.raw`\text{Attention}(Q,K,V) = \text{softmax}\left(\frac{QK^{\!T}}{\sqrt{d_k}}\right)V`}
-          description="Q、K、V 分别由输入 X 经可学习权重矩阵 W_Q、W_K、W_V 线性投影得到。"
+          description="Q、K、V 分别由输入 X 经可学习权重矩阵 W_Q、W_K、W_V 线性投影得到；采用列约定时 W_Q 形状为 d_model × d_k，Q = X W_Q。"
         />
         <FormulaCard
           title="注意力系数"
@@ -280,8 +283,13 @@ export default function Ch09AttentionPage() {
         />
         <FormulaCard
           title="多头注意力"
-          formula={String.raw`\text{MultiHead}(Q,K,V) = \text{Concat}(\text{head}_1,\dots,\text{head}_h)W^O`}
-          description="每个 head 独立学习一组投影，拼接后再经输出矩阵 W^O 变换。"
+          formula={String.raw`\text{head}_h = \text{Attention}(X W_Q^{(h)}, X W_K^{(h)}, X W_V^{(h)})`}
+          description="每个 head 使用独立的投影矩阵 W_Q^{(h)}、W_K^{(h)}、W_V^{(h)}。"
+        />
+        <FormulaCard
+          title="多头输出"
+          formula={String.raw`\text{MultiHead}(X) = \text{Concat}(\text{head}_1,\dots,\text{head}_H)\,W^O`}
+          description="拼接各 head 输出后再经输出矩阵 W^O 变换，得到最终表示。"
         />
         <FormulaCard
           title="计算复杂度"
@@ -296,7 +304,7 @@ export default function Ch09AttentionPage() {
           <div className="flex items-center justify-between">
             <p className="text-gray-700">
               {advanced
-                ? '高级模式：展示完整的矩阵投影 Q=XW_Q、K=XW_K、V=XW_V、缩放点积、softmax 与输出。'
+                ? '高级模式：展示真正的多头计算。每个 head 有独立的 W_Q、W_K、W_V；每头独立求注意力矩阵，再拼接并乘以 W_O。'
                 : '简化的一维玩具演示：用标量权重调节查询、键、值，观察注意力系数矩阵与输出向量的变化。'}
             </p>
             <div className="flex items-center gap-2">
@@ -394,71 +402,77 @@ export default function Ch09AttentionPage() {
           ) : (
             <div className="space-y-6">
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-                提示：这是固定权重下的矩阵演示。输入 X 为 3×4，投影后 Q/K/V 为 3×4；多头拆分为 2 个 head，每个 head 的维度 d_k=2。
+                提示：本演示使用共享的 <code>multiHeadAttention</code> 实现。输入 X 为 {EMBEDDINGS.length}×{D_MODEL}，H={H}，d_k={D_K}；每个 head 的 W_Q/W_K/W_V 形状为 {D_MODEL}×{D_K}，W_O 形状为 {D_MODEL}×{D_MODEL}。
               </div>
 
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="space-y-1">
-                  <div className="font-medium text-gray-700">XW_Q = Q</div>
-                  <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
-                    <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.Q)}\\end{bmatrix}`} />
+              {advancedResults.headOutputs.map((head, h) => (
+                <div key={h} className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+                  <div className="font-medium text-gray-700 flex items-center gap-2">
+                    <Layers className="w-4 h-4" />
+                    Head {h + 1}
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-3 text-sm">
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-500">Q_h = X W_Q^{(h)}</div>
+                      <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
+                        <KaTeX math={`\\begin{bmatrix}${formatMatrix(head.Q)}\\end{bmatrix}`} />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-500">K_h = X W_K^{(h)}</div>
+                      <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
+                        <KaTeX math={`\\begin{bmatrix}${formatMatrix(head.K)}\\end{bmatrix}`} />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-500">V_h = X W_V^{(h)}</div>
+                      <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
+                        <KaTeX math={`\\begin{bmatrix}${formatMatrix(head.V)}\\end{bmatrix}`} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-3 text-sm">
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-500">S_h = Q_h K_h^T / √d_k</div>
+                      <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
+                        <KaTeX math={`\\begin{bmatrix}${formatMatrix(head.scores)}\\end{bmatrix}`} />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs text-gray-500">A_h = softmax(S_h)</div>
+                      <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
+                        <KaTeX math={`\\begin{bmatrix}${formatMatrix(head.attention)}\\end{bmatrix}`} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-1 text-sm">
+                    <div className="text-xs text-gray-500">O_h = A_h V_h</div>
+                    <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
+                      <KaTeX math={`\\begin{bmatrix}${formatMatrix(head.headOut)}\\end{bmatrix}`} />
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <div className="font-medium text-gray-700">XW_K = K</div>
-                  <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
-                    <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.K)}\\end{bmatrix}`} />
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <div className="font-medium text-gray-700">XW_V = V</div>
-                  <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
-                    <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.V)}\\end{bmatrix}`} />
-                  </div>
-                </div>
-              </div>
+              ))}
 
               <div className="grid md:grid-cols-2 gap-4 text-sm">
                 <div className="space-y-1">
-                  <div className="font-medium text-gray-700">Scores = QK^T / √(d_k)</div>
+                  <div className="font-medium text-gray-700">Concat(O_1, ..., O_H)</div>
                   <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
-                    <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.scores)}\\end{bmatrix}`} />
+                    <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.concat)}\\end{bmatrix}`} />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="font-medium text-gray-700">Softmax(Scores) = A</div>
+                  <div className="font-medium text-gray-700">W_O</div>
                   <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
-                    <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.attn)}\\end{bmatrix}`} />
+                    <KaTeX math={`\\begin{bmatrix}${formatMatrix(WO)}\\end{bmatrix}`} />
                   </div>
                 </div>
               </div>
 
               <div className="space-y-1 text-sm">
-                <div className="font-medium text-gray-700">输出 = AV</div>
+                <div className="font-medium text-gray-700">Y = Concat · W_O</div>
                 <div className="font-mono bg-gray-50 p-2 rounded overflow-auto">
-                  <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.out)}\\end{bmatrix}`} />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="font-medium text-gray-700 flex items-center gap-2">
-                  <Layers className="w-4 h-4" />
-                  多头拆分（H=2, d_k=2）
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {[0, 1].map((h) => (
-                    <div key={h} className="bg-white border border-gray-200 rounded-lg p-3 text-sm">
-                      <div className="font-medium text-gray-700 mb-2">Head {h + 1}</div>
-                      <div className="text-xs text-gray-500 mb-1">Q_h</div>
-                      <div className="font-mono bg-gray-50 p-1 rounded mb-2">
-                        <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.headQ[h])}\\end{bmatrix}`} />
-                      </div>
-                      <div className="text-xs text-gray-500 mb-1">V_h</div>
-                      <div className="font-mono bg-gray-50 p-1 rounded">
-                        <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.headV[h])}\\end{bmatrix}`} />
-                      </div>
-                    </div>
-                  ))}
+                  <KaTeX math={`\\begin{bmatrix}${formatMatrix(advancedResults.finalOutput)}\\end{bmatrix}`} />
                 </div>
               </div>
             </div>
@@ -527,45 +541,68 @@ export default function Ch09AttentionPage() {
           <h2 className="text-2xl font-bold text-gray-900">小测题</h2>
         </div>
         <div className="space-y-6">
-          {quiz.map((q, qIdx) => (
-            <div key={qIdx} className="border border-gray-200 rounded-lg p-4">
-              <div className="font-medium text-gray-900 mb-3">
-                {qIdx + 1}. {q.question}
-              </div>
-              <div className="space-y-2">
-                {q.options.map((opt, oIdx) => {
-                  const answered = quizAnswers[qIdx] !== undefined;
-                  const isSelected = quizAnswers[qIdx] === oIdx;
-                  const isCorrect = oIdx === q.correctIndex;
-                  let btnClass = 'w-full text-left px-3 py-2 rounded-md text-sm border transition-colors ';
-                  if (answered) {
-                    if (isCorrect) btnClass += 'bg-emerald-50 border-emerald-300 text-emerald-800';
-                    else if (isSelected) btnClass += 'bg-red-50 border-red-300 text-red-800';
-                    else btnClass += 'bg-gray-50 border-gray-200 text-gray-500';
-                  } else {
-                    btnClass += 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700';
-                  }
-                  return (
-                    <button
-                      key={oIdx}
-                      type="button"
-                      disabled={answered}
-                      className={btnClass}
-                      onClick={() => setQuizAnswers((prev) => ({ ...prev, [qIdx]: oIdx }))}
-                    >
-                      {String.fromCharCode(65 + oIdx)}. {opt}
-                    </button>
-                  );
-                })}
-              </div>
-              {quizAnswers[qIdx] !== undefined && (
-                <div className="mt-3 text-sm text-gray-700 bg-slate-50 p-3 rounded-md">
-                  <span className="font-medium">解析：</span>
-                  {q.explanation}
+          {quiz.map((q, qIdx) => {
+            const { selected, submitted } = quizStates[qIdx];
+            return (
+              <div key={qIdx} className="border border-gray-200 rounded-lg p-4">
+                <div className="font-medium text-gray-900 mb-3">
+                  {qIdx + 1}. {q.question}
                 </div>
-              )}
-            </div>
-          ))}
+                <div className="space-y-2">
+                  {q.options.map((opt, oIdx) => {
+                    const isSelected = selected === oIdx;
+                    const isCorrect = oIdx === q.correctIndex;
+                    let btnClass = 'w-full text-left px-3 py-2 rounded-md text-sm border transition-colors ';
+                    if (submitted) {
+                      if (isCorrect) btnClass += 'bg-emerald-50 border-emerald-300 text-emerald-800';
+                      else if (isSelected) btnClass += 'bg-red-50 border-red-300 text-red-800';
+                      else btnClass += 'bg-gray-50 border-gray-200 text-gray-500';
+                    } else {
+                      btnClass += isSelected
+                        ? 'bg-violet-50 border-violet-300 text-violet-800'
+                        : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700';
+                    }
+                    return (
+                      <button
+                        key={oIdx}
+                        type="button"
+                        disabled={submitted}
+                        className={btnClass}
+                        onClick={() => selectOption(qIdx, oIdx)}
+                      >
+                        {String.fromCharCode(65 + oIdx)}. {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={selected === null || submitted}
+                    onClick={() => submitQuiz(qIdx)}
+                    className="px-3 py-1.5 text-sm bg-violet-600 text-white rounded-lg hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    提交答案
+                  </button>
+                  {submitted && (
+                    <button
+                      type="button"
+                      onClick={() => resetQuiz(qIdx)}
+                      className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                    >
+                      重置
+                    </button>
+                  )}
+                </div>
+                {submitted && (
+                  <div className="mt-3 text-sm text-gray-700 bg-slate-50 p-3 rounded-md">
+                    <span className="font-medium">解析：</span>
+                    {q.explanation}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 

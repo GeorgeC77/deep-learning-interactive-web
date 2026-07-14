@@ -21,17 +21,37 @@ export function matMul(A: number[][], B: number[][]): number[][] {
 }
 
 export type MultiHeadResult = {
-  headOutputs: { Q: number[][]; K: number[][]; V: number[][]; attention: number[][]; headOut: number[][] }[];
+  headOutputs: {
+    Q: number[][];
+    K: number[][];
+    V: number[][];
+    scores: number[][];
+    attention: number[][];
+    headOut: number[][];
+  }[];
   concat: number[][];
   finalOutput: number[][];
 };
 
 /**
- * Full multi-head attention.
- * X: N x dModel
- * W_Q^h: dModel x dK, W_K^h: dModel x dK, W_V^h: dModel x dK
- * WO: dModel x dModel
- * dK = dModel / H
+ * Full multi-head attention with per-head projection matrices.
+ *
+ * Column convention (standard):
+ *   X: N x dModel
+ *   W_Q^h, W_K^h, W_V^h: dModel x dK
+ *   W_O: dModel x dModel
+ *
+ * For each head:
+ *   Q_h = X W_Q^h
+ *   K_h = X W_K^h
+ *   V_h = X W_V^h
+ *   scores_h[i][j] = (Q_h[i] · K_h[j]) / sqrt(dK)
+ *   attention_h = softmax_rows(scores_h)
+ *   headOut_h = attention_h V_h
+ *
+ * Finally:
+ *   concat = [headOut_0 | ... | headOut_{H-1}]
+ *   Y = concat W_O
  */
 export function multiHeadAttention(
   X: number[][],
@@ -64,7 +84,7 @@ export function multiHeadAttention(
 
     const attention = scores.map((row) => softmax(row));
     const headOut = matMul(attention, V);
-    return { Q, K, V, attention, headOut };
+    return { Q, K, V, scores, attention, headOut };
   });
 
   // Concat: N x (H * dK) = N x dModel
