@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import ConvolutionSizeDemo from '@/components/demos/ConvolutionSizeDemo';
+import FeatureHierarchyLab from '@/components/demos/FeatureHierarchyLab';
 import {
   computeOutputSize,
   computeSamePadding,
@@ -83,6 +84,20 @@ export default function Ch07ConvolutionalFiltersPage() {
         "混淆 framework SAME：S>1 时输出是 ceil(I/S)，下采样是预期结果，不是“不整除才下采样”。",
         "忽略当 K 为偶数时 framework SAME 的左右填充可能不对称。",
       ]}
+      whyCards={[
+        {
+          question: "为什么深层越来越抽象？",
+          answer: "每层都把上一层的简单特征拼成更复杂的模式：边缘拼成纹理，纹理拼成部件，部件拼成物体。",
+        },
+        {
+          question: "为什么卷积要共享权重？",
+          answer: "同一个边缘检测器在图片任何位置都有用；共享权重既省参数，又让特征不依赖位置。",
+        },
+      ]}
+      counterexamples={[
+        "Pooling 后严格平移等变性会被破坏：输入平移一小步，池化输出可能不再精确对应平移。",
+        "加大步幅或裁剪边界时，输出对输入的精确平移对应关系也会被破坏。",
+      ]}
       quiz={[
         {
           question: `若 I=${SAME_DEMO_I}, K=${SAME_DEMO_K}, S=${SAME_DEMO_S}，framework SAME 的输出尺寸 O 是多少？`,
@@ -148,7 +163,7 @@ export default function Ch07ConvolutionalFiltersPage() {
         algorithms: ["二维离散卷积", "最大/平均池化"],
         exercises: ["给定 VGG 某层 I=224, K=3, P=1, S=1，逐层推导尺寸变化。", "对比 valid 与 framework SAME 在边界像素上的差异。"],
       }}
-      extraContent={<ConvolutionSizeDemo />}
+      extraContent={<><FeatureHierarchyLab /><ConvolutionSizeDemo /></>}
     />
   );
 }

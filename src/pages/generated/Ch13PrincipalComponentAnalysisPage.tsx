@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import PCALab from '@/components/demos/PCALab';
+import PCAReconstructionLab from '@/components/demos/PCAReconstructionLab';
 import { Shrink } from 'lucide-react';
 
 export default function Ch13PrincipalComponentAnalysisPage() {
@@ -42,6 +43,20 @@ export default function Ch13PrincipalComponentAnalysisPage() {
         "在使用 PCA 前忘记对数据中心化，导致主方向偏移。",
         "把 PCA 当作有监督特征选择方法；它是无监督的。",
         "认为 PCA 一定保留对下游任务最有判别性的信息。",
+      ]}
+      whyCards={[
+        {
+          question: "为什么最大方差意味着最小重构误差？",
+          answer: "总方差是固定的。留下的方向方差越大，丢掉的就越小，而丢掉的方差正是重构误差。",
+        },
+        {
+          question: "为什么降维只是结果？",
+          answer: "PCA 真正想做的是用最少信息把数据重建得最像；能重建好，自然就能用更少维度表示。",
+        },
+      ]}
+      counterexamples={[
+        "最大方差方向不一定是最佳分类方向：若两类数据沿同一方向拉开，保留它反而可能把类别混在一起。",
+        "若数据结构是非线性的（如弯曲流形），线性 PCA 即使保留高方差也无法低误差重构。",
       ]}
       quiz={[
         {
@@ -89,6 +104,7 @@ export default function Ch13PrincipalComponentAnalysisPage() {
         exercises: ["证明最大方差方向与最小重构误差方向一致。", "对二维相关高斯数据计算主成分。"],
       }}
       interactiveDemo={<PCALab />}
+      extraContent={<PCAReconstructionLab />}
     />
   );
 }

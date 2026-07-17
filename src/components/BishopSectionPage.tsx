@@ -10,6 +10,8 @@ import {
   AlertTriangle,
   HelpCircle,
   MapPin,
+  MessageCircleQuestion,
+  FlaskConical,
 } from 'lucide-react';
 import FormulaCard from './FormulaCard';
 import ConceptCard from './ConceptCard';
@@ -29,6 +31,13 @@ export type QuizItem = {
   options: string[];
   correctIndex: number;
   explanation: string;
+};
+
+export type WhyCardItem = {
+  /** The motivating question, e.g. “为什么需要 Value？” */
+  question: string;
+  /** Plain-language, formula-free answer aimed at a first-time learner (≤100 chars). */
+  answer: ReactNode;
 };
 
 export type BishopMapping = {
@@ -64,6 +73,10 @@ export type BishopSectionPageProps = {
   coreIntuition?: ReactNode;
   commonMistakes?: string[];
   quiz?: QuizItem[];
+  /** “为什么？”卡片：站在第一次学习的学生角度，不用公式解释动机。 */
+  whyCards?: WhyCardItem[];
+  /** 反例：帮助打破常见错误直觉的最小反例。 */
+  counterexamples?: string[];
   bishopMapping?: BishopMapping;
   extraContent?: ReactNode;
 };
@@ -79,6 +92,8 @@ export default function BishopSectionPage({
   coreIntuition,
   commonMistakes,
   quiz,
+  whyCards,
+  counterexamples,
   bishopMapping,
   extraContent,
 }: BishopSectionPageProps) {
@@ -270,6 +285,24 @@ export default function BishopSectionPage({
         </InteractiveDemo>
       )}
 
+      {/* Why? cards — motivation without formulas */}
+      {whyCards && whyCards.length > 0 && (
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <MessageCircleQuestion className="w-6 h-6 text-sky-600" />
+            <h2 className="text-2xl font-bold text-gray-900">为什么？</h2>
+          </div>
+          <div className="space-y-4">
+            {whyCards.map((card, idx) => (
+              <div key={idx} className="border-l-4 border-sky-300 bg-sky-50/60 rounded-r-lg p-4">
+                <div className="font-medium text-sky-900 mb-1">Q：{card.question}</div>
+                <div className="text-gray-700 text-[15px] leading-relaxed">{card.answer}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Common mistakes */}
       {commonMistakes && commonMistakes.length > 0 && (
         <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -282,6 +315,24 @@ export default function BishopSectionPage({
               <li key={idx} className="flex items-start gap-2 text-gray-700">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
                 <span>{mistake}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Counterexamples */}
+      {counterexamples && counterexamples.length > 0 && (
+        <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <FlaskConical className="w-6 h-6 text-orange-600" />
+            <h2 className="text-2xl font-bold text-gray-900">反例</h2>
+          </div>
+          <ul className="space-y-3">
+            {counterexamples.map((ce, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-gray-700">
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 flex-shrink-0" />
+                <span>{ce}</span>
               </li>
             ))}
           </ul>

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
-import { BookOpen, ChevronLeft, ChevronRight, Focus, ShieldAlert, SlidersHorizontal, AlertTriangle, HelpCircle, Target, Lightbulb, MapPin, Layers } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Focus, ShieldAlert, SlidersHorizontal, AlertTriangle, HelpCircle, Target, Lightbulb, MapPin, Layers, MessageCircleQuestion, FlaskConical } from 'lucide-react';
 import AttentionLab from '@/components/demos/AttentionLab';
+import AttentionMatrixVsOutputLab from '@/components/demos/AttentionMatrixVsOutputLab';
+import AttentionScalingLab from '@/components/demos/AttentionScalingLab';
 import ConceptCard from '@/components/ConceptCard';
 import FormulaCard from '@/components/FormulaCard';
 import InteractiveDemo from '@/components/InteractiveDemo';
@@ -513,6 +515,35 @@ export default function Ch09AttentionPage() {
       {/* Full multi-head attention lab */}
       <AttentionLab />
 
+      {/* Attention Matrix vs Output, and sqrt(d) scaling experiments */}
+      <AttentionMatrixVsOutputLab />
+      <AttentionScalingLab />
+
+      {/* Why? cards */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <MessageCircleQuestion className="w-6 h-6 text-sky-600" />
+          <h2 className="text-2xl font-bold text-gray-900">为什么？</h2>
+        </div>
+        <div className="space-y-4">
+          {[
+            {
+              q: '为什么需要 Value？',
+              a: 'Attention Matrix 只决定每个位置“看谁”的权重，真正被取回的信息在 V 里。没有 V，注意力不知道该拿回什么内容。',
+            },
+            {
+              q: '为什么除以 √d？',
+              a: '维度越大，点积自然越大，softmax 容易饱和、梯度消失。除以 √d 把尺度拉回稳定范围，让训练正常进行。',
+            },
+          ].map((card, idx) => (
+            <div key={idx} className="border-l-4 border-sky-300 bg-sky-50/60 rounded-r-lg p-4">
+              <div className="font-medium text-sky-900 mb-1">Q：{card.q}</div>
+              <div className="text-gray-700 text-[15px] leading-relaxed">{card.a}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Common mistakes */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-4">
@@ -528,6 +559,25 @@ export default function Ch09AttentionPage() {
           ].map((m, idx) => (
             <li key={idx} className="flex items-start gap-2 text-gray-700">
               <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0" />
+              <span>{m}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <FlaskConical className="w-6 h-6 text-orange-600" />
+          <h2 className="text-2xl font-bold text-gray-900">反例</h2>
+        </div>
+        <ul className="space-y-3">
+          {[
+            '固定 Q、K 时，Attention Heatmap 不变；但只要改 V，Output 就会全部改变——说明 Attention Matrix ≠ 输出。',
+            '把注意力权重直接当成“模型关注了语义重点”并不可靠：高权重也可能来自投影权重的巧合，而非语义相关。',
+          ].map((m, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-gray-700">
+              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-orange-500 flex-shrink-0" />
               <span>{m}</span>
             </li>
           ))}

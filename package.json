@@ -13,6 +13,7 @@
     "coverage:check": "node scripts/check-coverage.cjs",
     "audit:bishop": "node --experimental-strip-types scripts/audit_bishop_alignment.ts",
     "validate:teaching-ready": "npx tsx@latest scripts/validate_teaching_ready.ts",
+    "review:pedagogical": "npx tsx@latest scripts/generate_pedagogical_review.ts",
     "test": "vitest run --config config/vite.config.ts",
     "test:math": "vitest run src/math-tests src/pedagogical-tests --config config/vite.config.ts",
     "test:pedagogical": "vitest run src/pedagogical-tests --config config/vite.config.ts"

@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import ResidualJacobianLab from '@/components/demos/ResidualJacobianLab';
+import ResidualIdentityPathLab from '@/components/demos/ResidualIdentityPathLab';
 import { Layers } from 'lucide-react';
 
 export default function Ch06ResidualConnectionsPage() {
@@ -34,6 +35,20 @@ export default function Ch06ResidualConnectionsPage() {
         "把残差连接当成无条件解决梯度消失的方案，忽略 F≈-x 时 Jacobian 退化的可能性。",
         "只记住 y=x+F(x) 的公式，而不理解 I+∂F/∂x 的 Jacobian 含义。",
         "认为加入残差连接后就不需要关注初始化或学习率。",
+      ]}
+      whyCards={[
+        {
+          question: "为什么 Identity 能帮助训练？",
+          answer: "即使变换学坏了，输入仍能原样传到后面，网络至少有恒等映射保底，梯度也有路可回。",
+        },
+        {
+          question: "为什么残差不是更复杂而是更稳？",
+          answer: "它不学全新输出，只学要改多少；多数层只需微调，最坏退化成恒等，训练自然更稳。",
+        },
+      ]}
+      counterexamples={[
+        "若残差分支学到 F≈-x，整体 Jacobian 接近 0，深层网络仍会梯度消失——残差不是无条件保险。",
+        "残差分支过大且缺少合适初始化/正则时，训练仍可能不稳定，残差不能替代好的训练设置。",
       ]}
       quiz={[
         {
@@ -84,6 +99,7 @@ export default function Ch06ResidualConnectionsPage() {
         ],
       }}
       interactiveDemo={<ResidualJacobianLab />}
+      extraContent={<ResidualIdentityPathLab />}
     />
   );
 }

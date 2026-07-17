@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import EmbeddingGeometryLab from '@/components/demos/EmbeddingGeometryLab';
 import { Languages } from 'lucide-react';
 
 export default function Ch09NaturalLanguagePage() {
@@ -46,6 +47,19 @@ export default function Ch09NaturalLanguagePage() {
         "把词袋模型用于需要词序的任务，忽略其丢失序列信息的本质。",
         "认为 RNN 能自然记住任意长距离依赖，实际上梯度消失/爆炸会限制记忆长度。",
         "混淆 token embedding 与 positional encoding：前者给词含义，后者给位置信息。",
+      ]}
+      whyCards={[
+        {
+          question: "为什么距离代表语义？",
+          answer: "训练让常一起出现、用法相近的词靠得更近。于是空间里的距离就近似对应语义上的相似程度。",
+        },
+        {
+          question: "为什么用词向量而不是编号？",
+          answer: "编号本身没有远近含义；向量能把“相似”变成几何上的“靠近”，让模型利用语义关系。",
+        },
+      ]}
+      counterexamples={[
+        "距离近不一定同义：它只表示在当前任务中相似。比如“好”和“坏”常出现在同样语境，距离可能很近但意思相反。",
       ]}
       quiz={[
         {
@@ -98,6 +112,7 @@ export default function Ch09NaturalLanguagePage() {
         algorithms: ["词袋", "RNN 前向与 BPTT"],
         exercises: ["用给定词表写出句子的 one-hot 与 embedding 表示。", "推导 RNN 对短序列的 BPTT 梯度。"],
       }}
+      interactiveDemo={<EmbeddingGeometryLab />}
     />
   );
 }
