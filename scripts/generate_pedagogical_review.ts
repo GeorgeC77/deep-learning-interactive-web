@@ -52,10 +52,14 @@ type Row = {
   file: string;
   present: boolean[];
   coverage: number;
+  isOverview: boolean;
 };
 
+function isOverviewPage(path: string, title: string): boolean {
+  return /\/overview$/.test(path) || /概览|总览/.test(title);
+}
+
 const rows: Row[] = [];
-const dimHits = new Array(DIMS.length).fill(0);
 
 for (const sec of getAllSections()) {
   const componentName = routeComponentMap[sec.path] ?? '';
@@ -65,14 +69,15 @@ for (const sec of getAllSections()) {
   if (!file.includes('src/pages/generated/')) continue;
   const text = fs.readFileSync(file, 'utf8');
   const present = DIMS.map((d) => d.test(text));
-  present.forEach((p, i) => { if (p) dimHits[i]++; });
   const coverage = Math.round((present.filter(Boolean).length / DIMS.length) * 100);
-  rows.push({ path: sec.path, title: sec.title, file, present, coverage });
+  rows.push({ path: sec.path, title: sec.title, file, present, coverage, isOverview: isOverviewPage(sec.path, sec.title) });
 }
 
-const totalCoverage = rows.length
-  ? Math.round(rows.reduce((a, r) => a + r.coverage, 0) / rows.length)
-  : 0;
+const mean = (rs: Row[]) => (rs.length ? Math.round(rs.reduce((a, r) => a + r.coverage, 0) / rs.length) : 0);
+const contentRows = rows.filter((r) => !r.isOverview);
+const overviewRows = rows.filter((r) => r.isOverview);
+const contentCoverage = mean(contentRows);
+const totalCoverage = mean(rows);
 
 const md: string[] = [
   '# Pedagogical Review Checklist',
@@ -92,31 +97,47 @@ const md: string[] = [
   '| **Interactive** | 能通过交互实验自己动手验证 |',
   '| **Real-world Intuition** | 能联系到真实世界直觉（核心直觉） |',
   '',
-  '## 逐页检查（generated content pages）',
+  '## 逐页检查（内容页 content pages）',
+  '',
+  '概览/导航页（`/overview`）不承担具体知识点的教学，已单独统计，不计入内容页覆盖率。',
   '',
   `| 页面 | ${DIMS.map((d) => d.label).join(' | ')} | 覆盖率 |`,
   `|------|${DIMS.map(() => '---').join('|')}|---|`,
-  ...rows.map((r) => {
+  ...contentRows.map((r) => {
     const marks = r.present.map((p) => (p ? '✅' : '❌')).join(' | ');
     return `| ${r.title}（\`${r.path}\`） | ${marks} | ${r.coverage}% |`;
   }),
   '',
   '## 覆盖率统计（Coverage）',
   '',
-  `- 检查页面数：${rows.length}`,
-  `- **总体 Pedagogical Coverage：${totalCoverage}%**`,
+  `- 内容页（教学页）数量：${contentRows.length}`,
+  `- **内容页 Pedagogical Coverage：${contentCoverage}%**`,
+  `- 概览/导航页数量：${overviewRows.length}（覆盖率 ${mean(overviewRows)}%，仅作参考）`,
+  `- 全部生成页总体覆盖率：${totalCoverage}%`,
   '',
-  '### 各维度覆盖页面数',
+  '### 各维度覆盖页面数（内容页）',
   '',
-  ...DIMS.map((d, i) => `- **${d.label}**：${dimHits[i]} / ${rows.length} 页`),
+  ...DIMS.map((d, i) => {
+    const hit = contentRows.filter((r) => r.present[i]).length;
+    return `- **${d.label}**：${hit} / ${contentRows.length} 页`;
+  }),
   '',
-  rows.some((r) => r.coverage < 100)
-    ? `> ⚠️ 仍有 ${rows.filter((r) => r.coverage < 100).length} 个页面未达到 100% 覆盖，见上表 ❌ 项。`
-    : '> ✅ 所有核心页面已达到 100% Pedagogical Coverage。',
+  contentRows.some((r) => r.coverage < 100)
+    ? `> ⚠️ 仍有 ${contentRows.filter((r) => r.coverage < 100).length} 个内容页未达到 100% 覆盖，见上表 ❌ 项。`
+    : '> ✅ 所有内容页已达到 100% Pedagogical Coverage。',
+  '',
+  '## 概览/导航页（单独列出，不计入内容页覆盖率）',
+  '',
+  '| 页面 | 覆盖率 |',
+  '|------|---|',
+  ...overviewRows.map((r) => `| ${r.title}（\`${r.path}\`） | ${r.coverage}% |`),
   '',
 ];
 
 fs.mkdirSync('reports', { recursive: true });
 fs.writeFileSync('reports/pedagogical_review.md', md.join('\n'), 'utf8');
 
-console.log(`Pedagogical review written: ${rows.length} generated pages, overall coverage ${totalCoverage}%.`);
+console.log(
+  `Pedagogical review written: ${contentRows.length} content pages (coverage ${contentCoverage}%), ` +
+  `${overviewRows.length} overview pages, overall ${totalCoverage}%.`,
+);

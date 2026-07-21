@@ -43,22 +43,23 @@ export default function ResidualIdentityPathLab() {
           普通深层网络每层都会把信号乘上一个小于 1 的因子，层数越深信号越小；残差网络多了一条
           <strong> 恒等直连（identity path）</strong>，让信号可以绕过变换直接传到后面。
         </p>
+        <p className="text-xs text-gray-400">（示意图：信号衰减曲线为教学用简化模型，用于对比恒等直连的作用，并非真实 ResNet 的测量数据。）</p>
 
         {/* Network diagrams */}
         <div className="grid md:grid-cols-2 gap-4">
           <div className="border border-gray-200 rounded-lg p-3">
             <div className="text-xs font-semibold text-gray-500 mb-2">普通网络</div>
-            <svg viewBox="0 0 200 130" className="w-full">
-              <text x="10" y="18" fontSize="11" fill="#334155">x</text>
+            <svg viewBox="0 0 250 34" className="w-full">
+              <text x="8" y="21" fontSize="11" fill="#334155">x</text>
               {[0, 1, 2].map((i) => (
                 <g key={i}>
-                  <line x1={28 + i * 54} y1="14" x2={52 + i * 54} y2="14" stroke="#94a3b8" strokeWidth="1.5" markerEnd="url(#arrP)" />
-                  <rect x={52 + i * 54} y="4" width="46" height="20" rx="4" fill="#fee2e2" stroke="#ef4444" />
-                  <text x={75 + i * 54} y="18" fontSize="10" fill="#b91c1c" textAnchor="middle">Layer</text>
+                  <line x1={28 + i * 54} y1="17" x2={50 + i * 54} y2="17" stroke="#94a3b8" strokeWidth="1.5" markerEnd="url(#arrP)" />
+                  <rect x={50 + i * 54} y="7" width="46" height="20" rx="4" fill="#fee2e2" stroke="#ef4444" />
+                  <text x={73 + i * 54} y="21" fontSize="10" fill="#b91c1c" textAnchor="middle">Layer</text>
                 </g>
               ))}
-              <line x1="176" y1="14" x2="196" y2="14" stroke="#94a3b8" strokeWidth="1.5" />
-              <text x="160" y="40" fontSize="11" fill="#334155">输出</text>
+              <line x1="212" y1="17" x2="236" y2="17" stroke="#94a3b8" strokeWidth="1.5" markerEnd="url(#arrP)" />
+              <text x="238" y="21" fontSize="11" fill="#334155">输出</text>
               <defs>
                 <marker id="arrP" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
                   <path d="M0,0 L6,3 L0,6 z" fill="#94a3b8" />

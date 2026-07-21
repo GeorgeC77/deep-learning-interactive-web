@@ -52,6 +52,10 @@ export default function PCAReconstructionLab() {
           把信号投影到主成分上（Projection），再只用前 k 个主成分重建（Reconstruction）。
           拖动“保留维度”，立刻看到重构误差与被丢弃特征值的变化。
         </p>
+        <p className="text-xs text-gray-400">
+          说明：这里用一组固定的正交（余弦）基来演示“重构误差 = 被丢弃特征值之和”这一原理；
+          真实 PCA 的基是由数据协方差矩阵的特征向量决定的，可对照上方 PCALab 的二维特征分解。
+        </p>
 
         <div>
           <div className="flex items-center justify-between mb-1">
@@ -102,7 +106,7 @@ export default function PCAReconstructionLab() {
             <div className="font-mono font-bold text-red-700">{error.toFixed(4)}</div>
           </div>
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
-            <div className="text-xs text-gray-500">Discarded Eigenvalues</div>
+            <div className="text-xs text-gray-500">Discarded Components</div>
             <div className="font-mono font-bold text-gray-700">{D - k}</div>
           </div>
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2">

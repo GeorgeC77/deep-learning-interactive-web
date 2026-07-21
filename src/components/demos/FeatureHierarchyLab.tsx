@@ -96,6 +96,7 @@ export default function FeatureHierarchyLab() {
           同一张输入图逐层通过卷积。浅层只能看到边缘、纹理、角点；越深的层把低级特征组合成部件、
           物体，直到语义区域。点击下方任意一层查看它的 Feature Map。
         </p>
+        <p className="text-xs text-gray-400">（示意图：用手绘方式展示抽象层级，并非真实 CNN 的前向计算结果。）</p>
 
         <div className="flex flex-wrap items-center gap-1">
           {STAGES.map((s, i) => (
@@ -107,7 +108,7 @@ export default function FeatureHierarchyLab() {
               >
                 {s.name}
               </button>
-              {i < STAGES.length - 1 && <span className="mx-1 text-gray-400">↓</span>}
+              {i < STAGES.length - 1 && <span className="mx-1 text-gray-400">→</span>}
             </div>
           ))}
         </div>

@@ -41,7 +41,7 @@ describe('pedagogical quality: tenth batch (Why? / counterexample / new labs)', 
   it('PCAReconstructionLab shows reconstruction error and discarded eigenvalues', () => {
     render(<PCAReconstructionLab />);
     expect(screen.getAllByText(/Reconstruction Error/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Discarded Eigenvalues/)).toBeTruthy();
+    expect(screen.getByText(/Discarded Components/)).toBeTruthy();
     expect(screen.getByText(/Min Reconstruction Error/)).toBeTruthy();
     expect(screen.getByText(/保留维度 k/)).toBeTruthy();
   });
