@@ -46,3 +46,4 @@ nodejs/
 # Temp files
 *.tmp
 *.bak
+.tmp-node/
