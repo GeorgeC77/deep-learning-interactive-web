@@ -56,42 +56,7 @@ export default function Ch02DecisionTheoryPage() {
         "在多分类中直接逐类计算 ROC——ROC 本质是二分类工具，多分类需用 micro/macro 平均或一对一",
         "使用 0.5 作为决策阈值时忽略损失矩阵——最优阈值应由 c_FP/(c_FP+c_FN) 决定",
       ]}
-      quiz={[
-        {
-          question: "二分类中，若损失矩阵为 L(正→负)=10, L(负→正)=1，后验 p(C₁|x)=0.3。应如何决策？",
-          options: [
-            "选 C₁（正类），因为误判负类的代价更高",
-            "选 C₂（负类），因为后验概率更大",
-            "随机选择",
-            "拒绝决策",
-          ],
-          correctIndex: 0,
-          explanation: "E[选C₁] = 0·0.3 + 1·0.7 = 0.7, E[选C₂] = 10·0.3 + 0·0.7 = 3.0。0.7 < 3.0，选 C₁。虽然后验低，但高代价推动了决策。",
-        },
-        {
-          question: "二分类代价敏感决策中，选择正类的最优概率阈值是？",
-          options: [
-            "p > C_FP / (C_FP + C_FN)",
-            "p > 0.5",
-            "p > C_FN / (C_FP + C_FN)",
-            "p > 1/(C_FP + C_FN)",
-          ],
-          correctIndex: 0,
-          explanation: "比较两种风险 R(positive)=C_FP(1−p) 与 R(negative)=C_FN·p，正类更优当且仅当 p > C_FP/(C_FP+C_FN)。",
-        },
-        {
-          question: "ROC 曲线下面积 AUC = 1 意味着什么？",
-          options: [
-            "分类器在所有阈值下都完美排序——存在一个阈值使 TPR=1 且 FPR=0",
-            "分类器准确率 100%",
-            "训练数据集没有噪声",
-            "模型没有任何过拟合",
-          ],
-          correctIndex: 0,
-          explanation: "AUC=1 表示存在一个阈值使所有正例排在负例之前，即完美排序。但不等于准确率 100%——因为阈值选择可能仍有小误差。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 5",
         section: "5.2",
         pages: "§5.2, pp. 138–149",

@@ -55,37 +55,7 @@ export default function Ch17ScoreMatchingPage() {
         "把单次噪声 ε 当成真实边缘分数；实际上边缘分数需要 E[ε|z_t]，单次 ε 只是随机训练目标。",
         "笼统地说“闭式得到 unbiased pointwise score”；去噪分数匹配是用 conditional score 对经验分布做平滑，再构造等价目标。",
       ]}
-      quiz={[
-        {
-          question: "对于标准高斯 N(0,1)，分数函数 s(x) 等于？",
-          options: ["-x", "x", "exp(-x²/2)", "0"],
-          correctIndex: 0,
-          explanation: "s(x)=∇_x ln p(x)=∇_x(-x²/2 - const)=-x。",
-        },
-        {
-          question: "去噪分数匹配解决了原始分数匹配中的哪个困难？",
-          options: [
-            "避免直接计算海森迹，同时利用已知前向噪声核得到 conditional score",
-            "不再需要神经网络",
-            "可以直接得到归一化密度",
-            "只适用于离散数据",
-          ],
-          correctIndex: 0,
-          explanation: "原始分数匹配需要估计 score 的散度/迹；去噪分数匹配通过加噪样本得到 conditional score，将经验分布平滑后构造等价训练目标，避开了直接估计海森迹。",
-        },
-        {
-          question: "在低密度区域直接训练分数网络通常会遇到什么问题？",
-          options: [
-            "训练数据少，分数估计不准确，采样可能发散",
-            "分数恒为零",
-            "网络无法收敛",
-            "训练速度过快导致过拟合",
-          ],
-          correctIndex: 0,
-          explanation: "低密度区域样本少，分数估计方差大，Langevin 采样容易偏离数据流形。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 20",
         section: "20.3",
         pages: "Ch 20",

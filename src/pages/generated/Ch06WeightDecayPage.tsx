@@ -34,42 +34,7 @@ export default function Ch06WeightDecayPage() {
         "把偏置项也同等惩罚，导致结果依赖目标变量的原点选择。",
         "忽视正则化系数 λ 需要通过验证集或交叉验证来选择。",
       ]}
-      quiz={[
-        {
-          question: "L2 权重衰减对损失函数的主要影响是什么？",
-          options: [
-            "增加一个与参数平方和成正比的惩罚项。",
-            "随机丢弃部分神经元。",
-            "在训练达到一定步数后停止。",
-            "对输入特征进行归一化。",
-          ],
-          correctIndex: 0,
-          explanation: "L2 正则化在损失中加入 λ/2 ||w||²，使参数趋向于小值。",
-        },
-        {
-          question: "若原始损失为 E(w)，L2 正则化后的梯度更新会额外包含什么项？",
-          options: [
-            "λw",
-            "-λw",
-            "λ/w",
-            "0",
-          ],
-          correctIndex: 0,
-          explanation: "对 λ/2 ||w||² 求导得到 λw，因此梯度更新会额外加上 λw。",
-        },
-        {
-          question: "使用 Adam 优化器时，L2 正则化与权重衰减是否完全等价？",
-          options: [
-            "不完全等价，因为 Adam 的自适应学习率会改变权重衰减的有效强度。",
-            "完全等价，没有任何区别。",
-            "只有在批量梯度下降中等价。",
-            "只有在 L1 正则化中等价。",
-          ],
-          correctIndex: 0,
-          explanation: "AdamW 的出现正是为了在自适应优化器中正确解耦权重衰减与梯度更新。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 9",
         section: "9.2",
         pages: "Ch 9",

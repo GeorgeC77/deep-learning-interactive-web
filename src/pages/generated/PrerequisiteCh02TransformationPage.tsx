@@ -34,37 +34,7 @@ export default function PrerequisiteCh02TransformationPage() {
         "多元情形下混淆 ∂x/∂y 与 ∂y/∂x，用错 Jacobian 矩阵。",
         "在非单调变换上直接套用一元变量替换公式。",
       ]}
-      quiz={[
-        {
-          question: "对 y=g(x)=2x，已知 p_x(x)=N(0,1)，则 p_y(y) 在 y=2 处的值约为 p_x(1) 的多少倍？",
-          options: ["1/2", "2", "1", "4"],
-          correctIndex: 0,
-          explanation: "p_y(y)=p_x(y/2)·|dx/dy|=p_x(1)·1/2，因此为 p_x(1) 的一半。",
-        },
-        {
-          question: "多元密度变换中，为什么需要 Jacobian 行列式的绝对值？",
-          options: [
-            "它刻画体积元的局部伸缩，保证变换后总概率仍为 1。",
-            "为了让公式更复杂。",
-            "因为行列式本身就是概率密度。",
-            "只在高维情形需要，一维不需要。",
-          ],
-          correctIndex: 0,
-          explanation: "Jacobian 行列式的绝对值反映变换对体积元的缩放，密度必须相应缩放以保持概率守恒。",
-        },
-        {
-          question: "若 g 不是单调可逆函数，一元变量替换公式是否仍然适用？",
-          options: [
-            "不适用，需要分段处理或改用其他方法。",
-            "适用，只要 g 连续即可。",
-            "适用，只要 g 可导即可。",
-            "适用，但需要取平均导数。",
-          ],
-          correctIndex: 0,
-          explanation: "一元变量替换要求 g 单调可逆；否则一个 y 可能对应多个 x，需要分段求和。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 2",
         section: "2.4",
         pages: "Ch 2",

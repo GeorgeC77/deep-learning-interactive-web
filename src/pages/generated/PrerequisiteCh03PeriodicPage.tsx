@@ -33,42 +33,7 @@ export default function PrerequisiteCh03PeriodicPage() {
         "把 Von Mises 误称为普通高斯的位置-尺度分布；它是方向分布。",
         "在 m=0 时仍假设存在明显平均方向。",
       ]}
-      quiz={[
-        {
-          question: "Von Mises 分布中，参数 θ₀ 和 m 分别控制什么？",
-          options: [
-            "θ₀ 控制平均方向，m 控制集中程度。",
-            "θ₀ 控制集中程度，m 控制平均方向。",
-            "θ₀ 和 m 都控制平均方向。",
-            "θ₀ 和 m 都控制方差大小。",
-          ],
-          correctIndex: 0,
-          explanation: "θ₀ 是平均方向（location），m 是集中参数（concentration），越大越尖锐。",
-        },
-        {
-          question: "当 m=0 时，Von Mises 分布退化为？",
-          options: [
-            "圆周上的均匀分布",
-            "标准高斯分布",
-            "拉普拉斯分布",
-            "δ 分布",
-          ],
-          correctIndex: 0,
-          explanation: "m=0 时指数项为 1，分布与 θ 无关，即圆周均匀分布。",
-        },
-        {
-          question: "下列哪种情况最适合用 Von Mises 而不是高斯建模？",
-          options: [
-            "一周中的星期几（周期性）",
-            "人的身高",
-            "房屋价格",
-            "考试分数（0-100 且已标准化）",
-          ],
-          correctIndex: 0,
-          explanation: "周期性数据在边界处会回绕，普通高斯无法捕捉这种拓扑结构。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 3",
         section: "3.3",
         pages: "Ch 3",

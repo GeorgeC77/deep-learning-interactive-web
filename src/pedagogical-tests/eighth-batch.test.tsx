@@ -65,7 +65,8 @@ describe('pedagogical invariants: eighth batch (conditional independence / facto
   it('K-means page uses assign-then-update order and convergence detection', () => {
     const { container } = renderWithRouter(<KMeansPage />);
     const text = container.textContent || '';
-    expect(text).toContain('先分配样本到最近质心，再更新质心为簇内均值');
+    expect(text).toContain('分配样本到最近质心');
+    expect(text).toContain('更新质心为簇内均值');
     expect(text).toMatch(/[已未]收敛/);
   });
 

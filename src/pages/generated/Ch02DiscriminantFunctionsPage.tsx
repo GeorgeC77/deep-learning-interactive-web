@@ -46,32 +46,7 @@ export default function Ch02DiscriminantFunctionsPage() {
         "使用恒等基函数 ϕ(x)=x 导致无法学习非线性决策边界——需要像回归一样使用非线性基函数",
         "忽视最小二乘对异常值的敏感性：远离边界的'已正确分类'样本也会被平方损失拉向决策面",
       ]}
-      quiz={[
-        {
-          question: "二分类线性判别 y(x) = wᵀx + w₀。当 w = [1,0], w₀ = −3 时，决策边界是什么？",
-          options: ["x₁ = 3（垂直于 x₁ 轴的直线）", "x₁ = 0", "x₁ + x₂ = 3", "x₁ − x₂ = 3"],
-          correctIndex: 0,
-          explanation: "wᵀx + w₀ = 0 ⇒ 1·x₁ + 0·x₂ − 3 = 0 ⇒ x₁ = 3。",
-        },
-        {
-          question: "one-vs-rest 方式处理 3 类问题的根本问题是什么？",
-          options: [
-            "某些区域可能不属于任何类别或同时属于多个类别",
-            "它比 K 函数方法计算更快",
-            "它只能处理 2 类问题",
-            "它需要更多的训练数据",
-          ],
-          correctIndex: 0,
-          explanation: "三个二分类器各自划分空间，交集可能产生既不属于任何类也不被多个类同时判定的区域。",
-        },
-        {
-          question: "最小二乘分类对哪些样本的惩罚最重？",
-          options: ["距离决策边界很远的样本（即使分类正确）", "刚好在决策边界附近的样本", "被错误分类的样本", "噪声样本"],
-          correctIndex: 0,
-          explanation: "平方损失对大残差敏感。一个'非常确定正确'的样本残差为 1 − 0.95 = 0.05，其平方很小；但一个极端 outlier 可能导致残差为几十，平方极大。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 5",
         section: "5.1",
         pages: "§5.1, pp. 132–137",

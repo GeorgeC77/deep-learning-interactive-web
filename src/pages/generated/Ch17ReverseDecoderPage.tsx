@@ -47,42 +47,7 @@ export default function Ch17ReverseDecoderPage() {
         "在采样时忽略反向转移中的随机项，把去噪当成确定性操作。",
         "混淆 x_t 与 z_t 记号，导致与教材公式对照错误。",
       ]}
-      quiz={[
-        {
-          question: "反向解码器学习的目标分布是什么？",
-          options: [
-            "p(z_{t-1} | z_t, w)",
-            "p(z_t | z_{t-1})",
-            "p(z_0 | z_T)",
-            "p(w | z_0)",
-          ],
-          correctIndex: 0,
-          explanation: "反向解码器学习从当前带噪状态 z_t 回到上一时刻 z_{t-1} 的条件分布。",
-        },
-        {
-          question: "为什么噪声预测网络通常预测 total noise ε 而不是 incremental noise？",
-          options: [
-            "total noise 与输入 z_t 的分布解耦，训练目标更稳定",
-            "incremental noise 更容易解析计算",
-            "total noise 需要更少的网络层",
-            "ELBO 不允许预测 incremental noise",
-          ],
-          correctIndex: 0,
-          explanation: "预测 total noise 使目标分布固定为标准高斯，而 incremental noise 的统计特性随 t 变化。",
-        },
-        {
-          question: "训练完成后，生成新样本应从什么分布开始？",
-          options: [
-            "标准高斯 N(0,I)",
-            "训练数据分布",
-            "均匀分布",
-            "任意固定向量",
-          ],
-          correctIndex: 0,
-          explanation: "扩散模型从与最终前向分布一致的标准高斯噪声 z_T 出发，通过反向链生成数据。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 20",
         section: "20.2",
         pages: "Ch 20",

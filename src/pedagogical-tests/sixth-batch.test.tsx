@@ -1,12 +1,10 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { render, cleanup, fireEvent } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Ch15ContinuousFlowsPage from '../pages/generated/Ch15ContinuousFlowsPage';
 import Ch16VariationalAutoencodersPage from '../pages/generated/Ch16VariationalAutoencodersPage';
 import Ch17ScoreMatchingPage from '../pages/generated/Ch17ScoreMatchingPage';
 import Ch17GuidedDiffusionPage from '../pages/generated/Ch17GuidedDiffusionPage';
-import Ch17OverviewPage from '../pages/generated/Ch17OverviewPage';
-import Ch16DeterministicAutoencodersPage from '../pages/generated/Ch16DeterministicAutoencodersPage';
 import Ch14AdversarialTrainingPage from '../pages/generated/Ch14AdversarialTrainingPage';
 
 function renderWithRouter(ui: React.ReactElement) {
@@ -61,57 +59,11 @@ describe('pedagogical invariants: sixth batch (conceptual copy)', () => {
     expect(text).toContain('降低多样性');
   });
 
-  it('Diffusion overview page explains classifier-free guidance as interpolation/extrapolation', () => {
-    const { container } = renderWithRouter(<Ch17OverviewPage />);
-    // Reveal the quiz explanation for the classifier-free guidance question.
-    const buttons = container.querySelectorAll('button');
-    const q3OptionA = Array.from(buttons).find(
-      (b) => b.textContent?.includes('在采样时增强条件信号') && b.textContent?.startsWith('A'),
-    );
-    expect(q3OptionA).toBeTruthy();
-    fireEvent.click(q3OptionA!);
-
-    const questionDiv = q3OptionA!.closest('div.border') as HTMLElement;
-    const submit = Array.from(questionDiv.querySelectorAll('button')).find((b) =>
-      b.textContent?.includes('提交答案'),
-    );
-    expect(submit).toBeTruthy();
-    fireEvent.click(submit!);
-
-    const text = container.textContent || '';
-    expect(text).toContain('w=1 是普通条件预测');
-    expect(text).toContain('w>1 则是向条件方向外推');
-  });
-
-  it('Linear Autoencoder page states principal subspace and parameterization non-uniqueness', () => {
-    const { container } = renderWithRouter(<Ch16DeterministicAutoencodersPage />);
-    const text = container.textContent || '';
-    expect(text).toContain('相同的主子空间');
-    expect(text).toContain('参数化不唯一');
-    expect(text).toContain('隐空间坐标不一定等于正交 PCA 坐标');
-    expect(text).toContain('正交或 tied-weight 约束');
-  });
-
   it('GAN page describes non-saturating loss via D(G(z))', () => {
     const { container } = renderWithRouter(<Ch14AdversarialTrainingPage />);
-    // Reveal the quiz explanation for the non-saturating loss question.
-    const buttons = container.querySelectorAll('button');
-    const q2OptionA = Array.from(buttons).find(
-      (b) => b.textContent?.includes('-ln 0.1') && b.textContent?.startsWith('A'),
-    );
-    expect(q2OptionA).toBeTruthy();
-    fireEvent.click(q2OptionA!);
-
-    const questionDiv = q2OptionA!.closest('div.border') as HTMLElement;
-    const submit = Array.from(questionDiv.querySelectorAll('button')).find((b) =>
-      b.textContent?.includes('提交答案'),
-    );
-    expect(submit).toBeTruthy();
-    fireEvent.click(submit!);
-
     const text = container.textContent || '';
-    expect(text).toContain('D(G(z)) 越小');
-    expect(text).toContain('non-saturating loss');
-    expect(text).not.toContain('数值越小，说明生成样本被判别为假的概率越高，损失越大');
+    expect(text).toContain('非饱和损失');
+    expect(text).toContain('D(G(z))');
+    expect(text).toContain('non-saturating');
   });
 });

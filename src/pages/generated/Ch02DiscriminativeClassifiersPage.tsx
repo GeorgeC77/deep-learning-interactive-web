@@ -60,42 +60,7 @@ export default function Ch02DiscriminativeClassifiersPage() {
         "混淆 probit 和 logit——probit 使用正态 CDF，logit 使用 sigmoid；更关键的是，极端误分类时 probit 的 score 可能更大",
         "仅凭概率尾部更薄就断言 probit 更鲁棒：鲁棒性取决于 score 是否有界，而不是尾部衰减速度",
       ]}
-      quiz={[
-        {
-          question: "逻辑回归中，log-odds ln[p(C₁)/p(C₂)] 与输入 x 的关系是什么？",
-          options: [
-            "x 的线性函数",
-            "x 的 sigmoid 函数",
-            "x 的二次函数",
-            "与 x 无关的常数",
-          ],
-          correctIndex: 0,
-          explanation: "p(C₁) = σ(wᵀx) ⇒ logit = ln[σ/(1−σ)] = wᵀx，即 log-odds 是 x 的线性函数，这是逻辑回归得名'回归'的原因。",
-        },
-        {
-          question: "softmax(a_k) 的分母 Σ_j exp(a_j) 的作用是什么？",
-          options: [
-            "确保所有输出非负且总和为 1，形成有效的概率分布",
-            "加速计算",
-            "防止过拟合",
-            "消除特征间的相关性",
-          ],
-          correctIndex: 0,
-          explanation: "exp 确保非负，除以总和确保归一化——这就是 softmax 作为概率映射的核心机制。",
-        },
-        {
-          question: "在多类分类中，以下哪个损失函数是正确且凸的？",
-          options: [
-            "交叉熵损失：−Σ_k t_k·ln(softmax(a_k))",
-            "平方误差：Σ_k (t_k − a_k)²",
-            "hinge 损失：Σ_k max(0, 1 − a_k)",
-            "绝对值误差：Σ_k |t_k − a_k|",
-          ],
-          correctIndex: 0,
-          explanation: "与 softmax 配合的交叉熵损失是凸的且导数为 softmax(a_k) − t_k，形式简洁优雅。平方误差配合 softmax 是非凸的。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 5",
         section: "5.4",
         pages: "§5.4, pp. 157–166",

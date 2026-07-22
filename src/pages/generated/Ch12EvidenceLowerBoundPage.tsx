@@ -46,42 +46,7 @@ export default function Ch12EvidenceLowerBoundPage() {
         "认为 M 步必须闭式最大化；广义 EM 允许部分优化。",
         "在 i.i.d. 情形下忘记每个样本有独立的隐变量后验。",
       ]}
-      quiz={[
-        {
-          question: "在 GMM 的 EM 中，E 步计算的是？",
-          options: [
-            "每个样本属于每个高斯分量的后验责任 γ(z_nk)",
-            "高斯参数的极大似然估计",
-            "混合系数的梯度",
-            "数据的对数似然精确值",
-          ],
-          correctIndex: 0,
-          explanation: "E 步固定当前参数，计算隐变量后验（责任），为 M 步提供权重。",
-        },
-        {
-          question: "广义 EM 与标准 EM 的主要区别是？",
-          options: [
-            "广义 EM 的 M 步只需提升目标函数，不必完全最大化。",
-            "广义 EM 不需要 E 步。",
-            "广义 EM 只能用于连续隐变量。",
-            "广义 EM 不保证似然单调上升。",
-          ],
-          correctIndex: 0,
-          explanation: "广义 EM 放宽了 M 步要求，允许使用梯度步等部分优化方法。",
-        },
-        {
-          question: "顺序 EM 适用于？",
-          options: [
-            "数据流或在线学习场景",
-            "只有单个样本的数据集",
-            "隐变量维数无限的情形",
-            "不需要 E 步的模型",
-          ],
-          correctIndex: 0,
-          explanation: "顺序 EM 逐样本更新统计量，适合无法一次性加载全部数据的在线场景。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 15",
         section: "15.4",
         pages: "Ch 15",

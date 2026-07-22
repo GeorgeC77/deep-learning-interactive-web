@@ -48,70 +48,7 @@ export default function Ch11MarkovChainMonteCarloPage() {
         "在非对称提议下仍使用 Metropolis 公式，导致平稳分布不正确。",
         "忽略 MCMC 样本自相关，直接用独立样本的标准误公式估计方差。",
       ]}
-      quiz={[
-        {
-          question: "若提议分布 q(x'|x) 不对称，Metropolis 接受率 A=min(1,p(x')/p(x)) 会导致？",
-          options: [
-            "链的平稳分布不再是目标分布 p，需要用 Hastings 修正。",
-            "接受率更高，采样更高效。",
-            "结果仍然正确，因为 p 本身是对称的。",
-            "算法会立即收敛。",
-          ],
-          correctIndex: 0,
-          explanation: "非对称提议破坏细致平衡，必须引入 q(x|x')/q(x'|x) 修正。",
-        },
-        {
-          question: "在能量形式 p(x)∝exp(-E(x))、对称提议且 T=1 时，MH 接受率退化为？",
-          options: [
-            "A=min(1, exp(-(E(x')-E(x))))",
-            "A=min(1, exp(E(x')-E(x)))",
-            "A=1 恒接受",
-            "A=p(x)/p(x')",
-          ],
-          correctIndex: 0,
-          explanation: "p(x')/p(x)=exp(-E(x'))/exp(-E(x))=exp(-(E(x')-E(x)))=exp(-ΔE)。",
-        },
-        {
-          question: "Gibbs 采样可以看作 MH 的特例，其接受率是多少？",
-          options: ["1（恒接受）", "0.5", "min(1, p(x')/p(x))", "取决于提议方差"],
-          correctIndex: 0,
-          explanation: "Gibbs 按条件分布采样， proposals 总是来自目标条件分布，因此接受率恒为 1。",
-        },
-        {
-          question: "Markov chain 的平稳分布是什么意思？",
-          options: [
-            "一旦链达到该分布，后续转移不再改变其边际分布。",
-            "链在有限步内必然收敛到的初始分布。",
-            "所有状态概率都相等的均匀分布。",
-            "提议分布的对称形式。",
-          ],
-          correctIndex: 0,
-          explanation: "平稳分布满足 π(x')=∑_x π(x)T(x→x')，是链的长期边际分布。",
-        },
-        {
-          question: "什么时候 MH 接受率可以退化为 Metropolis 接受率 A=min(1,p(x')/p(x))？",
-          options: [
-            "当提议分布对称，即 q(x'|x)=q(x|x') 时。",
-            "当目标分布是对称高斯时。",
-            "当使用 Gibbs 提议时。",
-            "当链已经收敛到平稳分布时。",
-          ],
-          correctIndex: 0,
-          explanation: "对称提议下 q(x'|x)/q(x|x')=1，Hastings 修正项消失，MH 退化为 Metropolis。",
-        },
-        {
-          question: "为什么 MCMC 样本不能当成完全独立样本？",
-          options: [
-            "因为相邻样本由马尔可夫转移核生成，存在自相关。",
-            "因为 MH 接受率总是小于 1。",
-            "因为 burn-in 会删除样本。",
-            "因为平稳分布不存在。",
-          ],
-          correctIndex: 0,
-          explanation: "MCMC 样本按转移核顺序生成，相邻样本高度相关；估计方差时需考虑有效样本量。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 14",
         section: "14.2",
         pages: "Ch 14",

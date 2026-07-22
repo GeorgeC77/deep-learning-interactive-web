@@ -48,42 +48,7 @@ export default function Ch07StyleTransferPage() {
         "认为 Gram 矩阵保留空间布局；它主要捕捉纹理统计，弱化空间位置信息。",
         "忽视内容权重 α 与风格权重 β 的比例，导致结果过像风格或丢失内容。",
       ]}
-      quiz={[
-        {
-          question: "Gram 矩阵为什么能表示风格？",
-          options: [
-            "它统计同一层特征通道之间的相关性，反映纹理和色彩分布。",
-            "它直接记录图像中每个物体的空间位置。",
-            "它等于内容特征图本身。",
-            "它只与像素亮度有关，与纹理无关。",
-          ],
-          correctIndex: 0,
-          explanation: "Gram 矩阵通过通道间内积去掉空间信息，保留纹理统计特征，因此适合表示风格。",
-        },
-        {
-          question: "设某层风格图像 Gram 矩阵为 G^s，合成图像 Gram 矩阵为 G^\\hat{x}，则该层风格损失正比于？",
-          options: [
-            "G^\\hat{x} 与 G^s 对应元素差的平方和。",
-            "G^\\hat{x} 与 G^s 的逐元素乘积。",
-            "合成图像与风格图像的像素差。",
-            "内容特征与风格特征的点积。",
-          ],
-          correctIndex: 0,
-          explanation: "风格损失衡量两层 Gram 矩阵之间的 Frobenius 距离，即对应元素差的平方和。",
-        },
-        {
-          question: "在风格迁移中，若 β 相对 α 过大，最可能出现什么结果？",
-          options: [
-            "风格纹理被过度强调，内容结构可能被破坏。",
-            "生成图像完全等同于内容图像。",
-            "Gram 矩阵不再影响优化。",
-            "内容损失自动降为零。",
-          ],
-          correctIndex: 0,
-          explanation: "β 过大时优化更关注风格匹配，可能牺牲内容结构，使图像更像风格画而内容难以辨认。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 10",
         section: "10.6",
         pages: "Ch 10",

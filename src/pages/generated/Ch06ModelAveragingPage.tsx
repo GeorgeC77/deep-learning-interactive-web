@@ -45,42 +45,7 @@ export default function Ch06ModelAveragingPage() {
         "认为 Dropout 测试时的缩放就是精确模型平均——它只是一种实用的近似",
         "把委员会机器的成功推广到任意相关误差结构而不检验协方差假设",
       ]}
-      quiz={[
-        {
-          question: "在等方差、两两相关为 ρ 的 M 个模型中，平均预测的方差是？",
-          options: [
-            "σ²·[ρ + (1−ρ)/M]",
-            "σ²/M",
-            "σ²·ρ",
-            "σ²·(1−ρ)",
-          ],
-          correctIndex: 0,
-          explanation: "平均预测的方差为 σ²·[ρ + (1−ρ)/M]；ρ=0 时退化为 σ²/M，ρ=1 时为 σ²。",
-        },
-        {
-          question: "当模型间相关性 ρ=1 时，增加更多模型会怎样？",
-          options: [
-            "集成方差保持 σ² 不变，无法降低",
-            "集成方差以 1/M 继续下降",
-            "集成方差降到 0",
-            "集成方差反而增大",
-          ],
-          correctIndex: 0,
-          explanation: "ρ=1 表示所有模型给出完全相关的误差，平均后方差仍为 σ²，没有收益。",
-        },
-        {
-          question: "Dropout 在测试时的权重缩放与精确模型平均的关系是？",
-          options: [
-            "它是一种近似，而非无条件等价",
-            "它在数学上与枚举所有子网络平均完全等价",
-            "它只在单隐层网络中等价",
-            "它比精确平均更优",
-          ],
-          correctIndex: 0,
-          explanation: "Dropout 的测试时缩放是对指数级子网络平均的一种实用近似，通常效果良好但不保证严格等价。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 9",
         section: "9.6",
         pages: "Ch 9",

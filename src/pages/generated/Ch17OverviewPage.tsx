@@ -36,37 +36,7 @@ export default function Ch17OverviewPage() {
         "混淆 x_t（DDPM 记号）与 z_t（Bishop 教材记号）的符号差异。",
         "把扩散模型当成确定性映射；其训练和采样都涉及随机噪声。",
       ]}
-      quiz={[
-        {
-          question: "关于 β_t schedule，下列说法正确的是？",
-          options: [
-            "β_t 随时间递增是常见设置，但不是数学必要条件。",
-            "β_t 必须严格单调递增，否则模型不收敛。",
-            "β_t 只能取常数。",
-            "β_t 必须在第一步就接近 1。",
-          ],
-          correctIndex: 0,
-          explanation: "递增 schedule 有助于逐步增强噪声，但扩散模型的数学推导对任意满足条件的 schedule 都成立。",
-        },
-        {
-          question: "本页使用 x_t 表示带噪样本，Bishop 教材中常用什么符号？",
-          options: ["z_t", "y_t", "h_t", "a_t"],
-          correctIndex: 0,
-          explanation: "Bishop 教材中扩散状态常记为 z_t；本页采用 DDPM 常见记号 x_t，两者等价。",
-        },
-        {
-          question: "无分类器引导（classifier-free guidance）的主要作用是？",
-          options: [
-            "在采样时增强条件信号，提高生成内容与提示的一致性。",
-            "替代反向去噪网络。",
-            "减少训练所需的扩散步数。",
-            "把无条件生成变为确定性生成。",
-          ],
-          correctIndex: 0,
-          explanation: "无分类器引导在 0≤w≤1 时插值条件与无条件预测；w=1 是普通条件预测，w>1 则是向条件方向外推，从而增强条件控制强度。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 20",
         section: "20",
         pages: "Ch 20",

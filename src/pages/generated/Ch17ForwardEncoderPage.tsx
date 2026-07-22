@@ -42,42 +42,7 @@ export default function Ch17ForwardEncoderPage() {
         "认为必须迭代 T 步才能采样 x_t；实际上闭式重参数化可一步得到。",
         "把 β_t 递增说成扩散模型的数学必要条件；它只是常用工程选择。",
       ]}
-      quiz={[
-        {
-          question: "Bishop 教材中的 z_t 与 DDPM 文献中的 x_t 是什么关系？",
-          options: [
-            "同一对象的不同记号，均表示第 t 步带噪样本",
-            "z_t 是干净数据，x_t 是噪声",
-            "x_t 是隐变量，z_t 是观测",
-            "两者毫无关系",
-          ],
-          correctIndex: 0,
-          explanation: "Bishop 使用 z_t，DDPM 使用 x_t，两者都指前向过程第 t 步的带噪数据。",
-        },
-        {
-          question: "若 ᾱ_t=0.25，则 x_t 中信号分量与噪声分量的标准差分别是？",
-          options: [
-            "信号 0.5，噪声 ≈0.866",
-            "信号 0.25，噪声 0.75",
-            "信号 0.75，噪声 0.25",
-            "信号与噪声各 0.5",
-          ],
-          correctIndex: 0,
-          explanation: "信号系数 √ᾱ_t=0.5，噪声系数 √(1-ᾱ_t)=√0.75≈0.866。",
-        },
-        {
-          question: "给定 x₀ 时，x_t 的条件分布是什么？",
-          options: [
-            "高斯分布",
-            "均匀分布",
-            "拉普拉斯分布",
-            "确定性映射",
-          ],
-          correctIndex: 0,
-          explanation: "前向过程每一步都是高斯转移，累积后 q(x_t|x_0) 仍是高斯。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 20",
         section: "20.1",
         pages: "Ch 20",

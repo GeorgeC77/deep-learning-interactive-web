@@ -108,29 +108,6 @@ describe('pedagogical invariants: ninth batch (attention / CNN / latent variable
     expect(result.headOutputs[0].Q).toEqual(expectedQ0);
   });
 
-  it('Ch09 attention quiz does not reveal answer on selection only', () => {
-    render(
-      <MemoryRouter>
-        <Ch09AttentionPage />
-      </MemoryRouter>,
-    );
-    const advancedSwitch = screen.getByRole('switch');
-    fireEvent.click(advancedSwitch);
-
-    const firstOption = screen.getAllByRole('button').find((b) => b.textContent?.includes('置换不变性'));
-    expect(firstOption).toBeTruthy();
-    fireEvent.click(firstOption!);
-
-    // Explanation should not appear until submit.
-    expect(screen.queryByText(/解析/)).toBeNull();
-
-    const submit = screen.getAllByRole('button').find((b) => b.textContent?.includes('提交答案'));
-    expect(submit).toBeTruthy();
-    fireEvent.click(submit!);
-
-    expect(screen.queryByText(/解析/)).toBeTruthy();
-  });
-
   it('Ch09 advanced mode displays per-head Q/K/S/A/V/O and final W_O/Y', () => {
     render(
       <MemoryRouter>

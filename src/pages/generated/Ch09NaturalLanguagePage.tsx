@@ -61,42 +61,7 @@ export default function Ch09NaturalLanguagePage() {
       counterexamples={[
         "距离近不一定同义：它只表示在当前任务中相似。比如“好”和“坏”常出现在同样语境，距离可能很近但意思相反。",
       ]}
-      quiz={[
-        {
-          question: "自回归语言模型对句子 x₁,x₂,x₃ 的建模方式是？",
-          options: [
-            "p(x₁)p(x₂|x₁)p(x₃|x₁,x₂)",
-            "p(x₁)p(x₂)p(x₃)",
-            "p(x₃|x₂)p(x₂|x₁)p(x₁)",
-            "p(x₁,x₂,x₃) 用单个高斯分布建模",
-          ],
-          correctIndex: 0,
-          explanation: "自回归模型按前向顺序分解联合概率：p(x₁,x₂,x₃)=p(x₁)p(x₂|x₁)p(x₃|x₁,x₂)。",
-        },
-        {
-          question: "RNN 长程依赖困难的主要原因是？",
-          options: [
-            "反向传播时梯度经过多个时间步连乘，容易出现消失或爆炸。",
-            "RNN 不能处理变长序列。",
-            "RNN 没有隐状态。",
-            "RNN 不能与非线性激活一起使用。",
-          ],
-          correctIndex: 0,
-          explanation: "BPTT 中梯度随时间反向传播，长时间步连乘导致梯度消失或爆炸，是 RNN 的固有难点。",
-        },
-        {
-          question: "词袋模型在哪个场景下最可能失败？",
-          options: [
-            "判断“ dogs chase cats ”与“ cats chase dogs ”语义不同的场景。",
-            "统计文档中各词出现频率。",
-            "对短文本进行主题分类。",
-            "构建 TF-IDF 特征。",
-          ],
-          correctIndex: 0,
-          explanation: "词袋忽略词序，因此无法区分“狗追猫”和“猫追狗”的语义差异。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 12",
         section: "12.2",
         pages: "Ch 12",

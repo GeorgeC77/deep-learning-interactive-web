@@ -40,42 +40,7 @@ export default function Ch14AdversarialTrainingPage() {
         "混淆原始极小极大损失与非饱和损失：前者对生成器使用 ln(1-D(G(z)))，后者使用 -ln D(G(z))。",
         "忽视判别器过强会导致生成器梯度消失。",
       ]}
-      quiz={[
-        {
-          question: "原始 minimax generator loss 与非饱和 generator loss 的关键区别是什么？",
-          options: [
-            "minimax 使用 ln(1-D(G(z)))，在 D 很容易拒绝假样本时梯度很小；非饱和损失使用 -ln D(G(z))，早期梯度更稳定。",
-            "两者在数学上完全等价，只是写法不同。",
-            "非饱和损失不再需要训练判别器。",
-            "minimax 直接最大化 D(G(z))，而非饱和损失最小化 D(G(z))。",
-          ],
-          correctIndex: 0,
-          explanation: "minimax 目标中生成器最小化 ln(1-D(G(z)))，当 D(G(z))≈0 时梯度消失；非饱和损失 -ln D(G(z)) 在同样区域仍有强梯度。",
-        },
-        {
-          question: "若 D(G(z))=0.1，则非饱和生成器损失 -ln D(G(z)) 等于多少？",
-          options: [
-            "-ln 0.1 ≈ 2.30",
-            "ln 0.1 ≈ -2.30",
-            "0.9",
-            "0.1",
-          ],
-          correctIndex: 0,
-          explanation: "-ln(0.1)=ln(10)≈2.302。D(G(z)) 越小，说明生成样本被判为假的概率越高，non-saturating loss −ln D(G(z)) 就越大。",
-        },
-        {
-          question: "训练后期生成器只输出少数几类样本，判别器对这些样本给出高置信度，这最可能是？",
-          options: [
-            "模式崩溃（mode collapse）",
-            "GAN 已收敛到纳什均衡",
-            "判别器梯度消失",
-            "生成器过拟合到单个真实样本",
-          ],
-          correctIndex: 0,
-          explanation: "生成器陷入数据分布的少数模式，无法覆盖全部多样性，是 GAN 训练中典型的模式崩溃现象。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 17",
         section: "17.1",
         pages: "Ch 17",

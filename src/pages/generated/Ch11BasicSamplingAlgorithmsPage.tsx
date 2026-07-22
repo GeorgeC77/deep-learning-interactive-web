@@ -52,37 +52,7 @@ export default function Ch11BasicSamplingAlgorithmsPage() {
         "在 p=N(0,1), q=N(μ,1) 时错误认为 w(0)=exp(-μ²/2)；正确应为 exp(μ²/2)。",
         "忽视拒绝采样在高维空间的指数级低效，强行用于高维问题。",
       ]}
-      quiz={[
-        {
-          question: "设 p=N(0,1), q=N(μ,1)，则 w(0)=p(0)/q(0) 等于？",
-          options: [
-            "exp(μ²/2)",
-            "exp(-μ²/2)",
-            "μ",
-            "1",
-          ],
-          correctIndex: 0,
-          explanation: "p(0)=1/√(2π)，q(0)=1/√(2π)·exp(-μ²/2)，因此 w(0)=exp(μ²/2)。",
-        },
-        {
-          question: "若重要性采样的权重分布极不均匀，最可能说明？",
-          options: [
-            "提议分布 q 与目标分布 p 差异大，有效样本量低。",
-            "q 与 p 完全一致。",
-            "采样数越多估计方差越大。",
-            "重要性采样失效，必须改用拒绝采样。",
-          ],
-          correctIndex: 0,
-          explanation: "权重方差大意味着少数样本主导估计，ESS 下降，估计方差增大。",
-        },
-        {
-          question: "拒绝采样中，接受率随维度增加通常会？",
-          options: ["指数下降", "线性增加", "保持不变", "先降后升"],
-          correctIndex: 0,
-          explanation: "高维空间中 p 与 q 的重叠区域迅速减小，导致接受率指数级降低。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 14",
         section: "14.1",
         pages: "Ch 14",

@@ -38,42 +38,7 @@ export default function Ch17GuidedDiffusionPage() {
         "混淆分类器引导与无分类器引导：前者需要额外训练分类器，后者在训练时随机丢弃条件即可。",
         "忽视 w=1 只是普通条件采样；0≤w≤1 才是插值，w>1 是外推。",
       ]}
-      quiz={[
-        {
-          question: "无分类器引导中，若 ε_unc=0.2、ε_cond=0.5、w=2，则 ε_hat 是多少？",
-          options: [
-            "0.8",
-            "0.5",
-            "0.2",
-            "1.0",
-          ],
-          correctIndex: 0,
-          explanation: "ε_hat = ε_unc + w(ε_cond - ε_unc) = 0.2 + 2×(0.5-0.2) = 0.8。注意 w=2 已经超出普通条件预测，属于外推。",
-        },
-        {
-          question: "增大引导权重 w 时，conditional alignment 和 sample diversity 如何变化？",
-          options: [
-            "conditional alignment 增强，diversity 下降",
-            "conditional alignment 下降，diversity 增强",
-            "两者都增强",
-            "两者都下降",
-          ],
-          correctIndex: 0,
-          explanation: "w 越大，采样方向越偏向条件预测，条件对齐越好，但分布多样性越低。过高 w 会降低多样性，并可能造成过饱和、失真或伪影。",
-        },
-        {
-          question: "分类器引导与无分类器引导的主要区别是？",
-          options: [
-            "分类器引导需要额外训练分类器，无分类器引导在训练时随机丢弃条件",
-            "分类器引导只能用于文本条件",
-            "无分类器引导必须训练两个独立模型",
-            "两者在数学上完全等价",
-          ],
-          correctIndex: 0,
-          explanation: "分类器引导依赖外部分类器的梯度；无分类器引导通过单一模型同时学习条件与无条件预测。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 20",
         section: "20.4",
         pages: "Ch 20",

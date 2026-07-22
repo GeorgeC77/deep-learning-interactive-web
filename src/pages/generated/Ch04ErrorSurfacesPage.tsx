@@ -51,53 +51,7 @@ export default function Ch04ErrorSurfacesPage() {
         "把训练停滞误判为到达局部极小值；在高维中更可能是鞍点或高原。",
         "忽略条件数对收敛速度的影响，仅靠学习率调参无法解决病态曲面的根本问题。",
       ]}
-      quiz={[
-        {
-          question: "在极小值 w* 附近，误差函数的局部行为主要由什么决定？",
-          options: [
-            "Hessian 矩阵 H 的二次型",
-            "梯度 ∇E 的方向",
-            "误差函数的全局形状",
-            "训练数据的大小",
-          ],
-          correctIndex: 0,
-          explanation: "在驻点处一阶导数为零，泰勒展开的主项是 (1/2)(w-w*)ᵀH(w-w*)，局部几何完全由 Hessian 决定。",
-        },
-        {
-          question: "梯度下降的最大稳定学习率与 Hessian 最大特征值 λ_max 的关系是？",
-          options: [
-            "η_max = 2/λ_max",
-            "η_max = λ_max/2",
-            "η_max = 1/λ_max²",
-            "η_max = λ_max",
-          ],
-          correctIndex: 0,
-          explanation: "沿最大特征值方向，更新公式 w←w-η∇E 的稳定条件要求 η<2/λ_max，否则迭代发散。",
-        },
-        {
-          question: "为什么高维参数空间中鞍点比局部极小值更常见？",
-          options: [
-            "因为鞍点要求 Hessian 既有正又有负特征值，在高维中概率更高。",
-            "因为局部极小值在高维中不存在。",
-            "因为梯度下降会主动寻找鞍点。",
-            "因为高维空间中所有点都是鞍点。",
-          ],
-          correctIndex: 0,
-          explanation: "局部极小值要求 Hessian 所有特征值为正，随维度增加其概率指数衰减；而鞍点只需部分为正、部分为负，概率远高于严格局部极小。",
-        },
-        {
-          question: "条件数 κ=λ_max/λ_min 很大时，梯度下降的典型行为是？",
-          options: [
-            "在陡峭方向来回振荡，沿平缓方向缓慢前进。",
-            "均匀快速收敛到极小值。",
-            "完全不收敛。",
-            "直接跳过极小值。",
-          ],
-          correctIndex: 0,
-          explanation: "大条件数意味着曲面各向异性严重，梯度方向偏离极小值方向，形成之字形锯齿路径。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 7",
         section: "7.1",
         pages: "Ch 7",

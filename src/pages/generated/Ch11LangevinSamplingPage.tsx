@@ -41,37 +41,7 @@ export default function Ch11LangevinSamplingPage() {
         "使用过大步长 η，导致 Langevin 链不稳定或偏离目标分布。",
         "把有限步长的离散更新当成目标分布的精确样本。",
       ]}
-      quiz={[
-        {
-          question: "为什么 EBM 的 partition function 会导致训练困难？",
-          options: [
-            "Z(w) 通常需要在整个数据空间上积分，难以解析或精确计算。",
-            "它使能量函数 E(x,w) 不再可微。",
-            "它导致 score function 无法定义。",
-            "它让模型只能描述离散分布。",
-          ],
-          correctIndex: 0,
-          explanation: "Z(w)=∫exp{-E(x,w)}dx 通常没有闭式解，最大似然梯度中的模型期望需要通过采样近似。",
-        },
-        {
-          question: "若 E(x)=x²/2，则 score s(x)=∇_x ln p(x) 等于多少？",
-          options: ["-x", "x", "-x²/2", "1"],
-          correctIndex: 0,
-          explanation: "s(x)=-∇_x E(x)=-x；这正是标准高斯分布的 score。",
-        },
-        {
-          question: "关于 Langevin 采样的收敛性，下列说法最准确的是？",
-          options: [
-            "有限步长 η 只能得到近似样本，精确收敛通常需要额外假设。",
-            "任何步长下链都会精确收敛到模型分布。",
-            "噪声项会随步长增大而消失。",
-            "只要运行足够多步，结果一定无偏。",
-          ],
-          correctIndex: 0,
-          explanation: "显示的更新是 Euler–Maruyama 离散化；精确样本需要 η→0 或衰减步长，并满足正则性条件。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 14",
         section: "14.3",
         pages: "Ch 14",

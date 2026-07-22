@@ -51,42 +51,7 @@ export default function Ch04ConvergencePage() {
         "认为动量越大越好——μ 接近 1 时会导致振荡加剧",
         "把学习率衰减视为非凸网络无条件收敛的保证——实际收敛需要光滑性、步长、随机性等假设",
       ]}
-      quiz={[
-        {
-          question: "在 classical momentum v=μv+g、恒定梯度 g 下，稳态速度是多少？",
-          options: [
-            "−ηg/(1−μ)",
-            "−ηg",
-            "−ηg·(1−μ)",
-            "−ηg/μ",
-          ],
-          correctIndex: 0,
-          explanation: "稳态满足 v = μv + g ⇒ v = g/(1−μ)，位置更新为 −ηv = −ηg/(1−μ)。",
-        },
-        {
-          question: "EMA momentum v=μv+(1−μ)g 在恒定梯度下的稳态放大因子是多少？",
-          options: [
-            "1",
-            "1/(1−μ)",
-            "1−μ",
-            "μ",
-          ],
-          correctIndex: 0,
-          explanation: "EMA 约定把梯度按 (1−μ) 缩放，稳态时 v=g，位置更新为 −ηg，放大因子为 1。",
-        },
-        {
-          question: "关于学习率衰减的收敛保证，下列说法最准确的是？",
-          options: [
-            "在特定光滑性、步长和随机梯度假设下，适当衰减有助于收敛；对一般非凸网络不提供无条件保证",
-            "只要学习率衰减，就能保证收敛到全局最优",
-            "学习率衰减只对凸问题有效",
-            "学习率衰减能消除所有局部极小值",
-          ],
-          correctIndex: 0,
-          explanation: "学习率衰减的收敛结论依赖前提假设；深度非凸网络的优化理论尚无如此强的一般保证。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 7",
         section: "7.3",
         pages: "Ch 7",

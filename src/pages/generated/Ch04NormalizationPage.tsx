@@ -37,42 +37,7 @@ export default function Ch04NormalizationPage() {
         "在推理时使用 batch 统计量而不是训练好的移动统计量。",
         "认为归一化后就不需要仔细初始化或学习率调参。",
       ]}
-      quiz={[
-        {
-          question: "BatchNorm 与 LayerNorm 的主要区别在于？",
-          options: [
-            "BatchNorm 沿 batch 维度对每个特征归一化，LayerNorm 沿特征维度对每个样本归一化",
-            "BatchNorm 只用于 CNN，LayerNorm 只用于 RNN",
-            "两者完全相同",
-            "BatchNorm 不需要 γ、β 参数",
-          ],
-          correctIndex: 0,
-          explanation: "BatchNorm 计算每个特征在 mini-batch 上的均值/方差；LayerNorm 对每个样本单独在特征维度上计算。",
-        },
-        {
-          question: "推理时 BatchNorm 通常使用什么统计量？",
-          options: [
-            "训练阶段累积的移动平均统计量",
-            "当前 batch 的统计量",
-            "全局数据集的精确统计量",
-            "随机初始化统计量",
-          ],
-          correctIndex: 0,
-          explanation: "推理时 batch 可能只有一个样本，因此使用训练期间维护的 moving mean / moving variance。",
-        },
-        {
-          question: "关于归一化的效果，下列说法最准确的是？",
-          options: [
-            "通常有助于训练稳定，但效果依赖网络、任务与批量大小",
-            "一定能让网络使用任意大的学习率",
-            "在所有任务上都优于未归一化网络",
-            "可以完全替代权重初始化",
-          ],
-          correctIndex: 0,
-          explanation: "归一化是强有力的启发式，但不是无条件保证；小批量、不合适的任务或结构仍可能失效。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 7",
         section: "7.4",
         pages: "Ch 7",

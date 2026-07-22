@@ -55,42 +55,7 @@ export default function Ch06ParameterSharingPage() {
         "认为卷积和局部连接表达能力相同——卷积的共享约束强加了平移等变性",
         "忽视偏置项 C_out 在参数量公式中的贡献",
       ]}
-      quiz={[
-        {
-          question: "卷积层的参数量公式是？",
-          options: [
-            "K_h K_w C_in C_out + C_out",
-            "H_out W_out K_h K_w C_in C_out",
-            "H_in W_in C_in H_out W_out C_out",
-            "K_h K_w C_in C_out",
-          ],
-          correctIndex: 0,
-          explanation: "卷积核权重为 K_h·K_w·C_in·C_out，加上每个输出通道一个偏置。",
-        },
-        {
-          question: "局部连接与卷积相比，参数量大约相差多少倍？",
-          options: [
-            "H_out·W_out 倍（即空间位置数）",
-            "K_h·K_w 倍",
-            "C_in·C_out 倍",
-            "相同",
-          ],
-          correctIndex: 0,
-          explanation: "局部连接为每个输出位置保存独立核，因此参数量是卷积的 H_out·W_out 倍。",
-        },
-        {
-          question: "为什么卷积具有平移等变性？",
-          options: [
-            "同一组权重在所有空间位置复用",
-            "连接数更少",
-            "使用了 softmax",
-            "输出通道数更多",
-          ],
-          correctIndex: 0,
-          explanation: "参数共享意味着输入平移后，同一核仍以相同方式与局部 patch 作用，只是作用位置平移，因此输出也平移。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 9",
         section: "9.4",
         pages: "Ch 9",

@@ -53,42 +53,7 @@ export default function Ch08ConditionalIndependencePage() {
         "忽略条件化汇聚节点的子孙也会解除阻断。",
         "把 d-分离的图结构结论直接等同于因果论断。",
       ]}
-      quiz={[
-        {
-          question: "在链式结构 A → B → C 中，给定 B 后 A 与 C 的关系是？",
-          options: [
-            "条件独立",
-            "仍然相关",
-            "一定因果相关",
-            "无法判断",
-          ],
-          correctIndex: 0,
-          explanation: "B 是链的中间节点，条件化 B 阻断了 A 与 C 之间的唯一路径，因此 A ⊥ C | B。",
-        },
-        {
-          question: "在汇聚结构 A → B ← C 中，什么情况下 A 与 C 会变得相关？",
-          options: [
-            "给定 B 或 B 的某个子孙",
-            "给定 A 或 C",
-            "不条件化任何节点",
-            "删除 B 节点",
-          ],
-          correctIndex: 0,
-          explanation: "汇聚节点在无条件时被阻断；一旦条件化 B 或其子孙，路径被开通，A 与 C 相关（解释消除）。",
-        },
-        {
-          question: "d-分离规则可以用来判断什么？",
-          options: [
-            "在 DAG 中给定某节点集合后，另两个节点是否条件独立",
-            "变量之间的因果关系方向",
-            "联合分布的精确数值",
-            "模型参数的显著性",
-          ],
-          correctIndex: 0,
-          explanation: "d-分离是图结构准则，用于推断条件独立性，不直接给出因果方向或数值。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 11",
         section: "11.2",
         pages: "Ch 11",

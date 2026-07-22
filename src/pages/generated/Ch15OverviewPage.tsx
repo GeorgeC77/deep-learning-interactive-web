@@ -34,37 +34,7 @@ export default function Ch15OverviewPage() {
         "为了可逆性牺牲过多表达能力，导致模型无法拟合复杂数据。",
         "忽视不同流架构在训练、采样与密度评估上的计算差异。",
       ]}
-      quiz={[
-        {
-          question: "归一化流相比 VAE 的主要优势是什么？",
-          options: [
-            "可以精确计算似然 p(x)。",
-            "隐变量维度可以任意大。",
-            "不需要训练解码器。",
-            "只能用于离散数据。",
-          ],
-          correctIndex: 0,
-          explanation: "由于变换可逆且 Jacobian 易计算，归一化流能给出精确的对数似然。",
-        },
-        {
-          question: "变量替换公式中，若 Jacobian 行列式的绝对值大于 1，说明什么？",
-          options: [
-            "f 在该局部放大了体积，x 空间密度低于 z 空间对应点密度。",
-            "f 压缩了体积。",
-            "变换不可逆。",
-            "基分布必须是均匀分布。",
-          ],
-          correctIndex: 0,
-          explanation: "|det J|>1 表示体积膨胀，因此 p_x(x) = p_z(z)/|det J| 会减小。",
-        },
-        {
-          question: "下列哪种流架构的采样通常是串行的？",
-          options: ["自回归流", "耦合流", "连续流", "都不是"],
-          correctIndex: 0,
-          explanation: "自回归流按维度顺序生成，采样通常需要逐步进行；耦合流和连续流可更并行。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 18",
         pages: "Ch 18",
         textbookSubsections: [

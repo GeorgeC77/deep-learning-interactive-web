@@ -33,42 +33,7 @@ export default function Ch14ImageGansPage() {
         "认为 CycleGAN 的循环一致性损失足以保证语义一致；它只能约束像素层面的可逆性。",
         "忽视 DCGAN 中批归一化与卷积结构对训练稳定性的贡献。",
       ]}
-      quiz={[
-        {
-          question: "CycleGAN 为什么能在没有成对数据的情况下学习域转换？",
-          options: [
-            "它通过循环一致性损失把无配对样本组织成可学习的约束。",
-            "它完全不需要判别器。",
-            "它假设两个域的图像完全相同。",
-            "它使用预训练分类器生成配对数据。",
-          ],
-          correctIndex: 0,
-          explanation: "CycleGAN 同时学习双向映射并要求 F(G(x))≈x，无需输入与输出的一一对应。",
-        },
-        {
-          question: "循环一致性损失的目标是什么？",
-          options: [
-            "让 x 经 G 到 Y 域再经 F 回到 X 域后尽量接近原始 x。",
-            "让判别器无法区分真实图像与生成图像。",
-            "让生成器输出与输入完全相同。",
-            "让两个域的边缘分布完全相等。",
-          ],
-          correctIndex: 0,
-          explanation: "循环一致性约束 F(G(x))≈x 与 G(F(y))≈y，是无配对数据的直接监督来源。",
-        },
-        {
-          question: "如果去掉 cycle consistency loss，只保留对抗损失，最可能出现什么问题？",
-          options: [
-            "生成器可能把输入映射到目标域的任意图像，失去与输入的对应关系。",
-            "训练完全无法开始。",
-            "判别器会立即收敛到最优。",
-            "生成图像质量一定更高。",
-          ],
-          correctIndex: 0,
-          explanation: "没有循环一致性，生成器只需生成目标域中像真实图像的样本，而不必保留输入的语义内容。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 17",
         section: "17.2",
         pages: "Ch 17",

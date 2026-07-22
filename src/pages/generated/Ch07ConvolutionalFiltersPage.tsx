@@ -2,8 +2,6 @@ import BishopSectionPage from '@/components/BishopSectionPage';
 import ConvolutionSizeDemo from '@/components/demos/ConvolutionSizeDemo';
 import FeatureHierarchyLab from '@/components/demos/FeatureHierarchyLab';
 import {
-  computeOutputSize,
-  computeSamePadding,
   outputSizeFormulaLatex,
   classicSameFormulaLatex,
   frameworkSameFormulaLatex,
@@ -98,53 +96,7 @@ export default function Ch07ConvolutionalFiltersPage() {
         "Pooling 后严格平移等变性会被破坏：输入平移一小步，池化输出可能不再精确对应平移。",
         "加大步幅或裁剪边界时，输出对输入的精确平移对应关系也会被破坏。",
       ]}
-      quiz={[
-        {
-          question: `若 I=${SAME_DEMO_I}, K=${SAME_DEMO_K}, S=${SAME_DEMO_S}，framework SAME 的输出尺寸 O 是多少？`,
-          options: [
-            String(computeSamePadding(SAME_DEMO_I, SAME_DEMO_K, SAME_DEMO_S).outputSize),
-            String(computeOutputSize(SAME_DEMO_I, SAME_DEMO_K, 0, SAME_DEMO_S)),
-            String(SAME_DEMO_I),
-            String(Math.floor(SAME_DEMO_I / SAME_DEMO_S)),
-          ],
-          correctIndex: 0,
-          explanation: `Framework SAME 固定 O=ceil(I/S)=ceil(${SAME_DEMO_I}/${SAME_DEMO_S})=${computeSamePadding(SAME_DEMO_I, SAME_DEMO_K, SAME_DEMO_S).outputSize}，与核尺寸无关。`,
-        },
-        {
-          question: "valid convolution 与 framework SAME 的根本区别是什么？",
-          options: [
-            "valid 不填充，framework SAME 按 O=ceil(I/S) 自动填充。",
-            "valid 用于训练，framework SAME 用于测试。",
-            "valid 一定比 framework SAME 计算量更小。",
-            "valid 与 framework SAME 只是命名不同，没有实质区别。",
-          ],
-          correctIndex: 0,
-          explanation: "valid 在边界不补零；framework SAME 通过自动 padding 使输出尺寸为 ceil(I/S)，且 S>1 时允许下采样。",
-        },
-        {
-          question: "步幅 S>1 时，framework SAME 是否仍能保证 O=I？",
-          options: [
-            "不能；framework SAME 的输出是 ceil(I/S)，S>1 时通常下采样。",
-            "一定可以，只要 padding 足够大。",
-            "一定不行，因为步幅大于 1 必然缩小尺寸。",
-            "只有 K 为偶数时才不行。",
-          ],
-          correctIndex: 0,
-          explanation: "framework SAME 的定义就是 O=ceil(I/S)；S>1 时下采样是该约定的预期结果。",
-        },
-        {
-          question: "framework SAME 在哪种情况下会产生左右不对称的填充？",
-          options: [
-            "当总填充 Ptotal 为奇数时。",
-            "当核尺寸 K 为偶数时。",
-            "当步幅 S>1 时。",
-            "framework SAME 总是对称填充。",
-          ],
-          correctIndex: 0,
-          explanation: "Ptotal 为奇数时按 floor(Ptotal/2) 与 ceil(Ptotal/2) 分配左右；K 为偶数时常导致 Ptotal 为奇数。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 10",
         section: "10.2",
         pages: "Ch 10",

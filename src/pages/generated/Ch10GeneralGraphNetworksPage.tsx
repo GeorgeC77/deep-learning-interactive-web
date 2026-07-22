@@ -47,42 +47,7 @@ export default function Ch10GeneralGraphNetworksPage() {
         "在需要几何等变的任务中使用普通 GNN，导致模型预测依赖坐标系选择。",
         "GAT 注意力系数公式的分母错误地以源节点而非中心节点做归一化。",
       ]}
-      quiz={[
-        {
-          question: "GAT 与 GCN 在聚合邻居时的主要区别是？",
-          options: [
-            "GAT 通过学习注意力系数自适应加权邻居，GCN 使用固定归一化权重。",
-            "GAT 不能处理无向图，GCN 可以。",
-            "GCN 使用注意力，GAT 使用均值聚合。",
-            "两者在数学上完全相同。",
-          ],
-          correctIndex: 0,
-          explanation: "GAT 的核心是用可学习的注意力权重替代 GCN 中由度矩阵固定的归一化权重。",
-        },
-        {
-          question: "GAT 注意力系数 α_uv 的分母应当对哪些节点求和？",
-          options: [
-            "中心节点 v 的所有邻居 k∈N(v)",
-            "源节点 u 的所有邻居",
-            "图中所有节点",
-            "只包括 u 和 v 两个节点",
-          ],
-          correctIndex: 0,
-          explanation: "α_uv 是 v 聚合时的权重，因此分母必须以 v 为中心对其邻居做 softmax 归一化。",
-        },
-        {
-          question: "过平滑问题通常表现为？",
-          options: [
-            "深层网络中不同节点的表示变得非常相似。",
-            "训练损失无法下降。",
-            "模型对训练集过拟合。",
-            "图注意力权重全部变为 0。",
-          ],
-          correctIndex: 0,
-          explanation: "过平滑指随着层数增加，节点表示差异被平均掉，导致节点分类性能下降。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 13",
         section: "13.3",
         pages: "Ch 13",

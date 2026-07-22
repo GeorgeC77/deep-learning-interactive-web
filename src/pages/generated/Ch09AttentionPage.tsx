@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BookOpen, ChevronLeft, ChevronRight, Focus, ShieldAlert, SlidersHorizontal, AlertTriangle, HelpCircle, Target, Lightbulb, MapPin, Layers, MessageCircleQuestion, FlaskConical } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Focus, ShieldAlert, SlidersHorizontal, AlertTriangle, Target, Lightbulb, MapPin, Layers, MessageCircleQuestion, FlaskConical } from 'lucide-react';
 import AttentionLab from '@/components/demos/AttentionLab';
 import AttentionMatrixVsOutputLab from '@/components/demos/AttentionMatrixVsOutputLab';
 import AttentionScalingLab from '@/components/demos/AttentionScalingLab';
@@ -93,10 +93,6 @@ export default function Ch09AttentionPage() {
   const [seqLen, setSeqLen] = useState(8);
   const [embedDim, setEmbedDim] = useState(64);
 
-  const [quizStates, setQuizStates] = useState(
-    Array.from({ length: 3 }, () => ({ selected: null as number | null, submitted: false })),
-  );
-
   // Toy scalar demo: single head with d_k = 3.
   const { attnMatrix: toyAttn, outputs: toyOutputs } = useMemo(() => {
     const queries = EMBEDDINGS.map((e) => e.slice(0, 3).map((v) => v * wq));
@@ -128,45 +124,6 @@ export default function Ch09AttentionPage() {
     () => multiHeadAttention(EMBEDDINGS, WQ_HEADS, WK_HEADS, WV_HEADS, WO, false),
     [],
   );
-
-  const quiz = [
-    {
-      question: '没有位置编码时，自注意力对 token 顺序具有什么性质？',
-      options: ['置换不变性（permutation invariant）', '置换等变性（permutation equivariant）', '完全不受顺序影响，输出也完全不变化', '对顺序高度敏感'],
-      correctIndex: 1,
-      explanation: '没有位置编码时，若输入 token 顺序被置换，输出 token 会以同样方式置换，因此是置换等变而不是置换不变。',
-    },
-    {
-      question: '缩放点积注意力中除以 √(d_k) 的主要目的是什么？',
-      options: ['让 softmax 输出更尖锐', '防止点积过大导致 softmax 梯度消失', '减少参数量', '保证注意力权重和为 1'],
-      correctIndex: 1,
-      explanation: 'd_k 较大时点积方差会增大，softmax 容易进入饱和区，除以 √(d_k) 可以稳定梯度。',
-    },
-    {
-      question: '自注意力计算复杂度关于序列长度 N 的增长规律是？',
-      options: ['O(N)', 'O(N log N)', 'O(N²D)', 'O(N³)'],
-      correctIndex: 2,
-      explanation: '每个 token 都要与其他所有 token 计算相似度，因此主要计算复杂度为 O(N²D)。',
-    },
-  ];
-
-  const selectOption = (qIdx: number, oIdx: number) => {
-    setQuizStates((prev) =>
-      prev.map((state, idx) => (idx === qIdx && !state.submitted ? { ...state, selected: oIdx } : state)),
-    );
-  };
-
-  const submitQuiz = (qIdx: number) => {
-    setQuizStates((prev) =>
-      prev.map((state, idx) => (idx === qIdx ? { ...state, submitted: true } : state)),
-    );
-  };
-
-  const resetQuiz = (qIdx: number) => {
-    setQuizStates((prev) =>
-      prev.map((state, idx) => (idx === qIdx ? { selected: null, submitted: false } : state)),
-    );
-  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
@@ -582,78 +539,6 @@ export default function Ch09AttentionPage() {
             </li>
           ))}
         </ul>
-      </section>
-
-      {/* Quiz */}
-      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <HelpCircle className="w-6 h-6 text-violet-600" />
-          <h2 className="text-2xl font-bold text-gray-900">小测题</h2>
-        </div>
-        <div className="space-y-6">
-          {quiz.map((q, qIdx) => {
-            const { selected, submitted } = quizStates[qIdx];
-            return (
-              <div key={qIdx} className="border border-gray-200 rounded-lg p-4">
-                <div className="font-medium text-gray-900 mb-3">
-                  {qIdx + 1}. {q.question}
-                </div>
-                <div className="space-y-2">
-                  {q.options.map((opt, oIdx) => {
-                    const isSelected = selected === oIdx;
-                    const isCorrect = oIdx === q.correctIndex;
-                    let btnClass = 'w-full text-left px-3 py-2 rounded-md text-sm border transition-colors ';
-                    if (submitted) {
-                      if (isCorrect) btnClass += 'bg-emerald-50 border-emerald-300 text-emerald-800';
-                      else if (isSelected) btnClass += 'bg-red-50 border-red-300 text-red-800';
-                      else btnClass += 'bg-gray-50 border-gray-200 text-gray-500';
-                    } else {
-                      btnClass += isSelected
-                        ? 'bg-violet-50 border-violet-300 text-violet-800'
-                        : 'bg-white border-gray-200 hover:bg-gray-50 text-gray-700';
-                    }
-                    return (
-                      <button
-                        key={oIdx}
-                        type="button"
-                        disabled={submitted}
-                        className={btnClass}
-                        onClick={() => selectOption(qIdx, oIdx)}
-                      >
-                        {String.fromCharCode(65 + oIdx)}. {opt}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={selected === null || submitted}
-                    onClick={() => submitQuiz(qIdx)}
-                    className="px-3 py-1.5 text-sm bg-violet-600 text-white rounded-lg hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    提交答案
-                  </button>
-                  {submitted && (
-                    <button
-                      type="button"
-                      onClick={() => resetQuiz(qIdx)}
-                      className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-                    >
-                      重置
-                    </button>
-                  )}
-                </div>
-                {submitted && (
-                  <div className="mt-3 text-sm text-gray-700 bg-slate-50 p-3 rounded-md">
-                    <span className="font-medium">解析：</span>
-                    {q.explanation}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
       </section>
 
       {/* Navigation */}

@@ -63,53 +63,7 @@ export default function Ch01LinearRegressionPage() {
         "认为 SGD 只适用于大批量数据；实际上单样本 SGD 噪声虽大但计算极快，配合递减学习率可收敛",
         "把正则化参数 λ 设得过大导致严重欠拟合（所有 w 趋近于 0）",
       ]}
-      quiz={[
-        {
-          question: "y(x,w) = w₀ + w₁x + w₂x² 是线性模型吗？为什么？",
-          options: [
-            "是，因为对参数 w 是线性的（虽然对 x 不是）",
-            "不是，因为包含 x² 项",
-            "只有在 x 的取值范围内才是",
-            "取决于训练数据是否线性",
-          ],
-          correctIndex: 0,
-          explanation: "模型是参数的线性函数 wᵀϕ(x)，ϕ(x) = [1, x, x²] 是基函数，可以任意非线性。",
-        },
-        {
-          question: "高斯噪声假设下，最大化似然函数等价于最小化什么？",
-          options: [
-            "平方误差和",
-            "交叉熵",
-            "Hinge loss",
-            "KL 散度",
-          ],
-          correctIndex: 0,
-          explanation: "对数似然中的 exp(-β(t-y)²/2) 项取 log 后得到 -(t-y)² 项，最大化即最小化平方和。",
-        },
-        {
-          question: "正则化项 (λ/2)‖w‖² 对正规方程的解有什么影响？",
-          options: [
-            "在 ΦᵀΦ 对角线上加 λI，使矩阵满秩并收缩权重",
-            "消除所有基函数的影响",
-            "加速 SGD 收敛",
-            "增大模型容量",
-          ],
-          correctIndex: 0,
-          explanation: "正则化解 w = (λI + ΦᵀΦ)⁻¹Φᵀt 总是良定的，即使 ΦᵀΦ 奇异。λ > 0 确保矩阵可逆。",
-        },
-        {
-          question: "为什么 ΦᵀΦ 求逆的计算代价可能很高？",
-          options: [
-            "因为它是 M×M 矩阵，求逆复杂度 O(M³)。当 M（基函数数量）很大时不可行",
-            "因为它依赖于样本数 N",
-            "因为它不是对称矩阵",
-            "因为它只能在高斯噪声下使用",
-          ],
-          correctIndex: 0,
-          explanation: "正规方程的瓶颈是 M³ 的矩阵求逆。当 M 很大时（如深度网络），SGD 等方法避免了矩阵求逆。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 4",
         section: "4.1",
         pages: "§4.1, pp. 112–119",

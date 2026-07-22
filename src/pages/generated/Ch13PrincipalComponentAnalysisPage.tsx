@@ -58,37 +58,7 @@ export default function Ch13PrincipalComponentAnalysisPage() {
         "最大方差方向不一定是最佳分类方向：若两类数据沿同一方向拉开，保留它反而可能把类别混在一起。",
         "若数据结构是非线性的（如弯曲流形），线性 PCA 即使保留高方差也无法低误差重构。",
       ]}
-      quiz={[
-        {
-          question: "PCA 的第一主成分是什么？",
-          options: [
-            "数据投影后方差最大的方向",
-            "数据均值方向",
-            "任意一个正交方向",
-            "标签区分度最大的方向",
-          ],
-          correctIndex: 0,
-          explanation: "PCA 按方差排序主成分，第一主成分使投影方差最大。",
-        },
-        {
-          question: "若协方差矩阵的特征值为 λ₁=5, λ₂=2, λ₃=0.5，保留 2 维主成分的重构误差是多少？",
-          options: ["0.5", "5", "2", "7.5"],
-          correctIndex: 0,
-          explanation: "重构误差等于被丢弃特征值之和，即 λ₃=0.5。",
-        },
-        {
-          question: "在将数据投影到前 M 个主成分之前，必须先做什么？",
-          options: [
-            "中心化（减去均值）",
-            "归一化到 [0,1]",
-            "添加标签",
-            "做 one-hot 编码",
-          ],
-          correctIndex: 0,
-          explanation: "PCA 基于协方差矩阵，需要先中心化数据，否则主方向会受均值影响。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 16",
         section: "16.1",
         pages: "Ch 16",

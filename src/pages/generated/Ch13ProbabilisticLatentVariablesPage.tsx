@@ -92,42 +92,7 @@ export default function Ch13ProbabilisticLatentVariablesPage() {
         "认为 p(x) 的积分总有闭式解；只有线性高斯等特殊情况才有。",
         "忽视因子分析与概率 PCA 在噪声模型上的区别。",
       ]}
-      quiz={[
-        {
-          question: "概率隐变量模型中，观测 x 的边缘分布如何得到？",
-          options: [
-            "对隐变量 z 积分（或求和）：p(x)=∫p(x|z)p(z)dz。",
-            "直接令 z 等于 x 的均值。",
-            "对 z 求和且 z 必须是离散变量。",
-            "p(x)=p(x|z)p(z) 对任意固定 z。",
-          ],
-          correctIndex: 0,
-          explanation: "边缘分布通过对隐变量积分（连续）或求和（离散）得到，体现了隐变量的不确定性。",
-        },
-        {
-          question: "因子分析与概率 PCA 在噪声模型上的主要区别是？",
-          options: [
-            "因子分析允许每个观测维度有独立噪声方差，概率 PCA 使用各向同性 σ²。",
-            "因子分析没有噪声项。",
-            "概率 PCA 只能用于一维数据。",
-            "两者在数学上完全相同。",
-          ],
-          correctIndex: 0,
-          explanation: "因子分析的噪声协方差 Ψ 是对角矩阵；概率 PCA 假设 Ψ=σ²I。",
-        },
-        {
-          question: "下列哪种模型使用离散隐变量？",
-          options: [
-            "高斯混合模型。",
-            "概率 PCA。",
-            "因子分析。",
-            "标准 VAE。",
-          ],
-          correctIndex: 0,
-          explanation: "高斯混合模型通过离散隐变量（成分标号）对数据分组；FA、PPCA、标准 VAE 通常使用连续隐变量。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 16",
         section: "16.2",
         pages: "Ch 16",

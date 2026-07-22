@@ -53,42 +53,7 @@ export default function Ch05EvaluationOfGradientsPage() {
         "忘记保存前向传播的中间激活值——反向传播需要它们来计算局部导数，这是神经网络内存消耗的主要来源。",
         "混淆 adjoint（从输出传来的累积梯度）和 local derivative（仅本节点的 ∂out/∂in）。",
       ]}
-      quiz={[
-        {
-          question: "有 10⁶ 个参数的标量损失，反向模式计算全部梯度需多少次前向？",
-          options: [
-            "1 次前向 + 1 次后向（约 2-3 倍前向成本）",
-            "10⁶ 次前向（每个参数一次）",
-            "约 1000 次前向",
-            "与参数数量的对数成正比",
-          ],
-          correctIndex: 0,
-          explanation: "反向模式自动微分的核心优势：梯度计算成本与参数数量解耦，仅需约 1 次前向+1 次后向。",
-        },
-        {
-          question: "计算图中，节点 multiply(a,b) 对输入 a 的局部导数是多少？",
-          options: [
-            "b（另一个操作数的值）",
-            "a（自身的值）",
-            "1",
-            "a × b",
-          ],
-          correctIndex: 0,
-          explanation: "∂(a·b)/∂a = b。乘法操作的局部导数是另一个操作数——这是反传中'梯度互换'的原理。",
-        },
-        {
-          question: "有限差分的 h 太大或太小时分别导致什么误差？",
-          options: [
-            "h 太大→截断误差（忽略高阶项），h 太小→舍入误差（浮点精度）",
-            "h 太大→舍入误差，h 太小→截断误差",
-            "两种都导致截断误差",
-            "h 的选择与误差无关",
-          ],
-          correctIndex: 0,
-          explanation: "截断误差 ∝ O(h²)，舍入误差 ∝ O(1/h)。最优 h 使两者平衡，通常约 10⁻⁵。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 8",
         section: "8.1",
         pages: "§8.1",

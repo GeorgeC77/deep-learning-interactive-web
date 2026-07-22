@@ -83,53 +83,7 @@ export default function Ch13OverviewPage() {
         "忽视线性模型对非线性流形数据的局限性。",
         "把降维/生成立刻等同于“找映射/逆映射”；多数深度生成模型中编码器与解码器并不互逆。",
       ]}
-      quiz={[
-        {
-          question: "连续隐变量模型的核心假设是什么？",
-          options: [
-            "高维观测由低维连续隐变量经某种映射生成。",
-            "隐变量必须是离散的。",
-            "观测维度必须小于隐变量维度。",
-            "映射必须是线性且可逆的。",
-          ],
-          correctIndex: 0,
-          explanation: "隐变量模型假设存在低维隐空间，观测数据由其生成并可能加噪声。",
-        },
-        {
-          question: "PCA 与概率 PCA 的主要区别是？",
-          options: [
-            "PCA 是确定性降维方法，概率 PCA 是带概率假设的生成模型。",
-            "PCA 只能用于二维数据。",
-            "概率 PCA 不使用特征分解。",
-            "PCA 可以计算 p(x) 而概率 PCA 不能。",
-          ],
-          correctIndex: 0,
-          explanation: "PCA 寻找最大方差方向；概率 PCA 假设线性高斯生成过程，可导出似然函数。",
-        },
-        {
-          question: "下列哪类生成模型必须具有可逆映射？",
-          options: [
-            "标准化流（Normalizing Flow）。",
-            "VAE。",
-            "GAN。",
-            "自回归模型。",
-          ],
-          correctIndex: 0,
-          explanation: "只有标准化流通过可逆变换直接计算 p(x)；VAE、GAN 与自回归模型都不要求编码器/生成器可逆。",
-        },
-        {
-          question: "在 VAE 中，推断与生成通常由什么完成？",
-          options: [
-            "编码器近似 q(z|x)，解码器定义 p_θ(x|z)。",
-            "编码器与解码器必须互为逆函数。",
-            "解码器直接给出 p(z|x)。",
-            "编码器直接生成样本。",
-          ],
-          correctIndex: 0,
-          explanation: "VAE 用编码器近似后验，用解码器定义生成分布；二者不必互逆。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 16",
         pages: "Ch 16",
         textbookSubsections: [

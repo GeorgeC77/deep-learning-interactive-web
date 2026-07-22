@@ -50,32 +50,7 @@ export default function Ch07ObjectDetectionPage() {
         "用中心点距离代替 IoU，导致对框尺寸差异不敏感。",
         "NMS 阈值设置过严，漏检小目标；或设置过松，重复检测增多。",
       ]}
-      quiz={[
-        {
-          question: "框 A=(0,0,4,4)，框 B=(2,2,4,4)，它们的 IoU 是多少？",
-          options: ["4/28 = 1/7 ≈ 0.143", "4/16 = 0.25", "16/28 ≈ 0.571", "0"],
-          correctIndex: 0,
-          explanation: "交集面积 2×2=4，并集面积 16+16-4=28，IoU=4/28≈0.143。",
-        },
-        {
-          question: "根据 Bishop Ch 10.4 的主线，下列哪项不是核心内容而是工程补充？",
-          options: ["锚框设计", "边界框", "IoU", "非极大抑制"],
-          correctIndex: 0,
-          explanation: "锚框在某些实现（如 Faster R-CNN、YOLO）中作为先验框，但 Bishop 教材主线围绕边界框、IoU、滑动窗口、多尺度、NMS、Fast R-CNN。",
-        },
-        {
-          question: "NMS 中若 IoU 阈值从 0.5 提高到 0.8，最可能出现什么情况？",
-          options: [
-            "更多重叠框被保留，重复检测增加。",
-            "所有框都被删除，导致漏检。",
-            "对单个大目标无影响，只影响小目标。",
-            "IoU 阈值与结果无关。",
-          ],
-          correctIndex: 0,
-          explanation: "阈值越高，抑制条件越宽松，更多高重叠框会被保留，从而增加重复检测。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 10",
         section: "10.4",
         pages: "Ch 10",

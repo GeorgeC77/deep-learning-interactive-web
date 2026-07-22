@@ -43,42 +43,7 @@ export default function Ch13EvidenceLowerBoundPage() {
         "认为概率 PCA 的 EM 与标准 PCA 特征分解结果不同；极限情况下两者等价。",
         "忽略因子分析中对角噪声矩阵 Ψ 与概率 PCA 各向同性 σ² 的区别。",
       ]}
-      quiz={[
-        {
-          question: "概率 PCA 的 E-step 中，隐变量后验是什么分布？",
-          options: [
-            "高斯分布",
-            "类别分布",
-            "均匀分布",
-            "拉普拉斯分布",
-          ],
-          correctIndex: 0,
-          explanation: "由于模型是线性-高斯，后验 p(z|x) 也是高斯分布。",
-        },
-        {
-          question: "概率 PCA 与因子分析在噪声模型上的主要区别是？",
-          options: [
-            "概率 PCA 使用各向同性 σ²I，因子分析使用对角 Ψ。",
-            "概率 PCA 没有噪声项。",
-            "因子分析要求隐变量维度必须小于 2。",
-            "两者在数学上完全相同。",
-          ],
-          correctIndex: 0,
-          explanation: "概率 PCA 假设所有观测维度共享同一噪声方差；因子分析允许每个维度独立。",
-        },
-        {
-          question: "连续隐变量 EM 的 E-step 需要计算什么？",
-          options: [
-            "后验分布的充分统计量（如均值、协方差）",
-            "参数的点估计",
-            "损失函数的梯度",
-            "隐变量的精确采样",
-          ],
-          correctIndex: 0,
-          explanation: "E 步需要得到后验的期望统计量，供 M 步更新参数使用。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 16",
         section: "16.3",
         pages: "Ch 16",

@@ -46,42 +46,7 @@ export default function Ch03MixtureDensityNetworksPage() {
         "忽略高斯分量的归一化常数 1/√(2πσ²)，把未归一化的核密度当作概率密度",
         "忘记 σ_k 必须为正，通常通过 exp(·) 输出保证",
       ]}
-      quiz={[
-        {
-          question: "MDN 中混合系数 π_k(x) 必须满足什么约束？",
-          options: [
-            "Σ_k π_k(x) = 1 且每个 π_k(x) ≥ 0",
-            "Σ_k π_k(x) = K",
-            "每个 π_k(x) > 1",
-            "π_k(x) 可以为负",
-          ],
-          correctIndex: 0,
-          explanation: "混合系数必须构成有效的概率分布，因此非负且和为 1。",
-        },
-        {
-          question: "对于一个逆问题（同一 x 对应多个 t），MSE 回归通常会给出什么结果？",
-          options: [
-            "位于多个可行解之间的错误平均值",
-            "最接近真实解的一个模态",
-            "与真实解完全一致的单一预测",
-            "条件方差最大的点",
-          ],
-          correctIndex: 0,
-          explanation: "MSE 最小化条件均值；当条件密度是多峰时，均值可能落在概率密度很低的区域。",
-        },
-        {
-          question: "对于 p(t) = π₁N(t|0,1) + π₂N(t|2,1)，p(t=0) 的正确表达式是？",
-          options: [
-            "[π₁ + π₂·e⁻²] / √(2π)",
-            "π₁ + π₂·e⁻²",
-            "π₁·e⁰ + π₂·e⁻²",
-            "π₁/(2π) + π₂·e⁻²/(2π)",
-          ],
-          correctIndex: 0,
-          explanation: "每个高斯 PDF 都含归一化常数 1/√(2πσ²)；σ=1 时 N(0|0,1)=1/√(2π)，N(0|2,1)=e⁻²/√(2π)。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 6",
         section: "6.5",
         pages: "Ch 6",

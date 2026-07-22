@@ -47,42 +47,7 @@ export default function Ch16VariationalAutoencodersPage() {
         "用重参数化时直接对 z 采样后试图对 σ 求导，而不通过 μ+σε 的显式路径。",
         "忽视 posterior collapse：解码器过强时 q(z|x) 可能退化为先验，隐变量不再携带信息。",
       ]}
-      quiz={[
-        {
-          question: "重参数化技巧为什么能让梯度传到 encoder 的 μ 与 σ？",
-          options: [
-            "采样操作被移到不可导的 ε 上，z 对 μ、σ 的依赖变成确定性线性函数，梯度可正常回传。",
-            "它用蒙特卡洛估计代替了真实的 KL 项。",
-            "它让 encoder 直接输出样本而不是参数。",
-            "它取消了先验分布，使隐变量确定。",
-          ],
-          correctIndex: 0,
-          explanation: "z = μ + σ⊙ε 把随机性隔离到 ε，使 z 对 μ、σ 可微，反向传播可以更新 encoder。",
-        },
-        {
-          question: "若 q(z|x)=N(μ,σ²)，先验 p(z)=N(0,1)，则一维 KL(q||p) 等于？",
-          options: [
-            "0.5(σ² - ln σ² - 1 + μ²)",
-            "0.5(σ² + ln σ² - 1 + μ²)",
-            "σ² + μ²",
-            "ln(σ/μ)",
-          ],
-          correctIndex: 0,
-          explanation: "两个高斯之间的 KL 公式为 0.5(σ² - ln σ² - 1 + μ²)，σ²=1 且 μ=0 时退化为 0。",
-        },
-        {
-          question: "训练时发现 decoder 几乎忽略 z，q(z|x) 接近先验 N(0,I)，这被称为什么现象？",
-          options: [
-            "Posterior collapse",
-            "Mode collapse",
-            "Gradient vanishing",
-            "Teacher forcing",
-          ],
-          correctIndex: 0,
-          explanation: "Posterior collapse 指近似后验退化为先验，隐变量不再携带关于输入的信息。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 19",
         section: "19.2",
         pages: "Ch 19",

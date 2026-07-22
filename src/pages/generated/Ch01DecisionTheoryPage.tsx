@@ -57,42 +57,7 @@ export default function Ch01DecisionTheoryPage() {
         "认为后验均值在所有损失函数下都是最优预测——对于 L1 损失，中位数才是最优",
         "在偏态分布或存在异常值时仍用均值作为唯一参考，忽视中位数与众数的差异",
       ]}
-      quiz={[
-        {
-          question: "对于平方损失 L(t,y) = (t−y)²，贝叶斯最优预测是什么？",
-          options: [
-            "条件均值 E[t|x]",
-            "条件中位数",
-            "条件众数（mode）",
-            "任意 t 的随机样本",
-          ],
-          correctIndex: 0,
-          explanation: "最小化 E[(t−y)²| x] 对 y 求导得 −2E[t−y|x] = 0 ⇒ y = E[t|x]。",
-        },
-        {
-          question: "对于绝对损失 L(t,y) = |t−y|，贝叶斯最优预测是？",
-          options: [
-            "条件中位数",
-            "条件均值",
-            "条件方差",
-            "后验概率最大的 t",
-          ],
-          correctIndex: 0,
-          explanation: "绝对损失的最小化器是中位数，因为导数为 −∫_{−∞}^y p(t|x)dt + ∫_y^∞ p(t|x)dt = 0 时两侧概率相等。",
-        },
-        {
-          question: "当后验分布明显偏斜时，下列哪一项通常成立？",
-          options: [
-            "均值、中位数、众数三者可能互不相同，最优预测取决于具体损失函数",
-            "三者永远相等",
-            "绝对损失的最优预测总是众数",
-            "平方损失会忽略异常值",
-          ],
-          correctIndex: 0,
-          explanation: "偏态分布下三个中心指标通常分离；平方损失偏好均值，绝对损失偏好中位数，区间损失可能偏好众数附近。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 4",
         section: "4.2",
         pages: "§4.2, pp. 120–122",

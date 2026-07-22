@@ -44,37 +44,7 @@ export default function Ch15AutoregressiveFlowsPage() {
         "把 MAF 和 IAF 的适用场景混为一谈：MAF 训练时密度计算快，但采样慢；IAF 采样快，但估计训练数据密度需要按生成顺序逐个计算。",
         "忘记行列式是对角元乘积，而不是所有偏导数之和。",
       ]}
-      quiz={[
-        {
-          question: "自回归流中 Jacobian 矩阵为什么是三角矩阵？",
-          options: [
-            "因为每个 x_i 只依赖于 z_{≤i}，不依赖后面的 z_j。",
-            "因为网络参数被强制共享。",
-            "因为所有维度使用相同的变换。",
-            "因为基分布 p(z) 是标准高斯。",
-          ],
-          correctIndex: 0,
-          explanation: "三角结构来自因果顺序：输出 x_i 的偏导对后续 z_j 为零，因此 Jacobian 下三角。",
-        },
-        {
-          question: "若二维自回归变换为 x₁=z₁, x₂=2z₂+z₁，则 ln|det J| 是多少？",
-          options: ["ln 2", "2", "ln 3", "0"],
-          correctIndex: 0,
-          explanation: "Jacobian 为 [[1,0],[1,2]]，行列式为 2，取对数得 ln 2。",
-        },
-        {
-          question: "MAF 相比 IAF 的主要优势是什么？",
-          options: [
-            "对给定数据 x 计算密度 p(x) 只需一次前向传播。",
-            "采样新数据的速度明显更快。",
-            "不需要计算 Jacobian。",
-            "可以使用任意非可逆神经网络。",
-          ],
-          correctIndex: 0,
-          explanation: "MAF 的变换方向与数据维度顺序一致，因此估计密度高效；IAF 则在采样方向上高效。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 18",
         section: "18.2",
         pages: "Ch 18",

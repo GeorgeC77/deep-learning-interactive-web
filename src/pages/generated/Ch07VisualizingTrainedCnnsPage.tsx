@@ -43,53 +43,7 @@ export default function Ch07VisualizingTrainedCnnsPage() {
         "忽视饱和效应：当激活函数饱和时，梯度可能很小，但输入仍对输出有决定性影响。",
         "将对抗样本的泛化性误以为是人类视觉意义上的语义变化。",
       ]}
-      quiz={[
-        {
-          question: "显著性图中的梯度 S_i = |∂y_c/∂x_i| 表示什么？",
-          options: [
-            "输入 x_i 附近 class score 的局部敏感度。",
-            "x_i 对分类结果的因果重要性。",
-            "x_i 被模型直接注视的概率。",
-            "x_i 与标签之间的互信息。",
-          ],
-          correctIndex: 0,
-          explanation: "梯度显著性衡量的是在当前输入附近，像素值微小变化对 class score 的影响，不是因果重要性。",
-        },
-        {
-          question: "滤波器可视化常通过什么方式找到某个滤波器的偏好输入？",
-          options: [
-            "激活最大化：寻找使该滤波器响应最大的输入。",
-            "随机采样大量输入并取平均。",
-            "直接用训练集中响应最大的真实图像。",
-            "对权重矩阵做 PCA。",
-          ],
-          correctIndex: 0,
-          explanation: "激活最大化通过优化输入来最大化某神经元的响应，常配合正则化约束得到可解释的模式。",
-        },
-        {
-          question: "对抗扰动通常需要满足什么约束？",
-          options: [
-            "扰动范数不超过某个小阈值 ε。",
-            "必须改变图像的语义内容。",
-            "必须加到图像的前景区域。",
-            "必须让模型置信度降到 0。",
-          ],
-          correctIndex: 0,
-          explanation: "对抗样本的定义核心在于：对人眼不可察觉的小扰动（如 ℓ_p 范数 ≤ ε）就能导致模型错误分类。",
-        },
-        {
-          question: "梯度显著性图与 occlusion 归因的主要差异是什么？",
-          options: [
-            "梯度图用局部线性近似，occlusion 用遮挡后的分数变化。",
-            "梯度图只能用于 CNN，occlusion 只能用于全连接网络。",
-            "梯度图需要重新训练模型，occlusion 不需要。",
-            "两者在数学上完全等价。",
-          ],
-          correctIndex: 0,
-          explanation: "梯度图基于当前输入处的导数，occlusion 通过遮挡输入区域观察分数变化；前者是局部近似，后者是非局部扰动实验。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 10",
         section: "10.3",
         pages: "Ch 10",

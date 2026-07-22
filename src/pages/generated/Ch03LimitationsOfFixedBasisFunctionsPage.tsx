@@ -41,32 +41,7 @@ export default function Ch03LimitationsOfFixedBasisFunctionsPage() {
         "混淆数据流形假设与数据降维——流形假设是关于数据分布的，不是数据处理方法",
         "认为固定基函数完全没有用途——在低维问题或作为深度网络的组成部分时仍然有用",
       ]}
-      quiz={[
-        {
-          question: "如果每个维度使用 10 个基函数，10 维输入需多少固定基函数？",
-          options: ["10^10 个（指数爆炸）", "100 个", "10 个", "20 个"],
-          correctIndex: 0,
-          explanation: "每个维度 10 个，D=10 维需要 10^10 个基函数的笛卡尔积——这就是维度灾难。",
-        },
-        {
-          question: "高维空间中单位球的体积主要集中在什么地方？",
-          options: ["靠近球面的薄壳中", "球心附近", "均匀分布", "球心与球面之间"],
-          correctIndex: 0,
-          explanation: "在 D 维中，半径 r 处体积密度 ∝ r^{D-1}，D 很大时体积几乎全部集中在 r≈1 处。",
-        },
-        {
-          question: "数据流形假设对深度学习意味着什么？",
-          options: [
-            "真实数据分布集中在低维流形上，网络可学习此流形而避免维度灾难",
-            "所有数据都可降维到 2D 可视化",
-            "维度灾难不适用于图像",
-            "深度网络需要固定基函数",
-          ],
-          correctIndex: 0,
-          explanation: "流形假设让深度学习可行：虽然输入维数高，但有效维数远低于环境维数。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 6",
         section: "6.1",
         pages: "§6.1, pp. 172–179",

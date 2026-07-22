@@ -50,42 +50,7 @@ export default function Ch08GraphicalModelsPage() {
         "将一阶马尔可夫链的分解 p(x_1)∏p(x_i|x_{i-1}) 误当成一般 DAG 分解。",
         "忽略因子分解与 d-分离之间的等价性。",
       ]}
-      quiz={[
-        {
-          question: "对于 DAG X1 → X2 ← X3，其联合分布的正确分解是？",
-          options: [
-            "p(x1)p(x2|x1)p(x3|x2)",
-            "p(x1)p(x3)p(x2|x1,x3)",
-            "p(x1)p(x2|x1)p(x3|x1)",
-            "p(x1,x2,x3) 无法分解",
-          ],
-          correctIndex: 1,
-          explanation: "X1 和 X3 没有父节点；X2 的父节点是 {X1, X3}，因此 p(x)=p(x1)p(x3)p(x2|x1,x3)。",
-        },
-        {
-          question: "一般贝叶斯网络的因子分解适用于什么情况？",
-          options: [
-            "任意有向无环图",
-            "只能用于链式结构",
-            "只能用于树结构",
-            "只能用于高斯变量",
-          ],
-          correctIndex: 0,
-          explanation: "p(x)=∏p(x_i|pa_i) 对任何有向无环图都成立；链式只是特例。",
-        },
-        {
-          question: "如果删除 DAG 中一条 X → Y 的边，联合分布会怎样变化？",
-          options: [
-            "p(x) 不再可分解",
-            "Y 的条件概率中不再以 X 为条件",
-            "所有变量变得独立",
-            "必须重新估计所有参数",
-          ],
-          correctIndex: 1,
-          explanation: "删除边意味着 X 不再是 Y 的父节点，因此 Y 的局部条件概率不再包含 X。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 11",
         section: "11.1",
         pages: "Ch 11",

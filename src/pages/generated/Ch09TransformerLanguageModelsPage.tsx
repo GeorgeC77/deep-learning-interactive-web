@@ -55,37 +55,7 @@ export default function Ch09TransformerLanguageModelsPage() {
         "若训练解码器时不加因果掩码，让每个位置都能看到未来 token，模型会“作弊”直接抄答案，看似损失很低，实际无法用于生成。",
         "温度采样调得过高会让输出看似多样却语无伦次；调得过低则总生成重复的高频词——采样策略直接影响生成质量。",
       ]}
-      quiz={[
-        {
-          question: "解码器-only 与编码器-only Transformer 的关键差异是？",
-          options: [
-            "解码器使用因果掩码（只能看到前文），编码器使用双向自注意力。",
-            "解码器不能处理文本，只能生成图像。",
-            "编码器只能用于分类，解码器只能用于生成。",
-            "两者在注意力机制上没有区别。",
-          ],
-          correctIndex: 0,
-          explanation: "解码器为自回归生成使用因果掩码；编码器为理解任务使用双向注意力。",
-        },
-        {
-          question: "Nucleus (top-p) 采样与 top-k 采样相比的主要优势是？",
-          options: [
-            "根据分布形状动态调整候选集合大小，避免固定 k 带来的过宽或过窄。",
-            "总是比 top-k 更快。",
-            "保证生成结果完全相同。",
-            "只考虑概率最高的一个 token。",
-          ],
-          correctIndex: 0,
-          explanation: "nucleus 采样选择累积概率达到 p 的最小集合，候选数量随分布尖锐程度自适应变化。",
-        },
-        {
-          question: "在 seq2seq Transformer 中，解码器对编码器输出使用的注意力机制称为？",
-          options: ["Cross-attention", "Self-attention", "Masked self-attention", "Hierarchical attention"],
-          correctIndex: 0,
-          explanation: "解码器通过 cross-attention 查询编码器输出，而自注意力用于处理已生成的目标序列。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 12",
         section: "12.3",
         pages: "Ch 12",

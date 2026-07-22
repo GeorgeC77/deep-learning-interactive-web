@@ -47,42 +47,7 @@ export default function Ch15ContinuousFlowsPage() {
         "在维度较高时仍试图精确计算 Jacobian 迹，而忽略了 FFJORD 的随机迹估计。",
         "误以为连续流需要三角或对角 Jacobian；FFJORD 允许自由形式架构。",
       ]}
-      quiz={[
-        {
-          question: "瞬时变量替换公式中，log 密度随时间的变化率等于什么？",
-          options: [
-            "负的向量场散度（Jacobian 迹）。",
-            "向量场的 L2 范数。",
-            "基分布与目标分布的 KL 散度。",
-            "神经网络参数梯度的和。",
-          ],
-          correctIndex: 0,
-          explanation: "d/dt ln p(h(t)) = -tr(∂f/∂h)，即负散度。体积膨胀时密度减小。",
-        },
-        {
-          question: "关于神经 ODE 中的向量场 f 与流映射 φ，下列说法正确的是？",
-          options: [
-            "f 本身不必可逆；只要满足正则条件，ODE 积分得到的流映射 φ 就是可逆的。",
-            "f 必须是双射，否则无法定义可逆流。",
-            "流映射的逆需要通过额外训练一个反向网络得到。",
-            "连续流的 Jacobian 必须是三角矩阵。",
-          ],
-          correctIndex: 0,
-          explanation: "向量场 f 只需要满足 Lipschitz 等保证解存在且唯一的正则条件。流映射 φ 通过正向 ODE 积分得到，其逆通过反向积分得到，因此可逆性来自 ODE 理论而非 f 自身的双射性。",
-        },
-        {
-          question: "FFJORD 中 Hutchinson 迹估计的作用是？",
-          options: [
-            "用随机投影近似 Jacobian 迹，避免高维显式计算。",
-            "直接求解逆映射 z=g(x)。",
-            "替代 ODE 求解器进行积分。",
-            "计算两个分布之间的 Wasserstein 距离。",
-          ],
-          correctIndex: 0,
-          explanation: "Hutchinson 估计用 v^T (∂f/∂h) v 近似 tr(∂f/∂h)，将 O(D²) 迹计算降到 O(D)，使得 f 可以是自由形式网络。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 18",
         section: "18.3",
         pages: "Ch 18",

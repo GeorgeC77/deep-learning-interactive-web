@@ -50,42 +50,7 @@ export default function Ch06ResidualConnectionsPage() {
         "若残差分支学到 F≈-x，整体 Jacobian 接近 0，深层网络仍会梯度消失——残差不是无条件保险。",
         "残差分支过大且缺少合适初始化/正则时，训练仍可能不稳定，残差不能替代好的训练设置。",
       ]}
-      quiz={[
-        {
-          question: "残差块 y = x + F(x) 对输入的 Jacobian 是什么？",
-          options: [
-            "I + ∂F/∂x",
-            "∂F/∂x",
-            "I - ∂F/∂x",
-            "F(x)/x",
-          ],
-          correctIndex: 0,
-          explanation: "对 y = x + F(x) 求导，单位阵来自 x 的梯度，再加上 F 的 Jacobian。",
-        },
-        {
-          question: "为什么残差 Jacobian 有助于缓解梯度消失？",
-          options: [
-            "它保留了一个单位阵项，使梯度可以沿跳跃连接直接回传",
-            "它自动把激活值缩放到 0 附近",
-            "它消除了所有非线性",
-            "它让网络层数不再重要",
-          ],
-          correctIndex: 0,
-          explanation: "I + ∂F/∂x 的特征值在 1 附近时，连乘后的梯度幅值不易指数衰减。",
-        },
-        {
-          question: "残差连接是否总是有效？",
-          options: [
-            "不是；若 F≈-x，整体 Jacobian 接近 0，梯度仍可能消失",
-            "是，只要使用残差连接就绝不会梯度消失",
-            "只对 CNN 有效",
-            "只在浅层网络有效",
-          ],
-          correctIndex: 0,
-          explanation: "残差连接提供了梯度稳定的可能性，但不是无条件保证；退化分支就是一个反例。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 9",
         section: "9.5",
         pages: "Ch 9",

@@ -42,42 +42,7 @@ export default function Ch03MultilayerNetworksPage() {
         "在深层网络中使用 sigmoid 作为隐藏激活——梯度在饱和区接近零，导致梯度消失",
         "忽视权重对称性对初始化的重要性——如果所有权重初始化为相同值，网络无法打破对称",
       ]}
-      quiz={[
-        {
-          question: "ReLU(x) = max(0,x) 相比 sigmoid 的主要优势是什么？",
-          options: [
-            "正半轴梯度恒为 1，不饱和，缓解梯度消失",
-            "输出范围更大",
-            "计算更复杂",
-            "始终输出正值",
-          ],
-          correctIndex: 0,
-          explanation: "ReLU 在正半轴梯度为 1，避免了 sigmoid 和 tanh 在极端输入时的梯度消失问题。",
-        },
-        {
-          question: "为什么交换两个隐藏神经元后网络输出不变？",
-          options: [
-            "隐藏层内无顺序——交换神经元 i 和 j 并同步交换与上下层的连接权重，前向计算完全不变",
-            "因为激活函数是对称的",
-            "因为损失函数是凸的",
-            "这只是一个巧合",
-          ],
-          correctIndex: 0,
-          explanation: "权重空间对称性揭示了损失面上有大量结构等价的点——初始化的随机性决定最终收敛到哪一个等价解。",
-        },
-        {
-          question: "通用近似定理保证了什么？",
-          options: [
-            "存在一个足够宽的单隐藏网络可以近似任何连续函数",
-            "任何网络都能在 100 轮内收敛",
-            "深度网络一定比浅层网络好",
-            "不需要正则化",
-          ],
-          correctIndex: 0,
-          explanation: "定理只保证存在性——没说怎么找到、需要多少数据。但它奠定了神经网络的数学基础。",
-        },
-      ]}
-      bishopMapping={{
+            bishopMapping={{
         chapter: "Ch 6",
         section: "6.2",
         pages: "§6.2, pp. 180–185",

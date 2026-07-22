@@ -140,21 +140,7 @@ export default function Ch12OverviewPage() {
           '忽视隐变量模型中的不可识别性问题。',
           '认为 EM 算法一定收敛到全局最优。',
         ]}
-        quiz={[
-          {
-            question: 'K-means 与高斯混合模型最本质的区别是什么？',
-            options: ['优化目标不同', 'K-means 是硬分配，GMM 是软分配', 'K-means 需要更多内存', 'GMM 不能处理多维数据'],
-            correctIndex: 1,
-            explanation: 'K-means 将每个样本分配到一个簇，而 GMM 通过责任度给出属于每个分量的概率。',
-          },
-          {
-            question: 'EM 算法中的 E 步做什么？',
-            options: ['更新模型参数', '计算隐变量的后验分布', '随机初始化参数', '计算梯度'],
-            correctIndex: 1,
-            explanation: 'E 步固定当前参数，计算隐变量的后验分布（责任度），为 M 步做准备。',
-          },
-        ]}
-      />
+              />
 
       {/* Navigation */}
       <section className="flex flex-wrap justify-between gap-4">

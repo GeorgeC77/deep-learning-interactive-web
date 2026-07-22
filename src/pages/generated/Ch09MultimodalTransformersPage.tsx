@@ -40,27 +40,7 @@ export default function Ch09MultimodalTransformersPage() {
       "将本节结论直接套用到前提条件不同的场景，忽略假设差异。",
       "只关注公式写法，却不检验推导前提或代入具体数值验证。"
     ]}
-      quiz={[
-      {
-        question: "下列关于“视觉 Transformer”的叙述，哪一项最准确？",
-        options: ["将图像切分为 patch 序列，直接用 Transformer 建模空间关系。", "视觉 Transformer 只是术语，没有独立建模意义。", "视觉 Transformer 不需要任何分布假设即可直接使用。"],
-        correctIndex: 0,
-        explanation: "正确。将图像切分为 patch 序列，直接用 Transformer 建模空间关系。 这体现了本节的核心思想。",
-      },
-      {
-        question: "在应用“图像生成 Transformer”时，下列哪种做法最危险？",
-        options: ["忽视其前提假设，直接套用到不适用的数据分布上。", "只要模型足够复杂，数据分布的形状就不重要。", "该方法只适用于连续变量，离散变量完全无法使用。"],
-        correctIndex: 0,
-        explanation: "正确。图像生成 Transformer 的有效性依赖于特定假设，忽略前提会导致错误结论。",
-      },
-      {
-        question: "在一个具体情境中，你发现“音频与语音”的结果与预期不符，应优先排查哪些前提？",
-        options: ["是否违反了该方法成立的前提条件或数据假设。", "直觉一定是错的，直接接受计算结果。", "一定是代码实现出错，与理论无关。"],
-        correctIndex: 0,
-        explanation: "正确。音频与语音 的可靠性取决于前提假设是否满足；违反假设时结果可能反直觉但合理。",
-      }
-    ]}
-      bishopMapping={{
+            bishopMapping={{
       chapter: "Ch 12",
       section: "12.4",
       pages: "Ch 12",
