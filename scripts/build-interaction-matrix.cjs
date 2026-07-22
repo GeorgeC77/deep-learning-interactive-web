@@ -146,8 +146,6 @@ function semanticTestsForComponents(componentNames, pageFile) {
 
 function detectFeatures(source) {
   const staticExplanation = /summary\s*=|concepts\s*=|learningObjectives\s*=/i.test(source);
-  const quiz = /quiz\s*=\s*\{/i.test(source);
-  const submittedQuiz = quiz;
   const scalarDemo = /demo\s*=\s*\{\{/i.test(source);
   const customLab = /extraContent\s*=|interactiveDemo\s*=|@\/components\/demos\//i.test(source);
   const controlImports = (source.match(/@\/components\/ui\/(slider|switch|select|tabs|radio-group)/gi) || []).length;
@@ -155,8 +153,8 @@ function detectFeatures(source) {
   const linkedViews = customLab || controlImports >= 2 || (controlImports >= 1 && hasSvgOrCanvas);
   const predictionGate = /PredictionGate/i.test(source);
   const prediction = predictionGate;
-  const lock = quiz || predictionGate;
-  const reveal = quiz || predictionGate;
+  const lock = predictionGate;
+  const reveal = predictionGate;
   const evaluation = predictionGate;
   const feedback = predictionGate;
   const counterexample = /CounterexampleToggle|counterexample|反例|边界|极端/i.test(source);
@@ -164,8 +162,6 @@ function detectFeatures(source) {
   const mathTests = mathTestsFromSource(source);
   return {
     staticExplanation,
-    quiz,
-    submittedQuiz,
     scalarDemo,
     customLab,
     linkedViews,
@@ -235,10 +231,8 @@ function main() {
   lines.push('');
   lines.push(`Generated: ${new Date().toISOString()}`);
   lines.push('');
-  lines.push('Coverage dimensions: StaticExplanation, GenericQuiz, SubmittedQuiz, ScalarDemo, CustomLab, LinkedViews, Prediction, Lock, Reveal, Evaluation, Feedback, Counterexample, TransferChallenge, MathTests, SemanticTests.');
+  lines.push('Coverage dimensions: StaticExplanation, ScalarDemo, CustomLab, LinkedViews, Prediction, Lock, Reveal, Evaluation, Feedback, Counterexample, TransferChallenge, MathTests, SemanticTests.');
   lines.push('');
-  lines.push('- `GenericQuiz`: route provides a multiple-choice quiz.');
-  lines.push('- `SubmittedQuiz`: quiz uses submit-then-lock-then-reveal flow.');
   lines.push('- `Prediction/Lock/Reveal/Evaluation/Feedback`: route (or its lab) uses a PredictionGate with the full predict → submit → reveal → feedback cycle.');
   lines.push('- `L3+`: route has a CustomLab plus at least one of PredictionGate, Counterexample, or TransferChallenge.');
   lines.push('');
@@ -255,14 +249,12 @@ function main() {
   lines.push('');
   lines.push('## Coverage Matrix');
   lines.push('');
-  lines.push('| Route | Static | Quiz | Submitted | Scalar | Lab | Linked | Pred | Lock | Reveal | Eval | Feed | Counter | Transfer | Math | Semantic | L3+ |');
-  lines.push('|-------|--------|------|-----------|--------|-----|--------|------|------|--------|------|------|---------|----------|------|----------|-----|');
+  lines.push('| Route | Static | Scalar | Lab | Linked | Pred | Lock | Reveal | Eval | Feed | Counter | Transfer | Math | Semantic | L3+ |');
+  lines.push('|-------|--------|--------|-----|--------|------|------|--------|------|------|---------|----------|------|----------|-----|');
   for (const row of matrix) {
     const cells = [
       row.routePath,
       row.staticExplanation ? '✓' : '',
-      row.quiz ? '✓' : '',
-      row.submittedQuiz ? '✓' : '',
       row.scalarDemo ? '✓' : '',
       row.customLab ? '✓' : '',
       row.linkedViews ? '✓' : '',

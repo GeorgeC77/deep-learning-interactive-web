@@ -5,13 +5,6 @@ export type SectionStatus =
   | "interactive-reviewed"
   | "teaching-ready";
 
-export type QuizItem = {
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-};
-
 export type Section = {
   id: string;
   title: string;
@@ -22,7 +15,6 @@ export type Section = {
   bishopSection?: string;
   learningObjectives?: string[];
   commonMistakes?: string[];
-  quiz?: QuizItem[];
 };
 
 export type PartKind = 'prerequisite' | 'main' | 'appendix';

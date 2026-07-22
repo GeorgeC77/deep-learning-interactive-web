@@ -338,12 +338,6 @@ for (const file of generatedFiles) {
     }
   }
 
-  const quizBlock = extractBlock(text, 'quiz');
-  if (quizBlock) {
-    const strings = extractQuotedStrings(quizBlock);
-    checkStringsForTemplates(strings, 'quiz');
-  }
-
   const exercisesBlock = extractBlock(text, 'exercises');
   if (exercisesBlock) {
     const strings = extractQuotedStrings(exercisesBlock);
@@ -455,7 +449,7 @@ const invalidMd = [
       ]
     : ['None.']),
   '',
-  '### Template phrases in quiz/commonMistakes',
+  '### Template phrases in commonMistakes',
   ...(templateRows.length
     ? [
         '| componentFile | routePath | phrase | context |',

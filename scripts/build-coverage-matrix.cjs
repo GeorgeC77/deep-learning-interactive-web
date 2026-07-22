@@ -65,10 +65,8 @@ function buildCoverageEntry(section, componentName) {
     interactiveDemos: isGenerated || ['/ch01/bias-variance', '/ch09/attention'].includes(section.path)
       ? [`${section.title} 交互演示`]
       : [],
-    exercisesOrQuizzes: isGenerated ? [`${section.title} 小测题`] : [],
     learningObjectives: [],
     commonMistakes: [],
-    quiz: [],
     status: section.status || (isWrong ? 'draft' : 'content-reviewed'),
   };
 }

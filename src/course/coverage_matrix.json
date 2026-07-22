@@ -11,12 +11,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -31,12 +27,8 @@
     "interactiveDemos": [
       "1.1 深度学习的影响 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "1.1 深度学习的影响 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -51,12 +43,8 @@
     "interactiveDemos": [
       "1.2 Tutorial：多项式曲线拟合 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "1.2 Tutorial：多项式曲线拟合 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -71,12 +59,8 @@
     "interactiveDemos": [
       "1.3 机器学习简史 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "1.3 机器学习简史 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -91,12 +75,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -111,12 +91,8 @@
     "interactiveDemos": [
       "2.1 概率规则 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "2.1 概率规则 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -131,12 +107,8 @@
     "interactiveDemos": [
       "2.2 概率密度 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "2.2 概率密度 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -151,12 +123,8 @@
     "interactiveDemos": [
       "2.3 高斯分布 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "2.3 高斯分布 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -171,12 +139,8 @@
     "interactiveDemos": [
       "2.4 密度变换 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "2.4 密度变换 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -191,12 +155,8 @@
     "interactiveDemos": [
       "2.5 信息论 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "2.5 信息论 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -211,12 +171,8 @@
     "interactiveDemos": [
       "2.6 贝叶斯概率 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "2.6 贝叶斯概率 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -231,12 +187,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -251,12 +203,8 @@
     "interactiveDemos": [
       "3.1 离散变量 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "3.1 离散变量 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -271,12 +219,8 @@
     "interactiveDemos": [
       "3.2 多元高斯 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "3.2 多元高斯 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -291,12 +235,8 @@
     "interactiveDemos": [
       "3.3 周期变量 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "3.3 周期变量 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -311,12 +251,8 @@
     "interactiveDemos": [
       "3.4 指数族 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "3.4 指数族 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -331,12 +267,8 @@
     "interactiveDemos": [
       "3.5 非参数方法 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "3.5 非参数方法 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -351,12 +283,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -371,12 +299,8 @@
     "interactiveDemos": [
       "4.1 线性回归 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "4.1 线性回归 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -391,12 +315,8 @@
     "interactiveDemos": [
       "4.2 决策理论 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "4.2 决策理论 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -411,12 +331,8 @@
     "interactiveDemos": [
       "4.3 偏差–方差权衡 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "4.3 偏差–方差权衡 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "teaching-ready"
   },
   {
@@ -431,12 +347,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -451,12 +363,8 @@
     "interactiveDemos": [
       "5.1 判别函数 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "5.1 判别函数 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -471,12 +379,8 @@
     "interactiveDemos": [
       "5.2 决策理论 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "5.2 决策理论 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -491,12 +395,8 @@
     "interactiveDemos": [
       "5.3 生成分类器 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "5.3 生成分类器 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -511,12 +411,8 @@
     "interactiveDemos": [
       "5.4 判别分类器 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "5.4 判别分类器 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -531,12 +427,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -551,12 +443,8 @@
     "interactiveDemos": [
       "6.1 固定基函数的局限性 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "6.1 固定基函数的局限性 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -571,12 +459,8 @@
     "interactiveDemos": [
       "6.2 多层网络 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "6.2 多层网络 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -591,12 +475,8 @@
     "interactiveDemos": [
       "6.3 深度网络 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "6.3 深度网络 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -611,12 +491,8 @@
     "interactiveDemos": [
       "6.4 误差函数 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "6.4 误差函数 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -631,12 +507,8 @@
     "interactiveDemos": [
       "6.5 混合密度网络 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "6.5 混合密度网络 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -651,12 +523,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -671,12 +539,8 @@
     "interactiveDemos": [
       "7.1 误差曲面 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "7.1 误差曲面 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -691,12 +555,8 @@
     "interactiveDemos": [
       "7.2 梯度下降优化 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "7.2 梯度下降优化 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -711,12 +571,8 @@
     "interactiveDemos": [
       "7.3 收敛性 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "7.3 收敛性 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -731,12 +587,8 @@
     "interactiveDemos": [
       "7.4 归一化 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "7.4 归一化 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -751,12 +603,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -771,12 +619,8 @@
     "interactiveDemos": [
       "8.1 梯度求值 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "8.1 梯度求值 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -791,12 +635,8 @@
     "interactiveDemos": [
       "8.2 自动微分 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "8.2 自动微分 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -811,12 +651,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -831,12 +667,8 @@
     "interactiveDemos": [
       "9.1 归纳偏置 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "9.1 归纳偏置 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -851,12 +683,8 @@
     "interactiveDemos": [
       "9.2 权重衰减 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "9.2 权重衰减 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -871,12 +699,8 @@
     "interactiveDemos": [
       "9.3 学习曲线 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "9.3 学习曲线 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -891,12 +715,8 @@
     "interactiveDemos": [
       "9.4 参数共享 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "9.4 参数共享 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -911,12 +731,8 @@
     "interactiveDemos": [
       "9.5 残差连接 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "9.5 残差连接 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -931,12 +747,8 @@
     "interactiveDemos": [
       "9.6 模型平均 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "9.6 模型平均 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -951,12 +763,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -971,12 +779,8 @@
     "interactiveDemos": [
       "10.1 计算机视觉 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "10.1 计算机视觉 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -991,12 +795,8 @@
     "interactiveDemos": [
       "10.2 卷积滤波器 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "10.2 卷积滤波器 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "teaching-ready"
   },
   {
@@ -1011,12 +811,8 @@
     "interactiveDemos": [
       "10.3 可视化训练后的 CNN 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "10.3 可视化训练后的 CNN 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1031,12 +827,8 @@
     "interactiveDemos": [
       "10.4 目标检测 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "10.4 目标检测 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1051,12 +843,8 @@
     "interactiveDemos": [
       "10.5 图像分割 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "10.5 图像分割 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "teaching-ready"
   },
   {
@@ -1071,12 +859,8 @@
     "interactiveDemos": [
       "10.6 风格迁移 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "10.6 风格迁移 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1091,12 +875,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1111,12 +891,8 @@
     "interactiveDemos": [
       "11.1 图模型 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "11.1 图模型 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1131,12 +907,8 @@
     "interactiveDemos": [
       "11.2 条件独立 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "11.2 条件独立 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1151,12 +923,8 @@
     "interactiveDemos": [
       "11.3 序列模型 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "11.3 序列模型 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1171,12 +939,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1191,12 +955,8 @@
     "interactiveDemos": [
       "12.1 注意力机制 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "12.1 注意力机制 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "teaching-ready"
   },
   {
@@ -1211,12 +971,8 @@
     "interactiveDemos": [
       "12.2 自然语言处理 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "12.2 自然语言处理 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1231,12 +987,8 @@
     "interactiveDemos": [
       "12.3 Transformer 语言模型 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "12.3 Transformer 语言模型 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "teaching-ready"
   },
   {
@@ -1251,12 +1003,8 @@
     "interactiveDemos": [
       "12.4 多模态 Transformer 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "12.4 多模态 Transformer 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1271,12 +1019,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1291,12 +1035,8 @@
     "interactiveDemos": [
       "13.1 图上的机器学习 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "13.1 图上的机器学习 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1311,12 +1051,8 @@
     "interactiveDemos": [
       "13.2 神经消息传递 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "13.2 神经消息传递 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "teaching-ready"
   },
   {
@@ -1331,12 +1067,8 @@
     "interactiveDemos": [
       "13.3 通用图网络 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "13.3 通用图网络 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1351,12 +1083,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1371,12 +1099,8 @@
     "interactiveDemos": [
       "14.1 基本采样算法 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "14.1 基本采样算法 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1391,12 +1115,8 @@
     "interactiveDemos": [
       "14.2 马尔可夫链蒙特卡洛 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "14.2 马尔可夫链蒙特卡洛 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1411,12 +1131,8 @@
     "interactiveDemos": [
       "14.3 Langevin 采样 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "14.3 Langevin 采样 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1431,12 +1147,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1451,12 +1163,8 @@
     "interactiveDemos": [
       "15.1 K-means 聚类 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "15.1 K-means 聚类 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1471,12 +1179,8 @@
     "interactiveDemos": [
       "15.2 高斯混合 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "15.2 高斯混合 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1491,12 +1195,8 @@
     "interactiveDemos": [
       "15.3 期望最大化算法 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "15.3 期望最大化算法 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1511,12 +1211,8 @@
     "interactiveDemos": [
       "15.4 证据下界 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "15.4 证据下界 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1531,12 +1227,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1551,12 +1243,8 @@
     "interactiveDemos": [
       "16.1 主成分分析 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "16.1 主成分分析 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1571,12 +1259,8 @@
     "interactiveDemos": [
       "16.2 概率隐变量 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "16.2 概率隐变量 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1591,12 +1275,8 @@
     "interactiveDemos": [
       "16.3 证据下界 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "16.3 证据下界 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1611,12 +1291,8 @@
     "interactiveDemos": [
       "16.4 非线性隐变量模型 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "16.4 非线性隐变量模型 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1631,12 +1307,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1651,12 +1323,8 @@
     "interactiveDemos": [
       "17.1 对抗训练 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "17.1 对抗训练 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1671,12 +1339,8 @@
     "interactiveDemos": [
       "17.2 图像 GAN 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "17.2 图像 GAN 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1691,12 +1355,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1711,12 +1371,8 @@
     "interactiveDemos": [
       "18.1 耦合流 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "18.1 耦合流 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "draft"
   },
   {
@@ -1731,12 +1387,8 @@
     "interactiveDemos": [
       "18.2 自回归流 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "18.2 自回归流 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1751,12 +1403,8 @@
     "interactiveDemos": [
       "18.3 连续流 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "18.3 连续流 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1771,12 +1419,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1791,12 +1435,8 @@
     "interactiveDemos": [
       "19.1 确定性自编码器 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "19.1 确定性自编码器 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1811,12 +1451,8 @@
     "interactiveDemos": [
       "19.2 变分自编码器 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "19.2 变分自编码器 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1831,12 +1467,8 @@
     "interactiveDemos": [
       "课程概览 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "课程概览 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1851,12 +1483,8 @@
     "interactiveDemos": [
       "20.1 前向编码器 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "20.1 前向编码器 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1871,12 +1499,8 @@
     "interactiveDemos": [
       "20.2 反向解码器 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "20.2 反向解码器 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1891,12 +1515,8 @@
     "interactiveDemos": [
       "20.3 分数匹配 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "20.3 分数匹配 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1911,12 +1531,8 @@
     "interactiveDemos": [
       "20.4 引导扩散 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "20.4 引导扩散 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1931,12 +1547,8 @@
     "interactiveDemos": [
       "矩阵运算 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "矩阵运算 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1951,12 +1563,8 @@
     "interactiveDemos": [
       "变分法基础 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "变分法基础 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   },
   {
@@ -1971,12 +1579,8 @@
     "interactiveDemos": [
       "约束优化 交互演示"
     ],
-    "exercisesOrQuizzes": [
-      "约束优化 小测题"
-    ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "quiz": [],
     "status": "content-reviewed"
   }
 ]

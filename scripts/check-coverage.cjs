@@ -112,7 +112,6 @@ function pageChecks(pageSource) {
     hasBishopSection: /bishopSection|§\d+\.\d+/i.test(src),
     hasLearningObjectives: /learningObjectives|学习目标/i.test(src),
     hasCommonMistakes: /commonMistakes|常见误区/i.test(src),
-    hasQuiz: /quiz|小测题|question.*options/i.test(src),
   };
 }
 
