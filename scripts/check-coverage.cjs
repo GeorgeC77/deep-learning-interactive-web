@@ -129,12 +129,13 @@ function resolveImportPath(importPath) {
 }
 
 function findWrappedSource(pageSource) {
-  // Detect simple wrapper files: import X from '...'; return <X />;
+  // Detect wrapper: import X from '...'; return <X /> or fragment containing <X />
   const importMatch = pageSource.match(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/);
   if (!importMatch) return null;
   const importedName = importMatch[1];
   const importPath = importMatch[2];
-  const usesImport = new RegExp(`<${importedName}[^/]*/?\\s*/>`).test(pageSource);
+  // Match <X /> or <X/> in any context (including fragments)
+  const usesImport = pageSource.includes(`<${importedName} />`) || pageSource.includes(`<${importedName}/>`);
   if (!usesImport) return null;
   return resolveImportPath(importPath);
 }
