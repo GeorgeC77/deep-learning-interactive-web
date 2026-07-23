@@ -33,6 +33,20 @@ export default function PrerequisiteCh03PeriodicPage() {
         "把 Von Mises 误称为普通高斯的位置-尺度分布；它是方向分布。",
         "在 m=0 时仍假设存在明显平均方向。",
       ]}
+      whyCards={[
+        {
+          question: "为什么角度数据不能用普通高斯建模？",
+          answer: "普通高斯在实数轴上定义，无法处理 0° 和 360° 是同一个方向的事实。Von Mises 分布专门为圆周变量设计。",
+        },
+        {
+          question: "为什么 Von Mises 分布用 cos(θ-θ₀)？",
+          answer: "cos 函数自然地把角度的周期性编码进来，θ 和 θ₀ 的接近程度决定了概率密度的大小。",
+        },
+      ]}
+      counterexamples={[
+        "对 0° 和 360° 的数据直接使用普通高斯，得到两个分离的峰——说明普通高斯无法处理周期性。",
+        "在 m=0 时仍假设存在明显平均方向——此时 Von Mises 退化为圆周均匀分布，没有 preferred direction。",
+      ]}
             bishopMapping={{
         chapter: "Ch 3",
         section: "3.3",

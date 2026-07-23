@@ -179,6 +179,51 @@ export default function PrerequisiteChapter01HistoryPage() {
         </div>
       </section>
     
+      {/* Interactive demo */}
+      <InteractiveDemo title="深度学习发展时间线">
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            拖动滑块，查看不同年份的关键技术突破。
+          </p>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 w-32">年份</span>
+            <input type="range" min="1943" max="2024" defaultValue="2012" className="flex-1" id="year-slider" />
+            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded w-20 text-center" id="year-value">2012</span>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="text-sm font-medium text-gray-700" id="milestone-text">
+              2012: AlexNet 在 ImageNet 上取得突破，深度学习在计算机视觉中爆发
+            </div>
+          </div>
+          <script dangerouslySetInnerHTML={{ __html: `
+            const milestones = [
+              { year: 1943, text: '1943: McCulloch 与 Pitts 提出神经元数学模型' },
+              { year: 1958, text: '1958: Rosenblatt 发明感知机' },
+              { year: 1986, text: '1986: 反向传播算法重新发现' },
+              { year: 2006, text: '2006: Hinton 提出深度信念网络' },
+              { year: 2012, text: '2012: AlexNet 在 ImageNet 上取得突破' },
+              { year: 2014, text: '2014: GAN 被提出' },
+              { year: 2017, text: '2017: Transformer 架构出现' },
+              { year: 2018, text: '2018: BERT 发布' },
+              { year: 2020, text: '2020: GPT-3 展示大规模语言模型能力' },
+              { year: 2022, text: '2022: ChatGPT 引发大模型热潮' },
+              { year: 2024, text: '2024: 多模态大模型与科学智能体快速发展' }
+            ];
+            const slider = document.getElementById('year-slider');
+            const yearValue = document.getElementById('year-value');
+            const milestoneText = document.getElementById('milestone-text');
+            slider.addEventListener('input', (e) => {
+              const year = parseInt(e.target.value);
+              yearValue.textContent = year;
+              const closest = milestones.reduce((prev, curr) =>
+                Math.abs(curr.year - year) < Math.abs(prev.year - year) ? curr : prev
+              );
+              milestoneText.textContent = closest.text;
+            });
+          ` }} />
+        </div>
+      </InteractiveDemo>
+
       {/* Why? */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>

@@ -84,6 +84,24 @@ export default function Ch02GenerativeClassifiersPage() {
           "推导共享协方差假设下 log-odds 为线性的证明",
         ],
       }}
+      demo={{
+        title: "先验概率对后验的影响",
+        label: "类别先验 p(C₁)",
+        param: 0.5,
+        min: 0.01,
+        max: 0.99,
+        step: 0.01,
+        compute: (prior) => {
+          const likelihood = 0.8;
+          const posterior = (likelihood * prior) / (likelihood * prior + 0.3 * (1 - prior));
+          return {
+            label: '后验概率 p(C₁|x)',
+            value: posterior,
+            display: String.raw`p(C_1|x)=\frac{0.8 \cdot ${prior.toFixed(2)}}{0.8 \cdot ${prior.toFixed(2)} + 0.3 \cdot ${(1 - prior).toFixed(2)}}=${posterior.toFixed(3)}`,
+          };
+        },
+        formula: String.raw`p(C_1|x) = \frac{p(x|C_1)p(C_1)}{p(x)}`,
+      }}
     />
   );
 }

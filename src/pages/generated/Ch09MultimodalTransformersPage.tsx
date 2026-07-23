@@ -69,6 +69,23 @@ export default function Ch09MultimodalTransformersPage() {
           "举例说明视觉-语言模型在零样本分类中的工作原理。",
         ],
       }}
+      demo={{
+        title: "视觉 Transformer 的 patch 数量",
+        label: "图像边长（patch 数）",
+        param: 14,
+        min: 7,
+        max: 32,
+        step: 1,
+        compute: (n) => {
+          const numPatches = n * n;
+          return {
+            label: '总 patch 数',
+            value: numPatches,
+            display: String.raw`${n} \times ${n} = ${numPatches}`,
+          };
+        },
+        formula: String.raw`\text{patch 数} = \frac{H}{P} \times \frac{W}{P}`,
+      }}
     />
   );
 }

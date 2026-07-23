@@ -67,6 +67,24 @@ export default function Ch03LimitationsOfFixedBasisFunctionsPage() {
           "6.1.4 Data-dependent basis functions",
         ],
       }}
+      demo={{
+        title: "维度灾难：基函数数量随维度指数增长",
+        label: "输入维度 D",
+        param: 2,
+        min: 1,
+        max: 10,
+        step: 1,
+        compute: (D) => {
+          const K = 5;
+          const numBasis = Math.pow(K, D);
+          return {
+            label: `K=${K} 时基函数数量`,
+            value: numBasis,
+            display: String.raw`K^D=${K}^{${D}}=${numBasis.toLocaleString()}`,
+          };
+        },
+        formula: String.raw`\text{基函数数量} = K^D`,
+      }}
     />
   );
 }

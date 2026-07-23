@@ -84,6 +84,25 @@ export default function Ch03DeepNetworksPage() {
         ],
         formulas: ["representation learning", "contrastive loss"],
       }}
+      demo={{
+        title: "深度 vs 宽度：参数量对比",
+        label: "网络深度 L",
+        param: 2,
+        min: 1,
+        max: 10,
+        step: 1,
+        compute: (L) => {
+          const width = 10;
+          const deepParams = L * width * width;
+          const wideParams = width * width * 10;
+          return {
+            label: `深度 ${L} 层参数量 vs 宽度 100 单层参数量`,
+            value: deepParams,
+            display: String.raw`L \times 100 = ${L} \times 100 = ${deepParams} \quad vs \quad 100 \times 100 = ${wideParams}`,
+          };
+        },
+        formula: String.raw`\text{深度参数量} = L \times W^2, \quad \text{宽度参数量} = W^3`,
+      }}
     />
   );
 }

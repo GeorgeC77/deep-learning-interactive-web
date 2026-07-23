@@ -63,6 +63,23 @@ export default function Ch14ImageGansPage() {
         algorithms: ["CycleGAN"],
         exercises: ["说明 CycleGAN 为什么不需要成对数据。"],
       }}
+      demo={{
+        title: "CycleGAN 循环一致性损失",
+        label: "循环权重 λ",
+        param: 1,
+        min: 0,
+        max: 5,
+        step: 0.1,
+        compute: (lambda) => {
+          const totalLoss = 1 + lambda;
+          return {
+            label: '总损失（对抗+循环）',
+            value: totalLoss,
+            display: String.raw`1 + ${lambda.toFixed(1)} = ${totalLoss.toFixed(1)}`,
+          };
+        },
+        formula: String.raw`L = L_{\text{adv}} + \lambda L_{\text{cyc}}`,
+      }}
     />
   );
 }

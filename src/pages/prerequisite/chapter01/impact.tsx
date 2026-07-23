@@ -180,6 +180,40 @@ export default function PrerequisiteChapter01ImpactPage() {
         </div>
       </section>
     
+      {/* Interactive demo */}
+      <InteractiveDemo title="模型规模与性能关系">
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            拖动滑块，观察模型参数量增加时性能的变化。注意：当数据量固定时，过大的模型可能过拟合。
+          </p>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 w-32">参数量（百万）</span>
+            <input type="range" min="1" max="1000" defaultValue="100" className="flex-1" id="param-slider" />
+            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded w-16 text-center" id="param-value">100</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 w-32">相对性能</span>
+            <div className="flex-1 bg-gray-200 rounded-full h-4">
+              <div className="bg-blue-600 h-4 rounded-full" style={{ width: '60%' }} id="perf-bar"></div>
+            </div>
+            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded w-16 text-center" id="perf-value">0.60</span>
+          </div>
+          <script dangerouslySetInnerHTML={{ __html: `
+            const slider = document.getElementById('param-slider');
+            const paramValue = document.getElementById('param-value');
+            const perfBar = document.getElementById('perf-bar');
+            const perfValue = document.getElementById('perf-value');
+            slider.addEventListener('input', (e) => {
+              const params = parseInt(e.target.value);
+              paramValue.textContent = params;
+              const perf = Math.min(1, Math.log10(params + 1) / 3);
+              perfBar.style.width = (perf * 100) + '%';
+              perfValue.textContent = perf.toFixed(2);
+            });
+          ` }} />
+        </div>
+      </InteractiveDemo>
+
       {/* Why? */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>

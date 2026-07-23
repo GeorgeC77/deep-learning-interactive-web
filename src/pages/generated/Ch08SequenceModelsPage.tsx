@@ -56,6 +56,23 @@ export default function Ch08SequenceModelsPage() {
         algorithms: ["前向-后向算法"],
         exercises: ["说明马尔可夫假设在文本与语音任务中的适用性。", "解释隐状态如何帮助模型捕捉长距离依赖。"]
       }}
+      demo={{
+        title: "马尔可夫链状态转移",
+        label: "转移概率 p",
+        param: 0.5,
+        min: 0,
+        max: 1,
+        step: 0.1,
+        compute: (p) => {
+          const stayProb = 1 - p;
+          return {
+            label: '停留在当前状态的概率',
+            value: stayProb,
+            display: String.raw`1 - ${p.toFixed(1)} = ${stayProb.toFixed(1)}`,
+          };
+        },
+        formula: String.raw`p(x_t | x_{t-1})`,
+      }}
     />
   );
 }

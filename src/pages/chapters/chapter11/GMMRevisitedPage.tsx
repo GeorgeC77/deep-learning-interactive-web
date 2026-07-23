@@ -1,9 +1,13 @@
 import SectionMetadata from '@/components/SectionMetadata';
+import { useState } from 'react';
 import { ShieldAlert, RotateCcw, CheckCircle2 , Circle} from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
 import FormulaCard from '@/components/FormulaCard';
+import InteractiveDemo from '@/components/InteractiveDemo';
 
 export default function GMMRevisitedPage() {
+  const [pi, setPi] = useState(0.5);
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       <section className="text-center py-8 bg-white rounded-2xl shadow-sm border border-gray-200">
@@ -117,6 +121,25 @@ export default function GMMRevisitedPage() {
           </li>
         </ul>
       </section>
+
+      {/* Interactive demo */}
+      <InteractiveDemo title="GMM 混合系数对密度的影响">
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            调整第一个高斯分量的混合系数 π₁，观察混合密度在 t=0 处的值。
+          </p>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 w-32">混合系数 π₁</span>
+            <input type="range" min="0" max="1" step="0.05" value={pi} onChange={(e) => setPi(parseFloat(e.target.value))} className="flex-1" />
+            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded w-16 text-center">{pi.toFixed(2)}</span>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="text-sm text-gray-700">
+              p(t=0) = {(1 / Math.sqrt(2 * Math.PI) * (pi + (1 - pi) * Math.exp(-2))).toFixed(3)}
+            </div>
+          </div>
+        </div>
+      </InteractiveDemo>
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>

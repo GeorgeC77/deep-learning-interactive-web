@@ -1,8 +1,10 @@
 import SectionMetadata from '@/components/SectionMetadata';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Waves, ShieldAlert, ArrowRight, Calculator, Ruler } from 'lucide-react';
 import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
+import InteractiveDemo from '../../../components/InteractiveDemo';
 import KaTeX from '../../../components/KaTeX';
 
 function PdfSvg() {
@@ -99,6 +101,9 @@ function PdfSvg() {
 }
 
 export default function PrerequisiteChapter02DensitiesPage() {
+  const [distType, setDistType] = useState('gaussian');
+  const [distParam, setDistParam] = useState(1);
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       {/* Hero */}
@@ -245,6 +250,35 @@ export default function PrerequisiteChapter02DensitiesPage() {
         </Link>
       </section>
     
+      {/* Interactive demo */}
+      <InteractiveDemo title="概率密度函数演示">
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            拖动滑块改变分布参数，观察概率密度函数的变化。
+          </p>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 w-32">分布类型</span>
+            <select className="flex-1 px-3 py-2 border border-gray-300 rounded-lg" value={distType} onChange={(e) => setDistType(e.target.value)}>
+              <option value="uniform">均匀分布</option>
+              <option value="exponential">指数分布</option>
+              <option value="gaussian">高斯分布</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600 w-32">参数</span>
+            <input type="range" min="0.1" max="3" step="0.1" value={distParam} onChange={(e) => setDistParam(parseFloat(e.target.value))} className="flex-1" />
+            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded w-16 text-center">{distParam.toFixed(1)}</span>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="text-sm text-gray-700">
+              {distType === 'uniform' && `均匀分布 U(0, ${distParam.toFixed(1)})：在 [0, ${distParam.toFixed(1)}] 上密度为 ${(1/distParam).toFixed(2)}`}
+              {distType === 'exponential' && `指数分布 Exp(${distParam.toFixed(1)})：均值 ${(1/distParam).toFixed(2)}，密度随 x 指数衰减`}
+              {distType === 'gaussian' && `高斯分布 N(0, ${distParam.toFixed(1)}²)：均值 0，方差 ${(distParam*distParam).toFixed(2)}`}
+            </div>
+          </div>
+        </div>
+      </InteractiveDemo>
+
       {/* Why? */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>

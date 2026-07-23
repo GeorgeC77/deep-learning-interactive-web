@@ -34,6 +34,20 @@ export default function PrerequisiteCh02TransformationPage() {
         "多元情形下混淆 ∂x/∂y 与 ∂y/∂x，用错 Jacobian 矩阵。",
         "在非单调变换上直接套用一元变量替换公式。",
       ]}
+      whyCards={[
+        {
+          question: "为什么密度变换需要 Jacobian 行列式？",
+          answer: "变量变换会拉伸或压缩空间，Jacobian 行列式正是衡量这种局部体积变化的因子，保证概率质量守恒。",
+        },
+        {
+          question: "为什么可逆变换在生成模型中如此重要？",
+          answer: "可逆变换让我们既能从简单分布采样生成复杂数据，也能精确计算生成样本的概率密度，这是归一化流的基础。",
+        },
+      ]}
+      counterexamples={[
+        "忘记取导数绝对值，导致密度为负——说明概率密度必须非负。",
+        "在非单调变换上直接套用一元变量替换公式，导致密度积分不为 1——说明可逆性是变量替换的前提。",
+      ]}
             bishopMapping={{
         chapter: "Ch 2",
         section: "2.4",

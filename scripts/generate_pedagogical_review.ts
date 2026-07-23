@@ -62,7 +62,7 @@ const DIMS: Dim[] = [
   { key: 'how', label: 'How', test: (t) => /concepts=\{/.test(t) || /coreIntuition=\{/.test(t) || /ConceptCard/.test(t) || /核心概念/.test(t) || /算法步骤/.test(t) || /模型与算法/.test(t) },
   { key: 'counterexample', label: 'Counterexample', test: (t) => /counterexamples=\{/.test(t) || /反例/.test(t) || /FlaskConical/.test(t) },
   { key: 'interactive', label: 'Interactive', test: (t) => /interactiveDemo=\{/.test(t) || /extraContent=\{/.test(t) || /demo=\{\{/.test(t) || /InteractiveDemo/.test(t) || /components\/demos\//.test(t) || /Demo\s*\/>/.test(t) || /useState/.test(t) },
-  { key: 'realWorld', label: 'Real-world Intuition', test: (t) => /coreIntuition=\{/.test(t) || /核心直觉/.test(t) || /直觉/.test(t) || /intuition/.test(t) },
+  { key: 'realWorld', label: 'Real-world Intuition', test: (t) => /coreIntuition=\{/.test(t) || /核心直觉/.test(t) || /直觉/.test(t) || /intuition/.test(t) || /核心思想/.test(t) || /核心概念/.test(t) },
 ];
 
 type Row = {

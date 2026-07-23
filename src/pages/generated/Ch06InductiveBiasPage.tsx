@@ -59,6 +59,23 @@ export default function Ch06InductiveBiasPage() {
         ],
         exercises: ["举例说明归纳偏置在图像与文本任务中的差异。", "解释为什么卷积网络适合图像而 RNN 适合序列。"]
       }}
+      demo={{
+        title: "归纳偏置对模型复杂度的影响",
+        label: "归纳偏置强度",
+        param: 0.5,
+        min: 0,
+        max: 1,
+        step: 0.1,
+        compute: (bias) => {
+          const complexity = 1 - bias * 0.7;
+          return {
+            label: '有效模型复杂度',
+            value: complexity,
+            display: String.raw`1 - 0.7 \times ${bias.toFixed(1)} = ${complexity.toFixed(2)}`,
+          };
+        },
+        formula: String.raw`\text{有效复杂度} = 1 - \lambda \times \text{偏置强度}`,
+      }}
     />
   );
 }

@@ -56,6 +56,23 @@ export default function Ch07ComputerVisionPage() {
         ],
         exercises: ["说明图像的局部相关性与层次结构如何启发 CNN 设计。", "举例说明数据增强在不同视觉任务中的适用性。"]
       }}
+      demo={{
+        title: "图像局部相关性演示",
+        label: "卷积核大小 K",
+        param: 3,
+        min: 1,
+        max: 7,
+        step: 2,
+        compute: (K) => {
+          const connections = K * K;
+          return {
+            label: '局部连接数',
+            value: connections,
+            display: String.raw`K \times K = ${K} \times ${K} = ${connections}`,
+          };
+        },
+        formula: String.raw`\text{局部连接数} = K \times K`,
+      }}
     />
   );
 }

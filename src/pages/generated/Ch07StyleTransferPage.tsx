@@ -77,6 +77,23 @@ export default function Ch07StyleTransferPage() {
           "比较浅层和深层特征用于风格/内容表示的差异。",
         ],
       }}
+      demo={{
+        title: "风格迁移权重对生成结果的影响",
+        label: "风格权重 β",
+        param: 1,
+        min: 0,
+        max: 5,
+        step: 0.1,
+        compute: (beta) => {
+          const contentPreserved = Math.max(0, 1 - beta * 0.2);
+          return {
+            label: '内容保留程度',
+            value: contentPreserved,
+            display: String.raw`1 - 0.2 \times ${beta.toFixed(1)} = ${contentPreserved.toFixed(2)}`,
+          };
+        },
+        formula: String.raw`L = \alpha L_{\text{content}} + \beta L_{\text{style}}`,
+      }}
     />
   );
 }

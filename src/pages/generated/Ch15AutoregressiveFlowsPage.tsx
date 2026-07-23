@@ -74,6 +74,23 @@ export default function Ch15AutoregressiveFlowsPage() {
         algorithms: ["MAF", "IAF"],
         exercises: ["推导二维自回归变换的 Jacobian 行列式。", "比较 MAF 与 IAF 在训练与采样时的计算复杂度。"],
       }}
+      demo={{
+        title: "自回归流的维度依赖",
+        label: "当前维度 i",
+        param: 3,
+        min: 1,
+        max: 10,
+        step: 1,
+        compute: (i) => {
+          const dependencies = i - 1;
+          return {
+            label: '依赖的维度数',
+            value: dependencies,
+            display: String.raw`i - 1 = ${i} - 1 = ${dependencies}`,
+          };
+        },
+        formula: String.raw`x_i = \mu_i(x_{<i}) + \sigma_i(x_{<i}) z_i`,
+      }}
     />
   );
 }

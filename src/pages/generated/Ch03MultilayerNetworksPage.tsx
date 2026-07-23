@@ -68,6 +68,25 @@ export default function Ch03MultilayerNetworksPage() {
           "6.2.4 Weight-space symmetries",
         ],
       }}
+      demo={{
+        title: "不同激活函数的输出",
+        label: "输入值 z",
+        param: 0,
+        min: -3,
+        max: 3,
+        step: 0.1,
+        compute: (z) => {
+          const relu = Math.max(0, z);
+          const sigmoid = 1 / (1 + Math.exp(-z));
+          const tanh = Math.tanh(z);
+          return {
+            label: `ReLU=${relu.toFixed(2)}, Sigmoid=${sigmoid.toFixed(2)}, Tanh=${tanh.toFixed(2)}`,
+            value: relu,
+            display: String.raw`\text{ReLU}=${relu.toFixed(2)}, \sigma=${sigmoid.toFixed(2)}, \tanh=${tanh.toFixed(2)}`,
+          };
+        },
+        formula: String.raw`\text{ReLU}(z)=\max(0,z), \quad \sigma(z)=\frac{1}{1+e^{-z}}, \quad \tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}`,
+      }}
     />
   );
 }

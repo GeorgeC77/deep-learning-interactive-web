@@ -66,6 +66,23 @@ export default function Ch13NonlinearLatentVariableModelsPage() {
         algorithms: ["VAE", "GAN", "Normalizing Flows", "Autoregressive models"],
         exercises: ["比较四类生成模型的似然可计算性。", "说明离散观测下解码器分布的选择。"],
       }}
+      demo={{
+        title: "非线性流形曲率",
+        label: "曲率参数",
+        param: 1,
+        min: 0,
+        max: 3,
+        step: 0.1,
+        compute: (curvature) => {
+          const linearApproxError = curvature * 0.5;
+          return {
+            label: '线性近似误差',
+            value: linearApproxError,
+            display: String.raw`0.5 \times ${curvature.toFixed(1)} = ${linearApproxError.toFixed(2)}`,
+          };
+        },
+        formula: String.raw`\text{线性近似误差} \propto \text{流形曲率}`,
+      }}
     />
   );
 }
