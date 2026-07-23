@@ -11,7 +11,7 @@
     "preview": "vite preview --config config/vite.config.ts",
     "coverage:build": "node scripts/build-coverage-matrix.cjs",
     "coverage:check": "node scripts/check-coverage.cjs",
-    "audit:bishop": "node --experimental-strip-types scripts/audit_bishop_alignment.ts",
+    "audit:bishop": "npx tsx@latest scripts/audit_bishop_alignment.ts",
     "validate:teaching-ready": "npx tsx@latest scripts/validate_teaching_ready.ts",
     "review:pedagogical": "npx tsx@latest scripts/generate_pedagogical_review.ts",
     "test": "vitest run --config config/vite.config.ts",

@@ -141,7 +141,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "pre-ch02-information",
@@ -237,7 +237,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "pre-ch03-exponential",
@@ -317,7 +317,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch01-bias-variance",
@@ -365,7 +365,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch02-decision-theory",
@@ -381,7 +381,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch02-generative-classifiers",
@@ -829,7 +829,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch07-image-segmentation",
@@ -941,7 +941,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch09-attention",
@@ -1005,7 +1005,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch10-overview",
@@ -1101,7 +1101,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch11-markov-chain-monte-carlo",
@@ -1117,7 +1117,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch11-langevin-sampling",
@@ -1213,7 +1213,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch13-overview",
@@ -1229,7 +1229,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch13-principal-component-analysis",
@@ -1261,7 +1261,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch13-evidence-lower-bound",
@@ -1277,7 +1277,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch13-nonlinear-latent-variable-models",
@@ -1373,7 +1373,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "draft"
+    "status": "content-reviewed"
   },
   {
     "id": "ch15-autoregressive-flows",
