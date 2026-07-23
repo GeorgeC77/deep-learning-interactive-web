@@ -46,6 +46,20 @@ export default function Ch12EvidenceLowerBoundPage() {
         "认为 M 步必须闭式最大化；广义 EM 允许部分优化。",
         "在 i.i.d. 情形下忘记每个样本有独立的隐变量后验。",
       ]}
+      whyCards={[
+        {
+          question: "为什么需要 ELBO？",
+          answer: "对数似然里含有隐变量的积分或求和，直接优化很困难。ELBO 用变分后验构造一个可以计算的下界，把难题变成可解的交替优化。",
+        },
+        {
+          question: "为什么 EM 能保证收敛？",
+          answer: "E 步让 ELBO 在当前参数处与对数似然相切，M 步提升这个下界，因此对数似然单调不减，必然收敛到局部极值。",
+        },
+      ]}
+      counterexamples={[
+        "在 GMM 中把 E 步的后验换成均匀分布，ELBO 不再紧致，M 步的提升不再保证对数似然增加——说明后验选择至关重要。",
+        "认为 M 步必须全局最优，实际上广义 EM 只要提升 ELBO 就能收敛——说明“最优”不是必要条件。",
+      ]}
             bishopMapping={{
         chapter: "Ch 15",
         section: "15.4",

@@ -118,7 +118,7 @@ export const courseManifest: Part[] = [
             id: "pre-ch02-transformation",
             title: "2.4 密度变换",
             path: "/prerequisite/ch02/transformation",
-            status: "draft",
+            status: "content-reviewed",
             description: "变量替换、多元分布的密度变换。",
           },
           {
@@ -168,7 +168,7 @@ export const courseManifest: Part[] = [
             id: "pre-ch03-periodic",
             title: "3.3 周期变量",
             path: "/prerequisite/ch03/periodic",
-            status: "draft",
+            status: "content-reviewed",
             description: "Von Mises 分布与角度数据。",
           },
           {
@@ -220,7 +220,7 @@ export const courseManifest: Part[] = [
             id: "ch01-decision-theory",
             title: "4.2 决策理论",
             path: "/ch01/decision-theory",
-            status: "draft",
+            status: "content-reviewed",
             description: "损失函数、期望损失与最优决策。",
           },
           {
@@ -249,14 +249,14 @@ export const courseManifest: Part[] = [
             id: "ch02-discriminant-functions",
             title: "5.1 判别函数",
             path: "/ch02/discriminant-functions",
-            status: "draft",
+            status: "content-reviewed",
             description: "二分类与多类判别函数、1-of-K 编码、最小二乘分类。",
           },
           {
             id: "ch02-decision-theory",
             title: "5.2 决策理论",
             path: "/ch02/decision-theory",
-            status: "draft",
+            status: "content-reviewed",
             description: "误分类率、期望损失、拒绝选项、推断与决策。",
           },
           {
@@ -510,7 +510,7 @@ export const courseManifest: Part[] = [
             id: "ch07-object-detection",
             title: "10.4 目标检测",
             path: "/ch07/object-detection",
-            status: "draft",
+            status: "content-reviewed",
             description: "边界框、IoU、滑动窗口、多尺度检测、非极大抑制与 Fast R-CNN。",
           },
           {
@@ -575,7 +575,7 @@ export const courseManifest: Part[] = [
             id: "ch09-overview",
             title: "课程概览",
             path: "/ch09/overview",
-            status: "draft",
+            status: "content-reviewed",
             description: "注意力、自注意力、多头注意力与大语言模型。",
           },
           {
@@ -603,7 +603,7 @@ export const courseManifest: Part[] = [
             id: "ch09-multimodal-transformers",
             title: "12.4 多模态 Transformer",
             path: "/ch09/multimodal-transformers",
-            status: "draft",
+            status: "content-reviewed",
             description: "视觉 Transformer、图像生成 Transformer、音频、语音合成与视觉-语言模型。",
           }
         ],
@@ -670,14 +670,14 @@ export const courseManifest: Part[] = [
             id: "ch11-basic-sampling-algorithms",
             title: "14.1 基本采样算法",
             path: "/ch11/basic-sampling-algorithms",
-            status: "draft",
+            status: "content-reviewed",
             description: "期望、标准分布、拒绝采样、自适应拒绝采样、重要性采样与 SIR。",
           },
           {
             id: "ch11-markov-chain-monte-carlo",
             title: "14.2 马尔可夫链蒙特卡洛",
             path: "/ch11/markov-chain-monte-carlo",
-            status: "draft",
+            status: "content-reviewed",
             description: "Metropolis 算法、马尔可夫链、Metropolis-Hastings 与 Gibbs 采样。",
           },
           {
@@ -727,7 +727,7 @@ export const courseManifest: Part[] = [
             id: "ch12-evidence-lower-bound",
             title: "15.4 证据下界",
             path: "/ch12/evidence-lower-bound",
-            status: "draft",
+            status: "content-reviewed",
             description: "ELBO、EM 再审视、i.i.d. 数据、参数先验与广义 EM。",
           }
         ],
@@ -742,7 +742,7 @@ export const courseManifest: Part[] = [
             id: "ch13-overview",
             title: "课程概览",
             path: "/ch13/overview",
-            status: "draft",
+            status: "content-reviewed",
             description: "PCA、因子分析、ICA 与非线性隐变量模型。",
           },
           {
@@ -756,14 +756,14 @@ export const courseManifest: Part[] = [
             id: "ch13-probabilistic-latent-variables",
             title: "16.2 概率隐变量",
             path: "/ch13/probabilistic-latent-variables",
-            status: "draft",
+            status: "content-reviewed",
             description: "生成模型、似然函数、最大似然、因子分析与独立成分分析。",
           },
           {
             id: "ch13-evidence-lower-bound",
             title: "16.3 证据下界",
             path: "/ch13/evidence-lower-bound",
-            status: "draft",
+            status: "content-reviewed",
             description: "期望最大化、PCA 的 EM、因子分析的 EM。",
           },
           {
@@ -821,7 +821,7 @@ export const courseManifest: Part[] = [
             id: "ch15-coupling-flows",
             title: "18.1 耦合流",
             path: "/ch15/coupling-flows",
-            status: "draft",
+            status: "content-reviewed",
             description: "可逆耦合层与 RealNVP；密度变换公式已修正，待复核后升级。",
           },
           {

@@ -48,6 +48,20 @@ export default function Ch11MarkovChainMonteCarloPage() {
         "在非对称提议下仍使用 Metropolis 公式，导致平稳分布不正确。",
         "忽略 MCMC 样本自相关，直接用独立样本的标准误公式估计方差。",
       ]}
+      whyCards={[
+        {
+          question: "为什么需要 Metropolis-Hastings 修正？",
+          answer: "当提议分布不对称时，从 x 到 x' 和从 x' 到 x 的“容易程度”不同，需要用提议比例来修正，保证链最终收敛到目标分布。",
+        },
+        {
+          question: "为什么 MCMC 样本不能直接当作独立样本？",
+          answer: "相邻样本通过转移核相关联，自相关系数高。用独立样本公式会低估方差，导致过于自信的结论。",
+        },
+      ]}
+      counterexamples={[
+        "用对称提议公式处理非对称提议，链的平稳分布不再是目标分布——说明修正项不是可有可无的。",
+        "把 burn-in 阶段的样本也计入平均，估计结果会严重偏离真实值——说明预热阶段必须丢弃。",
+      ]}
             bishopMapping={{
         chapter: "Ch 14",
         section: "14.2",

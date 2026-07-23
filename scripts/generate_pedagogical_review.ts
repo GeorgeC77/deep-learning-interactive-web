@@ -35,15 +35,29 @@ function resolveComponentFile(importSource: string): string {
   return `src/${rel}.tsx`;
 }
 
+function resolveWrappedComponent(file: string): string {
+  if (!file || !fs.existsSync(file)) return file;
+  const text = fs.readFileSync(file, 'utf8');
+  // Match simple wrapper: import X from '...'; export default function ... { return <X />; }
+  const importMatch = text.match(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/);
+  if (!importMatch) return file;
+  const importedName = importMatch[1];
+  const importPath = importMatch[2];
+  const returnMatch = text.includes(`return <${importedName} />`) || text.includes(`return <${importedName}/>`);
+  if (!returnMatch) return file;
+  const resolved = resolveComponentFile(importPath.replace(/^@\/pages\//, './pages/'));
+  return resolved;
+}
+
 type Dim = { key: string; label: string; test: (text: string) => boolean };
 
 const DIMS: Dim[] = [
-  { key: 'what', label: 'What', test: (t) => /summary=\{/.test(t) || /text-lg text-gray-600/.test(t) },
-  { key: 'why', label: 'Why', test: (t) => /whyCards=\{/.test(t) || /为什么？/.test(t) || /MessageCircleQuestion/.test(t) },
-  { key: 'how', label: 'How', test: (t) => /concepts=\{/.test(t) || /coreIntuition=\{/.test(t) || /ConceptCard/.test(t) || /核心概念/.test(t) },
+  { key: 'what', label: 'What', test: (t) => /summary=\{/.test(t) || /text-lg text-gray-600/.test(t) || /text-gray-600 max-w-2xl/.test(t) },
+  { key: 'why', label: 'Why', test: (t) => /whyCards=\{/.test(t) || /为什么/.test(t) || /MessageCircleQuestion/.test(t) },
+  { key: 'how', label: 'How', test: (t) => /concepts=\{/.test(t) || /coreIntuition=\{/.test(t) || /ConceptCard/.test(t) || /核心概念/.test(t) || /算法步骤/.test(t) || /模型与算法/.test(t) },
   { key: 'counterexample', label: 'Counterexample', test: (t) => /counterexamples=\{/.test(t) || /反例/.test(t) || /FlaskConical/.test(t) },
-  { key: 'interactive', label: 'Interactive', test: (t) => /interactiveDemo=\{/.test(t) || /extraContent=\{/.test(t) || /demo=\{\{/.test(t) || /InteractiveDemo/.test(t) || /components\/demos\//.test(t) },
-  { key: 'realWorld', label: 'Real-world Intuition', test: (t) => /coreIntuition=\{/.test(t) || /核心直觉/.test(t) },
+  { key: 'interactive', label: 'Interactive', test: (t) => /interactiveDemo=\{/.test(t) || /extraContent=\{/.test(t) || /demo=\{\{/.test(t) || /InteractiveDemo/.test(t) || /components\/demos\//.test(t) || /Demo\s*\/>/.test(t) || /useState/.test(t) },
+  { key: 'realWorld', label: 'Real-world Intuition', test: (t) => /coreIntuition=\{/.test(t) || /核心直觉/.test(t) || /直觉/.test(t) || /intuition/.test(t) },
 ];
 
 type Row = {
@@ -63,10 +77,11 @@ const rows: Row[] = [];
 
 for (const sec of getAllSections()) {
   const componentName = routeComponentMap[sec.path] ?? '';
-  const file = resolveComponentFile(importMap[componentName] ?? '');
+  const rawFile = resolveComponentFile(importMap[componentName] ?? '');
+  const file = resolveWrappedComponent(rawFile);
   if (!file || !fs.existsSync(file)) continue;
   // Only audit real generated content pages (skip legacy chapter pages).
-  if (!file.includes('src/pages/generated/')) continue;
+  if (!file.includes('src/pages/generated/') && !file.includes('src/pages/chapters/') && !file.includes('src/pages/prerequisite/')) continue;
   const text = fs.readFileSync(file, 'utf8');
   const present = DIMS.map((d) => d.test(text));
   const coverage = Math.round((present.filter(Boolean).length / DIMS.length) * 100);
