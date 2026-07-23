@@ -209,6 +209,8 @@ function main() {
         checks = Object.fromEntries(
           Object.keys(checks).map((k) => [k, checks[k] || wrappedChecks[k]])
         );
+      } else if (process.env.DEBUG_COVERAGE) {
+        console.log(`No wrapped source found for ${componentName} (${section.path})`);
       }
       const missing = Object.entries(checks)
         .filter(([, v]) => !v)
