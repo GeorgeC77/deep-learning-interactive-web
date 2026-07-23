@@ -234,6 +234,36 @@ export default function PrerequisiteChapter02InformationPage() {
         </Link>
       </section>
     
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么熵能度量不确定性？</strong>
+            熵是“惊讶程度”的期望。分布越均匀，每次抽样的结果越难预测，熵就越大；分布越集中，熵就越小。
+          </p>
+          <p>
+            <strong>为什么 KL 散度不对称？</strong>
+            KL(p||q) 用 p 的期望衡量 q 对 p 的近似程度，方向性很重要。把它当成对称距离是常见错误。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为熵越大信息量越大。</strong>
+            熵度量的是不确定性，不是信息量。确定分布的熵为 0，但包含全部信息——说明熵和信息量不是同一概念。
+          </p>
+          <p>
+            <strong>反例 2：认为 KL 散度是对称距离。</strong>
+            KL(p||q) ≠ KL(q||p)，交换两个分布会得到完全不同的值——说明 KL 散度不是真正的距离度量。
+          </p>
+        </div>
+      </section>
+    
       <SectionMetadata
         bishopChapter={"Ch 2"}
         bishopSection={"information"}

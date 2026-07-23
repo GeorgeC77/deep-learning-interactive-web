@@ -384,6 +384,36 @@ export default function PrerequisiteChapter02BayesianPage() {
         </Link>
       </section>
     
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么需要贝叶斯概率？</strong>
+            频率派把概率看作长期频率，贝叶斯派把概率看作信念程度。贝叶斯框架可以自然地结合先验知识与数据，特别适合小样本推断。
+          </p>
+          <p>
+            <strong>为什么共轭先验如此方便？</strong>
+            共轭先验让后验与先验属于同一分布族，计算上大大简化。例如 Beta 分布是伯努利似然的共轭先验。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为贝叶斯概率只是主观猜测。</strong>
+            贝叶斯概率有严格的数学规则，先验的选择会影响后验，但数据会逐步纠正不合理的先验——说明贝叶斯方法是客观推断工具。
+          </p>
+          <p>
+            <strong>反例 2：认为共轭先验总是合理选择。</strong>
+            共轭先验主要为了计算方便，不一定反映真实先验知识——说明计算便利与先验合理性需要权衡。
+          </p>
+        </div>
+      </section>
+    
       <SectionMetadata
         bishopChapter={"Ch 2"}
         bishopSection={"bayesian"}

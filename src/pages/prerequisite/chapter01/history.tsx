@@ -179,6 +179,36 @@ export default function PrerequisiteChapter01HistoryPage() {
         </div>
       </section>
     
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么反向传播对深度学习如此重要？</strong>
+            它让多层网络中的所有参数都可以根据最终误差联合优化，实现端到端学习，是深度网络可训练的关键算法。
+          </p>
+          <p>
+            <strong>为什么深度学习在 2012 年爆发？</strong>
+            大数据（ImageNet）、强算力（GPU）、好算法（AlexNet）三者同时成熟，使深度网络首次在大规模视觉任务上取得突破。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为深度学习是全新发明。</strong>
+            感知机、反向传播、多层网络等核心概念在几十年前就已提出——说明深度学习是长期积累的结果。
+          </p>
+          <p>
+            <strong>反例 2：认为只要堆深度就能提升性能。</strong>
+            没有残差连接等架构创新，深层网络会因梯度消失而无法训练——说明深度需要配合算法进步。
+          </p>
+        </div>
+      </section>
+    
       <SectionMetadata
         bishopChapter={"Ch 1"}
         bishopSection={"history"}

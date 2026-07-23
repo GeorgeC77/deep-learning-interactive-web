@@ -293,6 +293,36 @@ export default function DiscreteDistributionsPage() {
           }
         />
       </InteractiveDemo>
+
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么离散分布是分类模型的基础？</strong>
+            分类问题的输出是离散标签，Bernoulli、二项、多项分布正好描述这些离散结果的概率，是生成分类器的核心。
+          </p>
+          <p>
+            <strong>为什么二项分布的方差在 μ=0.5 时最大？</strong>
+            方差 Nμ(1−μ) 在 μ=0.5 时取最大值，因为此时成功与失败的不确定性最大；μ 接近 0 或 1 时结果几乎确定。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为二项分布的均值越大方差越大。</strong>
+            二项分布方差 Nμ(1−μ) 在 μ=0.5 时最大，μ 接近 0 或 1 时方差趋近于 0——说明方差与均值不是单调关系。
+          </p>
+          <p>
+            <strong>反例 2：认为多项分布各维度独立。</strong>
+            多项分布各维度的计数受总和约束，一个维度增加必然导致其他维度减少——说明各维度并不独立。
+          </p>
+        </div>
+      </section>
     
       <SectionMetadata
         bishopChapter={"Ch 3"}

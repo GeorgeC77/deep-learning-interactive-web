@@ -251,6 +251,36 @@ export default function MultivariateGaussianPage() {
           </p>
         </div>
       </InteractiveDemo>
+
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么需要多元高斯分布？</strong>
+            一元高斯只能描述单个变量，而现实中多个变量往往相关。多元高斯用协方差矩阵捕捉变量间的线性关系，是多变量建模的基础。
+          </p>
+          <p>
+            <strong>为什么协方差矩阵必须是半正定的？</strong>
+            协方差矩阵衡量变量间的方差和协方差，半正定性保证任何线性组合的方差非负，这是概率分布的基本要求。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为相关系数为 0 意味着变量独立。</strong>
+            多元高斯中相关系数为 0 才意味着独立；非高斯分布中相关系数为 0 仍可能高度依赖——说明高斯假设的特殊性。
+          </p>
+          <p>
+            <strong>反例 2：认为协方差矩阵可以随意填写。</strong>
+            不是半正定的矩阵不能作为协方差矩阵，否则某些线性组合的方差会为负——说明协方差矩阵有数学约束。
+          </p>
+        </div>
+      </section>
     
       <SectionMetadata
         bishopChapter={"Ch 3"}

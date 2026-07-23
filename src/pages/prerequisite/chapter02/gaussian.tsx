@@ -272,6 +272,36 @@ export default function PrerequisiteChapter02GaussianPage() {
         </Link>
       </section>
     
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么高斯分布在机器学习中如此重要？</strong>
+            中心极限定理告诉我们，大量独立随机变量的和趋近高斯分布。高斯分布有简单的解析形式，最大熵原理也支持它在只有均值方差约束时是“最不确定”的选择。
+          </p>
+          <p>
+            <strong>为什么最大似然估计的均值和方差是样本均值和样本方差？</strong>
+            高斯分布的对数似然对均值求导置零正好得到样本均值，对方差求导置零得到样本方差——这是高斯分布的解析性质。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为所有数据都近似高斯分布。</strong>
+            收入、等待时间等数据往往是偏态的，直接用高斯建模会严重失真——说明分布选择需要匹配数据特性。
+          </p>
+          <p>
+            <strong>反例 2：认为最大似然估计总是无偏的。</strong>
+            高斯分布的最大似然方差估计是有偏的（除以 N 而不是 N-1）——说明最大似然不保证无偏性。
+          </p>
+        </div>
+      </section>
+    
       <SectionMetadata
         bishopChapter={"Ch 2"}
         bishopSection={"gaussian"}

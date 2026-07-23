@@ -320,6 +320,36 @@ export default function NonparametricMethodsPage() {
           }
         />
       </InteractiveDemo>
+
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么需要非参数方法？</strong>
+            参数方法假设数据服从特定分布，当真实分布未知或复杂时，非参数方法（如核密度估计、K近邻）可以直接从数据估计分布。
+          </p>
+          <p>
+            <strong>为什么核密度估计需要带宽选择？</strong>
+            带宽控制核的平滑程度：带宽太小会导致过拟合，带宽太大会导致欠拟合。选择合适的带宽是核方法的关键。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为非参数方法不需要任何假设。</strong>
+            非参数方法仍然需要假设（如核函数形式、带宽、距离度量），只是不假设特定分布——说明“非参数”不等于“无假设”。
+          </p>
+          <p>
+            <strong>反例 2：认为带宽越小核密度估计越准确。</strong>
+            带宽太小会导致每个样本点都成为一个尖峰，过拟合噪声——说明带宽需要在偏差和方差之间权衡。
+          </p>
+        </div>
+      </section>
     
       <SectionMetadata
         bishopChapter={"Ch 3"}

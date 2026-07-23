@@ -213,6 +213,36 @@ export default function ExponentialFamilyPage() {
           )}
         </div>
       </InteractiveDemo>
+
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么指数族如此重要？</strong>
+            高斯、伯努利、泊松、指数等常见分布都属于指数族，它们有统一的形式和性质，便于理论分析和算法设计。
+          </p>
+          <p>
+            <strong>为什么充分统计量如此有用？</strong>
+            充分统计量包含了数据中关于参数的全部信息，只需存储充分统计量就可以进行推断，大大简化计算。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为所有分布都属于指数族。</strong>
+            均匀分布、柯西分布等不属于指数族，它们没有有限维的充分统计量——说明指数族虽然广泛但并非万能。
+          </p>
+          <p>
+            <strong>反例 2：认为充分统计量总是低维的。</strong>
+            某些分布的充分统计量维度与样本量相同，无法压缩数据——说明充分统计量的压缩能力取决于分布形式。
+          </p>
+        </div>
+      </section>
     
       <SectionMetadata
         bishopChapter={"Ch 3"}

@@ -239,6 +239,36 @@ export default function PrerequisiteChapter02RulesPage() {
         </Link>
       </section>
     
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么贝叶斯定理如此重要？</strong>
+            它把“假设”和“证据”联系起来，让我们在看到新数据后定量更新信念，是推断与学习的基石。
+          </p>
+          <p>
+            <strong>为什么医学筛查中阳性结果不一定意味着患病？</strong>
+            当疾病先验概率很低时，即使测试很准确，阳性结果中的假阳性比例也可能很高——这就是基础概率谬误。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为测试准确率 99% 就意味着阳性结果 99% 可靠。</strong>
+            当疾病先验只有 1% 时，即使测试准确率 99%，阳性结果中真患病的比例可能远低于 99%——说明先验概率决定后验概率。
+          </p>
+          <p>
+            <strong>反例 2：认为条件概率 p(A|B) 和 p(B|A) 相同。</strong>
+            p（患病|阳性） 和 p（阳性|患病） 完全不同——混淆两者是概率推断中最常见的错误。
+          </p>
+        </div>
+      </section>
+    
       <SectionMetadata
         bishopChapter={"Ch 2"}
         bishopSection={"rules"}

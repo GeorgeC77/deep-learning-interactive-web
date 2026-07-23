@@ -43,10 +43,15 @@ function resolveWrappedComponent(file: string): string {
   if (!importMatch) return file;
   const importedName = importMatch[1];
   const importPath = importMatch[2];
-  const returnMatch = text.includes(`return <${importedName} />`) || text.includes(`return <${importedName}/>`);
-  if (!returnMatch) return file;
-  const resolved = resolveComponentFile(importPath.replace(/^@\/pages\//, './pages/'));
-  return resolved;
+  // Simple wrapper: return <X /> or return <X/>
+  if (text.includes(`return <${importedName} />`) || text.includes(`return <${importedName}/>`)) {
+    return resolveComponentFile(importPath.replace(/^@\/pages\//, './pages/'));
+  }
+  // Fragment wrapper: return (<> <X /> ... </>) or return (<div> <X /> ... </div>)
+  if (text.includes(`<${importedName} />`) || text.includes(`<${importedName}/>`)) {
+    return resolveComponentFile(importPath.replace(/^@\/pages\//, './pages/'));
+  }
+  return file;
 }
 
 type Dim = { key: string; label: string; test: (text: string) => boolean };

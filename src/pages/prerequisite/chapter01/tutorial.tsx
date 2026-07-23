@@ -825,6 +825,36 @@ export default function PrerequisiteChapter01TutorialPage() {
         />
       </section>
     
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么多项式拟合会过拟合？</strong>
+            高阶多项式有足够自由度精确穿过每个训练点，包括噪声。训练误差降为零，但模型学到的是噪声而非真实规律。
+          </p>
+          <p>
+            <strong>为什么正则化能缓解过拟合？</strong>
+            正则化惩罚过大的参数，迫使模型选择更平滑的解。这就像给模型戴上“紧箍咒”，防止它为了拟合噪声而疯狂震荡。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为训练误差越低模型越好。</strong>
+            9 阶多项式可以完美拟合 10 个训练点，但测试误差可能爆炸——说明低训练误差不等于好模型。
+          </p>
+          <p>
+            <strong>反例 2：认为正则化参数越大越好。</strong>
+            过大的正则化会让所有参数趋近于零，模型失去拟合能力——说明正则化需要适度。
+          </p>
+        </div>
+      </section>
+    
       <SectionMetadata
         bishopChapter={"Ch 1"}
         bishopSection={"tutorial"}

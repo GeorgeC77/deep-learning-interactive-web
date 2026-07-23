@@ -180,6 +180,36 @@ export default function PrerequisiteChapter01ImpactPage() {
         </div>
       </section>
     
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么深度学习能在这么多领域成功？</strong>
+            它不需要人工设计特征，而是从数据中自动学习层次化表示。同一套框架可以处理图像、文本、语音、分子结构等不同模态。
+          </p>
+          <p>
+            <strong>为什么大语言模型能表现出“涌现能力”？</strong>
+            当模型规模、数据量和算力足够大时，一些在小型模型中不存在的能力（如推理、编程）会突然出现，这被称为涌现。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为深度学习在所有任务上都优于传统方法。</strong>
+            在小数据集或特征工程已经很完善的任务上，传统方法（如 XGBoost）可能更简单有效——说明深度学习并非万能。
+          </p>
+          <p>
+            <strong>反例 2：认为规模越大能力越强。</strong>
+            在数据质量差或任务与预训练目标不匹配时，盲目扩大模型规模可能适得其反——说明规模必须与数据和任务匹配。
+          </p>
+        </div>
+      </section>
+    
       <SectionMetadata
         bishopChapter={"Ch 1"}
         bishopSection={"impact"}

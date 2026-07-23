@@ -245,6 +245,36 @@ export default function PrerequisiteChapter02DensitiesPage() {
         </Link>
       </section>
     
+      {/* Why? */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么连续变量要用概率密度而不是概率？</strong>
+            连续变量取任意单点的概率为 0，只有对区间积分才有意义。概率密度描述的是“概率的密度”，而不是概率本身。
+          </p>
+          <p>
+            <strong>为什么 PDF 的值可以大于 1？</strong>
+            PDF 是密度，不是概率。例如均匀分布 Uniform(0, 0.5) 的 PDF 在区间内为 2，只要积分等于 1 就是合法密度。
+          </p>
+        </div>
+      </section>
+
+      {/* Counterexamples */}
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为 PDF 的值就是概率。</strong>
+            连续变量在某一点的概率为 0，PDF 的值可以大于 1——说明密度和概率是两个概念。
+          </p>
+          <p>
+            <strong>反例 2：认为所有分布都有有界的 PDF。</strong>
+            柯西分布的 PDF 在中心趋于无穷——说明 PDF 可以无界，只要积分有限即可。
+          </p>
+        </div>
+      </section>
+    
       <SectionMetadata
         bishopChapter={"Ch 2"}
         bishopSection={"densities"}
