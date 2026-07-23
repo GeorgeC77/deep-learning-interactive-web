@@ -43,6 +43,8 @@ function resolveWrappedComponent(file: string): string {
   if (!importMatch) return file;
   const importedName = importMatch[1];
   const importPath = importMatch[2];
+  // Only resolve wrappers that import from pages, not components/demos
+  if (!importPath.includes('/pages/')) return file;
   // Simple wrapper: return <X /> or return <X/>
   if (text.includes(`return <${importedName} />`) || text.includes(`return <${importedName}/>`)) {
     return resolveComponentFile(importPath.replace(/^@\/pages\//, './pages/'));

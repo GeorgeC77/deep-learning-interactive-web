@@ -14,6 +14,7 @@ import {
 import KaTeX from '../../../components/KaTeX';
 import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
+import InteractiveDemo from '../../../components/InteractiveDemo';
 
 const milestones = [
   {
