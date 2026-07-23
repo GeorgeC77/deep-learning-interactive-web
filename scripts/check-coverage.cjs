@@ -282,6 +282,13 @@ function main() {
   console.log(`Summary: ${report.mapped}/${report.total} mapped, ${report.semanticIssues.length} semantic issues, ${report.metadataIssues.length} metadata issues`);
 
   if (report.semanticIssues.length > 0 || report.metadataIssues.length > 0) {
+    console.error('Coverage check failed. Details:');
+    for (const issue of report.semanticIssues) {
+      console.error(`  Semantic: ${issue.path} ${issue.title} → ${issue.componentName}: ${issue.issue}`);
+    }
+    for (const issue of report.metadataIssues) {
+      console.error(`  Metadata: ${issue.path} ${issue.title}${issue.componentName ? ` → ${issue.componentName}` : ''}: ${issue.issue}`);
+    }
     process.exit(1);
   }
 }
