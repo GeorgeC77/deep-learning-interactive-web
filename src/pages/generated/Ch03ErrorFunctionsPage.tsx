@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ErrorFunctionLab from '@/components/demos/ErrorFunctionLab';
 import { Activity } from 'lucide-react';
 
 export default function Ch03ErrorFunctionsPage() {
@@ -62,20 +63,7 @@ export default function Ch03ErrorFunctionsPage() {
       formulas: ["回归：平方误差公式", "二分类：交叉熵公式", "多分类：Softmax 交叉熵公式"],
       exercises: ["展开本节一个核心公式并说明每个符号的数学含义。", "用一个简单数值实例检验本节结论。", "对照前文结论，分析本节结论的适用边界与差异。"]
     }}
-          demo={{
-      title: "交叉熵随预测概率变化",
-      label: "预测正确类概率 p",
-      param: 0.8,
-      min: 0.05,
-      max: 0.99,
-      step: 0.01,
-      compute: (p) => ({
-        label: '交叉熵',
-        value: -Math.log(p),
-        display: String.raw`H=-\ln ${p.toFixed(2)}`,
-      }),
-      formula: String.raw`H(p) = -\ln p`,
-    }}
+      interactiveDemo={<ErrorFunctionLab />}
     />
   );
 }

@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import DepthVsWidthLab from '@/components/demos/DepthVsWidthLab';
 import { Brain } from 'lucide-react';
 
 export default function Ch03DeepNetworksPage() {
@@ -103,6 +104,7 @@ export default function Ch03DeepNetworksPage() {
         },
         formula: String.raw`\text{深度参数量} = L \times W^2, \quad \text{宽度参数量} = W^3`,
       }}
+      interactiveDemo={<DepthVsWidthLab />}
     />
   );
 }

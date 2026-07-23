@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ActivationFunctionLab from '@/components/demos/ActivationFunctionLab';
 import { Layers } from 'lucide-react';
 
 export default function Ch03MultilayerNetworksPage() {
@@ -87,6 +88,7 @@ export default function Ch03MultilayerNetworksPage() {
         },
         formula: String.raw`\text{ReLU}(z)=\max(0,z), \quad \sigma(z)=\frac{1}{1+e^{-z}}, \quad \tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}`,
       }}
+      interactiveDemo={<ActivationFunctionLab />}
     />
   );
 }

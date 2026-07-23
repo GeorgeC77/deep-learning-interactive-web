@@ -31,15 +31,6 @@ function distance(a: number[], b: number[]): number {
   return Math.sqrt(sum);
 }
 
-// 计算点到原点的距离
-function norm(a: number[]): number {
-  let sum = 0;
-  for (let i = 0; i < a.length; i++) {
-    sum += a[i] ** 2;
-  }
-  return Math.sqrt(sum);
-}
-
 export default function CurseOfDimensionalityLab() {
   const [D, setD] = useState(2);
   const [numSamples, setNumSamples] = useState(50);
@@ -62,10 +53,6 @@ export default function CurseOfDimensionalityLab() {
     return dists;
   }, [samples]);
 
-  const norms = useMemo(() => {
-    return samples.map(norm);
-  }, [samples]);
-
   const avgDistance = useMemo(() => {
     if (distances.length === 0) return 0;
     return distances.reduce((a, b) => a + b, 0) / distances.length;
@@ -80,11 +67,6 @@ export default function CurseOfDimensionalityLab() {
     if (distances.length === 0) return 0;
     return Math.max(...distances);
   }, [distances]);
-
-  const avgNorm = useMemo(() => {
-    if (norms.length === 0) return 0;
-    return norms.reduce((a, b) => a + b, 0) / norms.length;
-  }, [norms]);
 
   const distanceRatio = useMemo(() => {
     if (minDistance === 0) return 0;

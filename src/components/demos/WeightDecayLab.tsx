@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
-import KaTeX from '@/components/KaTeX';
 
 const PLOT_W = 560;
 const PLOT_H = 280;
@@ -22,7 +21,6 @@ function generateData(n: number, noise: number): { x: number; y: number }[] {
 
 // 多项式拟合（带权重衰减）
 function fitPolynomial(data: { x: number; y: number }[], degree: number, lambda: number): number[] {
-  const n = data.length;
   const X: number[][] = data.map((p) => {
     const row: number[] = [];
     for (let j = 0; j <= degree; j++) {

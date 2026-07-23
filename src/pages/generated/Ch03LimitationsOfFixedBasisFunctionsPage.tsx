@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import CurseOfDimensionalityLab from '@/components/demos/CurseOfDimensionalityLab';
 import { AlertTriangle } from 'lucide-react';
 
 export default function Ch03LimitationsOfFixedBasisFunctionsPage() {
@@ -85,6 +86,7 @@ export default function Ch03LimitationsOfFixedBasisFunctionsPage() {
         },
         formula: String.raw`\text{基函数数量} = K^D`,
       }}
+      interactiveDemo={<CurseOfDimensionalityLab />}
     />
   );
 }
