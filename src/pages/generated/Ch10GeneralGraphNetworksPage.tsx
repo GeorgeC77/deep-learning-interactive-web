@@ -47,6 +47,20 @@ export default function Ch10GeneralGraphNetworksPage() {
         "在需要几何等变的任务中使用普通 GNN，导致模型预测依赖坐标系选择。",
         "GAT 注意力系数公式的分母错误地以源节点而非中心节点做归一化。",
       ]}
+      whyCards={[
+        {
+          question: "为什么 GAT 比 GCN 更灵活？",
+          answer: "GCN 用固定的度归一化聚合邻居，GAT 为每个邻居学习自适应权重，能根据任务自动调整不同邻居的重要性。",
+        },
+        {
+          question: "为什么 GNN 会过平滑？",
+          answer: "多层消息传递会让所有节点的表示趋于一致，远距离节点难以区分。这就像反复搅拌咖啡，最终所有区域都变得相同。",
+        },
+      ]}
+      counterexamples={[
+        "增加 GNN 层数从 2 到 10，节点分类精度先升后降——说明过平滑不是理论问题而是实际障碍。",
+        "在分子性质预测中使用普通 GNN，旋转分子坐标后预测结果改变——说明几何等变性对物理任务至关重要。",
+      ]}
             bishopMapping={{
         chapter: "Ch 13",
         section: "13.3",

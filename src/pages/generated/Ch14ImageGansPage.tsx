@@ -33,6 +33,20 @@ export default function Ch14ImageGansPage() {
         "认为 CycleGAN 的循环一致性损失足以保证语义一致；它只能约束像素层面的可逆性。",
         "忽视 DCGAN 中批归一化与卷积结构对训练稳定性的贡献。",
       ]}
+      whyCards={[
+        {
+          question: "为什么 CycleGAN 不需要成对数据？",
+          answer: "循环一致性损失要求转换后再转换回来能恢复原图，这为无配对数据提供了自监督信号。",
+        },
+        {
+          question: "为什么 DCGAN 要用卷积和批归一化？",
+          answer: "卷积匹配图像的局部相关性，批归一化稳定训练，两者共同让 GAN 能够生成高质量图像。",
+        },
+      ]}
+      counterexamples={[
+        "把条件 GAN 当成 CycleGAN 使用，试图做图像到图像转换——说明任务类型决定模型选择。",
+        "认为循环一致性损失能保证语义一致——它只能约束像素可逆，不能保证“马变成斑马后还是马”。",
+      ]}
             bishopMapping={{
         chapter: "Ch 17",
         section: "17.2",

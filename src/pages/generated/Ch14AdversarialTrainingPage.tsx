@@ -40,6 +40,20 @@ export default function Ch14AdversarialTrainingPage() {
         "混淆原始极小极大损失与非饱和损失：前者对生成器使用 ln(1-D(G(z)))，后者使用 -ln D(G(z))。",
         "忽视判别器过强会导致生成器梯度消失。",
       ]}
+      whyCards={[
+        {
+          question: "为什么 GAN 训练不稳定？",
+          answer: "GAN 是两人博弈，不是单方优化。生成器和判别器目标相反，参数更新可能相互追逐而不收敛。",
+        },
+        {
+          question: "为什么需要非饱和损失？",
+          answer: "原始损失在判别器很强时，生成器的梯度接近零。非饱和损失让生成器在训练早期也能获得足够梯度。",
+        },
+      ]}
+      counterexamples={[
+        "判别器训练得太好，生成器梯度几乎为零——说明 GAN 需要平衡双方能力。",
+        "认为非饱和损失和原始损失等价——实际上非饱和损失改变了生成器的梯度尺度。",
+      ]}
             bishopMapping={{
         chapter: "Ch 17",
         section: "17.1",

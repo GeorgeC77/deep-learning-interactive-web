@@ -44,6 +44,20 @@ export default function Ch15AutoregressiveFlowsPage() {
         "把 MAF 和 IAF 的适用场景混为一谈：MAF 训练时密度计算快，但采样慢；IAF 采样快，但估计训练数据密度需要按生成顺序逐个计算。",
         "忘记行列式是对角元乘积，而不是所有偏导数之和。",
       ]}
+      whyCards={[
+        {
+          question: "为什么自回归流的 Jacobian 是三角矩阵？",
+          answer: "每一维的变换只依赖前面维度，后面维度不影响前面维度，因此 Jacobian 矩阵的非对角块为零，形成三角结构。",
+        },
+        {
+          question: "为什么 MAF 和 IAF 的密度估计与采样速度相反？",
+          answer: "MAF 沿数据维度顺序建模，密度可并行计算但采样需逐维生成；IAF 反用依赖结构，采样可并行但密度需串行求逆。",
+        },
+      ]}
+      counterexamples={[
+        "把 MAF 的并行密度估计特性套用到 IAF 上，导致密度计算极慢——说明 MAF 和 IAF 的适用场景完全不同。",
+        "认为自回归流的 Jacobian 行列式是所有偏导数之和——实际上它是三角矩阵对角元的乘积。",
+      ]}
             bishopMapping={{
         chapter: "Ch 18",
         section: "18.2",

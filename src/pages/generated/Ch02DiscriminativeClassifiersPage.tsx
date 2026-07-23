@@ -60,6 +60,20 @@ export default function Ch02DiscriminativeClassifiersPage() {
         "混淆 probit 和 logit——probit 使用正态 CDF，logit 使用 sigmoid；更关键的是，极端误分类时 probit 的 score 可能更大",
         "仅凭概率尾部更薄就断言 probit 更鲁棒：鲁棒性取决于 score 是否有界，而不是尾部衰减速度",
       ]}
+      whyCards={[
+        {
+          question: "为什么逻辑回归的损失是交叉熵而不是平方误差？",
+          answer: "平方误差假设输出是连续值且噪声高斯；分类输出是离散标签，伯努利似然对应交叉熵。用平方误差会导致梯度在 sigmoid 饱和区消失。",
+        },
+        {
+          question: "为什么多分类必须用 softmax 而不是多个 sigmoid？",
+          answer: "多个独立 sigmoid 的概率和可以大于 1，无法比较类别。softmax 保证所有类别概率非负且和为 1，形成真正的概率分布。",
+        },
+      ]}
+      counterexamples={[
+        "在完全线性可分的数据上不加正则化，逻辑回归的权重会发散到无穷大——说明最大似然并不总是稳定的。",
+        "对远离决策面的异常点，logistic 的梯度有界而 probit 的梯度可能更大——说明不能仅凭概率尾部判断鲁棒性。",
+      ]}
             bishopMapping={{
         chapter: "Ch 5",
         section: "5.4",

@@ -47,6 +47,20 @@ export default function Ch15ContinuousFlowsPage() {
         "在维度较高时仍试图精确计算 Jacobian 迹，而忽略了 FFJORD 的随机迹估计。",
         "误以为连续流需要三角或对角 Jacobian；FFJORD 允许自由形式架构。",
       ]}
+      whyCards={[
+        {
+          question: "为什么连续流不需要可逆层？",
+          answer: "连续流用 ODE 积分定义可逆映射，向量场 f 只需满足 Lipschitz 条件，不必是双射。可逆性来自 ODE 解的唯一性。",
+        },
+        {
+          question: "为什么 FFJORD 能处理高维数据？",
+          answer: "FFJORD 用 Hutchinson 随机迹估计替代精确 Jacobian 迹，避免计算高维矩阵的迹，大幅降低计算成本。",
+        },
+      ]}
+      counterexamples={[
+        "认为神经 ODE 的向量场 f 必须可逆——实际上 f 不必是双射，可逆的是积分后的流映射。",
+        "在高维数据中精确计算 Jacobian 迹，计算成本爆炸——说明 FFJORD 的随机迹估计不是可选优化而是必要技术。",
+      ]}
             bishopMapping={{
         chapter: "Ch 18",
         section: "18.3",

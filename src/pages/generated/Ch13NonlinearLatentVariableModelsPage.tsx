@@ -37,6 +37,20 @@ export default function Ch13NonlinearLatentVariableModelsPage() {
         "把 GAN 与流模型混为一谈；前者不计算似然，后者精确计算似然。",
         "忽视离散数据需要不同的输出分布假设。",
       ]}
+      whyCards={[
+        {
+          question: "为什么非线性隐变量模型的似然积分难解？",
+          answer: "非线性映射让 p(x|z) 和 p(z) 的乘积积分没有解析形式，无法直接计算或优化。",
+        },
+        {
+          question: "为什么需要多种生成模型？",
+          answer: "VAE、GAN、流模型和自回归模型在表示能力、训练稳定性和似然可计算性上各有取舍，没有单一方法在所有方面都最优。",
+        },
+      ]}
+      counterexamples={[
+        "用线性 PCA 拟合 S 形流形数据，投影方向完全错误——说明线性方法无法捕捉非线性结构。",
+        "认为 VAE 可以给出精确似然，实际上它只能优化 ELBO——说明近似方法与精确方法的边界。",
+      ]}
             bishopMapping={{
         chapter: "Ch 16",
         section: "16.4",

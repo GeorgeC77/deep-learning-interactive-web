@@ -96,6 +96,20 @@ export default function DoubleDescentPage() {
         </div>
       </section>
 
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为过拟合必然导致测试误差上升。</strong>
+            在过参数化区域，虽然训练误差为零，但测试误差可能继续下降——说明“训练误差低 = 过拟合”的直觉在高维不成立。
+          </p>
+          <p>
+            <strong>反例 2：认为最小范数解总是最好的。</strong>
+            在噪声很大或特征与标签无关时，最小范数插值也可能学到噪声——说明双下降不是无条件成立的。
+          </p>
+        </div>
+      </section>
+
       <section className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
         <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
           <CheckCircle2 className="w-5 h-5" />

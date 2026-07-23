@@ -42,6 +42,20 @@ export default function Ch17ForwardEncoderPage() {
         "认为必须迭代 T 步才能采样 x_t；实际上闭式重参数化可一步得到。",
         "把 β_t 递增说成扩散模型的数学必要条件；它只是常用工程选择。",
       ]}
+      whyCards={[
+        {
+          question: "为什么前向过程可以用闭式重参数化？",
+          answer: "高斯噪声的叠加仍然是高斯，任意时刻的边际分布都有解析形式，无需逐步迭代。",
+        },
+        {
+          question: "为什么需要区分 x_t 和 z_t 记号？",
+          answer: "Bishop 教材用 z_t 表示带噪状态，DDPM 文献常用 x_t，两者指同一概念。混淆记号会导致公式理解错误。",
+        },
+      ]}
+      counterexamples={[
+        "认为必须迭代 T 步才能采样 x_t——实际上闭式重参数化可一步得到，大大简化训练。",
+        "把 β_t 递增说成扩散模型的数学必要条件——它只是常用工程选择，不是数学必需。",
+      ]}
             bishopMapping={{
         chapter: "Ch 20",
         section: "20.1",

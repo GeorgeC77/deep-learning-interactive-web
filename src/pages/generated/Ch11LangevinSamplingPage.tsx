@@ -41,6 +41,20 @@ export default function Ch11LangevinSamplingPage() {
         "使用过大步长 η，导致 Langevin 链不稳定或偏离目标分布。",
         "把有限步长的离散更新当成目标分布的精确样本。",
       ]}
+      whyCards={[
+        {
+          question: "为什么 Langevin 采样能绕过 partition function？",
+          answer: "Langevin 更新只依赖 score（对数概率对 x 的梯度），而 score 不含有归一化常数 Z，因此无需显式计算 Z。",
+        },
+        {
+          question: "为什么 Langevin 采样只是近似？",
+          answer: "它是连续 Langevin 动力学的 Euler–Maruyama 离散化，有限步长会引入偏差；只有步长足够小或衰减时才能渐近收敛到目标分布。",
+        },
+      ]}
+      counterexamples={[
+        "用大步长 η 运行 Langevin 采样，链在几个模式之间剧烈振荡且无法稳定——说明步长控制对采样质量至关重要。",
+        "把 Langevin 采样的有限步结果当作精确样本，用于估计期望时会有偏差——说明离散化近似不是精确采样。",
+      ]}
             bishopMapping={{
         chapter: "Ch 14",
         section: "14.3",

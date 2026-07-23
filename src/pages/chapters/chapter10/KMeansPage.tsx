@@ -120,6 +120,34 @@ export default function KMeansPage() {
         </ul>
       </section>
 
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么 K-means 会收敛？</strong>
+            每次分配和更新都会使失真函数单调不增，而失真函数有下界，因此算法必然在有限步内停止。
+          </p>
+          <p>
+            <strong>为什么需要多次随机初始化？</strong>
+            K-means 只保证局部最优，不同初始质心可能收敛到完全不同的聚类结果。多次初始化并选择失真函数最小的结果是常用策略。
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为 K-means 总能找到全局最优。</strong>
+            对同一个数据集，不同随机初始化可能得到完全不同的聚类结果——说明 K-means 只保证局部最优。
+          </p>
+          <p>
+            <strong>反例 2：认为 K-means 对异常值稳健。</strong>
+            一个远离数据主体的异常点会显著拉动质心，破坏聚类结构——说明 K-means 对异常值敏感。
+          </p>
+        </div>
+      </section>
+
       <SectionMetadata
         bishopChapter="Ch 15"
         bishopSection="0.5"

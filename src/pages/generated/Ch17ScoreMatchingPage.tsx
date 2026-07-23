@@ -55,6 +55,20 @@ export default function Ch17ScoreMatchingPage() {
         "把单次噪声 ε 当成真实边缘分数；实际上边缘分数需要 E[ε|z_t]，单次 ε 只是随机训练目标。",
         "笼统地说“闭式得到 unbiased pointwise score”；去噪分数匹配是用 conditional score 对经验分布做平滑，再构造等价目标。",
       ]}
+      whyCards={[
+        {
+          question: "为什么分数匹配能绕过归一化常数？",
+          answer: "分数是对数密度的梯度，归一化常数在梯度中消失，因此无需计算难以处理的 partition function。",
+        },
+        {
+          question: "为什么需要去噪分数匹配？",
+          answer: "直接估计数据分布的分数需要知道密度，而去噪分数匹配利用已知的前向噪声核，把分数估计转化为条件噪声预测。",
+        },
+      ]}
+      counterexamples={[
+        "把单次噪声 ε 当成真实边缘分数，采样结果充满噪声——说明边缘分数需要条件期望 E[ε|z_t]。",
+        "用单尺度分数网络在所有噪声水平采样，低噪声区域分数估计不准——说明多尺度训练是必要的。",
+      ]}
             bishopMapping={{
         chapter: "Ch 20",
         section: "20.3",

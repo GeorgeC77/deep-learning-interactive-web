@@ -117,6 +117,34 @@ export default function GMMRevisitedPage() {
           </li>
         </ul>
       </section>
+
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么 GMM 的 EM 有闭式解？</strong>
+            高斯分布属于指数族，E-step 的后验权重有解析形式，M-step 对加权对数似然求导也能得到闭式更新。
+          </p>
+          <p>
+            <strong>为什么 GMM 比 K-means 更灵活？</strong>
+            K-means 做硬分配（非 0 即 1），GMM 做软分配（后验概率），能表示样本同时属于多个簇的不确定性。
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为 GMM 的 EM 与 K-means 完全不同。</strong>
+            当 GMM 的方差趋于 0 时，软分配退化为硬分配，GMM 就退化为 K-means——说明两者是同一框架的不同极限。
+          </p>
+          <p>
+            <strong>反例 2：认为 GMM 的协方差必须各向同性。</strong>
+            GMM 允许每个分量有独立的协方差矩阵，能拟合椭球形簇——说明模型复杂度需要根据数据选择。
+          </p>
+        </div>
+      </section>
     
       <SectionMetadata
         bishopChapter={"Ch 15"}

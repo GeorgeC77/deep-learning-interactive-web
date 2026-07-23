@@ -47,6 +47,20 @@ export default function Ch16VariationalAutoencodersPage() {
         "用重参数化时直接对 z 采样后试图对 σ 求导，而不通过 μ+σε 的显式路径。",
         "忽视 posterior collapse：解码器过强时 q(z|x) 可能退化为先验，隐变量不再携带信息。",
       ]}
+      whyCards={[
+        {
+          question: "为什么需要重参数化技巧？",
+          answer: "直接对随机变量 z 采样会阻断梯度路径。重参数化把随机性移到外部噪声 ε，让梯度可以通过 μ 和 σ 反向传播。",
+        },
+        {
+          question: "为什么 VAE 的隐空间是“云”而不是“点”？",
+          answer: "编码器输出的是分布参数（均值和方差），不是确定值。这朵“云”表示了模型对隐变量的不确定性。",
+        },
+      ]}
+      counterexamples={[
+        "把 VAE 的编码器输出当成确定性隐变量，直接用于下游任务——忽视了后验分布的不确定性。",
+        "认为 β-VAE 只是微调 ELBO——实际上 β-VAE 改变了目标函数，不再保证是似然的下界。",
+      ]}
             bishopMapping={{
         chapter: "Ch 19",
         section: "19.2",

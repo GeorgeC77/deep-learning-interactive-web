@@ -37,6 +37,20 @@ export default function Ch04NormalizationPage() {
         "在推理时使用 batch 统计量而不是训练好的移动统计量。",
         "认为归一化后就不需要仔细初始化或学习率调参。",
       ]}
+      whyCards={[
+        {
+          question: "为什么 BatchNorm 在推理时要用移动统计量？",
+          answer: "推理时通常没有 batch 数据，只能用训练阶段累积的均值和方差。用 batch 统计量会导致结果不一致。",
+        },
+        {
+          question: "为什么 LayerNorm 适合 Transformer？",
+          answer: "LayerNorm 沿特征维度对每个样本单独归一化，不依赖 batch 大小，适合变长序列和注意力机制。",
+        },
+      ]}
+      counterexamples={[
+        "在 batch size 为 2 时使用 BatchNorm，统计量估计极不稳定，性能可能反而下降——说明归一化并非无条件有效。",
+        "在推理时使用 batch 统计量而不是移动统计量，同一输入在不同 batch 下输出不同——说明移动统计量是推理稳定性的关键。",
+      ]}
             bishopMapping={{
         chapter: "Ch 7",
         section: "7.4",

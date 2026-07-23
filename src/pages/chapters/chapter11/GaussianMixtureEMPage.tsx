@@ -159,6 +159,34 @@ export default function GaussianMixtureEMPage() {
           </li>
         </ul>
       </section>
+
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">为什么？</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>为什么 EM 能保证似然单调增加？</strong>
+            E-step 让变分后验等于真实后验，ELBO 与对数似然相切；M-step 最大化 ELBO，因此对数似然必然不减。
+          </p>
+          <p>
+            <strong>为什么 EM 也可能陷入局部最优？</strong>
+            EM 只保证单调增加，不保证全局最优。不同初始化可能收敛到不同的局部极大值。
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">反例</h2>
+        <div className="space-y-3 text-gray-700">
+          <p>
+            <strong>反例 1：认为 EM 总能找到全局最优。</strong>
+            对同一个 GMM，不同初始化可能收敛到完全不同的参数——说明 EM 只保证局部最优。
+          </p>
+          <p>
+            <strong>反例 2：认为 M-step 必须完全最大化。</strong>
+            广义 EM 只要求 M-step 提升 ELBO，不要求完全最大化——说明“最优”不是收敛的必要条件。
+          </p>
+        </div>
+      </section>
     
       <SectionMetadata
         bishopChapter={"Ch 15"}
