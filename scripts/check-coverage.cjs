@@ -141,6 +141,10 @@ function findWrappedSource(pageSource) {
 }
 
 function main() {
+  // `reports/` is intentionally ignored, so it does not exist in a fresh CI
+  // checkout. Ensure the output directory exists before writing the report.
+  fs.mkdirSync(path.dirname(REPORT_MD), { recursive: true });
+
   const manifestSource = fs.readFileSync(MANIFEST_TS, 'utf8');
   const appSource = fs.readFileSync(APP_TSX, 'utf8');
   const coverage = JSON.parse(fs.readFileSync(COVERAGE_JSON, 'utf8'));
