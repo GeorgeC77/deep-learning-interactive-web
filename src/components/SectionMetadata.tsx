@@ -1,16 +1,21 @@
+import { type ReactNode } from 'react';
 import { Target, Lightbulb, AlertTriangle, MapPin } from 'lucide-react';
 
 export type SectionMetadataProps = {
   bishopChapter: string;
   bishopSection?: string;
+  textbookSections?: string[];
   learningObjectives: string[];
+  coreIntuition?: ReactNode;
   commonMistakes: string[];
 };
 
 export default function SectionMetadata({
   bishopChapter,
   bishopSection,
+  textbookSections,
   learningObjectives,
+  coreIntuition,
   commonMistakes,
 }: SectionMetadataProps) {
 
@@ -27,6 +32,11 @@ export default function SectionMetadata({
           <strong> {bishopChapter}</strong>
           {bishopSection && ` §${bishopSection}`}。
         </p>
+        {textbookSections && textbookSections.length > 0 && (
+          <p className="mt-3 text-sm text-indigo-800">
+            <strong>覆盖小节：</strong>{textbookSections.join('、')}
+          </p>
+        )}
       </section>
 
       {/* Learning objectives */}
@@ -51,10 +61,14 @@ export default function SectionMetadata({
           <Lightbulb className="w-6 h-6 text-amber-600" />
           <h2 className="text-2xl font-bold text-gray-900">核心直觉</h2>
         </div>
-        <p className="text-gray-700 leading-relaxed">
-          掌握本小节的关键在于理解其数学动机与几何/概率直觉，而不是只记忆公式符号。
-          试着用一句话向同学解释：为什么这个方法有效？它解决了什么痛点？
-        </p>
+        <div className="text-gray-700 leading-relaxed">
+          {coreIntuition ?? (
+            <p>
+              掌握本小节的关键在于理解其数学动机与几何/概率直觉，而不是只记忆公式符号。
+              试着用一句话向同学解释：为什么这个方法有效？它解决了什么痛点？
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Common mistakes */}

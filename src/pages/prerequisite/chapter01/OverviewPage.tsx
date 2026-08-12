@@ -3,6 +3,28 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Activity, Brain, Sparkles, ArrowRight, ShieldAlert } from 'lucide-react';
 import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  {
+    exerciseSetId: 'chapter01-impact',
+    label: '1.1 深度学习的影响',
+    path: '/prerequisite/ch01/impact',
+    exerciseCount: 3,
+  },
+  {
+    exerciseSetId: 'chapter01-tutorial',
+    label: '1.2 多项式曲线拟合',
+    path: '/prerequisite/ch01/tutorial',
+    exerciseCount: 3,
+  },
+  {
+    exerciseSetId: 'chapter01-history',
+    label: '1.3 机器学习简史',
+    path: '/prerequisite/ch01/history',
+    exerciseCount: 3,
+  },
+];
 
 const sections = [
   { label: '1.1 深度学习的影响', path: '/prerequisite/ch01/impact', desc: '医疗、蛋白质、图像合成、大语言模型' },
@@ -30,6 +52,8 @@ export default function PrerequisiteChapter01OverviewPage() {
           仅供教学与非商业学习使用。
         </p>
       </section>
+
+      <ChapterProgressCard title="第一章掌握进度" sections={progressSections} />
 
       {/* Why it matters */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -121,10 +145,24 @@ export default function PrerequisiteChapter01OverviewPage() {
     
       <SectionMetadata
         bishopChapter={"Ch 1"}
-        bishopSection={"overview"}
-        learningObjectives={["理解 Overview 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+        textbookSections={['1.1 深度学习的影响', '1.2 Tutorial 示例', '1.3 机器学习简史']}
+        learningObjectives={[
+          '说明深度学习的应用影响，并区分监督、无监督与自监督信号。',
+          '用多项式拟合解释模型、损失、泛化、正则化与模型选择。',
+          '从数据、算力和算法共同演进的角度解释深度学习的发展。',
+        ]}
+        coreIntuition={
+          <p>
+            本章用一个完整的学习问题把全书串起来：模型从数据中调整参数，但真正目标不是记住训练样本，
+            而是在新数据上做出可靠预测。后续概率、优化与网络结构都在回答这个问题的不同部分。
+          </p>
+        }
+        commonMistakes={[
+          '把深度学习等同于“大模型”，忽略表示学习和任务目标。',
+          '只比较训练误差，不检查模型在未见数据上的泛化。',
+          '把技术突破归因于单一算法，忽略数据、算力和工程条件。',
+        ]}
+      />
 </div>
   );
 }

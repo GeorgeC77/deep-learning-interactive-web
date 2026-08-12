@@ -1,4 +1,5 @@
 import SectionMetadata from '@/components/SectionMetadata';
+import { useState } from 'react';
 import {
   Zap,
   Activity,
@@ -15,6 +16,120 @@ import KaTeX from '../../../components/KaTeX';
 import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
 import InteractiveDemo from '../../../components/InteractiveDemo';
+import ExercisePanel from '@/components/ExercisePanel';
+import PredictionGate from '@/components/PredictionGate';
+import { chapter01ImpactExercises } from '@/course/chapter01Exercises';
+
+function ScaleTradeoffDemo() {
+  const [modelSize, setModelSize] = useState(100);
+  const [dataCoverage, setDataCoverage] = useState(50);
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+
+  const capacity = Math.log10(modelSize + 1) / Math.log10(1001);
+  const support = Math.sqrt(dataCoverage / 100);
+  const mismatch = Math.max(0, capacity - support);
+  const trainingScore = Math.min(0.99, 0.35 + 0.62 * capacity);
+  const validationScore = Math.min(
+    0.96,
+    Math.max(0.2, 0.35 + 0.58 * Math.min(capacity, support) - 0.22 * mismatch),
+  );
+
+  return (
+    <InteractiveDemo title="概念实验：规模、数据与泛化">
+      <div className="space-y-6">
+        <PredictionGate
+          resetKey="chapter01-scale-tradeoff"
+          prediction={prediction}
+          onPredictionChange={setPrediction}
+          submitted={submitted}
+          onSubmit={() => setSubmitted(true)}
+          revealed={revealed}
+          onReveal={() => setRevealed((value) => !value)}
+          canReveal={submitted}
+          question="如果数据覆盖有限，只增大模型容量，训练表现和验证表现最可能怎样变化？"
+          hint="容量更大的模型更容易记住训练样本，但新数据可能来自训练集没有覆盖的区域。"
+          options={[
+            { value: 'gap', label: '训练表现继续提高，但验证表现可能停滞或下降' },
+            { value: 'both', label: '两者一定以相同速度持续提高' },
+            { value: 'none', label: '模型大小不会影响训练或验证表现' },
+          ]}
+          evaluatePrediction={(answer) => ({
+            correct: answer === 'gap',
+            category: '泛化判断',
+            feedback:
+              answer === 'gap'
+                ? '容量与数据覆盖需要匹配；规模不是脱离数据质量和任务约束的万能旋钮。'
+                : '请区分拟合训练数据的能力与在新数据上的泛化能力。',
+          })}
+          revealContent={
+            <p className="text-sm text-gray-700">
+              大模型提供更强的表示能力，但是否转化为可靠泛化，还取决于数据覆盖、目标函数、优化和评估方式。
+              下面的概念模拟刻意展示容量与数据不匹配时出现的训练-验证间隙。
+            </p>
+          }
+        />
+
+        {submitted && (
+          <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-5 space-y-5">
+            <div>
+              <label htmlFor="impact-model-size" className="flex justify-between text-sm font-medium text-gray-700">
+                <span>模型容量（相对参数规模）</span>
+                <span className="font-mono text-blue-700">{modelSize}</span>
+              </label>
+              <input
+                id="impact-model-size"
+                aria-label="模型容量"
+                type="range"
+                min="1"
+                max="1000"
+                value={modelSize}
+                onChange={(event) => setModelSize(Number(event.target.value))}
+                className="mt-2 w-full accent-blue-600"
+              />
+            </div>
+            <div>
+              <label htmlFor="impact-data-coverage" className="flex justify-between text-sm font-medium text-gray-700">
+                <span>数据覆盖</span>
+                <span className="font-mono text-emerald-700">{dataCoverage}%</span>
+              </label>
+              <input
+                id="impact-data-coverage"
+                aria-label="数据覆盖"
+                type="range"
+                min="10"
+                max="100"
+                value={dataCoverage}
+                onChange={(event) => setDataCoverage(Number(event.target.value))}
+                className="mt-2 w-full accent-emerald-600"
+              />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                { label: '训练表现', value: trainingScore, color: 'bg-blue-600' },
+                { label: '验证表现', value: validationScore, color: 'bg-emerald-600' },
+              ].map((metric) => (
+                <div key={metric.label} className="rounded-lg border border-gray-200 bg-white p-4">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium text-gray-700">{metric.label}</span>
+                    <span className="font-mono">{metric.value.toFixed(2)}</span>
+                  </div>
+                  <div className="mt-2 h-3 overflow-hidden rounded-full bg-gray-200">
+                    <div className={`h-full ${metric.color}`} style={{ width: `${metric.value * 100}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500">
+              这是用于理解容量-数据匹配关系的概念模型，不是经验缩放定律，也不能用于预测真实系统指标。
+            </p>
+          </div>
+        )}
+      </div>
+    </InteractiveDemo>
+  );
+}
 
 export default function PrerequisiteChapter01ImpactPage() {
   return (
@@ -181,39 +296,7 @@ export default function PrerequisiteChapter01ImpactPage() {
         </div>
       </section>
     
-      {/* Interactive demo */}
-      <InteractiveDemo title="模型规模与性能关系">
-        <div className="space-y-4">
-          <p className="text-gray-700">
-            拖动滑块，观察模型参数量增加时性能的变化。注意：当数据量固定时，过大的模型可能过拟合。
-          </p>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 w-32">参数量（百万）</span>
-            <input type="range" min="1" max="1000" defaultValue="100" className="flex-1" id="param-slider" />
-            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded w-16 text-center" id="param-value">100</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 w-32">相对性能</span>
-            <div className="flex-1 bg-gray-200 rounded-full h-4">
-              <div className="bg-blue-600 h-4 rounded-full" style={{ width: '60%' }} id="perf-bar"></div>
-            </div>
-            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded w-16 text-center" id="perf-value">0.60</span>
-          </div>
-          <script dangerouslySetInnerHTML={{ __html: `
-            const slider = document.getElementById('param-slider');
-            const paramValue = document.getElementById('param-value');
-            const perfBar = document.getElementById('perf-bar');
-            const perfValue = document.getElementById('perf-value');
-            slider.addEventListener('input', (e) => {
-              const params = parseInt(e.target.value);
-              paramValue.textContent = params;
-              const perf = Math.min(1, Math.log10(params + 1) / 3);
-              perfBar.style.width = (perf * 100) + '%';
-              perfValue.textContent = perf.toFixed(2);
-            });
-          ` }} />
-        </div>
-      </InteractiveDemo>
+      <ScaleTradeoffDemo />
 
       {/* Why? */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -224,11 +307,19 @@ export default function PrerequisiteChapter01ImpactPage() {
             它不需要人工设计特征，而是从数据中自动学习层次化表示。同一套框架可以处理图像、文本、语音、分子结构等不同模态。
           </p>
           <p>
-            <strong>为什么大语言模型能表现出“涌现能力”？</strong>
-            当模型规模、数据量和算力足够大时，一些在小型模型中不存在的能力（如推理、编程）会突然出现，这被称为涌现。
+            <strong>为什么扩大规模有时会出现新的可观察能力？</strong>
+            模型、数据与计算规模共同增加时，某些任务表现可能跨过可用阈值。不过“突然涌现”也可能受评价指标影响，
+            因此应以具体任务实验为依据，而不是把规模当作必然保证。
           </p>
         </div>
       </section>
+
+      <ExercisePanel
+        exerciseSetId="chapter01-impact"
+        title="1.1 分级练习"
+        description="从学习范式判断，到真实部署中的泛化与风险检查。"
+        exercises={chapter01ImpactExercises}
+      />
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -247,10 +338,25 @@ export default function PrerequisiteChapter01ImpactPage() {
     
       <SectionMetadata
         bishopChapter={"Ch 1"}
-        bishopSection={"impact"}
-        learningObjectives={["理解 Impact 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+        bishopSection={"1.1"}
+        textbookSections={['1.1.1 医疗诊断', '1.1.2 蛋白质结构', '1.1.3 图像合成', '1.1.4 大语言模型']}
+        learningObjectives={[
+          '列举深度学习在医疗、蛋白质结构、图像生成和语言建模中的任务形式。',
+          '根据监督信号的来源区分监督、无监督与自监督学习。',
+          '解释模型容量、数据覆盖与可靠泛化之间的关系。',
+        ]}
+        coreIntuition={
+          <p>
+            不同领域的输入和输出看起来差异巨大，但学习问题共享同一结构：从数据构造目标、优化参数、
+            再在未见样本上验证。深度学习的通用性来自可学习表示，不代表它能绕过数据质量和部署风险。
+          </p>
+        }
+        commonMistakes={[
+          '把自监督误解为“没有训练目标”，忽略目标由数据自身构造。',
+          '把内部测试集的高准确率直接当成真实部署可靠性。',
+          '认为增加参数量必然提升所有任务，而不检查数据覆盖和评价方式。',
+        ]}
+      />
 </div>
   );
 }

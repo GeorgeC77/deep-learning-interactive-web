@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronRight } from 'lucide-react';
+import KaTeX from './KaTeX';
 
 type DerivationStep = {
   label: string;
@@ -47,8 +48,8 @@ export default function DerivationStepper({ title, steps }: DerivationStepperPro
             {currentStep + 1}
           </span>
           <div className="space-y-3 flex-1">
-            <div className="bg-gray-50 rounded-lg p-3 font-mono text-sm overflow-x-auto">
-              {'\\( ' + steps[currentStep].formula + ' \\)'}
+            <div className="bg-gray-50 rounded-lg p-3 text-sm overflow-x-auto">
+              <KaTeX math={steps[currentStep].formula} display />
             </div>
             <p className="text-sm text-gray-700">{steps[currentStep].explanation}</p>
           </div>

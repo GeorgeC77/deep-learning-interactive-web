@@ -1,4 +1,5 @@
 import SectionMetadata from '@/components/SectionMetadata';
+import { useState } from 'react';
 import {
   History,
   Cpu,
@@ -15,6 +16,9 @@ import KaTeX from '../../../components/KaTeX';
 import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
 import InteractiveDemo from '../../../components/InteractiveDemo';
+import ExercisePanel from '@/components/ExercisePanel';
+import PredictionGate from '@/components/PredictionGate';
+import { chapter01HistoryExercises } from '@/course/chapter01Exercises';
 
 const milestones = [
   {
@@ -53,6 +57,90 @@ const milestones = [
       '大语言模型、多模态模型与科学基础模型展现出惊人的涌现能力。深度学习的关注点从单一任务转向通用智能、可解释性与安全对齐。',
   },
 ];
+
+const timelineMarkers = [
+  { year: 1943, text: 'McCulloch 与 Pitts 提出神经元数学模型' },
+  { year: 1958, text: 'Rosenblatt 推动感知机研究' },
+  { year: 1986, text: '反向传播在多层网络训练中得到广泛关注' },
+  { year: 2006, text: '逐层预训练推动深层网络复兴' },
+  { year: 2012, text: 'AlexNet 在 ImageNet 上取得突破' },
+  { year: 2014, text: '生成对抗网络提出' },
+  { year: 2017, text: 'Transformer 架构提出' },
+  { year: 2018, text: 'BERT 推动预训练语言表示' },
+  { year: 2020, text: 'GPT-3 展示大规模语言模型能力' },
+  { year: 2022, text: '对话式大语言模型进入大众视野' },
+  { year: 2024, text: '多模态模型与科学基础模型继续发展' },
+];
+
+function HistoryTimelineDemo() {
+  const [year, setYear] = useState(2012);
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const closest = timelineMarkers.reduce((previous, current) =>
+    Math.abs(current.year - year) < Math.abs(previous.year - year) ? current : previous,
+  );
+
+  return (
+    <InteractiveDemo title="深度学习发展时间线">
+      <div className="space-y-6">
+        <PredictionGate
+          resetKey="chapter01-history-conditions"
+          prediction={prediction}
+          onPredictionChange={setPrediction}
+          submitted={submitted}
+          onSubmit={() => setSubmitted(true)}
+          revealed={revealed}
+          onReveal={() => setRevealed((value) => !value)}
+          canReveal={submitted}
+          question="多层网络和反向传播早已出现，为什么大规模视觉突破仍要等到 2012 年前后？"
+          hint="从可用训练数据、并行计算和训练方法三个方面考虑。"
+          options={[
+            { value: 'convergence', label: '数据、GPU 算力与算法/工程改进共同成熟' },
+            { value: 'invented', label: '神经网络直到 2012 年才被发明' },
+            { value: 'depth', label: '只因为网络层数第一次超过某个固定阈值' },
+          ]}
+          evaluatePrediction={(answer) => ({
+            correct: answer === 'convergence',
+            category: '历史因果',
+            feedback:
+              answer === 'convergence'
+                ? '突破来自多项条件汇合，而不是单一发现突然出现。'
+                : '感知机、多层网络和反向传播都早于 2012 年，需要解释为何已有思想当时才规模化奏效。',
+          })}
+          revealContent={
+            <p className="text-sm text-gray-700">
+              历史时间线的重点不是背年份，而是识别长期思想如何在新数据、硬件与训练技术条件下重新释放价值。
+            </p>
+          }
+        />
+
+        {submitted && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-5 space-y-4">
+            <label htmlFor="history-year" className="flex items-center justify-between gap-4 text-sm text-gray-700">
+              <span className="font-medium">选择年份</span>
+              <span className="w-20 rounded bg-white px-2 py-1 text-center font-mono">{year}</span>
+            </label>
+            <input
+              id="history-year"
+              aria-label="时间线年份"
+              type="range"
+              min="1943"
+              max="2024"
+              value={year}
+              onChange={(event) => setYear(Number(event.target.value))}
+              className="w-full accent-amber-600"
+            />
+            <div className="rounded-lg border border-amber-200 bg-white p-4" aria-live="polite">
+              <p className="text-sm font-bold text-amber-800">{closest.year}</p>
+              <p className="mt-1 text-sm text-gray-700">{closest.text}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </InteractiveDemo>
+  );
+}
 
 export default function PrerequisiteChapter01HistoryPage() {
   return (
@@ -118,8 +206,8 @@ export default function PrerequisiteChapter01HistoryPage() {
           />
           <ConceptCard
             icon={<TrendingUp className="w-5 h-5" />}
-            title="规模即能力"
-            description="当模型、数据与计算规模同时扩大时，深度学习往往能展现出定性上的新能力，这一规律被称为规模法则。"
+            title="可扩展性"
+            description="模型、数据与计算规模协同增加时，许多任务性能会持续改善；是否出现新能力仍需用具体评价实验判断。"
           />
         </div>
       </section>
@@ -180,50 +268,7 @@ export default function PrerequisiteChapter01HistoryPage() {
         </div>
       </section>
     
-      {/* Interactive demo */}
-      <InteractiveDemo title="深度学习发展时间线">
-        <div className="space-y-4">
-          <p className="text-gray-700">
-            拖动滑块，查看不同年份的关键技术突破。
-          </p>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 w-32">年份</span>
-            <input type="range" min="1943" max="2024" defaultValue="2012" className="flex-1" id="year-slider" />
-            <span className="text-sm font-mono bg-gray-100 px-2 py-1 rounded w-20 text-center" id="year-value">2012</span>
-          </div>
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div className="text-sm font-medium text-gray-700" id="milestone-text">
-              2012: AlexNet 在 ImageNet 上取得突破，深度学习在计算机视觉中爆发
-            </div>
-          </div>
-          <script dangerouslySetInnerHTML={{ __html: `
-            const milestones = [
-              { year: 1943, text: '1943: McCulloch 与 Pitts 提出神经元数学模型' },
-              { year: 1958, text: '1958: Rosenblatt 发明感知机' },
-              { year: 1986, text: '1986: 反向传播算法重新发现' },
-              { year: 2006, text: '2006: Hinton 提出深度信念网络' },
-              { year: 2012, text: '2012: AlexNet 在 ImageNet 上取得突破' },
-              { year: 2014, text: '2014: GAN 被提出' },
-              { year: 2017, text: '2017: Transformer 架构出现' },
-              { year: 2018, text: '2018: BERT 发布' },
-              { year: 2020, text: '2020: GPT-3 展示大规模语言模型能力' },
-              { year: 2022, text: '2022: ChatGPT 引发大模型热潮' },
-              { year: 2024, text: '2024: 多模态大模型与科学智能体快速发展' }
-            ];
-            const slider = document.getElementById('year-slider');
-            const yearValue = document.getElementById('year-value');
-            const milestoneText = document.getElementById('milestone-text');
-            slider.addEventListener('input', (e) => {
-              const year = parseInt(e.target.value);
-              yearValue.textContent = year;
-              const closest = milestones.reduce((prev, curr) =>
-                Math.abs(curr.year - year) < Math.abs(prev.year - year) ? curr : prev
-              );
-              milestoneText.textContent = closest.text;
-            });
-          ` }} />
-        </div>
-      </InteractiveDemo>
+      <HistoryTimelineDemo />
 
       {/* Why? */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -239,6 +284,13 @@ export default function PrerequisiteChapter01HistoryPage() {
           </p>
         </div>
       </section>
+
+      <ExercisePanel
+        exerciseSetId="chapter01-history"
+        title="1.3 分级练习"
+        description="从感知机的限制，到算法与基础设施共同推动突破。"
+        exercises={chapter01HistoryExercises}
+      />
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -257,10 +309,25 @@ export default function PrerequisiteChapter01HistoryPage() {
     
       <SectionMetadata
         bishopChapter={"Ch 1"}
-        bishopSection={"history"}
-        learningObjectives={["理解 History 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+        bishopSection={"1.3"}
+        textbookSections={['1.3.1 单层网络', '1.3.2 反向传播', '1.3.3 深度网络']}
+        learningObjectives={[
+          '说明感知机的线性表达限制以及隐藏层带来的变化。',
+          '解释反向传播为何使多层网络的端到端训练成为可能。',
+          '从数据、计算和算法共同成熟的角度分析 2012 年前后的突破。',
+        ]}
+        coreIntuition={
+          <p>
+            深度学习并非突然出现的单一发明。核心思想经历了提出、受限、复兴和规模化：
+            表达能力必须配合可行的训练算法，而算法又需要足够的数据、计算和工程基础设施。
+          </p>
+        }
+        commonMistakes={[
+          '认为深度学习直到 2012 年才被发明。',
+          '认为反向传播保证找到全局最优，而不是一种高效求梯度的方法。',
+          '把历史突破归因于网络深度这一项，忽略数据、硬件与训练方法。',
+        ]}
+      />
 </div>
   );
 }

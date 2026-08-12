@@ -17,12 +17,20 @@ import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
 import InteractiveDemo from '../../../components/InteractiveDemo';
 import InteractivePanel from '../../../components/InteractivePanel';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import PredictionGate from '@/components/PredictionGate';
+import { chapter01TutorialExercises } from '@/course/chapter01Exercises';
+import {
+  coefficientNorm,
+  fitPolynomial,
+  predictPolynomial as predict,
+  rmsError,
+  type RegressionPoint,
+} from '@/lib/math/polynomialRegression';
 
 /* ── types & constants ── */
-interface DataPoint {
-  x: number;
-  t: number;
-}
+type DataPoint = RegressionPoint;
 
 const N_TRAIN = 10;
 const NOISE_STD = 0.3;
@@ -52,71 +60,6 @@ function generateTestData(count = 100): DataPoint[] {
     points.push({ x, t: Math.sin(2 * Math.PI * x) });
   }
   return points;
-}
-
-/* ── linear algebra helpers ── */
-function solveLinearSystem(A: number[][], b: number[]): number[] {
-  const n = A.length;
-  const M: number[][] = A.map((row, i) => [...row, b[i]]);
-
-  for (let col = 0; col < n; col++) {
-    let maxRow = col;
-    let maxVal = Math.abs(M[col][col]);
-    for (let row = col + 1; row < n; row++) {
-      if (Math.abs(M[row][col]) > maxVal) {
-        maxVal = Math.abs(M[row][col]);
-        maxRow = row;
-      }
-    }
-    if (maxVal < 1e-12) continue;
-    [M[col], M[maxRow]] = [M[maxRow], M[col]];
-    const pivot = M[col][col];
-    for (let j = col; j <= n; j++) M[col][j] /= pivot;
-    for (let row = 0; row < n; row++) {
-      if (row === col) continue;
-      const factor = M[row][col];
-      for (let j = col; j <= n; j++) M[row][j] -= factor * M[col][j];
-    }
-  }
-  return M.map((row) => row[n]);
-}
-
-function fitPolynomial(train: DataPoint[], M: number): number[] {
-  const X: number[][] = train.map((p) => {
-    const row: number[] = [];
-    let xj = 1;
-    for (let j = 0; j <= M; j++) {
-      row.push(xj);
-      xj *= p.x;
-    }
-    return row;
-  });
-
-  const XtX: number[][] = Array.from({ length: M + 1 }, (_, i) =>
-    Array.from({ length: M + 1 }, (_, j) =>
-      X.reduce((sum, row) => sum + row[i] * row[j], 0)
-    )
-  );
-  const Xty: number[] = Array.from({ length: M + 1 }, (_, i) =>
-    train.reduce((sum, p, idx) => sum + X[idx][i] * p.t, 0)
-  );
-
-  return solveLinearSystem(XtX, Xty);
-}
-
-function predict(x: number, coeffs: number[]): number {
-  let y = 0;
-  let xj = 1;
-  for (let j = 0; j < coeffs.length; j++) {
-    y += coeffs[j] * xj;
-    xj *= x;
-  }
-  return y;
-}
-
-function rmsError(points: DataPoint[], coeffs: number[]): number {
-  const sq = points.reduce((sum, p) => sum + (predict(p.x, coeffs) - p.t) ** 2, 0);
-  return Math.sqrt(sq / points.length);
 }
 
 /* ── drawing helpers ── */
@@ -529,12 +472,17 @@ function drawRmsChart(svgEl: SVGSVGElement, rmsByM: { train: number; test: numbe
 function PolyFitDemo() {
   const [trainData, setTrainData] = useState<DataPoint[]>(() => generateTrainData());
   const [M, setM] = useState<number>(3);
+  const [logLambda, setLogLambda] = useState<number>(-6);
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const fitRef = useRef<SVGSVGElement>(null);
   const rmsRef = useRef<SVGSVGElement>(null);
 
   const testData = useMemo(() => generateTestData(), []);
+  const lambda = logLambda <= -6 ? 0 : 10 ** logLambda;
 
-  const coeffs = useMemo(() => fitPolynomial(trainData, M), [trainData, M]);
+  const coeffs = useMemo(() => fitPolynomial(trainData, M, lambda), [trainData, M, lambda]);
 
   const rmsTrain = useMemo(() => rmsError(trainData, coeffs), [trainData, coeffs]);
   const rmsTest = useMemo(() => rmsError(testData, coeffs), [testData, coeffs]);
@@ -542,14 +490,14 @@ function PolyFitDemo() {
   const rmsByM = useMemo(() => {
     const result: { train: number; test: number }[] = [];
     for (let m = 0; m <= 9; m++) {
-      const c = fitPolynomial(trainData, m);
+      const c = fitPolynomial(trainData, m, lambda);
       result.push({
         train: rmsError(trainData, c),
         test: rmsError(testData, c),
       });
     }
     return result;
-  }, [trainData, testData]);
+  }, [trainData, testData, lambda]);
 
   useEffect(() => {
     if (fitRef.current) {
@@ -565,7 +513,39 @@ function PolyFitDemo() {
 
   return (
     <InteractiveDemo title="交互式多项式曲线拟合">
-      <InteractivePanel
+      <div className="space-y-6">
+        <PredictionGate
+          resetKey="chapter01-polynomial-prediction"
+          prediction={prediction}
+          onPredictionChange={setPrediction}
+          submitted={submitted}
+          onSubmit={() => setSubmitted(true)}
+          revealed={revealed}
+          onReveal={() => setRevealed((value) => !value)}
+          canReveal={submitted}
+          question="只有 10 个带噪训练点时，把多项式阶数从 M=3 提高到 M=9，哪种结果最可能出现？"
+          hint="训练误差衡量已见样本，测试误差衡量未见位置上的函数恢复。"
+          options={[
+            { value: 'overfit', label: '训练误差下降，但测试误差可能上升' },
+            { value: 'always-better', label: '训练与测试误差一定同时下降' },
+            { value: 'unchanged', label: '阶数变化不会影响拟合曲线' },
+          ]}
+          evaluatePrediction={(answer) => ({
+            correct: answer === 'overfit',
+            category: '偏差-方差判断',
+            feedback:
+              answer === 'overfit'
+                ? '高阶模型可能把训练噪声当作规律，形成低训练误差、高测试误差。'
+                : '请分别考虑拟合能力和对未见数据的泛化。',
+          })}
+          revealContent={
+            <p className="text-sm text-gray-700">
+              提交预测后，先将 M 调到 3，再调到 9；随后逐渐增大 λ，观察测试误差和参数范数是否下降。
+            </p>
+          }
+        />
+
+        {submitted && <InteractivePanel
         hint="拖动滑块改变多项式阶数 M，观察拟合曲线与 RMS 误差的变化；点击“重新生成数据”可更换训练样本。"
         chart={
           <div className="space-y-4">
@@ -597,6 +577,24 @@ function PolyFitDemo() {
               <p className="text-xs text-gray-500 mt-1">M 越大，模型复杂度越高</p>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                正则化 λ ={' '}
+                <span className="text-emerald-700 font-mono font-bold">
+                  {lambda === 0 ? '0' : lambda.toExponential(1)}
+                </span>
+              </label>
+              <Slider
+                value={[logLambda]}
+                onValueChange={(value) => setLogLambda(value[0])}
+                min={-6}
+                max={1}
+                step={0.5}
+                aria-label="正则化强度的对数"
+              />
+              <p className="text-xs text-gray-500 mt-1">从无正则化逐步增加权重惩罚</p>
+            </div>
+
             <Button
               variant="outline"
               className="w-full"
@@ -617,6 +615,11 @@ function PolyFitDemo() {
                   测试 RMS = <span className="font-mono font-bold">{rmsTest.toFixed(3)}</span>
                 </p>
               </div>
+              <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                <p className="text-sm text-emerald-800">
+                  参数范数 ‖w‖ = <span className="font-mono font-bold">{coefficientNorm(coeffs).toFixed(2)}</span>
+                </p>
+              </div>
             </div>
 
             <div className="text-xs text-gray-600 space-y-1">
@@ -635,7 +638,8 @@ function PolyFitDemo() {
             </div>
           </div>
         }
-      />
+        />}
+      </div>
     </InteractiveDemo>
   );
 }
@@ -661,6 +665,32 @@ export default function PrerequisiteChapter01TutorialPage() {
           仅供教学与非商业学习使用。
         </p>
       </section>
+
+      <DerivationStepper
+        title="从平方误差到正则化最小二乘"
+        steps={[
+          {
+            label: '写成矩阵形式',
+            formula: String.raw`E(\mathbf w)=\frac{1}{2}\lVert \mathbf X\mathbf w-\mathbf t\rVert^2`,
+            explanation: '设计矩阵 X 的每一行是一个样本的多项式基函数，w 是待学习系数。',
+          },
+          {
+            label: '加入权重惩罚',
+            formula: String.raw`\widetilde E(\mathbf w)=\frac{1}{2}\lVert \mathbf X\mathbf w-\mathbf t\rVert^2+\frac{\lambda}{2}\lVert\mathbf w\rVert^2`,
+            explanation: 'λ 控制数据拟合与小参数之间的权衡；λ=0 时退化为普通最小二乘。',
+          },
+          {
+            label: '对参数求梯度',
+            formula: String.raw`\nabla_{\mathbf w}\widetilde E=\mathbf X^T(\mathbf X\mathbf w-\mathbf t)+\lambda\mathbf w`,
+            explanation: '最优点的一阶条件是梯度为零。这里假设惩罚项包含全部多项式系数。',
+          },
+          {
+            label: '得到正规方程',
+            formula: String.raw`(\mathbf X^T\mathbf X+\lambda\mathbf I)\mathbf w=\mathbf X^T\mathbf t`,
+            explanation: 'λI 改善病态问题并抑制过大的系数，正是上方实验中的数值求解式。',
+          },
+        ]}
+      />
 
       {/* Data generation */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -690,6 +720,13 @@ export default function PrerequisiteChapter01TutorialPage() {
           }
         />
       </section>
+
+      <ExercisePanel
+        exerciseSetId="chapter01-tutorial"
+        title="1.2 分级练习"
+        description="从模型容量判断，到训练/验证/测试的正确分工。"
+        exercises={chapter01TutorialExercises}
+      />
 
       {/* Polynomial model */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -857,10 +894,32 @@ export default function PrerequisiteChapter01TutorialPage() {
     
       <SectionMetadata
         bishopChapter={"Ch 1"}
-        bishopSection={"tutorial"}
-        learningObjectives={["理解 Tutorial 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+        bishopSection={"1.2"}
+        textbookSections={[
+          '1.2.1 合成数据',
+          '1.2.2 线性模型',
+          '1.2.3 误差函数',
+          '1.2.4 模型复杂度',
+          '1.2.5 正则化',
+          '1.2.6 模型选择',
+        ]}
+        learningObjectives={[
+          '从带噪正弦数据构建设计矩阵并拟合多项式模型。',
+          '通过训练与测试 RMS 曲线识别欠拟合和过拟合。',
+          '解释正则化如何限制参数范数，并使用验证数据选择 M 与 λ。',
+        ]}
+        coreIntuition={
+          <p>
+            学习不是让训练误差越低越好，而是在有限、带噪样本下选择能恢复稳定规律的模型。
+            容量控制模型能学什么，正则化限制它愿意使用多复杂的解，验证集负责在两者之间做选择。
+          </p>
+        }
+        commonMistakes={[
+          '把训练误差最低的模型直接当成最佳模型。',
+          '用测试集反复选择阶数或正则化强度，造成评估信息泄漏。',
+          '认为正则化越强越好，忽略过强惩罚也会导致欠拟合。',
+        ]}
+      />
 </div>
   );
 }
