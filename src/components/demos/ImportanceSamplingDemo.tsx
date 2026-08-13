@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import { Slider } from '@/components/ui/slider';
 import KaTeX from '@/components/KaTeX';
+import PredictionGate from '@/components/PredictionGate';
 import {
   gaussian,
   sampleProposal,
@@ -24,6 +25,9 @@ const PLOT_TOP = 20;
 const PLOT_H = PLOT_BOTTOM - PLOT_TOP;
 
 export default function ImportanceSamplingDemo() {
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const [muQ, setMuQ] = useState(1.5);
   const [sigmaQ, setSigmaQ] = useState(1.0);
   const [nSamples, setNSamples] = useState(200);
@@ -76,7 +80,34 @@ export default function ImportanceSamplingDemo() {
 
   return (
     <InteractiveDemo title="重要性采样：p=N(0,1), q=N(μ,σ)">
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="space-y-6">
+        <PredictionGate
+          resetKey="importance-overlap"
+          prediction={prediction}
+          onPredictionChange={setPrediction}
+          submitted={submitted}
+          onSubmit={() => setSubmitted(true)}
+          revealed={revealed}
+          onReveal={() => setRevealed((value) => !value)}
+          canReveal={submitted}
+          question="目标 p=N(0,1) 不变。若把提议 q 的均值从 0 移到 3 且缩小方差，有效样本量 ESS 通常怎样变化？"
+          hint="想想多数 q 样本会落在 p 的高密度区还是低密度区，以及权重是否会集中。"
+          options={[
+            { value: 'down', label: 'ESS 显著下降，少数权重占主导' },
+            { value: 'up', label: 'ESS 显著上升，权重更均匀' },
+            { value: 'same', label: 'ESS 完全不受 q 影响' },
+          ]}
+          evaluatePrediction={(answer) => ({
+            correct: answer === 'down',
+            category: '提议分布与权重退化',
+            feedback: answer === 'down'
+              ? '正确。q 与 p 的重叠变差后，归一化权重会集中到极少数样本。'
+              : 'ESS=(Σw)²/Σw²；权重越不均匀，分母相对越大，ESS 越小。',
+          })}
+          revealContent={<p className="text-sm text-gray-700">用 <KaTeX math="\mathrm{ESS}=(\sum_i w_i)^2/\sum_i w_i^2" /> 衡量权重退化。它不是实际样本个数，而是这组加权样本相当于多少个等权独立样本。</p>}
+        />
+
+      {submitted && <div className="grid md:grid-cols-2 gap-6" aria-label="重要性采样实验控制区">
         <div className="space-y-4">
           <div>
             <div className="flex justify-between text-sm font-medium text-gray-700 mb-1">
@@ -192,6 +223,7 @@ export default function ImportanceSamplingDemo() {
             </p>
           </div>
         </div>
+      </div>}
       </div>
     </InteractiveDemo>
   );

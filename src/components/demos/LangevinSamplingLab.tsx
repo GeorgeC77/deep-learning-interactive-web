@@ -16,6 +16,10 @@ function toY(y: number, maxY: number): number {
   return M.t + PH - (y / maxY) * PH;
 }
 
+function toStateY(value: number, min: number, max: number): number {
+  return M.t + PH - ((value - min) / (max - min)) * PH;
+}
+
 function gaussianPDF(x: number, mean = 0, sigma = 1): number {
   const z = (x - mean) / sigma;
   return (Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2 * Math.PI)));
@@ -38,7 +42,7 @@ export default function LangevinSamplingLab() {
 
   const trajPath = useMemo(() => {
     return traj
-      .map((x, i) => `${toX(i, 0, traj.length - 1)},${toX(x, trajMin, trajMax)}`)
+      .map((x, i) => `${toX(i, 0, traj.length - 1)},${toStateY(x, trajMin, trajMax)}`)
       .join(' ');
   }, [traj, trajMin, trajMax]);
 
@@ -125,8 +129,8 @@ export default function LangevinSamplingLab() {
           <div className="bg-white rounded-lg border border-gray-200 p-3">
             <div className="text-xs font-medium text-gray-600 mb-2">轨迹 x^τ</div>
             <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ maxHeight: 240 }}>
-              <line x1={M.l} y1={toX(0, trajMin, trajMax)} x2={W - M.r} y2={toX(0, trajMin, trajMax)} stroke="#e5e7eb" strokeWidth={1} />
-              <polyline points={trajPath} fill="none" stroke="#2563eb" strokeWidth={1.5} />
+              <line x1={M.l} y1={toStateY(0, trajMin, trajMax)} x2={W - M.r} y2={toStateY(0, trajMin, trajMax)} stroke="#e5e7eb" strokeWidth={1} />
+              <polyline aria-label="Langevin 样本轨迹" points={trajPath} fill="none" stroke="#2563eb" strokeWidth={1.5} />
               <rect x={M.l} y={M.t} width={PW} height={PH} fill="none" stroke="#d1d5db" strokeWidth={1} />
             </svg>
           </div>

@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import MetropolisHastingsDemo from '@/components/demos/MetropolisHastingsDemo';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter11McmcExercises } from '@/course/chapter11Exercises';
 import { Route } from 'lucide-react';
 
 export default function Ch11MarkovChainMonteCarloPage() {
@@ -11,7 +14,7 @@ export default function Ch11MarkovChainMonteCarloPage() {
       concepts={[
         {
           title: "Markov chains",
-          description: "状态序列依转移核演化；若链不可约、非周期且满足细致平衡，则存在唯一平稳分布。采样初期需要 burn-in 以接近平稳分布，样本之间存在自相关。",
+          description: "状态序列依转移核演化；细致平衡可保证目标分布不变，遍历性条件则保证链从初始状态收敛到目标。采样初期需要 burn-in，样本之间存在自相关。",
         },
         {
           title: "The Metropolis algorithm",
@@ -39,12 +42,12 @@ export default function Ch11MarkovChainMonteCarloPage() {
       ]}
       learningObjectives={[
         "能写出 Metropolis-Hastings 的一般接受率，并解释对称提议下的简化。",
-        "理解马尔可夫链的平稳分布、brown-in 与样本自相关。",
+        "理解马尔可夫链的平稳分布、burn-in 与样本自相关。",
         "知道 Gibbs 采样与 MH 的关系，以及祖先采样在图模型中的应用。",
       ]}
       coreIntuition={"Metropolis 像一位挑剔的探险者：随机迈步，如果新位置‘更有可能’就接受，否则按概率接受；非对称迈步时还要修正‘迈步容易程度’的差异。"}
       commonMistakes={[
-        "把 A=min(1, exp(-ΔE)) 当成通用 MH 接受率；它只适用于对称提议+能量形式+T=1。",
+        "把 A=min(1, exp(-ΔE)) 当成通用 MH 接受率；它只适用于对称提议与 p(z)∝exp{-E(z)} 的能量形式。",
         "在非对称提议下仍使用 Metropolis 公式，导致平稳分布不正确。",
         "忽略 MCMC 样本自相关，直接用独立样本的标准误公式估计方差。",
       ]}
@@ -65,8 +68,9 @@ export default function Ch11MarkovChainMonteCarloPage() {
             bishopMapping={{
         chapter: "Ch 14",
         section: "14.2",
-        pages: "Ch 14",
+        pages: "§14.2, pp. 440–451",
         textbookSubsections: [
+          "14.2 Markov Chain Monte Carlo",
           "14.2.1 The Metropolis algorithm",
           "14.2.2 Markov chains",
           "14.2.3 The Metropolis–Hastings algorithm",
@@ -76,12 +80,17 @@ export default function Ch11MarkovChainMonteCarloPage() {
         formulas: ["Metropolis A=min(1,exp(-ΔE))", "MH 一般接受率", "细致平衡"],
         algorithms: ["Metropolis", "Metropolis-Hastings", "Gibbs sampling", "ancestral sampling"],
         exercises: [
-          "证明对称提议下 MH 退化为 Metropolis。",
-          "在 demo 中对比对称与非对称提议的采样结果。",
-          "说明祖先采样与 Gibbs 采样在图模型中的异同。",
+          "写出对称提议下的 Metropolis 接受率。",
+          "解释候选状态被拒绝后为何必须重复当前状态。",
+          "区分 Gibbs 条件更新与 DAG 祖先采样。",
         ],
       }}
-      extraContent={<MetropolisHastingsDemo />}
+      extraContent={<div className="space-y-10"><MetropolisHastingsDemo /><DerivationStepper title="分步推导：MH 接受率如何保证目标分布不变" steps={[
+        { label: '正向已接受流量', formula: String.raw`p(z)q(z'\mid z)A(z\to z')`, explanation: '处在 z、提议 z′ 且接受的联合概率质量，就是链从 z 流向 z′ 的概率流。' },
+        { label: '要求细致平衡', formula: String.raw`p(z)q(z'\mid z)A(z\to z')=p(z')q(z\mid z')A(z'\to z)`, explanation: '让每对状态之间的正反流量相等，是保证 p 为平稳分布的充分条件。' },
+        { label: '构造比率', formula: String.raw`r=\frac{p(z')q(z\mid z')}{p(z)q(z'\mid z)}`, explanation: '未知的目标归一化常数在比值中相消，因此只需计算未归一化密度。' },
+        { label: '截断为概率', formula: String.raw`A(z\to z')=\min(1,r)`, explanation: '若 r≥1 则正向必接收、反向以 1/r 接收；若 r<1 则角色互换，两种情况都满足细致平衡。' },
+      ]} /><ExercisePanel exerciseSetId="chapter11-mcmc" exercises={chapter11McmcExercises} /></div>}
     />
   );
 }

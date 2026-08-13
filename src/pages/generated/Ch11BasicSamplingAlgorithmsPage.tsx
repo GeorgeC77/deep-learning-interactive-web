@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import ImportanceSamplingDemo from '@/components/demos/ImportanceSamplingDemo';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter11BasicSamplingExercises } from '@/course/chapter11Exercises';
 import { Shuffle } from 'lucide-react';
 
 export default function Ch11BasicSamplingAlgorithmsPage() {
@@ -9,6 +12,11 @@ export default function Ch11BasicSamplingAlgorithmsPage() {
       heroIcon={<Shuffle className="w-9 h-9 text-blue-600" />}
       summary={"基本采样算法从简单分布生成样本：逆变换、拒绝采样、重要性采样与采样-重要性重采样构成蒙特卡洛基础。重要性采样的权重必须正确定义为 p(x)/q(x)。"}
       concepts={[
+        {
+          title: "期望的蒙特卡洛估计",
+          description: "用 L 个独立样本的函数值均值估计期望；估计量无偏，方差为 var[f]/L，但相关样本的有效样本量会更小。",
+          formula: String.raw`\mathbb E[f]\simeq\frac1L\sum_{l=1}^{L}f(z^{(l)}),\qquad \operatorname{var}(\hat f)=\frac{\operatorname{var}(f)}{L}`,
+        },
         {
           title: "逆变换采样",
           description: "若 U~Uniform(0,1)，则 X=F^{-1}(U) 服从分布 F。",
@@ -69,8 +77,9 @@ export default function Ch11BasicSamplingAlgorithmsPage() {
             bishopMapping={{
         chapter: "Ch 14",
         section: "14.1",
-        pages: "Ch 14",
+        pages: "§14.1, pp. 430–440",
         textbookSubsections: [
+          "14.1 Basic Sampling Algorithms",
           "14.1.1 Expectations",
           "14.1.2 Standard distributions",
           "14.1.3 Rejection sampling",
@@ -80,9 +89,14 @@ export default function Ch11BasicSamplingAlgorithmsPage() {
         ],
         formulas: ["逆变换 X=F⁻¹(U)", "重要性采样 E_p[f]=E_q[f·p/q]", "自归一化权重"],
         algorithms: ["逆变换采样", "拒绝采样", "重要性采样", "SIR"],
-        exercises: ["推导 p=N(0,1), q=N(μ,1) 时 w(0) 的表达式。", "用 demo 观察 ESS 随 μ 远离 0 的变化。"],
+        exercises: ["判断蒙特卡洛方差随样本量的变化。", "从包络条件推出拒绝采样接受率。", "判断重要性提议的支持条件。"],
       }}
-      extraContent={<ImportanceSamplingDemo />}
+      extraContent={<div className="space-y-10"><ImportanceSamplingDemo /><DerivationStepper title="分步推导：未知归一化常数时如何做重要性采样" steps={[
+        { label: '换分布积分', formula: String.raw`\mathbb E_p[f]=\int f(z)p(z)\,dz=\int f(z)\frac{p(z)}{q(z)}q(z)\,dz`, explanation: '只要 q 在 p(z)f(z) 有贡献的区域为正，就可把对 p 的积分改写成对易采样分布 q 的期望。' },
+        { label: '已归一化权重', formula: String.raw`\mathbb E_p[f]\simeq\frac1L\sum_{l=1}^{L}f(z^{(l)})\frac{p(z^{(l)})}{q(z^{(l)})}`, explanation: '若 p、q 的归一化密度都可计算，样本贡献乘似然比 p/q；权重方向不能颠倒。' },
+        { label: '未归一化目标', formula: String.raw`\widetilde r_l=\frac{\widetilde p(z^{(l)})}{q(z^{(l)})},\qquad w_l=\frac{\widetilde r_l}{\sum_m\widetilde r_m}`, explanation: '把未知 Zp 同时写入分子和权重总和，归一化常数相消，得到非负且和为 1 的权重。' },
+        { label: '自归一化估计', formula: String.raw`\mathbb E_p[f]\simeq\sum_{l=1}^{L}w_lf(z^{(l)}),\qquad \mathrm{ESS}=\frac{(\sum_l\widetilde r_l)^2}{\sum_l\widetilde r_l^2}`, explanation: '权重集中时 ESS 远小于 L；增加大量来自错误区域的 q 样本也未必能提供等量信息。' },
+      ]} /><ExercisePanel exerciseSetId="chapter11-basic-sampling" exercises={chapter11BasicSamplingExercises} /></div>}
     />
   );
 }

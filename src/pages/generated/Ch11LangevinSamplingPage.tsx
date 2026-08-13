@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import LangevinSamplingLab from '@/components/demos/LangevinSamplingLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter11LangevinExercises } from '@/course/chapter11Exercises';
 import { Wind } from 'lucide-react';
 
 export default function Ch11LangevinSamplingPage() {
@@ -17,6 +20,7 @@ export default function Ch11LangevinSamplingPage() {
         {
           title: "Maximum likelihood for EBMs",
           description: "对数似然梯度包含数据期望与模型期望两项，后者需要从当前模型分布中采样估计。",
+          formula: String.raw`\nabla_w\mathbb E_{p_D}[\ln p]=-\mathbb E_{p_D}[\nabla_wE]+\mathbb E_{p_M}[\nabla_wE]`,
         },
         {
           title: "Score function",
@@ -58,8 +62,9 @@ export default function Ch11LangevinSamplingPage() {
             bishopMapping={{
         chapter: "Ch 14",
         section: "14.3",
-        pages: "Ch 14",
+        pages: "§14.3, pp. 451–456",
         textbookSubsections: [
+          "14.3 Langevin Sampling",
           "14.3.1 Energy-based models",
           "14.3.2 Maximizing the likelihood",
           "14.3.3 Langevin dynamics",
@@ -76,7 +81,12 @@ export default function Ch11LangevinSamplingPage() {
           "比较 Langevin sampling 与普通随机游走 MH 的差异。",
         ],
       }}
-      interactiveDemo={<LangevinSamplingLab />}
+      interactiveDemo={<div className="space-y-10"><LangevinSamplingLab /><DerivationStepper title="分步推导：EBM 如何绕过配分函数得到 score" steps={[
+        { label: '能量模型', formula: String.raw`p(x\mid w)=\frac{1}{Z(w)}\exp\{-E(x,w)\}`, explanation: '任意实值能量经负指数变成非负未归一化密度；困难在于 Z(w) 要对整个 x 空间积分。' },
+        { label: '取对数', formula: String.raw`\ln p(x\mid w)=-E(x,w)-\ln Z(w)`, explanation: '对参数 w 求导时 Z 不能忽略，这会产生需要模型样本估计的负相位。' },
+        { label: '对数据求梯度', formula: String.raw`s(x,w)=\nabla_x\ln p(x\mid w)=-\nabla_xE(x,w)`, explanation: 'Z 只依赖 w、不依赖 x，所以在数据梯度中完全消失；score 指向局部概率上升方向。' },
+        { label: '加入扩散', formula: String.raw`x^{(\tau+1)}=x^{(\tau)}+\eta s(x^{(\tau)},w)+\sqrt{2\eta}\,\epsilon^{(\tau)}`, explanation: '漂移利用能量梯度，噪声避免只收敛到一个能量极小点；教材的无偏极限要求 η→0 且 T→∞。' },
+      ]} /><ExercisePanel exerciseSetId="chapter11-langevin" exercises={chapter11LangevinExercises} /></div>}
     />
   );
 }

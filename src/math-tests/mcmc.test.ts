@@ -5,9 +5,15 @@ import {
   computeESS,
   modeOccupancy,
   repeatedStatePct,
+  metropolisHastingsAcceptance,
 } from '../lib/math/mcmc';
 
 describe('mcmc', () => {
+  it('general MH acceptance includes the reverse/forward proposal correction', () => {
+    expect(metropolisHastingsAcceptance(0.2, 0.4, 0.8, 0.2)).toBeCloseTo(0.5, 12);
+    expect(metropolisHastingsAcceptance(0.2, 0.4, 0.3, 0.3)).toBe(1);
+  });
+
   it('small proposal ESS is lower than balanced proposal ESS', () => {
     const small = metropolisHastings(bimodalTarget, 0.15, 2000, 42);
     const balanced = metropolisHastings(bimodalTarget, 1.0, 2000, 42);

@@ -36,6 +36,18 @@ export interface MetropolisHastingsResult {
   accepted: number;
 }
 
+/** General Metropolis-Hastings acceptance probability for one proposed move. */
+export function metropolisHastingsAcceptance(
+  targetCurrent: number,
+  targetProposed: number,
+  proposalForward: number,
+  proposalReverse: number,
+): number {
+  if (targetCurrent <= 0 || proposalForward <= 0) return 0;
+  const ratio = (targetProposed * proposalReverse) / (targetCurrent * proposalForward);
+  return Math.min(1, Math.max(0, ratio));
+}
+
 /** Symmetric random-walk Metropolis sampler.
  *
  *  @param target      unnormalized target density
