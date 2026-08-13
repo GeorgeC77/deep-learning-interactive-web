@@ -59,10 +59,10 @@ export default function Ch03ErrorFunctionsPage() {
         section: '6.4',
         pages: '§6.4, pp. 194–197',
         textbookSubsections: [
-          '6.4 Error Functions',
-          '6.4.1 Regression',
-          '6.4.2 Binary classification',
-          '6.4.3 Multiclass classification',
+          "6.4 Error Functions",
+          "6.4.1 Regression",
+          "6.4.2 Binary classification",
+          "6.4.3 multiclass classification",
         ],
         formulas: [
           'Gaussian negative log-likelihood and squared error',

@@ -64,11 +64,11 @@ export default function Ch03MixtureDensityNetworksPage() {
         section: '6.5',
         pages: '§6.5, pp. 198–203',
         textbookSubsections: [
-          '6.5 Mixture Density Networks',
-          '6.5.1 Robot kinematics example',
-          '6.5.2 Conditional mixture distributions',
-          '6.5.3 Gradient optimization',
-          '6.5.4 Predictive distribution',
+          "6.5 Mixture Density Networks",
+          "6.5.1 Robot kinematics example",
+          "6.5.2 Conditional mixture distributions",
+          "6.5.3 Gradient optimization",
+          "6.5.4 Predictive distribution",
         ],
         formulas: [
           'p(t|x) = Σₖ πₖ(x)N(t|μₖ(x),σₖ²(x))',
