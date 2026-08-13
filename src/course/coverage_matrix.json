@@ -645,7 +645,7 @@
     "bishopSection": "",
     "sectionTitle": "课程概览",
     "routePath": "/ch06/overview",
-    "componentName": "Chapter09OverviewPage",
+    "componentName": "Ch06OverviewPage",
     "formulasCovered": [],
     "algorithmsCovered": [],
     "interactiveDemos": [
@@ -653,7 +653,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch06-inductive-bias",
@@ -669,7 +669,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch06-weight-decay",
@@ -685,7 +685,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch06-learning-curves",
@@ -701,7 +701,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch06-parameter-sharing",
@@ -717,7 +717,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch06-residual-connections",
@@ -733,7 +733,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch06-model-averaging",
@@ -749,7 +749,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch07-overview",

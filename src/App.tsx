@@ -28,7 +28,7 @@ import Ch03MixtureDensityNetworksPage from './pages/generated/Ch03MixtureDensity
 import Ch05EvaluationOfGradientsPage from './pages/generated/Ch05EvaluationOfGradientsPage';
 
 // Ch 9 (manifest ch06): Regularization
-import Chapter09OverviewPage from './pages/chapters/chapter09/OverviewPage';
+import Ch06OverviewPage from './pages/generated/Ch06OverviewPage';
 import Ch06WeightDecayPage from './pages/generated/Ch06WeightDecayPage';
 import Ch06LearningCurvesPage from './pages/generated/Ch06LearningCurvesPage';
 
@@ -152,7 +152,7 @@ const sectionComponents: Record<string, React.ComponentType> = {
   '/ch05/evaluation-of-gradients': Ch05EvaluationOfGradientsPage,
 
   // Ch 9 (manifest ch06): Regularization
-  '/ch06/overview': Chapter09OverviewPage,
+  '/ch06/overview': Ch06OverviewPage,
   '/ch06/weight-decay': Ch06WeightDecayPage,
   '/ch06/learning-curves': Ch06LearningCurvesPage,
 

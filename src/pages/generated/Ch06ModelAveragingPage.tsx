@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import ModelAveragingLab from '@/components/demos/ModelAveragingLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter06ModelAveragingExercises } from '@/course/chapter06Exercises';
 import { Users } from 'lucide-react';
 
 export default function Ch06ModelAveragingPage() {
@@ -8,7 +11,7 @@ export default function Ch06ModelAveragingPage() {
       sectionPath="/ch06/model-averaging"
       heroIcon={<Users className="w-9 h-9 text-blue-600" />}
       summary={
-        "模型平均通过组合多个模型的预测降低误差方差；其效果取决于模型误差的方差 σ² 与模型间相关性 ρ。Dropout 可视为对大量子网络做指数级隐式模型平均的一种近似。"
+        "Bishop §9.6 说明，与其选单个模型，不如平均多个模型的预测。互不相关误差时委员会误差可按 1/M 降低，但实际相关性限制收益。Bagging 用 bootstrap 数据制造差异；Dropout 则训练共享参数的随机掩码子网络并近似平均。"
       }
       concepts={[
         {
@@ -23,11 +26,11 @@ export default function Ch06ModelAveragingPage() {
         },
         {
           title: "Dropout 作为模型平均的近似",
-          description: "训练时随机失活神经元等价于采样子网络；测试时缩放或 MC 平均近似所有子网络平均。它是一种近似，而非与精确模型平均无条件等价。",
+          description: "训练时为每个样本采样 mask，得到共享参数的剪枝子网络；预测时可采样多个 mask 做 Monte Carlo 平均，或用完整网络配合缩放近似。它不等于独立训练全部 2^M 个网络。",
         },
         {
-          title: "贝叶斯模型平均",
-          description: "按模型后验概率加权组合，理论上最优但计算昂贵。",
+          title: "Bagging 与多样性",
+          description: "bootstrap aggregation 从原数据有放回采样出多个训练集，分别训练模型再平均。还可用不同初始化或算法增加多样性；若误差仍高度相关，收益有限。",
         },
       ]}
       learningObjectives={[
@@ -62,7 +65,7 @@ export default function Ch06ModelAveragingPage() {
             bishopMapping={{
         chapter: "Ch 9",
         section: "9.6",
-        pages: "Ch 9",
+        pages: "§9.6, pp. 277–281",
         textbookSubsections: ["9.6 Model Averaging", "9.6.1 Dropout"],
         formulas: [
           "Var(y_avg) = σ²[ρ + (1−ρ)/M]",
@@ -76,6 +79,12 @@ export default function Ch06ModelAveragingPage() {
         ],
       }}
       interactiveDemo={<ModelAveragingLab />}
+      extraContent={<div className="space-y-10"><DerivationStepper title="分步推导：相关误差如何限制集成收益" steps={[
+        { label: '平均误差', formula: String.raw`\bar\varepsilon=\frac1M\sum_{m=1}^{M}\varepsilon_m`, explanation: '委员会预测误差是成员误差的平均。' },
+        { label: '展开方差', formula: String.raw`\operatorname{Var}(\bar\varepsilon)=\frac1{M^2}\left(\sum_m\sigma^2+\sum_{m\ne l}\rho\sigma^2\right)`, explanation: '对角项是单模型方差，非对角项来自模型间协方差。' },
+        { label: '整理结果', formula: String.raw`\operatorname{Var}(\bar\varepsilon)=\sigma^2\left[\rho+\frac{1-\rho}{M}\right]`, explanation: 'ρ=0 时按 1/M 降低；ρ=1 时完全没有方差收益。' },
+        { label: '无限模型', formula: String.raw`M\to\infty\quad\Rightarrow\quad\operatorname{Var}(\bar\varepsilon)\to\rho\sigma^2`, explanation: '相关性形成不可由增加成员数消除的方差下限。' },
+      ]}/><ExercisePanel exerciseSetId="chapter06-model-averaging" exercises={chapter06ModelAveragingExercises}/></div>}
     />
   );
 }

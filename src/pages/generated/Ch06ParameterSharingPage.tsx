@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import ParameterSharingLab from '@/components/demos/ParameterSharingLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter06ParameterSharingExercises } from '@/course/chapter06Exercises';
 import { Share2 } from 'lucide-react';
 
 export default function Ch06ParameterSharingPage() {
@@ -8,12 +11,13 @@ export default function Ch06ParameterSharingPage() {
       sectionPath="/ch06/parameter-sharing"
       heroIcon={<Share2 className="w-9 h-9 text-blue-600" />}
       summary={
-        "参数共享让同一组权重在多个位置复用，显著减少参数量并强制定义不变性或局部性先验。卷积是最常见的共享形式，它与全连接、局部连接在连接数、参数量与自由度上有本质区别。"
+        "Bishop §9.4 将参数共享定义为让多个网络连接引用同一个可学习参数，从而使自由度小于连接数，并编码预先已知的结构偏置。软权重共享则不强制相等，而用可学习混合先验鼓励权重围绕多个中心聚类。"
       }
       concepts={[
         {
           title: "软权重共享",
-          description: "通过正则化鼓励参数彼此接近，而非强制相等，保留一定柔性。",
+          description: "用高斯混合先验及其负对数正则项鼓励大量权重聚集到若干学习到的中心，而不是强制严格相等；混合系数、均值和方差也参与学习。",
+          formula: String.raw`\Omega(\mathbf w)=-\sum_i\ln\sum_j\pi_j\mathcal N(w_i\mid\mu_j,\sigma_j^2)`,
         },
         {
           title: "卷积中的共享",
@@ -72,7 +76,7 @@ export default function Ch06ParameterSharingPage() {
             bishopMapping={{
         chapter: "Ch 9",
         section: "9.4",
-        pages: "Ch 9",
+        pages: "§9.4, pp. 270–274",
         textbookSubsections: ["9.4 Parameter Sharing", "9.4.1 Soft weight sharing"],
         formulas: [
           "Conv params = Kh Kw Cin Cout + Cout",
@@ -86,6 +90,12 @@ export default function Ch06ParameterSharingPage() {
         ],
       }}
       interactiveDemo={<ParameterSharingLab />}
+      extraContent={<div className="space-y-10"><DerivationStepper title="分步推导：共享参数为何累加多处梯度" steps={[
+        { label: '多处引用', formula: String.raw`E=E(w^{(1)},\ldots,w^{(R)}),\qquad w^{(r)}\equiv\theta`, explanation: '计算图中 R 条连接都引用同一个底层参数 θ。' },
+        { label: '全导数', formula: String.raw`\frac{dE}{d\theta}=\sum_{r=1}^{R}\frac{\partial E}{\partial w^{(r)}}\frac{\partial w^{(r)}}{\partial\theta}`, explanation: 'θ 通过所有使用位置影响损失，所以各路径贡献相加。' },
+        { label: '恒等引用', formula: String.raw`\frac{\partial w^{(r)}}{\partial\theta}=1\quad\Rightarrow\quad\frac{dE}{d\theta}=\sum_r\frac{\partial E}{\partial w^{(r)}}`, explanation: '自动微分会自动完成这项累加，无需为每条连接存独立权重。' },
+        { label: '结构结果', formula: String.raw`\#\text{degrees of freedom}<\#\text{connections}`, explanation: '卷积保留大量局部连接计算，却用较少独立参数编码平移等变偏置。' },
+      ]}/><ExercisePanel exerciseSetId="chapter06-parameter-sharing" exercises={chapter06ParameterSharingExercises}/></div>}
     />
   );
 }

@@ -1,102 +1,43 @@
-import SectionMetadata from '@/components/SectionMetadata';
-import { ShieldAlert, BookOpen, CheckCircle2 , Circle} from 'lucide-react';
-import KaTeX from '@/components/KaTeX';
-import FormulaCard from '@/components/FormulaCard';
+import { Link } from 'react-router-dom';
+import { ArrowRight, BookOpen, Compass, Layers, Scale, Share2, TrendingUp, Users } from 'lucide-react';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  { exerciseSetId: 'chapter06-inductive-bias', label: '9.1 归纳偏置', path: '/ch06/inductive-bias', exerciseCount: 3 },
+  { exerciseSetId: 'chapter06-weight-decay', label: '9.2 权重衰减', path: '/ch06/weight-decay', exerciseCount: 3 },
+  { exerciseSetId: 'chapter06-learning-curves', label: '9.3 学习曲线', path: '/ch06/learning-curves', exerciseCount: 3 },
+  { exerciseSetId: 'chapter06-parameter-sharing', label: '9.4 参数共享', path: '/ch06/parameter-sharing', exerciseCount: 3 },
+  { exerciseSetId: 'chapter06-residual', label: '9.5 残差连接', path: '/ch06/residual-connections', exerciseCount: 3 },
+  { exerciseSetId: 'chapter06-model-averaging', label: '9.6 模型平均', path: '/ch06/model-averaging', exerciseCount: 3 },
+];
+
+const routes = [
+  ['9.1 归纳偏置', '/ch06/inductive-bias', Compass, '逆问题、无免费午餐、不变性、等变性与数据增强'],
+  ['9.2 权重衰减', '/ch06/weight-decay', Scale, '二次惩罚、一致正则化器与广义 q 范数'],
+  ['9.3 学习曲线', '/ch06/learning-curves', TrendingUp, '验证曲线、早停与双下降'],
+  ['9.4 参数共享', '/ch06/parameter-sharing', Share2, '硬共享、软共享、连接数与自由度'],
+  ['9.5 残差连接', '/ch06/residual-connections', Layers, '恒等路径、Jacobian 与深层优化几何'],
+  ['9.6 模型平均', '/ch06/model-averaging', Users, '委员会、bagging、相关误差与 Dropout'],
+] as const;
 
 export default function OverviewPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
-      <section className="text-center py-8 bg-white rounded-2xl shadow-sm border border-gray-200">
-        <div className="text-sm font-medium text-blue-600 mb-2 tracking-wide uppercase">
-          正则化与模型选择
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">正则化与模型选择</h1>
-        <p className="text-gray-600 max-w-2xl mx-auto px-4">
-          正则化是控制模型复杂度、防止过拟合的核心技术；模型选择帮助我们在偏差与方差之间找到最佳平衡。
-          本章还将介绍优化器带来的隐式正则化，以及贝叶斯视角下的正则化解释。
-        </p>
-
-        <p className="mt-6 text-sm text-amber-700 flex items-center justify-center gap-2"><ShieldAlert className="w-4 h-4" /> 本内容仅供教学与非商业学习使用，完整授权说明见页脚。</p>
+      <section className="rounded-2xl border bg-white px-6 py-12 text-center shadow-sm">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100"><BookOpen className="h-9 w-9 text-blue-600" /></div>
+        <h1 className="mt-4 text-4xl font-bold text-gray-900">正则化</h1>
+        <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-600">有限数据不能唯一决定预测函数。第 9 章把正则化扩展为一组归纳偏置：从目标函数惩罚、训练时刻选择，到结构共享、残差路径和多个模型的组合。</p>
+        <div className="mt-5 inline-flex rounded-full bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-800">Bishop &amp; Bishop §9.1–9.6（教材页码 253–281）</div>
       </section>
-
-      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <BookOpen className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold text-gray-900">本章内容</h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-            <h3 className="font-semibold text-blue-800 mb-2">正则化</h3>
-            <p className="text-sm text-gray-700">
-              在损失函数中加入正则项，通过 L2（权重衰减）、L1（稀疏性）等方式控制模型复杂度。
-            </p>
-          </div>
-          <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-            <h3 className="font-semibold text-emerald-800 mb-2">隐式正则化</h3>
-            <p className="text-sm text-gray-700">
-              优化器、学习率、批量大小等训练超参数本身也会影响模型找到的解，带来隐式偏好。
-            </p>
-          </div>
-          <div className="bg-violet-50 rounded-lg p-4 border border-violet-200">
-            <h3 className="font-semibold text-violet-800 mb-2">交叉验证</h3>
-            <p className="text-sm text-gray-700">
-              用留出法、k 折交叉验证和留一法估计泛化误差，选择最佳模型复杂度。
-            </p>
-          </div>
-          <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-            <h3 className="font-semibold text-amber-800 mb-2">贝叶斯视角</h3>
-            <p className="text-sm text-gray-700">
-              从先验分布到 MAP 估计，理解 L2 正则化等价于高斯先验。
-            </p>
-          </div>
+      <ChapterProgressCard title="第六章掌握进度" sections={progressSections} />
+      <section className="rounded-xl border bg-white p-6 shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900">学习路线</h2>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {routes.map(([label,path,Icon,description]) => <Link key={path} to={path} className="group rounded-xl border-2 border-blue-200 bg-blue-50 p-5 hover:border-blue-400 hover:shadow-md"><Icon className="h-7 w-7 text-blue-700" /><h3 className="mt-3 font-bold text-gray-900">{label}</h3><p className="mt-2 text-sm text-gray-700">{description}</p><span className="mt-3 flex items-center gap-1 text-sm font-semibold text-blue-800">进入学习 <ArrowRight className="h-4 w-4" /></span></Link>)}
         </div>
       </section>
-
-      <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">核心思想</h2>
-        <FormulaCard
-          title="正则化损失函数"
-          formula={
-            <KaTeX
-              math={String.raw`J_{\text{reg}}(\theta) = J(\theta) + \lambda R(\theta)`}
-              display
-            />
-          }
-          description="通过正则项 R(θ) 惩罚复杂模型，λ 控制拟合数据与控制复杂度之间的权衡。"
-        />
-      </section>
-
-      <section className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-5">
-        <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5" />
-          小结
-        </h3>
-        <ul className="space-y-2 text-sm text-blue-800">
-          <li className="flex items-start gap-2">
-            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>正则化通过惩罚模型复杂度来缓解过拟合。</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>训练过程中的优化器选择也会带来隐式正则化效应。</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>交叉验证提供了一种数据驱动的模型选择方法。</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <Circle className="w-2 h-2 fill-current text-blue-500 mt-0.5 mt-1" />
-            <span>从贝叶斯角度看，正则化等价于对参数引入先验分布。</span>
-          </li>
-        </ul>
-      </section>
-    
-      <SectionMetadata
-        bishopChapter={"Ch 9"}
-        bishopSection={"9.1"}
-        learningObjectives={["理解 Overview 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
-</div>
+      <section className="rounded-xl border border-amber-200 bg-amber-50 p-6"><h2 className="text-xl font-bold text-amber-900">统一视角：偏好哪一种解</h2><p className="mt-2 text-sm leading-relaxed text-amber-950">权重衰减偏好小参数，早停偏好短优化轨迹，参数共享偏好满足结构约束的函数，残差连接偏好靠近恒等变换的深层组合，模型平均则用多个解的预测降低方差。它们可以组合，但每种偏置都必须与任务匹配。</p></section>
+      <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6"><h2 className="text-xl font-bold text-emerald-900">完成标准</h2><p className="mt-2 text-sm leading-relaxed text-emerald-900">完成六节共 18 道原创练习，并能用实验解释安全的数据增强、权重收缩、早停 checkpoint、共享参数的梯度累加、残差 Jacobian，以及模型相关性对集成收益的限制。</p></section>
+    </div>
   );
 }

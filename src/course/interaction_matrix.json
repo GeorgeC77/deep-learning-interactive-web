@@ -1000,11 +1000,11 @@
   {
     "routePath": "/ch06/overview",
     "title": "课程概览",
-    "componentName": "Chapter09OverviewPage",
-    "componentFile": "src\\pages\\chapters\\chapter09\\OverviewPage.tsx",
+    "componentName": "Ch06OverviewPage",
+    "componentFile": "src\\pages\\generated\\Ch06OverviewPage.tsx",
     "demos": [],
-    "status": "content-reviewed",
-    "staticExplanation": true,
+    "status": "teaching-ready",
+    "staticExplanation": false,
     "scalarDemo": false,
     "customLab": false,
     "linkedViews": false,
@@ -1017,7 +1017,7 @@
     "counterexample": false,
     "transferChallenge": false,
     "mathTests": false,
-    "semanticTests": false,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": false
   },
@@ -1026,12 +1026,14 @@
     "title": "9.1 归纳偏置",
     "componentName": "Ch06InductiveBiasPage",
     "componentFile": "src\\pages\\generated\\Ch06InductiveBiasPage.tsx",
-    "demos": [],
-    "status": "content-reviewed",
+    "demos": [
+      "src\\components\\demos\\InductiveBiasLab.tsx"
+    ],
+    "status": "teaching-ready",
     "staticExplanation": true,
-    "scalarDemo": true,
-    "customLab": false,
-    "linkedViews": false,
+    "scalarDemo": false,
+    "customLab": true,
+    "linkedViews": true,
     "predictionGate": false,
     "prediction": false,
     "lock": false,
@@ -1040,18 +1042,20 @@
     "feedback": false,
     "counterexample": true,
     "transferChallenge": false,
-    "mathTests": false,
-    "semanticTests": false,
+    "mathTests": true,
+    "semanticTests": true,
     "completePredictionGate": false,
-    "l3plus": false
+    "l3plus": true
   },
   {
     "routePath": "/ch06/weight-decay",
     "title": "9.2 权重衰减",
     "componentName": "Ch06WeightDecayPage",
     "componentFile": "src\\pages\\generated\\Ch06WeightDecayPage.tsx",
-    "demos": [],
-    "status": "content-reviewed",
+    "demos": [
+      "src\\components\\demos\\WeightDecayLab.tsx"
+    ],
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
     "customLab": true,
@@ -1065,7 +1069,7 @@
     "counterexample": true,
     "transferChallenge": false,
     "mathTests": false,
-    "semanticTests": false,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": true
   },
@@ -1074,24 +1078,26 @@
     "title": "9.3 学习曲线",
     "componentName": "Ch06LearningCurvesPage",
     "componentFile": "src\\pages\\generated\\Ch06LearningCurvesPage.tsx",
-    "demos": [],
-    "status": "content-reviewed",
+    "demos": [
+      "src\\components\\demos\\LearningCurvesLab.tsx"
+    ],
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
-    "customLab": false,
+    "customLab": true,
     "linkedViews": true,
-    "predictionGate": false,
-    "prediction": false,
-    "lock": false,
-    "reveal": false,
-    "evaluation": false,
-    "feedback": false,
+    "predictionGate": true,
+    "prediction": true,
+    "lock": true,
+    "reveal": true,
+    "evaluation": true,
+    "feedback": true,
     "counterexample": true,
     "transferChallenge": false,
-    "mathTests": false,
-    "semanticTests": false,
-    "completePredictionGate": false,
-    "l3plus": false
+    "mathTests": true,
+    "semanticTests": true,
+    "completePredictionGate": true,
+    "l3plus": true
   },
   {
     "routePath": "/ch06/parameter-sharing",
@@ -1101,7 +1107,7 @@
     "demos": [
       "src\\components\\demos\\ParameterSharingLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
     "customLab": true,
@@ -1128,7 +1134,7 @@
       "src\\components\\demos\\ResidualJacobianLab.tsx",
       "src\\components\\demos\\ResidualIdentityPathLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
     "customLab": true,
@@ -1154,7 +1160,7 @@
     "demos": [
       "src\\components\\demos\\ModelAveragingLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
     "customLab": true,

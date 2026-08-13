@@ -1,222 +1,129 @@
 import { useMemo, useState } from 'react';
-import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
+import { Slider } from '@/components/ui/slider';
+import {
+  activeCellCount,
+  circularTranslateGrid,
+  gridsEqual,
+  rotateGrid90,
+  type BinaryGrid,
+} from '@/lib/math/symmetry';
 
-const CANVAS_SIZE = 200;
 const GRID_SIZE = 8;
-const CELL_SIZE = CANVAS_SIZE / GRID_SIZE;
+const CELL_SIZE = 24;
 
-// 生成一个简单的“猫”图案（用 1 表示有像素，0 表示无）
-function generateCat(): number[][] {
-  const grid: number[][] = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
-  // 耳朵
-  grid[1][2] = 1; grid[1][5] = 1;
-  // 眼睛
-  grid[3][2] = 1; grid[3][5] = 1;
-  // 鼻子
-  grid[4][3] = 1; grid[4][4] = 1;
-  // 嘴巴
-  grid[5][2] = 1; grid[5][3] = 1; grid[5][4] = 1; grid[5][5] = 1;
+function generateCat(): BinaryGrid {
+  const grid = Array.from({ length: GRID_SIZE }, () => Array<number>(GRID_SIZE).fill(0));
+  grid[1][2] = 1;
+  grid[1][5] = 1;
+  grid[3][2] = 1;
+  grid[3][5] = 1;
+  grid[4][3] = 1;
+  grid[4][4] = 1;
+  grid[5][2] = 1;
+  grid[5][3] = 1;
+  grid[5][4] = 1;
+  grid[5][5] = 1;
   return grid;
 }
 
-// 平移图案
-function translateGrid(grid: number[][], dx: number, dy: number): number[][] {
-  const result: number[][] = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
-  for (let y = 0; y < GRID_SIZE; y++) {
-    for (let x = 0; x < GRID_SIZE; x++) {
-      const nx = x + dx;
-      const ny = y + dy;
-      if (nx >= 0 && nx < GRID_SIZE && ny >= 0 && ny < GRID_SIZE) {
-        result[ny][nx] = grid[y][x];
-      }
-    }
-  }
-  return result;
-}
-
-// 旋转图案 90 度
-function rotateGrid(grid: number[][]): number[][] {
-  const result: number[][] = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(0));
-  for (let y = 0; y < GRID_SIZE; y++) {
-    for (let x = 0; x < GRID_SIZE; x++) {
-      result[x][GRID_SIZE - 1 - y] = grid[y][x];
-    }
-  }
-  return result;
-}
-
-// 计算两个网格的相似度（IoU）
-function gridSimilarity(a: number[][], b: number[][]): number {
-  let intersection = 0;
-  let union = 0;
-  for (let y = 0; y < GRID_SIZE; y++) {
-    for (let x = 0; x < GRID_SIZE; x++) {
-      if (a[y][x] === 1 && b[y][x] === 1) intersection++;
-      if (a[y][x] === 1 || b[y][x] === 1) union++;
-    }
-  }
-  return union === 0 ? 0 : intersection / union;
-}
-
-// 模拟不同归纳偏置的模型预测
-function predictWithBias(
-  input: number[][],
-  biasType: 'none' | 'translation' | 'rotation' | 'local',
-  _target: number[][]
-): number {
-  // 模拟：有正确归纳偏置的模型对变换后的输入仍能保持高准确率
-  const similarity = gridSimilarity(input, _target);
-  switch (biasType) {
-    case 'none':
-      // 无偏置：对变换敏感，准确率随相似度线性下降
-      return similarity * 0.6;
-    case 'translation':
-      // 平移等变：对平移不变，准确率保持较高
-      return 0.9 - (1 - similarity) * 0.2;
-    case 'rotation':
-      // 旋转不变：对旋转不变，准确率保持较高
-      return 0.85 - (1 - similarity) * 0.3;
-    case 'local':
-      // 局部连接：对局部模式敏感，中等准确率
-      return 0.75 - (1 - similarity) * 0.4;
-    default:
-      return 0.5;
-  }
+function GridView({ grid, color, label }: { grid: BinaryGrid; color: string; label: string }) {
+  return (
+    <figure>
+      <figcaption className="mb-2 text-sm font-medium text-gray-700">{label}</figcaption>
+      <svg
+        aria-label={label}
+        className="border border-gray-300"
+        height={GRID_SIZE * CELL_SIZE}
+        viewBox={`0 0 ${GRID_SIZE * CELL_SIZE} ${GRID_SIZE * CELL_SIZE}`}
+        width={GRID_SIZE * CELL_SIZE}
+      >
+        {grid.flatMap((row, y) => row.map((cell, x) => (
+          <rect
+            key={`${x}-${y}`}
+            fill={cell === 1 ? color : '#f3f4f6'}
+            height={CELL_SIZE}
+            stroke="#e5e7eb"
+            strokeWidth={0.5}
+            width={CELL_SIZE}
+            x={x * CELL_SIZE}
+            y={y * CELL_SIZE}
+          />
+        )))}
+      </svg>
+    </figure>
+  );
 }
 
 export default function InductiveBiasLab() {
-  const [biasType, setBiasType] = useState<'none' | 'translation' | 'rotation' | 'local'>('translation');
   const [translateX, setTranslateX] = useState(0);
   const [rotate, setRotate] = useState(false);
-
   const originalGrid = useMemo(() => generateCat(), []);
-  const transformedGrid = useMemo(() => {
-    let grid = originalGrid;
-    if (rotate) grid = rotateGrid(grid);
-    if (translateX !== 0) grid = translateGrid(grid, translateX, 0);
-    return grid;
-  }, [originalGrid, translateX, rotate]);
 
-  const accuracy = useMemo(() => {
-    return predictWithBias(transformedGrid, biasType, originalGrid);
-  }, [transformedGrid, biasType, originalGrid]);
+  const transform = (grid: BinaryGrid) => {
+    const rotated = rotate ? rotateGrid90(grid) : grid;
+    return circularTranslateGrid(rotated, translateX, 0);
+  };
 
-  const similarity = useMemo(() => {
-    return gridSimilarity(transformedGrid, originalGrid);
-  }, [transformedGrid, originalGrid]);
+  const transformedGrid = transform(originalGrid);
+  const transformedSegmentationMask = transform(originalGrid);
+  const invariantHolds = activeCellCount(originalGrid) === activeCellCount(transformedGrid);
+  const equivariantHolds = gridsEqual(transformedSegmentationMask, transformedGrid);
 
   return (
-    <InteractiveDemo title="归纳偏置对模型性能的影响">
+    <InteractiveDemo title="不变性与等变性：输出究竟该不该移动？">
       <div className="space-y-6">
         <p className="text-gray-700">
-          选择一个归纳偏置类型，然后对输入图像进行平移或旋转，观察模型准确率的变化。
-          有合适归纳偏置的模型对相应变换更鲁棒。
+          对输入施加同一个群作用 g：分类标签应保持不变，像素级分割掩码则应随输入一起变换。
+          这里使用循环平移，避免有限网格边界裁剪破坏理论关系。
         </p>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <div className="text-sm font-medium text-gray-700 mb-2">原始图像</div>
-            <svg width={CANVAS_SIZE} height={CANVAS_SIZE} className="border border-gray-300">
-              {originalGrid.map((row, y) =>
-                row.map((cell, x) => (
-                  <rect
-                    key={`${x}-${y}`}
-                    x={x * CELL_SIZE}
-                    y={y * CELL_SIZE}
-                    width={CELL_SIZE}
-                    height={CELL_SIZE}
-                    fill={cell === 1 ? '#3b82f6' : '#f3f4f6'}
-                    stroke="#e5e7eb"
-                    strokeWidth={0.5}
-                  />
-                ))
-              )}
-            </svg>
-          </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          <GridView color="#2563eb" grid={originalGrid} label="原始输入 x" />
+          <GridView color="#dc2626" grid={transformedGrid} label="变换后输入 g(x)" />
+          <GridView color="#059669" grid={transformedSegmentationMask} label="变换后分割 g(f(x))" />
+        </div>
 
+        <div aria-label="不变性与等变性实验控制区" className="grid gap-5 rounded-xl border border-gray-200 bg-gray-50 p-4 md:grid-cols-2">
           <div>
-            <div className="text-sm font-medium text-gray-700 mb-2">变换后图像</div>
-            <svg width={CANVAS_SIZE} height={CANVAS_SIZE} className="border border-gray-300">
-              {transformedGrid.map((row, y) =>
-                row.map((cell, x) => (
-                  <rect
-                    key={`${x}-${y}`}
-                    x={x * CELL_SIZE}
-                    y={y * CELL_SIZE}
-                    width={CELL_SIZE}
-                    height={CELL_SIZE}
-                    fill={cell === 1 ? '#ef4444' : '#f3f4f6'}
-                    stroke="#e5e7eb"
-                    strokeWidth={0.5}
-                  />
-                ))
-              )}
-            </svg>
+            <label className="text-sm font-medium text-gray-700" htmlFor="translation-slider">
+              循环水平平移：{translateX > 0 ? `右移 ${translateX}` : translateX < 0 ? `左移 ${-translateX}` : '不平移'}
+            </label>
+            <Slider
+              id="translation-slider"
+              max={3}
+              min={-3}
+              onValueChange={(value) => setTranslateX(value[0])}
+              step={1}
+              value={[translateX]}
+            />
+          </div>
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+            <input checked={rotate} onChange={(event) => setRotate(event.target.checked)} type="checkbox" />
+            再旋转 90°
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className={`rounded-xl border p-4 ${invariantHolds ? 'border-blue-200 bg-blue-50' : 'border-red-200 bg-red-50'}`}>
+            <div className="font-semibold text-gray-900">分类不变性：f(g(x)) = f(x)</div>
+            <p className="mt-1 text-sm text-gray-700">
+              原图和变换图都输出“猫”；作为可检验的不变量，激活格数均为 {activeCellCount(originalGrid)}。
+            </p>
+            <div className="mt-2 font-mono text-sm">关系{invariantHolds ? '成立 ✓' : '不成立 ✗'}</div>
+          </div>
+          <div className={`rounded-xl border p-4 ${equivariantHolds ? 'border-emerald-200 bg-emerald-50' : 'border-red-200 bg-red-50'}`}>
+            <div className="font-semibold text-gray-900">分割等变性：f(g(x)) = g(f(x))</div>
+            <p className="mt-1 text-sm text-gray-700">
+              掩码与目标一起移动；逐格比较两条计算路径，而不是虚构一个“准确率”。
+            </p>
+            <div className="mt-2 font-mono text-sm">关系{equivariantHolds ? '成立 ✓' : '不成立 ✗'}</div>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700">归纳偏置类型</label>
-              <div className="flex gap-2 mt-2">
-                {(['none', 'translation', 'rotation', 'local'] as const).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setBiasType(type)}
-                    className={`px-3 py-1.5 text-sm rounded-lg border ${
-                      biasType === type
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {type === 'none' && '无偏置'}
-                    {type === 'translation' && '平移等变'}
-                    {type === 'rotation' && '旋转不变'}
-                    {type === 'local' && '局部连接'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700">水平平移</label>
-              <Slider value={[translateX]} min={-3} max={3} step={1} onValueChange={(v) => setTranslateX(v[0])} />
-              <div className="text-sm text-gray-500 mt-1">{translateX > 0 ? `右移 ${translateX}` : translateX < 0 ? `左移 ${-translateX}` : '不平移'}</div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="rotate"
-                checked={rotate}
-                onChange={(e) => setRotate(e.target.checked)}
-                className="rounded border-gray-300"
-              />
-              <label htmlFor="rotate" className="text-sm font-medium text-gray-700">
-                旋转 90°
-              </label>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <div className="text-sm text-gray-600">输入与原始相似度</div>
-              <div className="text-2xl font-bold text-blue-700">{(similarity * 100).toFixed(1)}%</div>
-            </div>
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <div className="text-sm text-gray-600">模型准确率</div>
-              <div className="text-2xl font-bold text-blue-700">{(accuracy * 100).toFixed(1)}%</div>
-            </div>
-            <div className="text-sm text-gray-600">
-              {biasType === 'translation' && translateX !== 0 && '平移等变模型对平移变换保持高准确率。'}
-              {biasType === 'rotation' && rotate && '旋转不变模型对旋转变换保持高准确率。'}
-              {biasType === 'none' && (translateX !== 0 || rotate) && '无偏置模型对变换敏感，准确率下降明显。'}
-              {biasType === 'local' && '局部连接模型对局部模式敏感，但对全局变换的鲁棒性有限。'}
-            </div>
-          </div>
-        </div>
+        <p className="text-sm text-gray-600">
+          反例提醒：真实卷积若使用零填充，靠近边界时可能只近似平移等变；旋转也不是普通卷积自动具备的对称性。
+        </p>
       </div>
     </InteractiveDemo>
   );

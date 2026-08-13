@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
-import Chapter09RegularizationPage from '@/pages/chapters/chapter09/RegularizationPage';
+import WeightDecayLab from '@/components/demos/WeightDecayLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter06WeightDecayExercises } from '@/course/chapter06Exercises';
 import { Scale } from 'lucide-react';
 
 export default function Ch06WeightDecayPage() {
@@ -16,11 +19,12 @@ export default function Ch06WeightDecayPage() {
         },
         {
           title: "一致正则化器",
-          description: "在重新参数化下保持不变的惩罚项，避免惩罚项与网络缩放方式耦合。",
+          description: "简单统一 λ 的惩罚会破坏某些输入/输出平移缩放下的映射性质。教材将不同层权重与 bias 分组并配置超参数，以明确重新参数化带来的影响。",
         },
         {
           title: "广义权重衰减",
-          description: "将权重衰减推广到不同层、不同参数类型或使用其他范数形式，如 L1 稀疏化。",
+          description: "q 范数族 Ω(w)=λΣ|wj|^q/2 包含 q=2 二次正则与 q=1 Lasso。L1 约束的尖角更容易与误差等高线在坐标轴相切，从而产生稀疏系数。",
+          formula: String.raw`\Omega(\mathbf w)=\frac{\lambda}{2}\sum_j|w_j|^q`,
         },
       ]}
       learningObjectives={[
@@ -51,7 +55,7 @@ export default function Ch06WeightDecayPage() {
             bishopMapping={{
         chapter: "Ch 9",
         section: "9.2",
-        pages: "Ch 9",
+        pages: "§9.2, pp. 260–266",
         textbookSubsections: [
           "9.2 Weight Decay",
           "9.2.1 Consistent regularizers",
@@ -65,7 +69,13 @@ export default function Ch06WeightDecayPage() {
         algorithms: ["权重衰减", "AdamW"],
         exercises: ["推导 L2 正则化最小二乘的闭式解。", "比较 SGD 下 L2 正则化与权重衰减的更新公式。"],
       }}
-      extraContent={<Chapter09RegularizationPage />}
+      interactiveDemo={<WeightDecayLab />}
+      extraContent={<div className="space-y-10"><DerivationStepper title="分步推导：L2 penalty 如何产生权重衰减" steps={[
+        { label: '正则目标', formula: String.raw`\widetilde E(\mathbf w)=E(\mathbf w)+\frac\lambda2\mathbf w^T\mathbf w`, explanation: '二次项对大参数施加更大代价。' },
+        { label: '计算梯度', formula: String.raw`\nabla\widetilde E=\nabla E+\lambda\mathbf w`, explanation: '因子 1/2 与平方求导的 2 抵消。' },
+        { label: 'SGD 更新', formula: String.raw`\mathbf w\leftarrow(1-\eta\lambda)\mathbf w-\eta\nabla E`, explanation: '在普通 SGD 中，这与对参数作乘法衰减形式一致。' },
+        { label: '适用边界', formula: String.raw`\text{adaptive preconditioner: }P_t(\nabla E+\lambda w)\ne P_t\nabla E+\lambda w`, explanation: '在自适应优化器中，L2 梯度会被预条件，解耦 weight decay 一般不再等价。' },
+      ]} /><ExercisePanel exerciseSetId="chapter06-weight-decay" exercises={chapter06WeightDecayExercises} /></div>}
     />
   );
 }
