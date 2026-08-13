@@ -12,6 +12,9 @@ import { Switch } from '@/components/ui/switch';
 import { multiHeadAttention } from '@/lib/math/attention';
 import { getSectionByPath, getAllSections } from '@/course/manifest';
 import { Link } from 'react-router-dom';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter09AttentionExercises } from '@/course/chapter09Exercises';
 
 const SECTION_PATH = '/ch09/attention';
 
@@ -140,7 +143,7 @@ export default function Ch09AttentionPage() {
         </p>
         <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-800 rounded-full text-sm">
           <MapPin className="w-4 h-4" />
-          教材映射：Bishop Ch 12 §12.1
+          教材映射：Bishop §12.1, pp. 358–374
         </div>
         <p className="mt-6 text-sm text-amber-800">
           <ShieldAlert className="w-4 h-4 inline-block mr-1" />
@@ -475,6 +478,15 @@ export default function Ch09AttentionPage() {
       {/* Attention Matrix vs Output, and sqrt(d) scaling experiments */}
       <AttentionMatrixVsOutputLab />
       <AttentionScalingLab />
+
+      <DerivationStepper title="分步推导：为什么缩放点积使用 √dk" steps={[
+        { label: '分量假设', formula: String.raw`q_r,k_r\ \text{i.i.d.},\quad \mathbb E[q_r]=\mathbb E[k_r]=0,\quad \operatorname{Var}(q_r)=\operatorname{Var}(k_r)=1`, explanation: '用单位方差的独立分量近似初始化阶段的查询和键。' },
+        { label: '点积方差', formula: String.raw`s=q^Tk=\sum_{r=1}^{d_k}q_rk_r,\quad \operatorname{Var}(s)=d_k`, explanation: 'dk 个近似独立乘积相加，使原始得分的标准差增长到 √dk。' },
+        { label: '缩放恢复', formula: String.raw`\operatorname{Var}\!\left(\frac{q^Tk}{\sqrt{d_k}}\right)=\frac{d_k}{d_k}=1`, explanation: '除以 √dk 把不同头维度下的得分保持在相近尺度。' },
+        { label: '训练含义', formula: String.raw`\alpha=\operatorname{softmax}\!\left(QK^T/\sqrt{d_k}\right)`, explanation: '若得分幅度随维度膨胀，softmax 会过早接近 one-hot、梯度变小；缩放提高训练稳定性，但不会降低 N² 复杂度。' },
+      ]} />
+
+      <ExercisePanel exerciseSetId="chapter09-attention" exercises={chapter09AttentionExercises} />
 
       {/* Why? cards */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

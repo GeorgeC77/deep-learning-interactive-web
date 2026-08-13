@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import EmbeddingGeometryLab from '@/components/demos/EmbeddingGeometryLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter09NaturalLanguageExercises } from '@/course/chapter09Exercises';
 import { Languages } from 'lucide-react';
 
 export default function Ch09NaturalLanguagePage() {
@@ -7,7 +10,7 @@ export default function Ch09NaturalLanguagePage() {
     <BishopSectionPage
       sectionPath="/ch09/natural-language"
       heroIcon={<Languages className="w-9 h-9 text-blue-600" />}
-      summary={"Bishop Ch 12.2 介绍文本表示基础：词嵌入、分词、词袋、自回归模型、循环神经网络以及随时间反向传播。"}
+      summary="Bishop §12.2 从离散词的 one-hot 与连续 embedding 开始，经分词和词袋基线引出词序问题；自回归分解保留顺序，RNN 用共享的隐状态递归处理历史，BPTT 则揭示长序列梯度消失、爆炸与串行计算瓶颈。"
       concepts={[
         {
           title: "词嵌入 Word Embedding",
@@ -64,8 +67,9 @@ export default function Ch09NaturalLanguagePage() {
             bishopMapping={{
         chapter: "Ch 12",
         section: "12.2",
-        pages: "Ch 12",
+        pages: "§12.2, pp. 374–382",
         textbookSubsections: [
+          "12.2 Natural Language",
           "12.2.1 Word embedding",
           "12.2.2 Tokenization",
           "12.2.3 Bag of words",
@@ -78,6 +82,17 @@ export default function Ch09NaturalLanguagePage() {
         exercises: ["用给定词表写出句子的 one-hot 与 embedding 表示。", "推导 RNN 对短序列的 BPTT 梯度。"],
       }}
       interactiveDemo={<EmbeddingGeometryLab />}
+      extraContent={(
+        <div className="space-y-10">
+          <DerivationStepper title="分步推导：BPTT 为什么产生长程梯度问题" steps={[
+            { label: '循环更新', formula: String.raw`h_t=f(a_t),\quad a_t=W_{hh}h_{t-1}+W_{xh}x_t+b`, explanation: '同一组循环参数在所有时间步共享，历史通过隐状态依次传递。' },
+            { label: '单步 Jacobian', formula: String.raw`\frac{\partial h_t}{\partial h_{t-1}}=\operatorname{diag}(f'(a_t))W_{hh}`, explanation: '每跨一个时间步，反向信号都要乘一次激活导数和循环权重。' },
+            { label: '跨时连乘', formula: String.raw`\frac{\partial h_T}{\partial h_k}=\prod_{t=k+1}^{T}\frac{\partial h_t}{\partial h_{t-1}}`, explanation: '从末端损失传回早期状态需要 T−k 个 Jacobian 的乘积。' },
+            { label: '消失或爆炸', formula: String.raw`\left\|\frac{\partial h_T}{\partial h_k}\right\|\lesssim\prod_{t=k+1}^{T}\left\|\operatorname{diag}(f'(a_t))W_{hh}\right\|`, explanation: '典型范数若持续小于 1 会指数衰减，持续大于 1 则可能爆炸；这也是 Transformer 用更短信号路径替代递归的重要动机。' },
+          ]} />
+          <ExercisePanel exerciseSetId="chapter09-natural-language" exercises={chapter09NaturalLanguageExercises} />
+        </div>
+      )}
     />
   );
 }

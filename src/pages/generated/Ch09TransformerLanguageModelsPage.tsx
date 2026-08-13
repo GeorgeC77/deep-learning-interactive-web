@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import AutoregressiveSamplingDemo from '@/components/demos/AutoregressiveSamplingDemo';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter09LanguageModelExercises } from '@/course/chapter09Exercises';
 import { Bot } from 'lucide-react';
 
 export default function Ch09TransformerLanguageModelsPage() {
@@ -15,7 +18,7 @@ export default function Ch09TransformerLanguageModelsPage() {
         },
         {
           title: "采样策略",
-          description: "贪心、top-k 与 nucleus（top-p）采样在确定性与多样性之间权衡。",
+          description: "greedy 逐步选最大概率但不保证整条序列最优；beam search 保留 B 个前缀，top-k 与 nucleus（top-p）采样则在质量与多样性之间权衡。",
         },
         {
           title: "编码器 Transformer",
@@ -58,8 +61,9 @@ export default function Ch09TransformerLanguageModelsPage() {
             bishopMapping={{
         chapter: "Ch 12",
         section: "12.3",
-        pages: "Ch 12",
+        pages: "§12.3, pp. 382–394",
         textbookSubsections: [
+          "12.3 Transformer Language Models",
           "12.3.1 Decoder transformers",
           "12.3.2 Sampling strategies",
           "12.3.3 Encoder transformers",
@@ -68,9 +72,20 @@ export default function Ch09TransformerLanguageModelsPage() {
         ],
         formulas: ["softmax 采样分布", "因果注意力掩码"],
         algorithms: ["Greedy decoding", "Top-k sampling", "Nucleus (top-p) sampling"],
-        exercises: ["比较同一 prompt 下 greedy 与 nucleus 采样结果。", "说明 BERT 与 GPT 分别对应哪种 Transformer 结构。"],
+        exercises: ["比较同一 prompt 下 greedy 与 nucleus 采样结果。", "说明 greedy 为什么不保证全局最优序列。", "区分 self-attention 与 cross-attention 的 Q/K/V 来源。"],
       }}
-      extraContent={<AutoregressiveSamplingDemo />}
+      extraContent={(
+        <div className="space-y-10">
+          <AutoregressiveSamplingDemo />
+          <DerivationStepper title="分步推导：为什么 greedy 局部最优不等于序列全局最优" steps={[
+            { label: '序列概率', formula: String.raw`p(y_{1:N})=\prod_{n=1}^{N}p(y_n\mid y_{<n})`, explanation: '完整输出的得分取决于整条路径上全部条件概率的乘积。' },
+            { label: 'Greedy 规则', formula: String.raw`\hat y_n=\arg\max_y p(y\mid \hat y_{<n})`, explanation: '每一步只比较当前前缀下的下一个 token，不会回看另一条前缀的后续潜力。' },
+            { label: '两步反例', formula: String.raw`0.6\times0.1=0.06\;<\;0.4\times0.9=0.36`, explanation: '第一步选 0.6 的分支看似更好，但若它的最佳后续只有 0.1，完整序列反而输给第一步概率 0.4 的分支。' },
+            { label: 'Beam 近似', formula: String.raw`\mathcal B_n=\operatorname{TopB}\{\log p(y_{1:n-1})+\log p(y_n\mid y_{<n})\}`, explanation: 'beam search 同时保留 B 个高分前缀，降低过早剪掉好路径的风险，但仍不是穷举全局最优。' },
+          ]} />
+          <ExercisePanel exerciseSetId="chapter09-language-models" exercises={chapter09LanguageModelExercises} />
+        </div>
+      )}
     />
   );
 }

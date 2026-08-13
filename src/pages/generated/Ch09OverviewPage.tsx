@@ -1,87 +1,46 @@
-import BishopSectionPage from '@/components/BishopSectionPage';
-import { Focus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, BookOpen, Bot, Focus, ImagePlus, Languages } from 'lucide-react';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  { exerciseSetId: 'chapter09-attention', label: '12.1 注意力机制', path: '/ch09/attention', exerciseCount: 3 },
+  { exerciseSetId: 'chapter09-natural-language', label: '12.2 自然语言', path: '/ch09/natural-language', exerciseCount: 3 },
+  { exerciseSetId: 'chapter09-language-models', label: '12.3 语言模型', path: '/ch09/transformer-language-models', exerciseCount: 3 },
+  { exerciseSetId: 'chapter09-multimodal', label: '12.4 多模态', path: '/ch09/multimodal-transformers', exerciseCount: 3 },
+];
+
+const routes = [
+  ['12.1 注意力机制', '/ch09/attention', Focus, 'Q/K/V、缩放点积、多头、Transformer 层、复杂度与位置编码'],
+  ['12.2 自然语言', '/ch09/natural-language', Languages, '词嵌入、分词、词袋、自回归模型、RNN 与 BPTT'],
+  ['12.3 Transformer 语言模型', '/ch09/transformer-language-models', Bot, 'decoder、采样与 beam search、encoder、seq2seq 和 LLM'],
+  ['12.4 多模态 Transformer', '/ch09/multimodal-transformers', ImagePlus, '图像 patch、离散图像码、音频、语音合成与视觉-语言 token'],
+] as const;
 
 export default function Ch09OverviewPage() {
   return (
-    <BishopSectionPage
-      sectionPath="/ch09/overview"
-      heroIcon={<Focus className="w-9 h-9 text-blue-600" />}
-      summary={"Transformer 架构用自注意力取代循环结构，使序列中任意位置都能直接交互，并成为现代大语言模型的基础。"}
-      concepts={[
-        {
-          title: "自注意力",
-          description: "查询、键、值来自同一序列，每个位置都能关注其他位置并分配注意力权重。没有位置编码时，自注意力对 token 顺序是置换等变的。",
-        },
-        {
-          title: "多头注意力",
-          description: "多组独立注意力并行，各自关注不同子空间的关系模式，最后拼接并线性投影。",
-        },
-        {
-          title: "位置编码",
-          description: "为 token 注入位置信息；没有位置编码时，Transformer 无法区分 “猫追狗” 与 “狗追猫”。",
-        },
-        {
-          title: "Encoder/Decoder",
-          description: "编码器使用双向自注意力，解码器使用掩码自注意力与交叉注意力。",
-        },
-      ]}
-      learningObjectives={[
-        "理解自注意力如何使序列中任意位置直接交互。",
-        "掌握多头注意力扩展单头注意力的方式。",
-        "认识位置编码的必要性。",
-        "了解 Transformer 编码器与解码器的结构差异。",
-      ]}
-      coreIntuition={"Transformer 架构用自注意力取代循环结构，使序列中任意位置都能直接交互，并成为现代大语言模型的基础。"}
-      commonMistakes={[
-        "把“置换等变”说成“置换不变”。等变意味着输出会随输入顺序一起置换；不变才意味着输出完全不变。",
-        "忽略位置编码的必要性。没有位置编码时，Transformer 无法区分 “猫追狗” 与 “狗追猫”。",
-        "认为注意力权重是模型直接“理解”语义的结果。权重由可学习投影决定，其可解释性需额外验证。",
-        "低估长序列开销。当 N 从 1k 增加到 4k 时，注意力计算量增长约 16 倍。",
-      ]}
-      whyCards={[
-        {
-          question: "为什么需要位置编码？",
-          answer: "自注意力本身对 token 顺序是置换等变的，打乱输入顺序输出也会同样打乱。位置编码把顺序信息注入表示，让模型知道谁在谁前面。",
-        },
-        {
-          question: "为什么用多头而不是单头？",
-          answer: "单头注意力只能在一个子空间里做相似度计算；多头让模型同时从多个角度观察关系，比如语法、语义、指代等。",
-        },
-      ]}
-      counterexamples={[
-        "固定 Q、K 时，Attention Heatmap 不变；但只要改 V，Output 就会全部改变——说明 Attention Matrix ≠ 输出。",
-        "没有位置编码时，输入 “猫 追 狗” 和 “狗 追 猫” 会得到完全相同的注意力权重，只是输出 token 顺序不同。",
-      ]}
-      bishopMapping={{
-        chapter: "Ch 12",
-        pages: "Ch 12",
-        textbookSubsections: [
-          "12.1 Attention",
-          "12.2 Natural Language",
-          "12.3 Transformer Language Models",
-          "12.4 Multimodal Transformers",
-        ],
-        algorithms: ["位置编码"],
-        exercises: [
-          "展开自注意力公式并说明每个符号的数学含义。",
-          "用一个简单数值实例检验多头注意力的输出维度。",
-          "对照循环网络，分析 Transformer 在长序列上的优势与代价。",
-        ],
-      }}
-      demo={{
-        title: "自注意力计算量随序列长度增长",
-        label: "序列长度 N",
-        param: 8,
-        min: 2,
-        max: 64,
-        step: 1,
-        compute: (N) => ({
-          label: 'O(N²D) 相对计算量',
-          value: N * N,
-          display: String.raw`N^2=${(N * N).toFixed(0)}`,
-        }),
-        formula: String.raw`\text{FLOPs} \propto N^2 D`,
-      }}
-    />
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
+      <section className="rounded-2xl border bg-white px-6 py-12 text-center shadow-sm">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100"><BookOpen className="h-9 w-9 text-blue-600" /></div>
+        <h1 className="mt-4 text-4xl font-bold text-gray-900">Transformer</h1>
+        <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-gray-600">第 12 章从注意力的加权检索出发，先建立语言表示与自回归建模，再组合 encoder、decoder 与 cross-attention，最后说明只要能把输入输出变成合适的 token，同一核心架构就能跨越文本、图像和音频。</p>
+        <div className="mt-5 inline-flex rounded-full bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-800">Bishop &amp; Bishop §12.1–12.4（教材页码 357–403）</div>
+      </section>
+
+      <ChapterProgressCard title="第九章掌握进度" sections={progressSections} />
+
+      <section className="rounded-xl border bg-white p-6 shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-900">学习路线</h2>
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          {routes.map(([label, path, Icon, description]) => (
+            <Link key={path} to={path} className="group rounded-xl border-2 border-blue-200 bg-blue-50 p-5 hover:border-blue-400 hover:shadow-md">
+              <Icon className="h-7 w-7 text-blue-700" /><h3 className="mt-3 font-bold text-gray-900">{label}</h3><p className="mt-2 text-sm text-gray-700">{description}</p><span className="mt-3 flex items-center gap-1 text-sm font-semibold text-blue-800">进入学习 <ArrowRight className="h-4 w-4" /></span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-amber-200 bg-amber-50 p-6"><h2 className="text-xl font-bold text-amber-900">统一视角：表示、交互与可见性</h2><p className="mt-2 text-sm leading-relaxed text-amber-950">embedding 决定一个 token 表示什么，位置编码说明它在哪里，注意力决定它与谁交互，mask 决定它能看见谁。跨模态复用 Transformer 并没有消除表示设计，反而把关键难题集中到了 token 化与输出解码。</p></section>
+      <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6"><h2 className="text-xl font-bold text-emerald-900">完成标准</h2><p className="mt-2 text-sm leading-relaxed text-emerald-900">完成四节共 12 道原创练习，并能手算注意力行归一化与缩放、解释 BPTT 的 Jacobian 连乘、区分 greedy 局部最优与序列全局最优，以及计算视觉 patch token 数和 N² 注意力成本。</p></section>
+    </div>
   );
 }

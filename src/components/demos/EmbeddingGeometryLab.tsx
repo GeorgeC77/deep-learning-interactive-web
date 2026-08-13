@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import { Slider } from '@/components/ui/slider';
+import { cosineSimilarity, dotProduct, euclideanDistance } from '@/lib/math/languageModels';
 
 type Vec = [number, number];
 
@@ -17,24 +18,6 @@ const CAR_END: Vec = [-0.62, -0.52]; // opposite direction -> negative final cos
 function lerp(a: Vec, b: Vec, t: number): Vec {
   return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 }
-function sub(a: Vec, b: Vec): Vec {
-  return [a[0] - b[0], a[1] - b[1]];
-}
-function norm(v: Vec): number {
-  return Math.hypot(v[0], v[1]);
-}
-function dot(a: Vec, b: Vec): number {
-  return a[0] * b[0] + a[1] * b[1];
-}
-function cosine(a: Vec, b: Vec): number {
-  const na = norm(a);
-  const nb = norm(b);
-  return na === 0 || nb === 0 ? 0 : dot(a, b) / (na * nb);
-}
-function dist(a: Vec, b: Vec): number {
-  return norm(sub(a, b));
-}
-
 const PAIRS = {
   similar: { other: 'Orange', start: ORANGE_START, end: ORANGE_END, blurb: '语义相近：训练中距离越来越近，余弦相似度上升。' },
   dissimilar: { other: 'Car', start: CAR_START, end: CAR_END, blurb: '语义无关：训练中距离越来越远，余弦相似度下降。' },
@@ -53,17 +36,17 @@ export default function EmbeddingGeometryLab() {
 
   const metrics = useMemo(() => {
     return {
-      cosine: cosine(applePos, otherPos),
-      euclidean: dist(applePos, otherPos),
-      dot: dot(applePos, otherPos),
+      cosine: cosineSimilarity(applePos, otherPos),
+      euclidean: euclideanDistance(applePos, otherPos),
+      dot: dotProduct(applePos, otherPos),
     };
   }, [applePos, otherPos]);
 
   // Cosine-similarity trajectory across training for both pairs.
   const trajectory = useMemo(() => {
     const steps = Array.from({ length: 21 }, (_, i) => i / 20);
-    const sim = steps.map((p) => cosine(lerp(APPLE_START, APPLE_END, p), lerp(ORANGE_START, ORANGE_END, p)));
-    const dis = steps.map((p) => cosine(lerp(APPLE_START, APPLE_END, p), lerp(CAR_START, CAR_END, p)));
+    const sim = steps.map((p) => cosineSimilarity(lerp(APPLE_START, APPLE_END, p), lerp(ORANGE_START, ORANGE_END, p)));
+    const dis = steps.map((p) => cosineSimilarity(lerp(APPLE_START, APPLE_END, p), lerp(CAR_START, CAR_END, p)));
     return { steps, sim, dis };
   }, []);
 

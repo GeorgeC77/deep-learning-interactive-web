@@ -575,7 +575,7 @@ export const courseManifest: Part[] = [
             id: "ch09-overview",
             title: "课程概览",
             path: "/ch09/overview",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "注意力、自注意力、多头注意力与大语言模型。",
           },
           {
@@ -589,7 +589,7 @@ export const courseManifest: Part[] = [
             id: "ch09-natural-language",
             title: "12.2 自然语言处理",
             path: "/ch09/natural-language",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "词嵌入、分词、词袋、自回归模型、RNN 与随时间反向传播。",
           },
           {
@@ -603,7 +603,7 @@ export const courseManifest: Part[] = [
             id: "ch09-multimodal-transformers",
             title: "12.4 多模态 Transformer",
             path: "/ch09/multimodal-transformers",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "视觉 Transformer、图像生成 Transformer、音频、语音合成与视觉-语言模型。",
           }
         ],
