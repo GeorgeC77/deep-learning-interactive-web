@@ -525,7 +525,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch04-error-surfaces",
@@ -541,7 +541,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch04-gradient-descent-optimization",
@@ -557,7 +557,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch04-convergence",
@@ -573,7 +573,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch04-normalization",
@@ -589,7 +589,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch05-overview",

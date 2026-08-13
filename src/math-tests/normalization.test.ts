@@ -58,4 +58,21 @@ describe('normalization', () => {
       out.reduce((s, v) => s + v * v, 0) / out.length,
     ).toBeCloseTo(1, 5);
   });
+
+  it('batchNorm inference uses the supplied running statistics', () => {
+    const { out, mean, std } = batchNorm(
+      [[12, 25]],
+      [1, 2],
+      [0, -1],
+      1e-8,
+      false,
+      0.9,
+      [10, 20],
+      [2, 5],
+    );
+    expect(mean).toEqual([10, 20]);
+    expect(std).toEqual([2, 5]);
+    expect(out[0][0]).toBeCloseTo(1, 12);
+    expect(out[0][1]).toBeCloseTo(1, 12);
+  });
 });

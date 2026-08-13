@@ -69,7 +69,7 @@ export function batchNorm(
     // inference: use running statistics
     for (let c = 0; c < C; c++) {
       mean[c] = runningMean?.[c] ?? 0;
-      std[c] = (runningStd?.[c] ?? 1) + eps;
+      std[c] = Math.max(runningStd?.[c] ?? 1, Math.sqrt(eps));
     }
   }
 

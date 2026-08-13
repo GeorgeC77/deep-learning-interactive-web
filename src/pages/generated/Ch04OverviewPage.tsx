@@ -1,5 +1,13 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, Mountain, ArrowDownCircle, Zap, Scale, ArrowRight } from 'lucide-react';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  { exerciseSetId: 'chapter04-error-surfaces', label: '7.1 误差曲面', path: '/ch04/error-surfaces', exerciseCount: 3 },
+  { exerciseSetId: 'chapter04-gradient-descent', label: '7.2 梯度下降', path: '/ch04/gradient-descent-optimization', exerciseCount: 3 },
+  { exerciseSetId: 'chapter04-convergence', label: '7.3 收敛性', path: '/ch04/convergence', exerciseCount: 3 },
+  { exerciseSetId: 'chapter04-normalization', label: '7.4 归一化', path: '/ch04/normalization', exerciseCount: 3 },
+];
 
 const roadmapItems = [
   {
@@ -45,7 +53,12 @@ export default function Ch04OverviewPage() {
           讨论批量、随机与小批量梯度下降的取舍，再到动量、Adam 等自适应优化策略，
           以及归一化技术对训练稳定性的关键作用。
         </p>
+        <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-800">
+          Bishop &amp; Bishop §7.1–7.4（教材页码 209–230）
+        </div>
       </section>
+
+      <ChapterProgressCard title="第四章掌握进度" sections={progressSections} />
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">本章学习路线</h2>
@@ -80,6 +93,14 @@ export default function Ch04OverviewPage() {
           梯度下降的本质是在高维参数空间中沿最陡下降方向行走。理解误差曲面的曲率（Hessian）
           能帮助你选择合适的学习率；理解批量大小与梯度方差的关系能帮助你平衡效率与稳定性；
           而归一化技术则是让深度网络能够使用大学习率快速训练的关键工程技巧。
+        </p>
+      </section>
+
+      <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+        <h2 className="text-xl font-bold text-emerald-900">完成标准</h2>
+        <p className="mt-2 text-sm leading-relaxed text-emerald-900">
+          完成四节共 12 道原创练习，并能用实验解释 Hessian 曲率与稳定步长、mini-batch 的 1/√B
+          统计规律、动量的有限时间累积，以及 BatchNorm 与 LayerNorm 的统计轴和推理差异。
         </p>
       </section>
     </div>

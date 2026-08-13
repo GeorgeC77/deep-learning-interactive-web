@@ -799,7 +799,7 @@
     "componentName": "Ch04OverviewPage",
     "componentFile": "src\\pages\\generated\\Ch04OverviewPage.tsx",
     "demos": [],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": false,
     "scalarDemo": false,
     "customLab": false,
@@ -813,7 +813,7 @@
     "counterexample": false,
     "transferChallenge": false,
     "mathTests": false,
-    "semanticTests": false,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": false
   },
@@ -825,7 +825,7 @@
     "demos": [
       "src\\components\\demos\\OptimizationLandscapeLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": true,
     "customLab": true,
@@ -839,7 +839,7 @@
     "counterexample": true,
     "transferChallenge": false,
     "mathTests": true,
-    "semanticTests": false,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": true
   },
@@ -848,24 +848,26 @@
     "title": "7.2 梯度下降优化",
     "componentName": "Ch04GradientDescentOptimizationPage",
     "componentFile": "src\\pages\\generated\\Ch04GradientDescentOptimizationPage.tsx",
-    "demos": [],
-    "status": "content-reviewed",
+    "demos": [
+      "src\\components\\demos\\MiniBatchGradientLab.tsx"
+    ],
+    "status": "teaching-ready",
     "staticExplanation": true,
-    "scalarDemo": true,
-    "customLab": false,
-    "linkedViews": false,
-    "predictionGate": false,
-    "prediction": false,
-    "lock": false,
-    "reveal": false,
-    "evaluation": false,
-    "feedback": false,
+    "scalarDemo": false,
+    "customLab": true,
+    "linkedViews": true,
+    "predictionGate": true,
+    "prediction": true,
+    "lock": true,
+    "reveal": true,
+    "evaluation": true,
+    "feedback": true,
     "counterexample": true,
     "transferChallenge": false,
-    "mathTests": false,
-    "semanticTests": false,
-    "completePredictionGate": false,
-    "l3plus": false
+    "mathTests": true,
+    "semanticTests": true,
+    "completePredictionGate": true,
+    "l3plus": true
   },
   {
     "routePath": "/ch04/convergence",
@@ -875,7 +877,7 @@
     "demos": [
       "src\\components\\demos\\MomentumTrajectoryLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
     "customLab": true,
@@ -901,7 +903,7 @@
     "demos": [
       "src\\components\\demos\\NormalizationLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
     "customLab": true,

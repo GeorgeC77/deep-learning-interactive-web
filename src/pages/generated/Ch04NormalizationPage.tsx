@@ -1,34 +1,38 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import NormalizationLab from '@/components/demos/NormalizationLab';
 import { Scale } from 'lucide-react';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter04NormalizationExercises } from '@/course/chapter04Exercises';
 
 export default function Ch04NormalizationPage() {
   return (
     <BishopSectionPage
       sectionPath="/ch04/normalization"
       heroIcon={<Scale className="w-9 h-9 text-blue-600" />}
-      summary={"归一化在许多实践中可以帮助稳定训练、允许使用更大学习率，但其效果依赖网络结构、批量大小与任务。BatchNorm 在推理时使用移动统计量，小批量时估计可能不准；LayerNorm 的稳定性也依赖特征维度假设。"}
+      summary={"Bishop §7.4 比较三种统计轴：输入数据按训练样本统计，BatchNorm 对每个隐藏单元跨 mini-batch 统计，LayerNorm 对每个样本跨隐藏单元统计。它们常能改善优化，但效果依赖网络结构、批量大小与任务。"}
       concepts={[
         {
           title: "数据归一化",
-          description: "将输入特征缩放为零均值、单位方差，使各维度对损失的贡献均衡。常用于预处理，但不改变特征间的相关性。",
+          description: "用训练集估计每个输入特征的均值和标准差，再原样处理验证、测试和线上输入。这样可缓解由特征量纲差异造成的病态曲率，但不会消除特征间相关性。",
           formula: "\\hat{x} = \\frac{x - \\mu}{\\sigma}",
         },
         {
           title: "批归一化",
           description: "对每个 mini-batch 的激活按特征维度做归一化，并通过可学习的缩放平移恢复表达能力。推理时通常使用训练阶段累积的移动统计量。",
-          formula: "\\hat{x}_{n,c} = \\frac{x_{n,c} - \\mu_B}{\\sigma_B + \\epsilon}, \\quad y_{n,c} = \\gamma_c \\hat{x}_{n,c} + \\beta_c",
+          formula: "\\hat{x}_{n,c} = \\frac{x_{n,c} - \\mu_{B,c}}{\\sqrt{\\sigma^2_{B,c} + \\epsilon}}, \\quad y_{n,c} = \\gamma_c \\hat{x}_{n,c} + \\beta_c",
         },
         {
           title: "层归一化",
           description: "沿特征维度对每个样本单独归一化，不依赖 batch 大小，广泛用于 RNN 与 Transformer。",
-          formula: "\\hat{x}_{n,d} = \\frac{x_{n,d} - \\mu_n}{\\sigma_n + \\epsilon}, \\quad y_{n,d} = \\gamma_d \\hat{x}_{n,d} + \\beta_d",
+          formula: "\\hat{x}_{n,d} = \\frac{x_{n,d} - \\mu_n}{\\sqrt{\\sigma_n^2 + \\epsilon}}, \\quad y_{n,d} = \\gamma_d \\hat{x}_{n,d} + \\beta_d",
         },
       ]}
       learningObjectives={[
         "理解数据归一化、BatchNorm 与 LayerNorm 的计算方式。",
         "能区分 BatchNorm（跨 batch 的特征维度）与 LayerNorm（跨特征维度的单样本）。",
         "认识归一化的效果依赖任务与超参数，并非无条件保证更快收敛。",
+        "说明 BatchNorm 训练统计与推理移动统计的区别，并避免数据泄漏。",
       ]}
       coreIntuition={"归一化通过重新调整数值尺度来稳定前向激活分布，但它不是万能药：BatchNorm 受批量统计量质量影响，LayerNorm 受特征维度假设限制，且不同网络结构受益程度不同。"}
       commonMistakes={[
@@ -54,7 +58,7 @@ export default function Ch04NormalizationPage() {
             bishopMapping={{
         chapter: "Ch 7",
         section: "7.4",
-        pages: "Ch 7",
+        pages: "§7.4, pp. 224–230",
         textbookSubsections: [
           "7.4 Normalization",
           "7.4.1 Data normalization",
@@ -73,6 +77,20 @@ export default function Ch04NormalizationPage() {
         ],
       }}
       interactiveDemo={<NormalizationLab />}
+      extraContent={
+        <div className="space-y-10">
+          <DerivationStepper
+            title="分步对比：BatchNorm 与 LayerNorm 的统计轴"
+            steps={[
+              { label: '激活矩阵', formula: String.raw`A\in\mathbb R^{B\times M}`, explanation: 'B 是 mini-batch 样本数，M 是该层隐藏单元数。' },
+              { label: 'BatchNorm', formula: String.raw`\mu_i=\frac1B\sum_{n=1}^{B}a_{ni}`, explanation: '固定隐藏单元 i，跨 batch 样本 n 统计；小 batch 会让估计更嘈杂。' },
+              { label: 'LayerNorm', formula: String.raw`\mu_n=\frac1M\sum_{i=1}^{M}a_{ni}`, explanation: '固定样本 n，跨该层隐藏单元 i 统计，因此不依赖其他 batch 样本。' },
+              { label: '推理差异', formula: String.raw`\text{BN: running }(\mu_i,\sigma_i^2)\quad\text{vs}\quad\text{LN: current sample statistics}`, explanation: '标准 BatchNorm 使用训练移动统计；LayerNorm 训练和推理使用同一单样本计算。' },
+            ]}
+          />
+          <ExercisePanel exerciseSetId="chapter04-normalization" exercises={chapter04NormalizationExercises} />
+        </div>
+      }
     />
   );
 }
