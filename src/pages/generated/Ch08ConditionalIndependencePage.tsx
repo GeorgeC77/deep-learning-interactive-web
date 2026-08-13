@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import DSeparationLab from '@/components/demos/DSeparationLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter08ConditionalIndependenceExercises } from '@/course/chapter08Exercises';
 import { Unlink } from 'lucide-react';
 
 export default function Ch08ConditionalIndependencePage() {
@@ -7,7 +10,7 @@ export default function Ch08ConditionalIndependencePage() {
     <BishopSectionPage
       sectionPath="/ch08/conditional-independence"
       heroIcon={<Unlink className="w-9 h-9 text-blue-600" />}
-      summary={"条件独立性是图模型的核心语义；d-分离给出了一套仅依据图结构判断条件独立的完备准则。"}
+      summary="Bishop §11.2 从链、分岔与汇聚三种局部结构建立 d-分离规则：条件化普通中间节点会阻断路径，条件化汇聚点或其子孙却会开通路径；朴素贝叶斯和马尔可夫毯都是这套语义的直接应用。"
       concepts={[
         {
           title: "链式结构",
@@ -70,7 +73,7 @@ export default function Ch08ConditionalIndependencePage() {
             bishopMapping={{
         chapter: "Ch 11",
         section: "11.2",
-        pages: "Ch 11",
+        pages: "§11.2, pp. 337–349",
         textbookSubsections: [
           "11.2 Conditional Independence",
           "11.2.1 Three example graphs",
@@ -88,6 +91,17 @@ export default function Ch08ConditionalIndependencePage() {
         ],
       }}
       interactiveDemo={<DSeparationLab />}
+      extraContent={(
+        <div className="space-y-10">
+          <DerivationStepper title="分步推导：为什么观测汇聚点会产生 explaining away" steps={[
+            { label: '汇聚分解', formula: String.raw`p(a,b,c)=p(a)p(c)p(b\mid a,c)`, explanation: '在 A→B←C 中，A 与 C 都是 B 的父节点，联合分布按图结构分解。' },
+            { label: '未观测结果', formula: String.raw`p(a,c)=p(a)p(c)\sum_b p(b\mid a,c)=p(a)p(c)`, explanation: '对共同结果 B 求和后，条件分布归一化为 1，因此两个原因在边缘上独立。' },
+            { label: '观测共同结果', formula: String.raw`p(a,c\mid b)=\frac{p(a)p(c)p(b\mid a,c)}{p(b)}`, explanation: '给定 B 后，似然 p(b|a,c) 同时包含 a 与 c，通常不能拆成只依赖 a 和只依赖 c 的两个因子。' },
+            { label: '解释消除', formula: String.raw`p(a\mid b,c)\neq p(a\mid b)`, explanation: '已知一个原因能解释结果时，另一个原因的后验会改变；观测汇聚点的子孙也会把关于 B 的信息反向传入而开通路径。' },
+          ]} />
+          <ExercisePanel exerciseSetId="chapter08-conditional-independence" exercises={chapter08ConditionalIndependenceExercises} />
+        </div>
+      )}
     />
   );
 }

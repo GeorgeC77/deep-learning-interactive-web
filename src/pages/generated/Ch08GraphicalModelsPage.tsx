@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import GraphFactorizationLab from '@/components/demos/GraphFactorizationLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter08GraphicalModelsExercises } from '@/course/chapter08Exercises';
 import { GitBranch } from 'lucide-react';
 
 export default function Ch08GraphicalModelsPage() {
@@ -7,7 +10,7 @@ export default function Ch08GraphicalModelsPage() {
     <BishopSectionPage
       sectionPath="/ch08/graphical-models"
       heroIcon={<GitBranch className="w-9 h-9 text-blue-600" />}
-      summary={"图模型用节点表示随机变量、有向边表示给定父节点后的直接概率依赖；联合分布按 DAG 结构因子分解，并隐含着可通过 d-分离读取的条件独立性。"}
+      summary="Bishop §11.1 用有向无环图表示随机变量之间的局部概率依赖，把联合分布 p(x) 分解成每个节点给定其父节点的条件分布；离散条件概率表、线性高斯节点与 plate 表示让同一框架覆盖分类、回归和重复观测。"
       concepts={[
         {
           title: "有向无环图（DAG）",
@@ -20,7 +23,7 @@ export default function Ch08GraphicalModelsPage() {
         },
         {
           title: "因子分解与拓扑序",
-          description: "按 DAG 的拓扑顺序写出条件概率乘积；每个节点只以其父节点为条件，体现局部因果关系。",
+          description: "按 DAG 的拓扑顺序写出条件概率乘积；每个节点只以其父节点为条件，体现图所编码的局部概率依赖。只有加入因果假设后，箭头才能进一步获得干预语义。",
         },
         {
           title: "离散变量",
@@ -48,7 +51,7 @@ export default function Ch08GraphicalModelsPage() {
       commonMistakes={[
         "把有向边直接解释为因果关系。",
         "将一阶马尔可夫链的分解 p(x_1)∏p(x_i|x_{i-1}) 误当成一般 DAG 分解。",
-        "忽略因子分解与 d-分离之间的等价性。",
+        "认为拓扑序中的所有前驱都必须出现在条件中；图结构允许只保留真正的父节点。",
       ]}
       whyCards={[
         {
@@ -67,7 +70,7 @@ export default function Ch08GraphicalModelsPage() {
             bishopMapping={{
         chapter: "Ch 11",
         section: "11.1",
-        pages: "Ch 11",
+        pages: "§11.1, pp. 326–337",
         textbookSubsections: [
           "11.1 Graphical Models",
           "11.1.1 Directed graphs",
@@ -86,6 +89,17 @@ export default function Ch08GraphicalModelsPage() {
         ],
       }}
       interactiveDemo={<GraphFactorizationLab />}
+      extraContent={(
+        <div className="space-y-10">
+          <DerivationStepper title="分步推导：一般 DAG 因子分解为何是归一化分布" steps={[
+            { label: '拓扑排序', formula: String.raw`\mathrm{pa}(k)\subseteq\{1,\ldots,k-1\}`, explanation: 'DAG 必然存在父节点先于子节点的拓扑序，因此每个局部条件分布只依赖已经出现的变量。' },
+            { label: '局部因子相乘', formula: String.raw`p(x_1,\ldots,x_K)=\prod_{k=1}^{K}p(x_k\mid \mathrm{pa}(k))`, explanation: '这不是把图强行写成链；每个节点只列自己的父节点，分岔、汇聚和多父节点结构都能直接表示。' },
+            { label: '消去末节点', formula: String.raw`\sum_{x_K}p(x_K\mid \mathrm{pa}(K))=1`, explanation: '拓扑序中的最后节点不可能是任何更早节点的父节点，对它求和只消掉自己的归一化条件因子；连续变量时把求和换成积分。' },
+            { label: '递归归一化', formula: String.raw`\sum_{x_1}\cdots\sum_{x_K}\prod_{k=1}^{K}p(x_k\mid \mathrm{pa}(k))=1`, explanation: '从后向前反复消去节点，最终得到 1，说明任意合法局部条件分布都定义了规范化的联合分布。' },
+          ]} />
+          <ExercisePanel exerciseSetId="chapter08-graphical-models" exercises={chapter08GraphicalModelsExercises} />
+        </div>
+      )}
     />
   );
 }
