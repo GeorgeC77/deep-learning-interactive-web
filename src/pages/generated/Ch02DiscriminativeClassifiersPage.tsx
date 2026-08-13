@@ -2,6 +2,9 @@ import BishopSectionPage from '@/components/BishopSectionPage';
 import LinkFunctionLab from '@/components/demos/LinkFunctionLab';
 import LogisticDecisionBoundaryDemo from '@/components/demos/LogisticDecisionBoundaryDemo';
 import { Activity } from 'lucide-react';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter02DiscriminativeExercises } from '@/course/chapter02Exercises';
 
 export default function Ch02DiscriminativeClassifiersPage() {
   return (
@@ -38,7 +41,7 @@ export default function Ch02DiscriminativeClassifiersPage() {
         },
         {
           title: "规范链接函数（Canonical link functions）",
-          description: "在广义线性模型（GLM）中，规范链接函数将自然参数 η 与线性预测器连接。对于伯努利分布，规范链接是 logit（对应逻辑回归）；对正态分布，规范链接是恒等（对应线性回归）。使用规范链接可保证似然的凸性。",
+          description: "在广义线性模型（GLM）中，规范链接函数将均值参数映射到自然参数，并令其等于线性预测器。对于伯努利分布，规范链接是 logit；对正态分布，规范链接是恒等。规范链接通常带来简洁梯度；目标的凸性还取决于指数族、参数化与可识别性等条件。",
         },
       ]}
       learningObjectives={[
@@ -107,7 +110,40 @@ export default function Ch02DiscriminativeClassifiersPage() {
         ],
       }}
       interactiveDemo={<LinkFunctionLab />}
-      extraContent={<LogisticDecisionBoundaryDemo />}
+      extraContent={
+        <div className="space-y-10">
+          <DerivationStepper
+            title="分步推导：逻辑回归为何得到概率残差梯度"
+            steps={[
+              {
+                label: '定义概率',
+                formula: String.raw`y=\sigma(a),\qquad a=\mathbf w^T\phi(x)`,
+                explanation: '线性预测器 a 经过 sigmoid 得到正类概率 y。',
+              },
+              {
+                label: '写出交叉熵',
+                formula: String.raw`E=-t\log y-(1-t)\log(1-y)`,
+                explanation: '这是伯努利负对数似然，t∈{0,1} 是目标标签。',
+              },
+              {
+                label: '对 logit 求导',
+                formula: String.raw`\frac{\partial E}{\partial a}=\frac{\partial E}{\partial y}\frac{\partial y}{\partial a}=y-t`,
+                explanation: '分母项与 sigmoid 导数 y(1-y) 抵消，留下预测概率减目标。',
+              },
+              {
+                label: '得到权重梯度',
+                formula: String.raw`\nabla_{\mathbf w}E=(y-t)\phi(x)`,
+                explanation: '梯度由“概率残差 × 输入特征”构成；批量梯度就是对样本求和或平均。',
+              },
+            ]}
+          />
+          <LogisticDecisionBoundaryDemo />
+          <ExercisePanel
+            exerciseSetId="chapter02-discriminative-classifiers"
+            exercises={chapter02DiscriminativeExercises}
+          />
+        </div>
+      }
     />
   );
 }

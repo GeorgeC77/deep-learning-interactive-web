@@ -4,6 +4,7 @@ import {
   normalCDF,
   normalPdf,
   scaledProbit,
+  probitLoss,
   logisticGradient,
   probitGradient,
 } from '../lib/math/probit';
@@ -43,6 +44,15 @@ describe('probit', () => {
     const probitSlope = (scaledProbit(h) - scaledProbit(-h)) / (2 * h);
     expect(probitSlope).toBeCloseTo(sigmoidSlope, 3);
     expect(probitSlope).toBeCloseTo(0.25, 3);
+  });
+
+  it('scaled probit loss and gradient use the same probability model', () => {
+    const lambda = 0.7;
+    const a = -0.8;
+    const h = 1e-5;
+    const numerical =
+      (probitLoss(1, a + h, lambda) - probitLoss(1, a - h, lambda)) / (2 * h);
+    expect(probitGradient(1, a, lambda)).toBeCloseTo(numerical, 5);
   });
 
   it('normalCDF is monotonic and within [0, 1]', () => {

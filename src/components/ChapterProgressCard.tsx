@@ -74,14 +74,14 @@ export default function ChapterProgressCard({ title, sections }: ChapterProgress
           className="h-full rounded-full bg-emerald-500 transition-all"
           style={{ width: `${percentage}%` }}
           role="progressbar"
-          aria-label="第一章掌握进度"
+          aria-label={title}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={percentage}
         />
       </div>
 
-      <div className="mt-5 grid gap-3 md:grid-cols-3">
+      <div className="mt-5 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         {progress.map((section) => {
           const complete = section.masteredCount >= section.exerciseCount;
           return (

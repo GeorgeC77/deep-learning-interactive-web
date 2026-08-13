@@ -1,5 +1,33 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, SeparatorVertical, Scale, BrainCircuit, Activity, ArrowRight, Target, Lightbulb } from 'lucide-react';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  {
+    exerciseSetId: 'chapter02-discriminant-functions',
+    label: '5.1 判别函数',
+    path: '/ch02/discriminant-functions',
+    exerciseCount: 3,
+  },
+  {
+    exerciseSetId: 'chapter02-decision-theory',
+    label: '5.2 决策理论',
+    path: '/ch02/decision-theory',
+    exerciseCount: 3,
+  },
+  {
+    exerciseSetId: 'chapter02-generative-classifiers',
+    label: '5.3 生成分类器',
+    path: '/ch02/generative-classifiers',
+    exerciseCount: 3,
+  },
+  {
+    exerciseSetId: 'chapter02-discriminative-classifiers',
+    label: '5.4 判别分类器',
+    path: '/ch02/discriminative-classifiers',
+    exerciseCount: 3,
+  },
+];
 
 const roadmapItems = [
   {
@@ -53,6 +81,8 @@ export default function Ch02OverviewPage() {
           Bishop &amp; Bishop §5.1–5.4（教材页码 131–166）
         </div>
       </section>
+
+      <ChapterProgressCard title="第二章掌握进度" sections={progressSections} />
 
       {/* Why generative vs discriminative matters */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -131,6 +161,14 @@ export default function Ch02OverviewPage() {
             </li>
           ))}
         </div>
+      </section>
+
+      <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+        <h2 className="text-xl font-bold text-emerald-900">完成标准</h2>
+        <p className="mt-2 text-sm leading-relaxed text-emerald-900">
+          完成四节共 12 道原创练习，并能在实验中解释三组关键关系：判别分数与决策边界、后验概率与损失、
+          类条件密度与先验如何共同形成后验。练习记录会保存在当前浏览器中。
+        </p>
       </section>
 
       {/* Connection */}

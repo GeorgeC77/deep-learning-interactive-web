@@ -1,6 +1,9 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { SeparatorVertical } from 'lucide-react';
 import LogisticDecisionBoundaryDemo from '@/components/demos/LogisticDecisionBoundaryDemo';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter02DiscriminantExercises } from '@/course/chapter02Exercises';
 
 export default function Ch02DiscriminantFunctionsPage() {
   return (
@@ -18,7 +21,7 @@ export default function Ch02DiscriminantFunctionsPage() {
         },
         {
           title: "Multiple classes（多分类判别）",
-          description: "K 类问题需要 K 个判别函数 y_k(x) = w_kᵀx + w_{k0}，预测为 argmax_k y_k(x)。这种'一对多'形式保证每个输入恰好被分配给一个类别，且决策区域是单连通凸区域。",
+          description: "K 类问题可联合定义 K 个判别函数 y_k(x) = w_kᵀx + w_{k0}，预测为 argmax_k y_k(x)。它避免了分别阈值化 K 个二分类器造成的重叠或空白；在线性分数下，每类区域是若干半空间的交，因此是凸区域（也可能为空）。",
           formula: String.raw`\mathcal{C}(\mathbf{x}) = \arg\max_k y_k(\mathbf{x}),\quad y_k(\mathbf{x}) = \mathbf{w}_k^{\!T}\mathbf{x} + w_{k0}`,
         },
         {
@@ -33,7 +36,7 @@ export default function Ch02DiscriminantFunctionsPage() {
       ]}
       learningObjectives={[
         "写出二分类线性判别函数及其决策面方程",
-        "解释为什么多分类应使用 K 个函数而不是 K 个二分类器组合",
+        "解释联合 argmax 与分别阈值化 K 个二分类器的差异",
         "理解 1-of-K 编码并写出对应的最小二乘目标函数",
         "能说出最小二乘分类相比逻辑回归的主要缺点",
       ]}
@@ -41,7 +44,7 @@ export default function Ch02DiscriminantFunctionsPage() {
         "判别函数就像一个国家的地图——每个类别有自己的'区域'，边界由判别函数值为 0 的线（超平面）定义。最小二乘分类相当于用尺子直接测量该画在哪里，但异常点会像磁铁一样把边界拉偏。"
       }
       commonMistakes={[
-        "用多个 one-vs-rest 二分类器组合处理多分类——会产生重叠或不可分类区域（四面体问题）",
+        "把 K 个 one-vs-rest 输出分别按固定阈值判决——可能产生重叠或无人负责的区域；若采用统一分数 argmax，则需进一步考虑分数可比性与校准",
         "把最小二乘分类输出的实数值直接当作概率——这些输出没有归一化，可能不在 [0,1] 范围内",
         "使用恒等基函数 ϕ(x)=x 导致无法学习非线性决策边界——需要像回归一样使用非线性基函数",
         "忽视最小二乘对异常值的敏感性：远离边界的'已正确分类'样本也会被平方损失拉向决策面",
@@ -49,7 +52,7 @@ export default function Ch02DiscriminantFunctionsPage() {
       whyCards={[
         {
           question: "为什么多分类要用 K 个判别函数？",
-          answer: "每个函数负责衡量“属于这一类”的程度，取最大值自然把空间划分为 K 个单连通区域；用多个二分类器组合会出现谁都不肯负责的灰色地带。",
+          answer: "每个函数负责给一个可比较的类别分数，取最大值会给出唯一归属。若把多个二分类器各自独立阈值化，才会出现多类同时为正或全部为负的歧义。",
         },
         {
           question: "为什么最小二乘分类对异常值敏感？",
@@ -57,7 +60,7 @@ export default function Ch02DiscriminantFunctionsPage() {
         },
       ]}
       counterexamples={[
-        "用 one-vs-rest 处理三类问题，某些区域可能同时被两个分类器判为正类，或都不被判为正类——说明组合策略有缺陷。",
+        "把三个 one-vs-rest 分类器分别按 0.5 阈值化时，某些区域可能同时被多个分类器接受或全部拒绝——说明独立阈值化需要额外的冲突处理规则。",
         "在远离决策面的位置加入一个异常点，最小二乘分类的决策面会明显偏移——说明平方损失并不稳健。",
       ]}
             bishopMapping={{
@@ -93,7 +96,40 @@ export default function Ch02DiscriminantFunctionsPage() {
         }),
         formula: String.raw`x = -w_0 / w_1 \quad (\text{设 } w_1 = 1)`,
       }}
-      extraContent={<LogisticDecisionBoundaryDemo />}
+      extraContent={
+        <div className="space-y-10">
+          <DerivationStepper
+            title="分步推导：1-of-K 最小二乘分类器"
+            steps={[
+              {
+                label: '写成矩阵目标',
+                formula: String.raw`E(\mathbf W)=\frac12\lVert\boldsymbol\Phi\mathbf W-\mathbf T\rVert_F^2`,
+                explanation: 'Φ 的每一行是一个样本的基函数，T 的每一行是对应的 1-of-K 目标。',
+              },
+              {
+                label: '对权重求导',
+                formula: String.raw`\nabla_{\mathbf W}E=\boldsymbol\Phi^{T}(\boldsymbol\Phi\mathbf W-\mathbf T)`,
+                explanation: 'Frobenius 范数等价于对 K 个输出的平方误差求和。',
+              },
+              {
+                label: '令梯度为零',
+                formula: String.raw`\boldsymbol\Phi^{T}\boldsymbol\Phi\mathbf W=\boldsymbol\Phi^{T}\mathbf T`,
+                explanation: '这就是多输出线性回归的正规方程；它没有引入概率约束。',
+              },
+              {
+                label: '得到闭式解',
+                formula: String.raw`\mathbf W=(\boldsymbol\Phi^{T}\boldsymbol\Phi)^{-1}\boldsymbol\Phi^{T}\mathbf T`,
+                explanation: '矩阵可逆时得到闭式解；实际计算常用 QR、SVD 或正则化，避免直接求逆。',
+              },
+            ]}
+          />
+          <LogisticDecisionBoundaryDemo />
+          <ExercisePanel
+            exerciseSetId="chapter02-discriminant-functions"
+            exercises={chapter02DiscriminantExercises}
+          />
+        </div>
+      }
     />
   );
 }

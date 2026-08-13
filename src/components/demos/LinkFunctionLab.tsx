@@ -40,13 +40,13 @@ export default function LinkFunctionLab() {
   const sig = sigmoid(a);
   const prob = scaledProbit(a);
   const lLoss1 = logisticLoss(1, a);
-  const pLoss1 = probitLoss(1, a);
+  const pLoss1 = probitLoss(1, a, DEFAULT_LAMBDA);
   const lLoss0 = logisticLoss(0, a);
-  const pLoss0 = probitLoss(0, a);
+  const pLoss0 = probitLoss(0, a, DEFAULT_LAMBDA);
   const lGrad1 = logisticGradient(1, a);
-  const pGrad1 = probitGradient(1, a);
+  const pGrad1 = probitGradient(1, a, DEFAULT_LAMBDA);
   const lGrad0 = logisticGradient(0, a);
-  const pGrad0 = probitGradient(0, a);
+  const pGrad0 = probitGradient(0, a, DEFAULT_LAMBDA);
 
   const { probPoints, sigPoints, gradLogisticPoints, gradProbitPoints } =
     useMemo(() => {
@@ -60,7 +60,10 @@ export default function LinkFunctionLab() {
         sigPoints.push({ x, y: sigmoid(x) });
         probPoints.push({ x, y: scaledProbit(x) });
         gradLogisticPoints.push({ x, y: Math.abs(logisticGradient(1, x)) });
-        gradProbitPoints.push({ x, y: Math.min(Math.abs(probitGradient(1, x)), 10) });
+        gradProbitPoints.push({
+          x,
+          y: Math.min(Math.abs(probitGradient(1, x, DEFAULT_LAMBDA)), 10),
+        });
       }
       return { probPoints, sigPoints, gradLogisticPoints, gradProbitPoints };
     }, []);
@@ -331,7 +334,8 @@ export default function LinkFunctionLab() {
               <KaTeX math="a \ll 0" />），logistic 梯度幅值趋于 1，是<strong>有界</strong>的。
             </li>
             <li>
-              probit 梯度为 <KaTeX math="-\phi(a)/\Phi(a)" />；当{' '}
+              scaled probit 梯度为{' '}
+              <KaTeX math="-\lambda\phi(\lambda a)/\Phi(\lambda a)" />；当{' '}
               <KaTeX math="a \to -\infty" /> 时，其幅值大致按 <KaTeX math="|a|" />{' '}
               增长，<strong>没有上界</strong>。
             </li>

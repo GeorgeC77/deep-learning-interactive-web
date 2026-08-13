@@ -114,8 +114,12 @@ export function logisticLoss(y: 0 | 1, a: number): number {
 /**
  * Probit loss for a binary label y ∈ {0, 1}.
  */
-export function probitLoss(y: 0 | 1, a: number): number {
-  const p = normalCDF(a);
+export function probitLoss(
+  y: 0 | 1,
+  a: number,
+  lambda: number = 1,
+): number {
+  const p = normalCDF(lambda * a);
   if (y === 1) {
     return -Math.log(Math.max(p, EPS));
   }
@@ -156,19 +160,24 @@ function millsRatioTail(t: number): number {
  * In the tails the direct ratio loses accuracy, so we use the Mills-ratio
  * asymptotic expansion for |a| > 3.
  */
-export function probitGradient(y: 0 | 1, a: number): number {
+export function probitGradient(
+  y: 0 | 1,
+  a: number,
+  lambda: number = 1,
+): number {
+  const scaledA = lambda * a;
   if (y === 1) {
-    if (a < -3) {
-      return -millsRatioTail(-a);
+    if (scaledA < -3) {
+      return -lambda * millsRatioTail(-scaledA);
     }
-    const p = normalCDF(a);
-    const phi = normalPdf(a);
-    return -phi / Math.max(p, EPS);
+    const p = normalCDF(scaledA);
+    const phi = normalPdf(scaledA);
+    return (-lambda * phi) / Math.max(p, EPS);
   }
-  if (a > 3) {
-    return millsRatioTail(a);
+  if (scaledA > 3) {
+    return lambda * millsRatioTail(scaledA);
   }
-  const p = normalCDF(a);
-  const phi = normalPdf(a);
-  return phi / Math.max(1 - p, EPS);
+  const p = normalCDF(scaledA);
+  const phi = normalPdf(scaledA);
+  return (lambda * phi) / Math.max(1 - p, EPS);
 }

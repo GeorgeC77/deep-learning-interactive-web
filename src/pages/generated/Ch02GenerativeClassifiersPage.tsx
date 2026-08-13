@@ -1,5 +1,9 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { BrainCircuit } from 'lucide-react';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import GaussianClassifierLab from '@/components/demos/GaussianClassifierLab';
+import { chapter02GenerativeExercises } from '@/course/chapter02Exercises';
 
 export default function Ch02GenerativeClassifiersPage() {
   return (
@@ -40,7 +44,7 @@ export default function Ch02GenerativeClassifiersPage() {
         "推导共享协方差高斯假设下决策边界为线性的原因",
         "能写出最大似然估计的类内均值与池化协方差公式",
         "理解朴素贝叶斯的条件独立性假设及其带来的参数简化",
-        "对比生成模型与判别模型在不同数据量下的优劣",
+        "结合模型假设、数据量和任务需求比较生成与判别方法，而不做绝对优劣判断",
       ]}
       coreIntuition={
         "生成分类器像为每个类别画一幅'典型肖像'（类条件分布），然后比较新样本更像哪类的'成员'。因为建模了完整的 x 的分布，它不仅能分类，还能说'这个人不像任何一类，可能是陌生的'。"
@@ -49,7 +53,7 @@ export default function Ch02GenerativeClassifiersPage() {
         "强制共享协方差矩阵导致线性决策边界，无法分离'环状'等非线性可分类数据",
         "在朴素贝叶斯中忽视特征相关性——如文本中 'machine' 和 'learning' 经常共现，独立性假设低估了这一组合的证据强度",
         "把生成模型的后验概率当作校准好的置信度——如果类条件假设不成立（如高斯近似 multimodal 分布），后验可能严重失真",
-        "认为生成模型总是比判别模型差——数据量少时，生成模型的额外结构假设反而带来更稳定的估计",
+        "认为生成模型总是比判别模型差——当结构假设近似成立时，它可能更节省样本；假设失配时也可能带来系统偏差",
       ]}
       whyCards={[
         {
@@ -102,6 +106,40 @@ export default function Ch02GenerativeClassifiersPage() {
         },
         formula: String.raw`p(C_1|x) = \frac{p(x|C_1)p(C_1)}{p(x)}`,
       }}
+      extraContent={
+        <div className="space-y-10">
+          <DerivationStepper
+            title="分步推导：共享协方差为何给出线性边界"
+            steps={[
+              {
+                label: '写出后验对数比',
+                formula: String.raw`a(x)=\log\frac{p(x\mid C_1)p(C_1)}{p(x\mid C_0)p(C_0)}`,
+                explanation: '归一化证据 p(x) 在比值中消失，决策只需判断 a(x) 的符号。',
+              },
+              {
+                label: '代入共享协方差高斯',
+                formula: String.raw`\log p(x\mid C_k)=-\frac12(x-\mu_k)^T\Sigma^{-1}(x-\mu_k)+\mathrm{const}`,
+                explanation: '两类使用相同的 Σ，因此拥有相同的 xᵀΣ⁻¹x 二次项。',
+              },
+              {
+                label: '抵消二次项',
+                formula: String.raw`a(x)=(\mu_1-\mu_0)^T\Sigma^{-1}x+b`,
+                explanation: '相减后只剩关于 x 的一次项与由均值、先验构成的常数 b。',
+              },
+              {
+                label: '读取决策边界',
+                formula: String.raw`a(x)=0\quad\Longrightarrow\quad w^Tx+w_0=0`,
+                explanation: '因此共享协方差得到线性边界；类别各自使用不同协方差时，二次项通常不会抵消。',
+              },
+            ]}
+          />
+          <GaussianClassifierLab />
+          <ExercisePanel
+            exerciseSetId="chapter02-generative-classifiers"
+            exercises={chapter02GenerativeExercises}
+          />
+        </div>
+      }
     />
   );
 }

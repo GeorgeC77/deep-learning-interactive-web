@@ -2,6 +2,9 @@ import BishopSectionPage from '@/components/BishopSectionPage';
 import ClassificationCostLab from '@/components/demos/ClassificationCostLab';
 import ROCInteractiveDemo from '@/components/demos/ROCInteractiveDemo';
 import { Scale } from 'lucide-react';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter02DecisionExercises } from '@/course/chapter02Exercises';
 
 export default function Ch02DecisionTheoryPage() {
   return (
@@ -67,7 +70,7 @@ export default function Ch02DecisionTheoryPage() {
         },
       ]}
       counterexamples={[
-        "在 99% 健康、1% 患病的数据上，把所有样本都判为健康也能得到 99% 准确率——说明准确率在不平衡数据上毫无意义。",
+        "在 99% 健康、1% 患病的数据上，把所有样本都判为健康也能得到 99% 准确率——说明准确率单独使用时会掩盖少数类完全漏检。",
         "两个分类器在同一阈值下一个准确率更高，但 ROC 曲线显示另一个在所有阈值下都更好——说明单点评估不可靠。",
       ]}
             bishopMapping={{
@@ -95,7 +98,40 @@ export default function Ch02DecisionTheoryPage() {
         ],
       }}
       interactiveDemo={<ClassificationCostLab />}
-      extraContent={<ROCInteractiveDemo />}
+      extraContent={
+        <div className="space-y-10">
+          <DerivationStepper
+            title="分步推导：二分类的代价敏感阈值"
+            steps={[
+              {
+                label: '写出阳性风险',
+                formula: String.raw`R(+\mid x)=C_{FP}[1-p(C_1\mid x)]`,
+                explanation: '判为阳性时，只有真实为负类才产生误诊代价。',
+              },
+              {
+                label: '写出阴性风险',
+                formula: String.raw`R(-\mid x)=C_{FN}p(C_1\mid x)`,
+                explanation: '判为阴性时，只有真实为正类才产生漏诊代价。',
+              },
+              {
+                label: '比较两种动作',
+                formula: String.raw`C_{FP}(1-p)<C_{FN}p`,
+                explanation: '当阳性动作的条件风险更小时，应预测阳性。',
+              },
+              {
+                label: '解出阈值',
+                formula: String.raw`p(C_1\mid x)>\frac{C_{FP}}{C_{FP}+C_{FN}}`,
+                explanation: '漏诊代价越高，阈值越低；0.5 只对应两种错误代价相同的特殊情况。',
+              },
+            ]}
+          />
+          <ROCInteractiveDemo />
+          <ExercisePanel
+            exerciseSetId="chapter02-decision-theory"
+            exercises={chapter02DecisionExercises}
+          />
+        </div>
+      }
     />
   );
 }
