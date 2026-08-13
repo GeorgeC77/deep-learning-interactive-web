@@ -1,5 +1,14 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, AlertTriangle, Layers, ArrowRight, Target, Lightbulb, Brain, GitBranch } from 'lucide-react';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  { exerciseSetId: 'chapter03-limitations', label: '6.1 固定基函数局限', path: '/ch03/limitations-of-fixed-basis-functions', exerciseCount: 3 },
+  { exerciseSetId: 'chapter03-multilayer', label: '6.2 多层网络', path: '/ch03/multilayer-networks', exerciseCount: 3 },
+  { exerciseSetId: 'chapter03-deep', label: '6.3 深度网络', path: '/ch03/deep-networks', exerciseCount: 3 },
+  { exerciseSetId: 'chapter03-error', label: '6.4 误差函数', path: '/ch03/error-functions', exerciseCount: 3 },
+  { exerciseSetId: 'chapter03-mdn', label: '6.5 混合密度网络', path: '/ch03/mixture-density-networks', exerciseCount: 3 },
+];
 
 const roadmapItems = [
   {
@@ -58,6 +67,8 @@ export default function Ch03OverviewPage() {
           Bishop &amp; Bishop §6.1–6.5（教材页码 171–204）
         </div>
       </section>
+
+      <ChapterProgressCard title="第三章掌握进度" sections={progressSections} />
 
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center gap-3 mb-4">
@@ -138,6 +149,14 @@ export default function Ch03OverviewPage() {
           网络有了"深度"——隐藏层自动学习特征，输出层只需做简单的线性组合。
           这直接引出后续的梯度下降（第 7 章）、反向传播（第 8 章）和正则化（第 9 章），
           构成了现代深度学习的核心三部曲。
+        </p>
+      </section>
+
+      <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+        <h2 className="text-xl font-bold text-emerald-900">完成标准</h2>
+        <p className="mt-2 text-sm leading-relaxed text-emerald-900">
+          完成五节共 15 道原创练习，并能用实验解释距离集中、非线性层的必要性、层次组合的表达效率、
+          损失函数对训练梯度的影响，以及为什么多峰逆问题需要条件分布而非单一均值。
         </p>
       </section>
 

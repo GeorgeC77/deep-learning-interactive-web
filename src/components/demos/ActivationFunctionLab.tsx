@@ -1,51 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
+import { ACTIVATIONS, type ActivationKey } from '@/lib/math/activations';
 
 const PLOT_W = 560;
 const PLOT_H = 280;
 const MARGIN = { t: 20, r: 20, b: 40, l: 50 };
 const INNER_W = PLOT_W - MARGIN.l - MARGIN.r;
 const INNER_H = PLOT_H - MARGIN.t - MARGIN.b;
-
-// 激活函数定义
-const ACTIVATIONS = {
-  relu: {
-    name: 'ReLU',
-    fn: (z: number) => Math.max(0, z),
-    grad: (z: number) => (z > 0 ? 1 : 0),
-    color: '#3b82f6',
-  },
-  sigmoid: {
-    name: 'Sigmoid',
-    fn: (z: number) => 1 / (1 + Math.exp(-z)),
-    grad: (z: number) => {
-      const s = 1 / (1 + Math.exp(-z));
-      return s * (1 - s);
-    },
-    color: '#10b981',
-  },
-  tanh: {
-    name: 'Tanh',
-    fn: (z: number) => Math.tanh(z),
-    grad: (z: number) => 1 - Math.tanh(z) ** 2,
-    color: '#8b5cf6',
-  },
-  leakyRelu: {
-    name: 'Leaky ReLU',
-    fn: (z: number) => (z > 0 ? z : 0.01 * z),
-    grad: (z: number) => (z > 0 ? 1 : 0.01),
-    color: '#f59e0b',
-  },
-  elu: {
-    name: 'ELU',
-    fn: (z: number) => (z > 0 ? z : Math.exp(z) - 1),
-    grad: (z: number) => (z > 0 ? 1 : Math.exp(z)),
-    color: '#ef4444',
-  },
-};
-
-type ActivationKey = keyof typeof ACTIVATIONS;
 
 export default function ActivationFunctionLab() {
   const [selected, setSelected] = useState<ActivationKey[]>(['relu', 'sigmoid', 'tanh']);

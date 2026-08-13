@@ -1,6 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import CurseOfDimensionalityLab from '@/components/demos/CurseOfDimensionalityLab';
 import { AlertTriangle } from 'lucide-react';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter03LimitationsExercises } from '@/course/chapter03Exercises';
 
 export default function Ch03LimitationsOfFixedBasisFunctionsPage() {
   return (
@@ -13,11 +15,11 @@ export default function Ch03LimitationsOfFixedBasisFunctionsPage() {
       concepts={[
         {
           title: "维度灾难（Curse of dimensionality）",
-          description: "基函数数量的增长随维度呈指数级。若每个维度 K 个基函数，D 维需 K^D 个基函数——随着 D 增加，数据迅速变稀疏，所需样本量爆炸增长。这是固定基函数在高维空间必然失败的根本原因。",
+          description: "采用每维 K 个位置的直积网格时，基函数数量为 K^D——随着 D 增加，数据覆盖迅速变稀疏。这说明朴素的局部固定基展开不可扩展，但不意味着所有固定特征方法在所有高维数据上都必然失败；结构、稀疏性与内在维度同样关键。",
         },
         {
           title: "高维空间的反直觉性质",
-          description: "在 D 维空间中：(1) 单位球的大多数体积集中在薄壳上（r≈1）；(2) 随机两点距离趋于常数；(3) 高斯分布概率质量集中在球面上而非原点。这些性质使基于距离的核方法（如 RBF）在高维时退化为几乎全局函数。",
+          description: "在 D 维空间中：(1) 单位球的相对体积更多靠近边界；(2) 某些独立同分布模型下，随机点间距离的相对波动变小；(3) 高斯分布的典型样本位于离均值约 √D 的壳层。这会削弱原始欧氏距离的对比度，但结论依赖数据分布与度量。",
         },
         {
           title: "数据流形（Data manifolds）",
@@ -35,25 +37,25 @@ export default function Ch03LimitationsOfFixedBasisFunctionsPage() {
         "论证从固定基函数过渡到可学习基函数的必要性",
       ]}
       coreIntuition={
-        "想象在一个大球体中均匀撒豆子。在 3 维空间中豆子还算集中，到了 100 维，几乎每个豆子都跑到球壳表面去了——'近邻'这个概念失去了意义。幸好真实的豆子（数据）不会均匀散布，而是沿着一根'隐藏的面条'（低维流形）排列。深度网络的工作就是发现这根面条的形状。"
+        "想象在一个高维空间中撒豆子：许多常见随机模型会让样本落在典型壳层，点间距离的相对差异随维度缩小。真实数据若靠近低维结构，模型便可能通过学习合适的表示与度量恢复有用的邻域，而不必均匀覆盖整个环境空间。"
       }
       commonMistakes={[
-        "认为增加数据量就能解决高维问题——维度灾难是几何性质的，再多数据也无法改变空间的稀疏性",
+        "认为有限幅度地增加数据量就能抵消直积网格的指数增长——若不利用结构，保持同等覆盖率所需样本会随维度急剧增加",
         "混淆数据流形假设与数据降维——流形假设是关于数据分布的，不是数据处理方法",
         "认为固定基函数完全没有用途——在低维问题或作为深度网络的组成部分时仍然有用",
       ]}
       whyCards={[
         {
           question: "为什么高维空间会让基于距离的方法失效？",
-          answer: "维度越高，随机两点之间的距离趋于相同，'近邻'失去意义。固定基函数依赖局部距离，因此在高维空间必然退化。",
+          answer: "在某些高维点云中，距离相对均值的波动会缩小，近邻和远邻的对比度下降。是否失效还取决于数据是否有低维结构，以及所用表示和度量。",
         },
         {
           question: "为什么数据流形假设能拯救深度学习？",
-          answer: "真实数据虽然在高维空间中，但只占据低维流形。深度学习通过可学习基函数自动发现流形结构，避免了维度灾难。",
+          answer: "若真实数据主要沿少量内在自由度变化，学习器就有机会利用这种结构降低有效样本需求。深度网络可以学习与任务相关的表示，但能否恢复流形仍取决于数据、归纳偏置和优化。",
         },
       ]}
       counterexamples={[
-        "在 100 维空间中，单位球内几乎所有点都集中在表面薄壳上——基于距离的 RBF 核不再局部。",
+        "在各向同性高维高斯点云中，原始欧氏距离的相对离散度明显缩小——若仍沿用固定带宽，RBF 相似度可能缺少区分度。",
         "增加固定基函数的数量从 10 到 100，在 10 维空间中需要 10^10 个基函数——说明指数增长不可持续。",
       ]}
             bishopMapping={{
@@ -87,6 +89,12 @@ export default function Ch03LimitationsOfFixedBasisFunctionsPage() {
         formula: String.raw`\text{基函数数量} = K^D`,
       }}
       interactiveDemo={<CurseOfDimensionalityLab />}
+      extraContent={
+        <ExercisePanel
+          exerciseSetId="chapter03-limitations"
+          exercises={chapter03LimitationsExercises}
+        />
+      }
     />
   );
 }

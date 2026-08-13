@@ -1,226 +1,77 @@
 import { useMemo, useState } from 'react';
-import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
+import { Slider } from '@/components/ui/slider';
+import {
+  binaryCrossEntropy,
+  binaryCrossEntropyLogitGradient,
+  binarySquaredError,
+  binarySquaredErrorLogitGradient,
+  sigmoidFromLogit,
+} from '@/lib/math/neuralLosses';
 
-const PLOT_W = 560;
-const PLOT_H = 280;
-const MARGIN = { t: 20, r: 20, b: 40, l: 50 };
-const INNER_W = PLOT_W - MARGIN.l - MARGIN.r;
-const INNER_H = PLOT_H - MARGIN.t - MARGIN.b;
-
-// 误差函数定义
-const ERROR_FUNCTIONS = {
-  mse: {
-    name: '平方误差 (MSE)',
-    fn: (y: number, t: number) => 0.5 * (y - t) ** 2,
-    grad: (y: number, t: number) => y - t,
-    color: '#3b82f6',
-  },
-  crossEntropy: {
-    name: '交叉熵',
-    fn: (y: number, t: number) => {
-      const p = Math.max(1e-10, Math.min(1 - 1e-10, y));
-      return t === 1 ? -Math.log(p) : -Math.log(1 - p);
-    },
-    grad: (y: number, t: number) => {
-      const p = Math.max(1e-10, Math.min(1 - 1e-10, y));
-      return t === 1 ? -1 / p : 1 / (1 - p);
-    },
-    color: '#10b981',
-  },
-  huber: {
-    name: 'Huber 损失',
-    fn: (y: number, t: number) => {
-      const delta = 1;
-      const diff = Math.abs(y - t);
-      return diff <= delta ? 0.5 * diff ** 2 : delta * (diff - 0.5 * delta);
-    },
-    grad: (y: number, t: number) => {
-      const delta = 1;
-      const diff = y - t;
-      return Math.abs(diff) <= delta ? diff : delta * Math.sign(diff);
-    },
-    color: '#8b5cf6',
-  },
-};
-
-type ErrorFunctionKey = keyof typeof ERROR_FUNCTIONS;
+type LossKey = 'crossEntropy' | 'squaredError';
 
 export default function ErrorFunctionLab() {
-  const [selected, setSelected] = useState<ErrorFunctionKey>('crossEntropy');
-  const [yValue, setYValue] = useState(0.5);
-  const [target, setTarget] = useState(1);
+  const [selected, setSelected] = useState<LossKey>('crossEntropy');
+  const [logit, setLogit] = useState(0);
+  const [target, setTarget] = useState<0 | 1>(1);
+  const probability = sigmoidFromLogit(logit);
+  const loss = selected === 'crossEntropy'
+    ? binaryCrossEntropy(probability, target)
+    : binarySquaredError(probability, target);
+  const gradient = selected === 'crossEntropy'
+    ? binaryCrossEntropyLogitGradient(logit, target)
+    : binarySquaredErrorLogitGradient(logit, target);
+  const points = useMemo(
+    () => Array.from({ length: 241 }, (_, index) => {
+      const a = -6 + index * 0.05;
+      const p = sigmoidFromLogit(a);
+      const value = selected === 'crossEntropy'
+        ? binaryCrossEntropy(p, target)
+        : binarySquaredError(p, target);
+      return { a, value: Math.min(6, value) };
+    }),
+    [selected, target],
+  );
 
-  const errorFn = ERROR_FUNCTIONS[selected];
-
-  const curvePath = useMemo(() => {
-    const points: string[] = [];
-    for (let i = 0; i <= 100; i++) {
-      const y = i / 100;
-      const loss = errorFn.fn(y, target);
-      const px = MARGIN.l + y * INNER_W;
-      const py = MARGIN.t + INNER_H - (loss / 5) * INNER_H;
-      points.push(`${i === 0 ? 'M' : 'L'} ${px} ${py}`);
-    }
-    return points.join(' ');
-  }, [errorFn, target]);
-
-  const gradientPath = useMemo(() => {
-    const points: string[] = [];
-    for (let i = 0; i <= 100; i++) {
-      const y = i / 100;
-      const grad = errorFn.grad(y, target);
-      const px = MARGIN.l + y * INNER_W;
-      const py = MARGIN.t + INNER_H - ((grad + 5) / 10) * INNER_H;
-      points.push(`${i === 0 ? 'M' : 'L'} ${px} ${py}`);
-    }
-    return points.join(' ');
-  }, [errorFn, target]);
-
-  const currentLoss = errorFn.fn(yValue, target);
-  const currentGrad = errorFn.grad(yValue, target);
+  const width = 600;
+  const height = 260;
+  const margin = { top: 16, right: 16, bottom: 36, left: 44 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+  const toX = (value: number) => margin.left + ((value + 6) / 12) * plotWidth;
+  const toY = (value: number) => margin.top + (1 - value / 6) * plotHeight;
 
   return (
-    <InteractiveDemo title="误差函数对训练的影响">
-      <div className="space-y-6">
-        <p className="text-gray-700">
-          选择不同的误差函数，观察损失值和梯度随预测概率变化的关系。
-          注意交叉熵在预测接近 0 或 1 时梯度很大，而平方误差在饱和区梯度很小。
+    <InteractiveDemo title="误差函数实验：比较对 logit 的训练信号">
+      <div className="space-y-5">
+        <p className="text-sm leading-relaxed text-gray-700">
+          为避免混淆，横轴使用 sigmoid 之前的 logit a，红色指标统一显示真正反向传播的量 ∂E/∂a。
+          当标签 t=1 而 a 很负时，交叉熵仍给出接近 -1 的纠正信号；平方误差还要乘 sigmoid 导数，可能接近 0。
         </p>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700">误差函数</label>
-              <div className="flex gap-2 mt-2">
-                {(Object.keys(ERROR_FUNCTIONS) as ErrorFunctionKey[]).map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => setSelected(key)}
-                    className={`px-3 py-1.5 text-sm rounded-lg border ${
-                      selected === key
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {ERROR_FUNCTIONS[key].name}
-                  </button>
-                ))}
-              </div>
-            </div>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => setSelected('crossEntropy')} className={`rounded-lg border px-3 py-2 text-sm ${selected === 'crossEntropy' ? 'bg-emerald-600 text-white' : 'bg-white'}`}>二分类交叉熵</button>
+          <button type="button" onClick={() => setSelected('squaredError')} className={`rounded-lg border px-3 py-2 text-sm ${selected === 'squaredError' ? 'bg-blue-600 text-white' : 'bg-white'}`}>sigmoid + 平方误差</button>
+          <button type="button" onClick={() => setTarget(target === 1 ? 0 : 1)} className="rounded-lg border bg-white px-3 py-2 text-sm">切换标签：t={target}</button>
+        </div>
 
-            <div>
-              <label className="text-sm font-medium text-gray-700">预测概率 y</label>
-              <Slider value={[yValue]} min={0.01} max={0.99} step={0.01} onValueChange={(v) => setYValue(v[0])} />
-              <div className="text-sm text-gray-500 mt-1">y = {yValue.toFixed(2)}</div>
-            </div>
+        <label className="space-y-2 text-sm font-medium text-gray-700">
+          <span className="flex justify-between"><span>logit a</span><span className="font-mono">{logit.toFixed(2)}</span></span>
+          <Slider value={[logit]} min={-6} max={6} step={0.05} onValueChange={([value]) => setLogit(value)} />
+        </label>
 
-            <div>
-              <label className="text-sm font-medium text-gray-700">真实标签</label>
-              <div className="flex gap-2 mt-2">
-                <button
-                  onClick={() => setTarget(1)}
-                  className={`px-3 py-1.5 text-sm rounded-lg border ${
-                    target === 1
-                      ? 'bg-emerald-600 text-white border-emerald-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  t = 1
-                </button>
-                <button
-                  onClick={() => setTarget(0)}
-                  className={`px-3 py-1.5 text-sm rounded-lg border ${
-                    target === 0
-                      ? 'bg-red-600 text-white border-red-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  t = 0
-                </button>
-              </div>
-            </div>
+        <svg viewBox={`0 0 ${width} ${height}`} className="w-full rounded-lg border bg-gray-50">
+          <polyline points={points.map((point) => `${toX(point.a)},${toY(point.value)}`).join(' ')} fill="none" stroke={selected === 'crossEntropy' ? '#059669' : '#2563eb'} strokeWidth="2.5" />
+          <line x1={toX(logit)} y1={margin.top} x2={toX(logit)} y2={height - margin.bottom} stroke="#dc2626" strokeDasharray="4 3" />
+          <circle cx={toX(logit)} cy={toY(Math.min(6, loss))} r="5" fill="#dc2626" />
+          <rect x={margin.left} y={margin.top} width={plotWidth} height={plotHeight} fill="none" stroke="#9ca3af" />
+        </svg>
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
-                <div className="text-xs text-gray-600">损失值</div>
-                <div className="text-lg font-bold text-blue-700">{currentLoss.toFixed(3)}</div>
-              </div>
-              <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
-                <div className="text-xs text-gray-600">梯度</div>
-                <div className="text-lg font-bold text-emerald-700">{currentGrad.toFixed(3)}</div>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <div className="text-sm text-gray-700">
-                <strong>分析：</strong>
-                {selected === 'mse' && ' 平方误差在预测接近 0 或 1 时梯度很小，导致 sigmoid 饱和区训练缓慢。'}
-                {selected === 'crossEntropy' && ' 交叉熵在预测偏离真实标签时梯度很大，训练更快。'}
-                {selected === 'huber' && ' Huber 损失在误差小时用平方，误差大时用线性，对异常值更鲁棒。'}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <svg viewBox={`0 0 ${PLOT_W} ${PLOT_H}`} className="w-full border border-gray-200 rounded-lg">
-              <rect x={MARGIN.l} y={MARGIN.t} width={INNER_W} height={INNER_H} fill="#f9fafb" />
-              {/* 网格线 */}
-              {[0, 1, 2, 3, 4, 5].map((y) => (
-                <line
-                  key={`gy-${y}`}
-                  x1={MARGIN.l}
-                  y1={MARGIN.t + INNER_H - (y / 5) * INNER_H}
-                  x2={MARGIN.l + INNER_W}
-                  y2={MARGIN.t + INNER_H - (y / 5) * INNER_H}
-                  stroke="#e5e7eb"
-                  strokeDasharray="3,3"
-                />
-              ))}
-              {[0, 0.25, 0.5, 0.75, 1].map((x) => (
-                <line
-                  key={`gx-${x}`}
-                  x1={MARGIN.l + x * INNER_W}
-                  y1={MARGIN.t}
-                  x2={MARGIN.l + x * INNER_W}
-                  y2={MARGIN.t + INNER_H}
-                  stroke="#e5e7eb"
-                  strokeDasharray="3,3"
-                />
-              ))}
-
-              {/* 损失曲线 */}
-              <path d={curvePath} fill="none" stroke={errorFn.color} strokeWidth={2.5} />
-              {/* 梯度曲线 */}
-              <path d={gradientPath} fill="none" stroke="#ef4444" strokeWidth={2} strokeDasharray="5,5" />
-
-              {/* 当前点 */}
-              <circle
-                cx={MARGIN.l + yValue * INNER_W}
-                cy={MARGIN.t + INNER_H - (currentLoss / 5) * INNER_H}
-                r={6}
-                fill={errorFn.color}
-                stroke="white"
-                strokeWidth={2}
-              />
-              <circle
-                cx={MARGIN.l + yValue * INNER_W}
-                cy={MARGIN.t + INNER_H - ((currentGrad + 5) / 10) * INNER_H}
-                r={5}
-                fill="#ef4444"
-                stroke="white"
-                strokeWidth={2}
-              />
-            </svg>
-            <div className="flex gap-4 justify-center mt-2 text-xs text-gray-600">
-              <span className="flex items-center gap-1">
-                <span className="w-4 h-0.5" style={{ backgroundColor: errorFn.color }} /> 损失
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-4 h-0.5 bg-red-500" style={{ borderTop: '2px dashed #ef4444' }} /> 梯度
-              </span>
-            </div>
-          </div>
+        <div className="grid gap-3 sm:grid-cols-3 text-center">
+          <div className="rounded-lg bg-violet-50 p-3"><div className="text-xs text-gray-600">概率 σ(a)</div><div className="font-bold text-violet-800">{probability.toFixed(5)}</div></div>
+          <div className="rounded-lg bg-blue-50 p-3"><div className="text-xs text-gray-600">损失 E</div><div className="font-bold text-blue-800">{loss.toFixed(5)}</div></div>
+          <div className="rounded-lg bg-red-50 p-3"><div className="text-xs text-gray-600">训练梯度 ∂E/∂a</div><div className="font-bold text-red-800">{gradient.toFixed(5)}</div></div>
         </div>
       </div>
     </InteractiveDemo>

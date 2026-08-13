@@ -1,6 +1,11 @@
 import { useMemo, useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
+import PredictionGate from '@/components/PredictionGate';
+import {
+  gaussianPoints,
+  summarizePairwiseDistances,
+} from '@/lib/math/highDimensional';
 
 const PLOT_W = 560;
 const PLOT_H = 280;
@@ -8,70 +13,19 @@ const MARGIN = { t: 20, r: 20, b: 40, l: 50 };
 const INNER_W = PLOT_W - MARGIN.l - MARGIN.r;
 const INNER_H = PLOT_H - MARGIN.t - MARGIN.b;
 
-// 生成 D 维空间中的随机点
-function randomPoint(D: number): number[] {
-  const point: number[] = [];
-  for (let i = 0; i < D; i++) {
-    // 使用 Box-Muller 生成高斯分布
-    let u = 0, v = 0;
-    while (u === 0) u = Math.random();
-    while (v === 0) v = Math.random();
-    const g = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
-    point.push(g);
-  }
-  return point;
-}
-
-// 计算两点欧氏距离
-function distance(a: number[], b: number[]): number {
-  let sum = 0;
-  for (let i = 0; i < a.length; i++) {
-    sum += (a[i] - b[i]) ** 2;
-  }
-  return Math.sqrt(sum);
-}
-
 export default function CurseOfDimensionalityLab() {
   const [D, setD] = useState(2);
   const [numSamples, setNumSamples] = useState(50);
+  const [seed, setSeed] = useState(42);
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
-  const samples = useMemo(() => {
-    const points: number[][] = [];
-    for (let i = 0; i < numSamples; i++) {
-      points.push(randomPoint(D));
-    }
-    return points;
-  }, [D, numSamples]);
-
-  const distances = useMemo(() => {
-    const dists: number[] = [];
-    for (let i = 0; i < samples.length; i++) {
-      for (let j = i + 1; j < samples.length; j++) {
-        dists.push(distance(samples[i], samples[j]));
-      }
-    }
-    return dists;
-  }, [samples]);
-
-  const avgDistance = useMemo(() => {
-    if (distances.length === 0) return 0;
-    return distances.reduce((a, b) => a + b, 0) / distances.length;
-  }, [distances]);
-
-  const minDistance = useMemo(() => {
-    if (distances.length === 0) return 0;
-    return Math.min(...distances);
-  }, [distances]);
-
-  const maxDistance = useMemo(() => {
-    if (distances.length === 0) return 0;
-    return Math.max(...distances);
-  }, [distances]);
-
-  const distanceRatio = useMemo(() => {
-    if (minDistance === 0) return 0;
-    return maxDistance / minDistance;
-  }, [maxDistance, minDistance]);
+  const samples = useMemo(
+    () => gaussianPoints(D, numSamples, seed),
+    [D, numSamples, seed],
+  );
+  const summary = useMemo(() => summarizePairwiseDistances(samples), [samples]);
 
   // 2D 可视化（只显示前两个维度）
   const scatterPoints = useMemo(() => {
@@ -86,11 +40,36 @@ export default function CurseOfDimensionalityLab() {
       <div className="space-y-6">
         <p className="text-gray-700">
           调整空间维度 D，观察高维空间中随机点的距离分布。随着维度增加，
-          点与点之间的距离趋于相同，"近邻"概念失去意义。
+          独立高斯点间距离的相对波动通常缩小，原始欧氏距离的近邻对比度也随之下降。
         </p>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-4">
+        <PredictionGate
+          resetKey="chapter03-distance-concentration"
+          prediction={prediction}
+          onPredictionChange={setPrediction}
+          submitted={submitted}
+          onSubmit={() => setSubmitted(true)}
+          revealed={revealed}
+          onReveal={() => setRevealed((value) => !value)}
+          canReveal={submitted}
+          question="从 D=2 增加到 D=50 时，点间距离的相对离散程度（标准差/均值）通常如何变化？"
+          hint="平均距离会增大；问题问的是相对于平均距离的波动。"
+          options={[
+            { value: 'decrease', label: '下降，距离相对更集中' },
+            { value: 'increase', label: '上升，距离相对更分散' },
+            { value: 'same', label: '完全不变' },
+          ]}
+          evaluatePrediction={(answer) => ({
+            correct: answer === 'decrease',
+            category: '距离集中',
+            feedback: answer === 'decrease' ? '正确。高维中绝对距离变大，但相对波动通常缩小。' : '区分绝对距离与相对离散度；应比较标准差/均值。',
+          })}
+          revealContent={<p className="text-sm text-gray-700">对独立高斯坐标，平方距离是许多独立项之和；维度增大时，相对波动因集中现象而减小。</p>}
+        />
+
+        {submitted && (
+          <div className="grid md:grid-cols-2 gap-6" aria-label="高维距离实验控制区">
+            <div className="space-y-4">
             <div>
               <label className="text-sm font-medium text-gray-700">空间维度 D</label>
               <Slider value={[D]} min={1} max={50} step={1} onValueChange={(v) => setD(v[0])} />
@@ -103,36 +82,40 @@ export default function CurseOfDimensionalityLab() {
               <div className="text-sm text-gray-500 mt-1">{numSamples} 个样本</div>
             </div>
 
+            <button type="button" onClick={() => setSeed((value) => value + 1)} className="rounded-lg border bg-white px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              更换固定随机种子（当前 {seed}）
+            </button>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
                 <div className="text-xs text-gray-600">平均距离</div>
-                <div className="text-lg font-bold text-blue-700">{avgDistance.toFixed(3)}</div>
+                <div className="text-lg font-bold text-blue-700">{summary.mean.toFixed(3)}</div>
               </div>
               <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-200">
-                <div className="text-xs text-gray-600">距离比率</div>
-                <div className="text-lg font-bold text-emerald-700">{distanceRatio.toFixed(2)}</div>
+                <div className="text-xs text-gray-600">相对离散度 σ/μ</div>
+                <div className="text-lg font-bold text-emerald-700">{summary.coefficientOfVariation.toFixed(3)}</div>
               </div>
               <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                 <div className="text-xs text-gray-600">最小距离</div>
-                <div className="text-lg font-bold text-amber-700">{minDistance.toFixed(3)}</div>
+                <div className="text-lg font-bold text-amber-700">{summary.minimum.toFixed(3)}</div>
               </div>
               <div className="bg-violet-50 rounded-lg p-3 border border-violet-200">
                 <div className="text-xs text-gray-600">最大距离</div>
-                <div className="text-lg font-bold text-violet-700">{maxDistance.toFixed(3)}</div>
+                <div className="text-lg font-bold text-violet-700">{summary.maximum.toFixed(3)}</div>
               </div>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <div className="text-sm text-gray-700">
                 <strong>解释：</strong>
-                {D <= 3 && ' 低维空间中，点之间的距离差异明显，近邻关系有意义。'}
-                {D > 3 && D <= 10 && ' 随着维度增加，点之间的距离开始趋于一致。'}
-                {D > 10 && ' 高维空间中，几乎所有点都彼此等距，"近邻"概念失效。'}
+                {D <= 3 && ' 低维下距离的相对波动通常较明显。'}
+                {D > 3 && D <= 10 && ' 随维度增加，距离的相对波动开始缩小。'}
+                {D > 10 && ' 高维下距离更集中；这会削弱仅依赖原始欧氏距离的近邻对比度，但不代表所有近邻方法在任何数据上都必然失效。'}
               </div>
             </div>
-          </div>
+            </div>
 
-          <div>
+            <div>
             <svg viewBox={`0 0 ${PLOT_W} ${PLOT_H}`} className="w-full border border-gray-200 rounded-lg">
               <rect x={MARGIN.l} y={MARGIN.t} width={INNER_W} height={INNER_H} fill="#f9fafb" />
               {/* 网格线 */}
@@ -180,17 +163,19 @@ export default function CurseOfDimensionalityLab() {
             <div className="text-center mt-2 text-xs text-gray-500">
               2D 投影（只显示前两个维度）
             </div>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-          <div className="text-sm text-amber-800">
-            <strong>关键观察：</strong>
-            当 D=2 时，点之间的最大距离与最小距离之比约为 {distanceRatio.toFixed(1)}；
-            当 D=50 时，这个比率接近 1，意味着所有点都几乎等距。
-            这就是为什么基于距离的核方法（如 RBF）在高维空间会失效。
+        {submitted && (
+          <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+            <div className="text-sm text-amber-800">
+              <strong>关键观察：</strong>
+              当前相对离散度为 {summary.coefficientOfVariation.toFixed(3)}。比较不同 D 时应关注这个无量纲量，
+              而不是只看平均距离或一次采样的最大/最小比。真实数据若位于低维流形，学习到的表示仍可能恢复有意义的邻域结构。
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </InteractiveDemo>
   );

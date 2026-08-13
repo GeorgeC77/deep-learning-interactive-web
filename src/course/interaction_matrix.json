@@ -645,7 +645,7 @@
     "componentName": "Ch03OverviewPage",
     "componentFile": "src\\pages\\generated\\Ch03OverviewPage.tsx",
     "demos": [],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": false,
     "scalarDemo": false,
     "customLab": false,
@@ -659,7 +659,7 @@
     "counterexample": false,
     "transferChallenge": true,
     "mathTests": false,
-    "semanticTests": false,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": false
   },
@@ -671,22 +671,22 @@
     "demos": [
       "src\\components\\demos\\CurseOfDimensionalityLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": true,
     "customLab": true,
     "linkedViews": true,
-    "predictionGate": false,
-    "prediction": false,
-    "lock": false,
-    "reveal": false,
-    "evaluation": false,
-    "feedback": false,
+    "predictionGate": true,
+    "prediction": true,
+    "lock": true,
+    "reveal": true,
+    "evaluation": true,
+    "feedback": true,
     "counterexample": true,
     "transferChallenge": false,
-    "mathTests": false,
-    "semanticTests": false,
-    "completePredictionGate": false,
+    "mathTests": true,
+    "semanticTests": true,
+    "completePredictionGate": true,
     "l3plus": true
   },
   {
@@ -697,7 +697,7 @@
     "demos": [
       "src\\components\\demos\\ActivationFunctionLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": true,
     "customLab": true,
@@ -710,8 +710,8 @@
     "feedback": false,
     "counterexample": true,
     "transferChallenge": false,
-    "mathTests": false,
-    "semanticTests": false,
+    "mathTests": true,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": true
   },
@@ -723,22 +723,22 @@
     "demos": [
       "src\\components\\demos\\DepthVsWidthLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
-    "scalarDemo": true,
+    "scalarDemo": false,
     "customLab": true,
     "linkedViews": true,
-    "predictionGate": false,
-    "prediction": false,
-    "lock": false,
-    "reveal": false,
-    "evaluation": false,
-    "feedback": false,
+    "predictionGate": true,
+    "prediction": true,
+    "lock": true,
+    "reveal": true,
+    "evaluation": true,
+    "feedback": true,
     "counterexample": true,
     "transferChallenge": true,
-    "mathTests": false,
-    "semanticTests": false,
-    "completePredictionGate": false,
+    "mathTests": true,
+    "semanticTests": true,
+    "completePredictionGate": true,
     "l3plus": true
   },
   {
@@ -749,7 +749,7 @@
     "demos": [
       "src\\components\\demos\\ErrorFunctionLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
     "customLab": true,
@@ -762,8 +762,8 @@
     "feedback": false,
     "counterexample": true,
     "transferChallenge": false,
-    "mathTests": false,
-    "semanticTests": false,
+    "mathTests": true,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": true
   },
@@ -775,7 +775,7 @@
     "demos": [
       "src\\components\\demos\\MDNLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": true,
     "customLab": true,

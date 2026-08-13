@@ -1,6 +1,9 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import ActivationFunctionLab from '@/components/demos/ActivationFunctionLab';
 import { Layers } from 'lucide-react';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter03MultilayerExercises } from '@/course/chapter03Exercises';
 
 export default function Ch03MultilayerNetworksPage() {
   return (
@@ -22,7 +25,7 @@ export default function Ch03MultilayerNetworksPage() {
         },
         {
           title: "隐藏单元激活函数",
-          description: "tanh（零中心，饱和）、logistic sigmoid（0到1，饱和）、ReLU（max(0,z)，不饱和，计算快）、leaky ReLU（避免 dead ReLU）、ELU（平滑）、GeLU（随机正则化视角）。现代网络几乎全部使用 ReLU 及其变体。",
+          description: "tanh（零中心但会饱和）、logistic sigmoid（0 到 1 且会饱和）、ReLU（正半轴梯度为 1，但可能出现死亡单元）、leaky ReLU 与平滑的 GELU 等各有优化和表示取舍。现代架构的选择与任务、归一化和残差结构有关，不存在对所有模型都最优的单一激活。",
         },
         {
           title: "权重空间对称性",
@@ -89,6 +92,20 @@ export default function Ch03MultilayerNetworksPage() {
         formula: String.raw`\text{ReLU}(z)=\max(0,z), \quad \sigma(z)=\frac{1}{1+e^{-z}}, \quad \tanh(z)=\frac{e^z-e^{-z}}{e^z+e^{-z}}`,
       }}
       interactiveDemo={<ActivationFunctionLab />}
+      extraContent={
+        <div className="space-y-10">
+          <DerivationStepper
+            title="分步检查：没有非线性时深层为何会坍缩"
+            steps={[
+              { label: '第一层', formula: String.raw`h=W_1x+b_1`, explanation: '先做一次仿射变换。' },
+              { label: '第二层', formula: String.raw`y=W_2h+b_2`, explanation: '若中间没有非线性，直接代入第一层。' },
+              { label: '合并矩阵', formula: String.raw`y=(W_2W_1)x+(W_2b_1+b_2)`, explanation: '矩阵乘积仍是一个矩阵，偏置也可合并。' },
+              { label: '得到结论', formula: String.raw`y=W_{\mathrm{eff}}x+b_{\mathrm{eff}}`, explanation: '任意多层纯线性/仿射网络仍等价于单层；非线性激活才扩展函数族。' },
+            ]}
+          />
+          <ExercisePanel exerciseSetId="chapter03-multilayer" exercises={chapter03MultilayerExercises} />
+        </div>
+      }
     />
   );
 }
