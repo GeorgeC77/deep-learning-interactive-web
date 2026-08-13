@@ -1,6 +1,9 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import ConvolutionSizeDemo from '@/components/demos/ConvolutionSizeDemo';
 import FeatureHierarchyLab from '@/components/demos/FeatureHierarchyLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter07ConvolutionExercises } from '@/course/chapter07Exercises';
 import {
   outputSizeFormulaLatex,
   classicSameFormulaLatex,
@@ -99,7 +102,7 @@ export default function Ch07ConvolutionalFiltersPage() {
             bishopMapping={{
         chapter: "Ch 10",
         section: "10.2",
-        pages: "Ch 10",
+        pages: "§10.2, pp. 290–302",
         textbookSubsections: [
           "10.2 Convolutional Filters",
           "10.2.1 Feature detectors",
@@ -115,7 +118,12 @@ export default function Ch07ConvolutionalFiltersPage() {
         algorithms: ["二维离散卷积", "最大/平均池化"],
         exercises: ["给定 VGG 某层 I=224, K=3, P=1, S=1，逐层推导尺寸变化。", "对比 valid 与 framework SAME 在边界像素上的差异。"],
       }}
-      extraContent={<><FeatureHierarchyLab /><ConvolutionSizeDemo /></>}
+      extraContent={<div className="space-y-10"><FeatureHierarchyLab /><ConvolutionSizeDemo /><DerivationStepper title="分步推导：滤波器为何是特征检测器" steps={[
+        { label: '局部响应', formula: String.raw`a=\sigma(\mathbf w^T\mathbf x+w_0)`, explanation: '把感受野内的图像块展平为 x，核权重展平为 w。' },
+        { label: '固定能量', formula: String.raw`\|\mathbf x\|_2=c`, explanation: '若不限制输入幅值，简单放大 x 就能让线性响应无限增长。' },
+        { label: '上界', formula: String.raw`\mathbf w^T\mathbf x\le\|\mathbf w\|_2\|\mathbf x\|_2=c\|\mathbf w\|_2`, explanation: '由 Cauchy-Schwarz 不等式得到最大可能响应。' },
+        { label: '相等条件', formula: String.raw`\mathbf x=\alpha\mathbf w,\quad \alpha>0`, explanation: '最大响应图像块与核的图案同方向，因此学习到的核可以解释为局部特征模板。' },
+      ]} /><ExercisePanel exerciseSetId="chapter07-convolution" exercises={chapter07ConvolutionExercises} /></div>}
     />
   );
 }

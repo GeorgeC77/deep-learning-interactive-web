@@ -1,6 +1,9 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import UnetDemo from '@/components/demos/UnetDemo';
 import TranslationEquivarianceLab from '@/components/demos/TranslationEquivarianceLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter07SegmentationExercises } from '@/course/chapter07Exercises';
 import { outputSizeFormulaLatex, frameworkSameFormulaLatex } from '@/lib/math/conv';
 import { Scissors } from 'lucide-react';
 
@@ -58,7 +61,7 @@ export default function Ch07ImageSegmentationPage() {
             bishopMapping={{
         chapter: "Ch 10",
         section: "10.5",
-        pages: "Ch 10",
+        pages: "§10.5, pp. 315–320",
         textbookSubsections: [
           "10.5.1 Convolutional segmentation",
           "10.5.3 Fully convolutional networks",
@@ -70,7 +73,12 @@ export default function Ch07ImageSegmentationPage() {
         exercises: ["画出 U-Net 的结构框图并标注 skip connection。", "用不同输入尺寸测试 FCN 输出尺寸。"],
       }}
       interactiveDemo={<TranslationEquivarianceLab />}
-      extraContent={<UnetDemo />}
+      extraContent={<div className="space-y-10"><UnetDemo /><DerivationStepper title="分步推导：U-Net 的空间与通道对齐" steps={[
+        { label: '编码尺寸', formula: String.raw`H_l=H_0/2^l,\quad C_l=C_0g^l`, explanation: '每次池化将空间边长减半，常同时按增长因子 g 增加通道。' },
+        { label: '瓶颈对齐', formula: String.raw`H_0\equiv0\pmod{2^L}`, explanation: 'L 次二倍下采样要求输入按 2^L 对齐；否则必须记录填充。' },
+        { label: '解码上采样', formula: String.raw`H_{l-1}=2H_l`, explanation: '转置卷积或插值加卷积把空间分辨率恢复到对应编码层。' },
+        { label: '跳连拼接', formula: String.raw`D_{l-1}=\operatorname{concat}(\operatorname{up}(D_l),E_{l-1})`, explanation: '只有 H×W 相同才能沿通道轴拼接；最终 1×1 卷积把通道降为类别数。' },
+      ]} /><ExercisePanel exerciseSetId="chapter07-segmentation" exercises={chapter07SegmentationExercises} /></div>}
     />
   );
 }

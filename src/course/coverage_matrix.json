@@ -765,7 +765,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch07-computer-vision",
@@ -781,7 +781,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch07-convolutional-filters",
@@ -813,7 +813,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch07-object-detection",
@@ -829,7 +829,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch07-image-segmentation",
@@ -861,7 +861,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch08-overview",

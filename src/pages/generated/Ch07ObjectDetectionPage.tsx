@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import IoUNMSDemo from '@/components/demos/IoUNMSDemo';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter07DetectionExercises } from '@/course/chapter07Exercises';
 import { Target } from 'lucide-react';
 
 export default function Ch07ObjectDetectionPage() {
@@ -67,7 +70,7 @@ export default function Ch07ObjectDetectionPage() {
             bishopMapping={{
         chapter: "Ch 10",
         section: "10.4",
-        pages: "Ch 10",
+        pages: "§10.4, pp. 308–315",
         textbookSubsections: [
           "10.4.1 Bounding boxes",
           "10.4.2 Intersection-over-union",
@@ -80,7 +83,12 @@ export default function Ch07ObjectDetectionPage() {
         algorithms: ["滑动窗口检测", "非极大抑制"],
         exercises: ["给定两个边界框坐标，手算 IoU。", "调整 NMS 阈值观察重复检测与漏检的权衡。"],
       }}
-      extraContent={<IoUNMSDemo />}
+      extraContent={<div className="space-y-10"><IoUNMSDemo /><DerivationStepper title="分步推导：从坐标到 IoU 与 NMS 决策" steps={[
+        { label: '交集边界', formula: String.raw`x_L=\max(x_A,x_B),\quad x_R=\min(x_A+w_A,x_B+w_B)`, explanation: 'y 方向同理；取较晚的左边界和较早的右边界。' },
+        { label: '交集面积', formula: String.raw`I=\max(0,x_R-x_L)\max(0,y_B-y_T)`, explanation: 'max(0,·) 保证不相交时面积为零。' },
+        { label: '并集与 IoU', formula: String.raw`U=|A|+|B|-I,\qquad \mathrm{IoU}=I/U`, explanation: '交集只应在并集中计数一次。' },
+        { label: '类别内抑制', formula: String.raw`s_B<\tau_s\ \text{或}\ \mathrm{IoU}(A,B)>\tau_{\mathrm{IoU}}\Rightarrow\text{discard }B`, explanation: '先过滤低置信度框，再按分数选择最大框，并在同类别剩余框中抑制高重叠项。' },
+      ]} /><ExercisePanel exerciseSetId="chapter07-detection" exercises={chapter07DetectionExercises} /></div>}
     />
   );
 }

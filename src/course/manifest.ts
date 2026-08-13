@@ -482,14 +482,14 @@ export const courseManifest: Part[] = [
             id: "ch07-overview",
             title: "课程概览",
             path: "/ch07/overview",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "卷积、池化、CNN 架构与视觉任务。",
           },
           {
             id: "ch07-computer-vision",
             title: "10.1 计算机视觉",
             path: "/ch07/computer-vision",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "图像数据与视觉任务概述。",
           },
           {
@@ -503,14 +503,14 @@ export const courseManifest: Part[] = [
             id: "ch07-visualizing-trained-cnns",
             title: "10.3 可视化训练后的 CNN",
             path: "/ch07/visualizing-trained-cnns",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "视觉皮层、滤波器可视化、显著性图、对抗攻击与合成图像。",
           },
           {
             id: "ch07-object-detection",
             title: "10.4 目标检测",
             path: "/ch07/object-detection",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "边界框、IoU、滑动窗口、多尺度检测、非极大抑制与 Fast R-CNN。",
           },
           {
@@ -524,7 +524,7 @@ export const courseManifest: Part[] = [
             id: "ch07-style-transfer",
             title: "10.6 风格迁移",
             path: "/ch07/style-transfer",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "神经风格迁移与特征重组。",
           }
         ],

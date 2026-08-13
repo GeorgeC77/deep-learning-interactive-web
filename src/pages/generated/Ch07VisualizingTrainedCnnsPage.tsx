@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import SaliencyComparisonLab from '@/components/demos/SaliencyComparisonLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter07VisualizationExercises } from '@/course/chapter07Exercises';
 import { Search } from 'lucide-react';
 
 export default function Ch07VisualizingTrainedCnnsPage() {
@@ -18,9 +21,14 @@ export default function Ch07VisualizingTrainedCnnsPage() {
           description: "第一层滤波器常呈现 Gabor 边缘检测器；激活最大化可找到使某滤波器响应最大的偏好输入。",
         },
         {
-          title: "显著性图",
-          description: "通过反向传播输入梯度，显示当前输入附近 class score 对像素的局部敏感度。",
+          title: "输入梯度显著性",
+          description: "把目标类别分数对输入像素的梯度绝对值作为局部敏感度；它便于计算，但会受到饱和、噪声和基线选择影响。",
           formula: String.raw`S_i = \left|\frac{\partial y_c}{\partial x_i}\right|`,
+        },
+        {
+          title: "Grad-CAM 显著性图",
+          description: "教材用目标类别预激活对最后卷积层各通道求梯度并作空间平均，再加权组合特征图；它保留定位但仍是模型证据的可视化，不等于因果解释。",
+          formula: String.raw`\alpha_k=\frac1{M_k}\sum_{i,j}\frac{\partial a^{(c)}}{\partial a_{ij}^{(k)}},\quad L=\sum_k\alpha_kA^{(k)}`,
         },
         {
           title: "对抗样本",
@@ -60,7 +68,7 @@ export default function Ch07VisualizingTrainedCnnsPage() {
             bishopMapping={{
         chapter: "Ch 10",
         section: "10.3",
-        pages: "Ch 10",
+        pages: "§10.3, pp. 302–308",
         textbookSubsections: [
           "10.3 Visualizing Trained CNNs",
           "10.3.1 Visual cortex",
@@ -69,11 +77,17 @@ export default function Ch07VisualizingTrainedCnnsPage() {
           "10.3.4 Adversarial attacks",
           "10.3.5 Synthetic images"
         ],
-        formulas: ["S_i = |∂y_c/∂x_i|", "对抗扰动约束 ‖δ‖_p ≤ ε"],
+        formulas: ["S_i = |∂y_c/∂x_i|", "Grad-CAM channel weight αk", "L=Σk αk A(k)", "对抗扰动约束 ‖δ‖p≤ε", "DeepDream F(I)=Σijk aijk(I)²"],
         algorithms: ["激活最大化", "梯度显著性", "Occlusion 归因", "Integrated Gradients"],
         exercises: ["比较同一输入上 gradient、gradient×input、integrated gradients 的差异。", "用随机化权重 sanity check 显著性方法。"],
       }}
       interactiveDemo={<SaliencyComparisonLab />}
+      extraContent={<div className="space-y-10"><DerivationStepper title="分步推导：Grad-CAM 从类别梯度到热力图" steps={[
+        { label: '选择类别', formula: String.raw`a^{(c)}(x)`, explanation: '使用 softmax 之前的目标类别预激活，避免类别概率耦合掩盖证据。' },
+        { label: '求局部梯度', formula: String.raw`g_{ij}^{(k)}=\frac{\partial a^{(c)}}{\partial a_{ij}^{(k)}}`, explanation: '梯度衡量类别分数对最后卷积层每个空间单元的局部敏感度。' },
+        { label: '通道权重', formula: String.raw`\alpha_k=\frac1{M_k}\sum_{i,j}g_{ij}^{(k)}`, explanation: '对空间位置平均，把每个通道压成一个类别相关权重。' },
+        { label: '组合热图', formula: String.raw`L=\sum_k\alpha_kA^{(k)}`, explanation: '加权通道仍保留最后卷积层的空间网格，可上采样叠加到原图；它是证据定位而非因果证明。' },
+      ]} /><ExercisePanel exerciseSetId="chapter07-visualization" exercises={chapter07VisualizationExercises} /></div>}
     />
   );
 }

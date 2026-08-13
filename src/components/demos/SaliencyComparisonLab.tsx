@@ -1,21 +1,13 @@
 import { useMemo, useState } from 'react';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import { Slider } from '@/components/ui/slider';
-
-function sigmoid(x: number) {
-  return 1 / (1 + Math.exp(-x));
-}
-
-function dsigmoid(y: number) {
-  return y * (1 - y);
-}
-
-function softmax1D(arr: number[]): number[] {
-  const max = Math.max(...arr);
-  const exps = arr.map((v) => Math.exp(v - max));
-  const sum = exps.reduce((a, b) => a + b, 0);
-  return exps.map((e) => e / sum);
-}
+import {
+  inputGradient,
+  integratedGradients as computeIntegratedGradients,
+  linearSigmoidScore,
+  occlusionAttribution,
+  softmax,
+} from '@/lib/math/saliency';
 
 export default function SaliencyComparisonLab() {
   const [input, setInput] = useState<number[]>([0.5, 1.0, 0.2, -0.3, 0.8]);
@@ -40,14 +32,9 @@ export default function SaliencyComparisonLab() {
     });
   };
 
-  const score = useMemo(() => {
-    const z = input.reduce((sum, x, i) => sum + x * effectiveWeights[i], 0) + bias;
-    return sigmoid(z);
-  }, [input, effectiveWeights, bias]);
-
   const vanillaGradient = useMemo(
-    () => effectiveWeights.map((w) => w * dsigmoid(score)),
-    [effectiveWeights, score],
+    () => inputGradient(input, effectiveWeights, bias),
+    [input, effectiveWeights, bias],
   );
 
   const gradTimesInput = useMemo(
@@ -56,28 +43,13 @@ export default function SaliencyComparisonLab() {
   );
 
   const integratedGradients = useMemo(() => {
-    const baseline = Array(input.length).fill(0);
-    const steps = 20;
-    let acc = Array(input.length).fill(0);
-    for (let s = 1; s <= steps; s++) {
-      const alpha = s / steps;
-      const interpolated = input.map((x, i) => baseline[i] + alpha * (x - baseline[i]));
-      const z = interpolated.reduce((sum, x, i) => sum + x * effectiveWeights[i], 0) + bias;
-      const y = sigmoid(z);
-      const grad = effectiveWeights.map((w) => w * dsigmoid(y));
-      acc = acc.map((v, i) => v + grad[i]);
-    }
-    return acc.map((v, i) => v * (input[i] - baseline[i]) / steps);
+    return computeIntegratedGradients(input, effectiveWeights, bias, 100);
   }, [input, effectiveWeights, bias]);
 
-  const occlusion = useMemo(() => {
-    const baseScore = score;
-    return input.map((_, i) => {
-      const occluded = input.map((x, j) => (j === i ? 0 : x));
-      const z = occluded.reduce((sum, x, j) => sum + x * effectiveWeights[j], 0) + bias;
-      return baseScore - sigmoid(z);
-    });
-  }, [input, effectiveWeights, bias, score]);
+  const occlusion = useMemo(
+    () => occlusionAttribution(input, effectiveWeights, bias),
+    [input, effectiveWeights, bias],
+  );
 
   // Two-class softmax toy extension: use same weights for class 0 and negated for class 1.
   const classScores = useMemo(() => {
@@ -85,16 +57,15 @@ export default function SaliencyComparisonLab() {
     return [z, -z];
   }, [input, effectiveWeights, bias]);
 
-  const probs = useMemo(() => softmax1D(classScores), [classScores]);
+  const probs = useMemo(() => softmax(classScores), [classScores]);
 
   const saturationInput = useMemo(() => [5.0, 5.0, 5.0, 5.0, 5.0], []);
   const saturationScore = useMemo(() => {
-    const z = saturationInput.reduce((sum, x, i) => sum + x * effectiveWeights[i], 0) + bias;
-    return sigmoid(z);
+    return linearSigmoidScore(saturationInput, effectiveWeights, bias);
   }, [saturationInput, effectiveWeights, bias]);
   const saturationGradient = useMemo(
-    () => effectiveWeights.map((w) => w * dsigmoid(saturationScore)),
-    [effectiveWeights, saturationScore],
+    () => inputGradient(saturationInput, effectiveWeights, bias),
+    [saturationInput, effectiveWeights, bias],
   );
 
   return (
