@@ -1,4 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import GraphPermutationLab from '@/components/demos/GraphPermutationLab';
+import { chapter10GraphBasicsExercises } from '@/course/chapter10Exercises';
 import { Globe } from 'lucide-react';
 
 export default function Ch10MachineLearningOnGraphsPage() {
@@ -17,6 +21,10 @@ export default function Ch10MachineLearningOnGraphsPage() {
           description: "分别预测单个节点、单条边或整张图的标签，不同任务对置换对称性的要求不同。",
         },
         {
+          title: "直推与归纳学习",
+          description: "直推节点分类在训练时可看到测试节点及图结构但不使用其标签；归纳学习则要求模型推广到训练时未出现的新节点或新图。",
+        },
+        {
           title: "置换等变性",
           description: "若对输入节点重新编号，节点级输出也按同样顺序重排。",
           formula: String.raw`f(P A P^{\top}, P X) = P f(A, X)`,
@@ -30,7 +38,7 @@ export default function Ch10MachineLearningOnGraphsPage() {
       learningObjectives={[
         "能用邻接矩阵表示简单图。",
         "区分节点级任务的置换等变性与图级任务的置换不变性。",
-        "理解为什么图模型应基于聚合操作。",
+        "区分直推学习与归纳学习中测试节点在训练阶段是否出现。",
       ]}
       coreIntuition={"图没有天然的节点顺序；好的图模型应像“集合上的函数”：节点级输出随节点顺序一起变，图级输出则不随顺序变。"}
       commonMistakes={[
@@ -55,30 +63,22 @@ export default function Ch10MachineLearningOnGraphsPage() {
             bishopMapping={{
         chapter: "Ch 13",
         section: "13.1",
-        pages: "Ch 13",
+        pages: "§13.1, pp. 409–412",
         textbookSubsections: [
           "13.1.1 Graph properties",
           "13.1.2 Adjacency matrix",
           "13.1.3 Permutation equivariance"
         ],
         formulas: ["置换等变 f(PAPᵀ,PX)=Pf(A,X)", "置换不变 f(PAPᵀ,PX)=f(A,X)"],
-        algorithms: ["度中心性", "图特征提取"],
-        exercises: ["写出 4 节点环图的邻接矩阵，并验证节点重排后的置换等价。", "判断节点分类与图分类分别需要哪种置换性质。"],
+        algorithms: ["邻接矩阵的同步行列置换", "置换不变图级 readout"],
+        exercises: ["计算 X′=PX 与 A′=PAPᵀ。", "判断节点/图任务需要等变还是不变。", "区分直推学习与归纳学习。"],
       }}
-      demo={{
-        title: "度中心性",
-        label: "节点度数 k",
-        param: 4,
-        min: 0,
-        max: 20,
-        step: 1,
-        compute: (k) => ({
-          label: '归一化度中心性',
-          value: k / 20,
-          display: String.raw`C_D=${(k / 20).toFixed(2)}`,
-        }),
-        formula: String.raw`C_D(v) = \frac{\deg(v)}{N-1}`,
-      }}
+      extraContent={<div className="space-y-10"><GraphPermutationLab /><DerivationStepper title="分步推导：节点等变如何变成整图不变" steps={[
+        { label: '重编号输入', formula: String.raw`\widetilde X=PX,\qquad \widetilde A=PAP^{\top}`, explanation: 'X 的行对应节点；A 的行和列都对应节点，因此同一个 P 要同时作用在两个索引上。' },
+        { label: '节点映射等变', formula: String.raw`H(\widetilde X,\widetilde A)=P H(X,A)`, explanation: '重新编号不会改变每个真实节点得到的信息，只会改变这些节点表示在矩阵中的排列。' },
+        { label: '对节点求和', formula: String.raw`r(H)=\mathbf 1^{\top}H`, explanation: '图级 readout 必须消除任意节点顺序；求和是最简单的置换不变聚合。' },
+        { label: '得到不变性', formula: String.raw`r(PH)=\mathbf 1^{\top}PH=\mathbf 1^{\top}H=r(H)`, explanation: '置换只重排行，所以 1ᵀP=1ᵀ。于是节点级等变表示经对称 readout 后给出图级不变输出。' },
+      ]} /><ExercisePanel exerciseSetId="chapter10-graph-basics" exercises={chapter10GraphBasicsExercises} /></div>}
     />
   );
 }

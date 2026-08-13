@@ -31,6 +31,16 @@ export function permuteVector<T>(vec: T[], perm: number[]): T[] {
   return Array.from({ length: vec.length }, (_, i) => vec[perm[i]]);
 }
 
+/** Node degrees for an unweighted adjacency matrix. */
+export function nodeDegrees(adj: number[][]): number[] {
+  return adj.map((row) => row.reduce((sum, value) => sum + value, 0));
+}
+
+/** Number of edges in an undirected graph without self-loops. */
+export function undirectedEdgeCount(adj: number[][]): number {
+  return nodeDegrees(adj).reduce((sum, degree) => sum + degree, 0) / 2;
+}
+
 /** Mean aggregation from neighbors. */
 function neighborMean(adj: number[][], features: number[]): number[] {
   const N = adj.length;

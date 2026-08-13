@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import MessagePassingInvariantDemo from '@/components/demos/MessagePassingInvariantDemo';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter10MessagePassingExercises } from '@/course/chapter10Exercises';
 import { MessageSquare } from 'lucide-react';
 
 export default function Ch10NeuralMessagePassingPage() {
@@ -10,9 +13,14 @@ export default function Ch10NeuralMessagePassingPage() {
       summary={"神经消息传递是图神经网络的核心框架：生成消息、置换不变地聚合邻居消息、更新节点表示，最后通过 readout 得到图级输出。"}
       concepts={[
         {
-          title: "消息函数 Message",
-          description: "根据源节点、目标节点及边特征计算要传递的消息。",
-          formula: String.raw`\mathbf{m}_{uv} = \phi(\mathbf{h}_u, \mathbf{h}_v, \mathbf{e}_{uv})`,
+          title: "卷积滤波器",
+          description: "网格卷积在不同空间位置共享同一滤波器；将像素邻域视为规则图，可以看清局部聚合、共享参数与等变性的来源。",
+          formula: String.raw`z_i^{(l+1)}=f\!\left(w_{\rm neigh}\sum_{j\in\mathcal N(i)}z_j^{(l)}+w_{\rm self}z_i^{(l)}+b\right)`,
+        },
+        {
+          title: "图卷积网络",
+          description: "把固定像素邻域替换为图邻域，并为每个节点执行相同的聚合—更新步骤；L 层传播让表示最多依赖 L 跳邻域。",
+          formula: String.raw`\mathbf z_n^{(l)}=\operatorname{Aggregate}\{\mathbf h_m^{(l)}:m\in\mathcal N(n)\}`,
         },
         {
           title: "聚合函数 Aggregate",
@@ -21,28 +29,24 @@ export default function Ch10NeuralMessagePassingPage() {
         },
         {
           title: "更新函数 Update",
-          description: "将当前节点表示与聚合后的邻居信息结合，得到新的节点表示。",
-          formula: String.raw`\mathbf{h}_v' = \gamma(\mathbf{h}_v, \mathbf{a}_v)`,
+          description: "将当前节点表示与聚合后的邻居信息结合，得到新的节点表示；参数在所有节点间共享。",
+          formula: String.raw`\mathbf h_n^{(l+1)}=f(W_{\rm self}\mathbf h_n^{(l)}+W_{\rm neigh}\mathbf z_n^{(l)}+\mathbf b)`,
         },
         {
-          title: "Readout",
-          description: "对全图节点表示做置换不变聚合，得到图级输出。",
-          formula: String.raw`\mathbf{z} = \rho\left(\{\mathbf{h}_v \mid v \in \mathcal{G}\}\right)`,
+          title: "节点分类",
+          description: "对每个最终节点嵌入应用共享分类器与 softmax；直推训练可让未标注节点参与传播，但交叉熵只在训练节点上求和。",
+          formula: String.raw`p(c\mid n)=\operatorname{softmax}_c(W\mathbf h_n^{(L)}+\mathbf b)`,
         },
         {
-          title: "GCN 更新",
-          description: "谱域图卷积的一阶近似，用归一化邻接矩阵聚合邻居特征。",
-          formula: String.raw`H^{(l+1)} = \sigma\left(\tilde{D}^{-1/2} \tilde{A} \tilde{D}^{-1/2} H^{(l)} W^{(l)}\right)`,
+          title: "边分类",
+          description: "用一对节点的最终嵌入预测它们之间是否存在边；教材给出的基础形式是点积后接 logistic sigmoid。",
+          formula: String.raw`p(n,m)=\sigma(\mathbf h_n^{\top}\mathbf h_m)`,
         },
-      
-    {
-      title: "Convolutional filters",
-      description: "介绍 Convolutional filters 的定义、关键公式与典型应用场景。",
-    },
-    {
-      title: "Graph convolutional networks",
-      description: "介绍 Graph convolutional networks 的定义、关键公式与典型应用场景。",
-    },
+        {
+          title: "图分类",
+          description: "先对全部最终节点嵌入做置换不变聚合，再由共享预测器输出整图标签或连续性质。",
+          formula: String.raw`\mathbf y=f\!\left(\sum_{n\in\mathcal V}\mathbf h_n^{(L)}\right)`,
+        },
   ]}
       learningObjectives={[
         "能写出消息传递的 message → aggregate → update → readout 流程。",
@@ -72,7 +76,7 @@ export default function Ch10NeuralMessagePassingPage() {
             bishopMapping={{
         chapter: "Ch 13",
         section: "13.2",
-        pages: "Ch 13",
+        pages: "§13.2, pp. 412–420",
         textbookSubsections: [
           "13.2 Neural Message-Passing",
           "13.2.1 Convolutional filters",
@@ -83,11 +87,16 @@ export default function Ch10NeuralMessagePassingPage() {
           "13.2.6 Edge classification",
           "13.2.7 Graph classification"
         ],
-        formulas: ["消息函数 m_uv=φ(h_u,h_v,e_uv)", "聚合 a_v=⊕ m_uv", "GCN 更新"],
-        algorithms: ["消息传递神经网络 MPNN", "图卷积网络 GCN"],
-        exercises: ["用邻接矩阵手动推导一轮 GCN 更新。", "说明聚合函数为何是置换不变的。"],
+        formulas: ["邻域聚合 z_n=Aggregate({h_m:m∈N(n)})", "更新 h_n'=Update(h_n,z_n)", "边概率与图级 readout"],
+        algorithms: ["Algorithm 13.1 Neural message-passing", "sum/mean/degree-normalized aggregation"],
+        exercises: ["判断邻居重排是否影响聚合。", "推导 L 层消息传递的感受野。", "辨认边概率与图级不变读出。"],
       }}
-      extraContent={<MessagePassingInvariantDemo />}
+      extraContent={<div className="space-y-10"><MessagePassingInvariantDemo /><DerivationStepper title="分步推导：为什么一层消息传递是置换等变的" steps={[
+        { label: '收集邻域', formula: String.raw`\mathcal M_n^{(l)}=\{\mathbf h_m^{(l)}:m\in\mathcal N(n)\}`, explanation: '节点重编号只会重命名中心节点与邻居，不会改变每个中心所对应的邻域多重集合。' },
+        { label: '对称聚合', formula: String.raw`\mathbf z_n^{(l)}=\operatorname{Aggregate}(\mathcal M_n^{(l)})`, explanation: 'sum、mean、max 等聚合不依赖邻居枚举顺序，因此重编号前后的同一真实节点得到相同消息。' },
+        { label: '共享更新', formula: String.raw`\mathbf h_n^{(l+1)}=\operatorname{Update}(\mathbf h_n^{(l)},\mathbf z_n^{(l)})`, explanation: '所有节点使用同一个 Update，而不是按节点编号使用不同参数，所以输出仍只跟随节点身份移动。' },
+        { label: '整层等变', formula: String.raw`F(PH,PAP^{\top})=P F(H,A)`, explanation: '邻域保留、聚合对顺序不敏感、更新参数共享，三者合起来保证节点表示按同一置换重排。' },
+      ]} /><ExercisePanel exerciseSetId="chapter10-message-passing" exercises={chapter10MessagePassingExercises} /></div>}
     />
   );
 }

@@ -6,6 +6,10 @@ import {
   permutationEquivarianceError,
   permutationInvarianceError,
   nodeFeatureVariance,
+  nodeDegrees,
+  permuteAdjacency,
+  permuteVector,
+  undirectedEdgeCount,
 } from '../lib/math/gnn';
 
 const NODES = 4;
@@ -29,6 +33,13 @@ function randomPerm(N: number, seed = 123): number[] {
 }
 
 describe('gnn', () => {
+  it('simultaneous row and column permutation preserves graph structure', () => {
+    const perm = [2, 0, 3, 1];
+    const permuted = permuteAdjacency(ADJ, perm);
+    expect(nodeDegrees(permuted)).toEqual(permuteVector(nodeDegrees(ADJ), perm));
+    expect(undirectedEdgeCount(permuted)).toBe(undirectedEdgeCount(ADJ));
+  });
+
   it('round changes output values', () => {
     const h1 = messagePassing(ADJ, FEATURES, 1, 0.5, 0.5, 'relu');
     const h2 = messagePassing(ADJ, FEATURES, 2, 0.5, 0.5, 'relu');

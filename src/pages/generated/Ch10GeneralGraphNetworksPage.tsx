@@ -1,5 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import GraphAttentionLab from '@/components/demos/GraphAttentionLab';
+import DerivationStepper from '@/components/DerivationStepper';
+import ExercisePanel from '@/components/ExercisePanel';
+import { chapter10GeneralGraphExercises } from '@/course/chapter10Exercises';
 import { Hexagon } from 'lucide-react';
 
 export default function Ch10GeneralGraphNetworksPage() {
@@ -64,23 +67,30 @@ export default function Ch10GeneralGraphNetworksPage() {
             bishopMapping={{
         chapter: "Ch 13",
         section: "13.3",
-        pages: "Ch 13",
+        pages: "§13.3, pp. 420–425",
         textbookSubsections: [
-          "13.3.4 Over-smoothing",
+          "13.3 General Graph Networks",
           "13.3.1 Graph attention networks",
           "13.3.2 Edge embeddings",
           "13.3.3 Graph embeddings",
+          "13.3.4 Over-smoothing",
           "13.3.5 Regularization",
           "13.3.6 Geometric deep learning",
         ],
-        formulas: ["GAT attention coefficient \\alpha_{uv}"],
-        algorithms: ["通用图网络 GN block", "GAT"],
+        formulas: ["GAT attention coefficient \\alpha_{uv}", "edge/node/global updates", "geometric invariant messages and equivariant coordinates"],
+        algorithms: ["Algorithm 13.2 node-edge-graph message passing", "GAT"],
         exercises: [
-          "对比 GCN 与 GAT 在同一图上的聚合差异。",
-          "分析增加 GNN 层数对节点分类精度的影响。",
+          "判断 GAT softmax 的归一化集合。",
+          "选择缓解过平滑的结构。",
+          "证明平方距离在刚体变换下不变。",
         ],
       }}
-      interactiveDemo={<GraphAttentionLab />}
+      interactiveDemo={<div className="space-y-10"><GraphAttentionLab /><DerivationStepper title="分步推导：平方距离不变、坐标更新等变" steps={[
+        { label: '刚体变换', formula: String.raw`\widetilde{\mathbf x}_n=Q\mathbf x_n+\mathbf t,\qquad Q^{\top}Q=I`, explanation: 'Q 可表示旋转或镜像，t 表示平移；物理标量预测不应依赖坐标系选择。' },
+        { label: '相对位移', formula: String.raw`\widetilde{\mathbf x}_n-\widetilde{\mathbf x}_m=Q(\mathbf x_n-\mathbf x_m)`, explanation: '平移项相消，相对位移只随 Q 同步旋转或镜像，因此是等变量。' },
+        { label: '平方距离不变', formula: String.raw`\|\widetilde{\mathbf x}_n-\widetilde{\mathbf x}_m\|^2=(\mathbf x_n-\mathbf x_m)^{\top}Q^{\top}Q(\mathbf x_n-\mathbf x_m)=\|\mathbf x_n-\mathbf x_m\|^2`, explanation: '正交矩阵保持长度，所以用距离构造的边消息对平移、旋转和镜像都不变。' },
+        { label: '坐标更新等变', formula: String.raw`\mathbf x_n'=\mathbf x_n+\sum_m(\mathbf x_n-\mathbf x_m)\,\phi(e_{nm})`, explanation: '不变标量 φ 乘等变向量，再与原坐标相加；输入经 Q,t 变换时，输出坐标也按同一 Q,t 变换。' },
+      ]} /><ExercisePanel exerciseSetId="chapter10-general-graphs" exercises={chapter10GeneralGraphExercises} /></div>}
     />
   );
 }

@@ -618,14 +618,14 @@ export const courseManifest: Part[] = [
             id: "ch10-overview",
             title: "课程概览",
             path: "/ch10/overview",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "消息传递、GCN、GAT 与几何深度学习。",
           },
           {
             id: "ch10-machine-learning-on-graphs",
             title: "13.1 图上的机器学习",
             path: "/ch10/machine-learning-on-graphs",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "图性质、邻接矩阵与置换等变性。",
           },
           {
@@ -639,7 +639,7 @@ export const courseManifest: Part[] = [
             id: "ch10-general-graph-networks",
             title: "13.3 通用图网络",
             path: "/ch10/general-graph-networks",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "图注意力网络、边嵌入、图嵌入、过平滑、正则化与几何深度学习。",
           }
         ],
