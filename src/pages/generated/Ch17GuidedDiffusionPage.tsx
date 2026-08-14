@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import Chapter17SectionCompletion from '@/components/Chapter17SectionCompletion';
 import { Crosshair } from 'lucide-react';
 
 export default function Ch17GuidedDiffusionPage() {
@@ -55,7 +56,7 @@ export default function Ch17GuidedDiffusionPage() {
             bishopMapping={{
         chapter: "Ch 20",
         section: "20.4",
-        pages: "Ch 20",
+        pages: "§20.4, pp. 599–603",
         textbookSubsections: [
           "20.4.1 Classifier guidance",
           "20.4.2 Classifier-free guidance"
@@ -81,6 +82,7 @@ export default function Ch17GuidedDiffusionPage() {
         }),
         formula: String.raw`\hat{\epsilon} = \epsilon_{\text{unc}} + w \, (\epsilon_{\text{cond}} - \epsilon_{\text{unc}})`,
       }}
+      extraContent={<Chapter17SectionCompletion sectionKey="guided" />}
     />
   );
 }

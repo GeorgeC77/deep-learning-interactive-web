@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import Chapter17SectionCompletion from '@/components/Chapter17SectionCompletion';
 import DiffusionTimelineLab from '@/components/demos/DiffusionTimelineLab';
 import { Wind } from 'lucide-react';
 
@@ -59,7 +60,7 @@ export default function Ch17ForwardEncoderPage() {
             bishopMapping={{
         chapter: "Ch 20",
         section: "20.1",
-        pages: "Ch 20",
+        pages: "§20.1, pp. 582–585",
         textbookSubsections: [
           "20.1.1 Diffusion kernel",
           "20.1.2 Conditional distribution"
@@ -85,7 +86,12 @@ export default function Ch17ForwardEncoderPage() {
         }),
         formula: String.raw`\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\, \mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\, \boldsymbol{\epsilon}`,
       }}
-      extraContent={<DiffusionTimelineLab />}
+      extraContent={(
+        <>
+          <DiffusionTimelineLab />
+          <Chapter17SectionCompletion sectionKey="forward" />
+        </>
+      )}
     />
   );
 }

@@ -1469,7 +1469,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch17-forward-encoder",
@@ -1485,7 +1485,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch17-reverse-decoder",
@@ -1501,7 +1501,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch17-score-matching",
@@ -1517,7 +1517,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch17-guided-diffusion",
@@ -1533,7 +1533,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "appendix-a-overview",

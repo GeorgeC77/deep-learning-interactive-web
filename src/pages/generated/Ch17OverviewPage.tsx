@@ -1,5 +1,13 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
 import { Waves } from 'lucide-react';
+
+const progressSections = [
+  { exerciseSetId: 'chapter17-forward', label: '20.1 前向编码器', path: '/ch17/forward-encoder', exerciseCount: 3 },
+  { exerciseSetId: 'chapter17-reverse', label: '20.2 反向解码器', path: '/ch17/reverse-decoder', exerciseCount: 3 },
+  { exerciseSetId: 'chapter17-score', label: '20.3 分数匹配', path: '/ch17/score-matching', exerciseCount: 3 },
+  { exerciseSetId: 'chapter17-guided', label: '20.4 引导扩散', path: '/ch17/guided-diffusion', exerciseCount: 3 },
+];
 
 export default function Ch17OverviewPage() {
   return (
@@ -39,17 +47,25 @@ export default function Ch17OverviewPage() {
             bishopMapping={{
         chapter: "Ch 20",
         section: "20",
-        pages: "Ch 20",
+        pages: "pp. 581–608",
         textbookSubsections: [
           "20.1 Forward Encoder",
           "20.2 Reverse Decoder",
           "20.3 Score Matching",
           "20.4 Guided Diffusion"
         ],
-        formulas: ["扩散前向核", "噪声预测损失"],
-        algorithms: ["DDPM 采样", "无分类器引导"],
-        exercises: ["对比 x_t 与 z_t 两种记号在前向过程中的定义。", "讨论 β_t schedule 改变对噪声强度的影响。"],
+        formulas: ["扩散前向核", "反向 ELBO", "去噪分数匹配", "引导分数"],
+        algorithms: ["Algorithm 20.1 DDPM 训练", "Algorithm 20.2 DDPM 采样", "退火 Langevin 动力学", "无分类器引导"],
+        exercises: ["由逐步高斯转移推导闭式扩散核。", "比较噪声预测、分数匹配与无分类器引导的目标。"],
       }}
+      extraContent={(
+        <>
+          <ChapterProgressCard title="扩散模型掌握进度" sections={progressSections} />
+          <p className="text-center text-sm text-emerald-800">
+            完成四节共 12 道原创练习，即可串联闭式扩散核、ELBO、噪声预测、反向 SDE 与条件引导。
+          </p>
+        </>
+      )}
     />
   );
 }

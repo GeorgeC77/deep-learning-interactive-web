@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import Chapter17SectionCompletion from '@/components/Chapter17SectionCompletion';
 import { ArrowLeft } from 'lucide-react';
 
 export default function Ch17ReverseDecoderPage() {
@@ -24,7 +25,7 @@ export default function Ch17ReverseDecoderPage() {
         },
         {
           title: "预测 total noise 而非 incremental noise",
-          description: "预测总噪声 ε 使网络输入始终为标准高斯噪声，目标与 z_t 无关，训练更稳定；预测小步增量会随 t 变化剧烈。",
+          description: "总噪声目标 ε 的边缘分布固定为标准高斯；网络输入 z_t 仍依赖数据与时间 t。闭式构造 z_t 后，随机抽一个 t 就能获得低方差、统一尺度的监督信号。",
         },
         {
           title: "Algorithm 20.1：训练流程",
@@ -44,13 +45,14 @@ export default function Ch17ReverseDecoderPage() {
       commonMistakes={[
         "认为反向过程的真实分布严格是高斯；它只是在 β 很小时的近似。",
         "让网络预测相邻两步之间的增量噪声；预测总噪声更稳定。",
-        "在采样时忽略反向转移中的随机项，把去噪当成确定性操作。",
+        "认为所有反向步都必须加随机项；Algorithm 20.2 的中间步采样噪声，但最终生成无噪声 x 的一步不再加噪。",
         "混淆 x_t 与 z_t 记号，导致与教材公式对照错误。",
+        "把删除时间权重后的简单噪声 MSE 说成与原始 ELBO 数值完全相同；它是改变了各时间步权重的代理目标。",
       ]}
       whyCards={[
         {
           question: "为什么预测总噪声比预测增量噪声更稳定？",
-          answer: "预测总噪声使网络输入始终为标准高斯噪声，目标与 z_t 无关；预测增量噪声的目标会随 t 剧烈变化，训练更困难。",
+          answer: "每次监督目标 ε 都从同一个 N(0,I) 采样，并可用闭式核在任意 t 构造 z_t；输入 z_t 并非始终为标准高斯，且与 ε 统计相关。统一的是目标的边缘尺度，而不是输入分布。",
         },
         {
           question: "为什么反向过程只是近似高斯？",
@@ -58,13 +60,13 @@ export default function Ch17ReverseDecoderPage() {
         },
       ]}
       counterexamples={[
-        "让网络预测相邻两步之间的增量噪声，训练不稳定且生成质量差——说明预测目标的选择对训练至关重要。",
-        "在采样时忽略反向转移中的随机项，生成结果多样性差——说明去噪是随机过程而非确定性映射。",
+        "把 z_t 当作始终服从 N(0,I) 的输入，会忽略小 t 时它仍保留大量数据结构——标准高斯假设只对极限端点 z_T 近似成立。",
+        "在最终 z₁→x 的去噪步继续加入噪声，会污染本应无噪声的输出——随机项的处理依赖采样步骤。",
       ]}
             bishopMapping={{
         chapter: "Ch 20",
         section: "20.2",
-        pages: "Ch 20",
+        pages: "§20.2, pp. 585–594",
         textbookSubsections: [
           "20.2.1 Training the decoder",
           "20.2.2 Evidence lower bound",
@@ -73,7 +75,7 @@ export default function Ch17ReverseDecoderPage() {
           "20.2.5 Generating new samples"
         ],
         formulas: ["p_w(z_{t-1}|z_t)", "噪声预测损失"],
-        algorithms: ["Algorithm 20.1", "DDPM 反向采样"],
+        algorithms: ["Algorithm 20.1 DDPM 训练", "Algorithm 20.2 DDPM 采样"],
         exercises: ["从 ELBO 推导出噪声预测损失。", "说明生成时为什么从 z_T~N(0,I) 开始。"],
       }}
       demo={{
@@ -90,6 +92,7 @@ export default function Ch17ReverseDecoderPage() {
         }),
         formula: String.raw`\|\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_w(\mathbf{z}_t, t)\|^2`,
       }}
+      extraContent={<Chapter17SectionCompletion sectionKey="reverse" />}
     />
   );
 }

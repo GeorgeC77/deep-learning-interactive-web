@@ -2319,11 +2319,11 @@
     "componentName": "Ch17OverviewPage",
     "componentFile": "src\\pages\\generated\\Ch17OverviewPage.tsx",
     "demos": [],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": false,
-    "customLab": false,
-    "linkedViews": false,
+    "customLab": true,
+    "linkedViews": true,
     "predictionGate": false,
     "prediction": false,
     "lock": false,
@@ -2333,7 +2333,7 @@
     "counterexample": false,
     "transferChallenge": false,
     "mathTests": false,
-    "semanticTests": false,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": false
   },
@@ -2345,7 +2345,7 @@
     "demos": [
       "src\\components\\demos\\DiffusionTimelineLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": true,
     "customLab": true,
@@ -2359,7 +2359,7 @@
     "counterexample": true,
     "transferChallenge": false,
     "mathTests": true,
-    "semanticTests": false,
+    "semanticTests": true,
     "completePredictionGate": false,
     "l3plus": true
   },
@@ -2369,11 +2369,11 @@
     "componentName": "Ch17ReverseDecoderPage",
     "componentFile": "src\\pages\\generated\\Ch17ReverseDecoderPage.tsx",
     "demos": [],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": true,
-    "customLab": false,
-    "linkedViews": false,
+    "customLab": true,
+    "linkedViews": true,
     "predictionGate": false,
     "prediction": false,
     "lock": false,
@@ -2383,9 +2383,9 @@
     "counterexample": true,
     "transferChallenge": false,
     "mathTests": false,
-    "semanticTests": false,
+    "semanticTests": true,
     "completePredictionGate": false,
-    "l3plus": false
+    "l3plus": true
   },
   {
     "routePath": "/ch17/score-matching",
@@ -2395,7 +2395,7 @@
     "demos": [
       "src\\components\\demos\\ScoreMatchingLab.tsx"
     ],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": true,
     "customLab": true,
@@ -2419,11 +2419,11 @@
     "componentName": "Ch17GuidedDiffusionPage",
     "componentFile": "src\\pages\\generated\\Ch17GuidedDiffusionPage.tsx",
     "demos": [],
-    "status": "content-reviewed",
+    "status": "teaching-ready",
     "staticExplanation": true,
     "scalarDemo": true,
-    "customLab": false,
-    "linkedViews": false,
+    "customLab": true,
+    "linkedViews": true,
     "predictionGate": false,
     "prediction": false,
     "lock": false,
@@ -2435,7 +2435,7 @@
     "mathTests": false,
     "semanticTests": true,
     "completePredictionGate": false,
-    "l3plus": false
+    "l3plus": true
   },
   {
     "routePath": "/appendix/a/overview",

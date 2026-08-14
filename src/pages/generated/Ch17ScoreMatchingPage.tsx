@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import Chapter17SectionCompletion from '@/components/Chapter17SectionCompletion';
 import ScoreMatchingLab from '@/components/demos/ScoreMatchingLab';
 import { Activity } from 'lucide-react';
 
@@ -10,35 +11,24 @@ export default function Ch17ScoreMatchingPage() {
       summary={"分数匹配通过估计数据对数密度的梯度（分数函数）来建模分布。去噪分数匹配利用已知前向噪声核的 conditional score，构造与噪声预测网络等价的训练目标，是 Bishop §20.3 的核心内容。"}
       concepts={[
         {
-          title: "分数函数（Score function）",
-          description: "分数是对数密度关于输入的梯度，指向数据密度增加最快的方向。",
+          title: "20.3.1 分数损失函数",
+          description: "分数是对数密度关于输入的梯度，指向密度增加最快的方向；用模型分数与真实数据分数之间的期望平方误差作为目标。",
           formula: String.raw`s(\mathbf{x}) = \nabla_{\mathbf{x}} \ln p(\mathbf{x})`,
         },
         {
-          title: "条件腐蚀分数",
-          description: "给定干净样本 x，前向加噪过程 q(z_t|x) 是高斯的。其分数可由采样噪声 ε 闭式写出，单次 ε 是随机训练目标。",
+          title: "20.3.2 修正后的分数损失",
+          description: "用 Parzen 噪声核平滑不可微的经验分布，再把未知边缘分数目标等价改写为已知条件核分数；单次 ε 是随机标签。",
           formula: String.raw`\nabla_{\mathbf{z}_t} \ln q(\mathbf{z}_t \mid \mathbf{x}) = -\frac{\boldsymbol{\epsilon}}{\sqrt{1-\bar{\alpha}_t}}`,
         },
         {
-          title: "边缘噪声分数",
-          description: "扰动数据分布 q_t(z_t) 的分数是对所有可能干净样本的条件分数取期望。因此最优网络输出的是给定 z_t 下 ε 的条件期望。",
-          formula: String.raw`\nabla_{\mathbf{z}_t} \ln q_t(\mathbf{z}_t) = -\frac{\mathbb{E}[\boldsymbol{\epsilon}\mid\mathbf{z}_t]}{\sqrt{1-\bar{\alpha}_t}} \approx -\frac{\boldsymbol{\epsilon}_w(\mathbf{z}_t, t)}{\sqrt{1-\bar{\alpha}_t}}`,
+          title: "20.3.3 噪声方差",
+          description: "大方差能平滑低维流形、低密度区和不连通模式，却会扭曲细节；噪声阶梯与退火 Langevin 采样在二者之间搭桥。",
+          formula: String.raw`\nabla_{\mathbf{z}_t} \ln q_t(\mathbf{z}_t) = -\frac{\mathbb{E}\!\left(\boldsymbol{\epsilon}\mid\mathbf{z}_t\right)}{\sqrt{1-\bar{\alpha}_t}}`,
         },
         {
-          title: "分数匹配损失",
-          description: "用模型分数与真实分数之间的 Fisher 散度作为目标。",
-        },
-        {
-          title: "修正后的分数损失",
-          description: "通过引入噪声数据分布，避免直接估计海森迹。",
-        },
-        {
-          title: "噪声方差与多尺度训练",
-          description: "在不同噪声水平下训练分数网络，使其覆盖从纯噪声到干净数据的整个路径。",
-        },
-        {
-          title: "随机微分方程",
-          description: "将离散前向过程推广到连续时间 SDE，建立更一般的分数生成框架。",
+          title: "20.3.4 随机微分方程",
+          description: "将离散前向过程推广到连续时间 SDE；反向 SDE 的漂移由学得的边缘分数修正，对应 ODE 则保持相同边缘密度。",
+          formula: String.raw`d\mathbf z=\{f(\mathbf z,t)-g^2(t)\nabla_{\mathbf z}\ln p_t(\mathbf z)\}\,dt+g(t)\,d\bar{\mathbf v}`,
         },
       ]}
       learningObjectives={[
@@ -72,7 +62,7 @@ export default function Ch17ScoreMatchingPage() {
             bishopMapping={{
         chapter: "Ch 20",
         section: "20.3",
-        pages: "Ch 20",
+        pages: "§20.3, pp. 594–599",
         textbookSubsections: [
           "20.3.1 Score loss function",
           "20.3.2 Modified score loss",
@@ -103,6 +93,7 @@ export default function Ch17ScoreMatchingPage() {
         formula: String.raw`s(x) = \nabla_x \ln \mathcal{N}(x\mid 0,1) = -x`,
       }}
       interactiveDemo={<ScoreMatchingLab />}
+      extraContent={<Chapter17SectionCompletion sectionKey="score" />}
     />
   );
 }
