@@ -1,5 +1,13 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
 import { Shrink } from 'lucide-react';
+
+const progressSections = [
+  { exerciseSetId: 'chapter13-pca', label: '16.1 主成分分析', path: '/ch13/principal-component-analysis', exerciseCount: 3 },
+  { exerciseSetId: 'chapter13-probabilistic', label: '16.2 概率隐变量', path: '/ch13/probabilistic-latent-variables', exerciseCount: 3 },
+  { exerciseSetId: 'chapter13-elbo', label: '16.3 证据下界', path: '/ch13/evidence-lower-bound', exerciseCount: 3 },
+  { exerciseSetId: 'chapter13-nonlinear', label: '16.4 非线性模型', path: '/ch13/nonlinear-latent-variable-models', exerciseCount: 3 },
+];
 
 const ModelComparisonTable = () => (
   <div className="overflow-x-auto">
@@ -32,9 +40,9 @@ const ModelComparisonTable = () => (
           <td className="border px-2 py-1">是</td>
         </tr>
         <tr>
-          <td className="border px-2 py-1">Autoregressive</td>
-          <td className="border px-2 py-1">{'逐维度推断 p(x_i|x_{<i})'}</td>
-          <td className="border px-2 py-1">逐维度采样</td>
+          <td className="border px-2 py-1">Diffusion</td>
+          <td className="border px-2 py-1">学习多噪声尺度的去噪/分数</td>
+          <td className="border px-2 py-1">从高斯噪声多步逆向去噪</td>
           <td className="border px-2 py-1">否</td>
         </tr>
       </tbody>
@@ -85,7 +93,7 @@ export default function Ch13OverviewPage() {
       ]}
             bishopMapping={{
         chapter: "Ch 16",
-        pages: "Ch 16",
+        pages: "pp. 495–532",
         textbookSubsections: [
           "16.1 Principal Component Analysis",
           "16.2 Probabilistic Latent Variables",
@@ -108,6 +116,14 @@ export default function Ch13OverviewPage() {
         }),
         formula: String.raw`\text{压缩比} = \frac{d}{D}`,
       }}
+      extraContent={(
+        <>
+          <ChapterProgressCard title="连续隐变量掌握进度" sections={progressSections} />
+          <p className="text-center text-sm text-emerald-800">
+            完成四节共 12 道原创练习，即可串联确定性 PCA、概率隐变量、连续 EM 与非线性生成模型。
+          </p>
+        </>
+      )}
     />
   );
 }

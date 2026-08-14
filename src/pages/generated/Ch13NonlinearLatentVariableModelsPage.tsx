@@ -1,4 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ContinuousLatentChapterLab from '@/components/demos/ContinuousLatentChapterLab';
+import Chapter13SectionCompletion from '@/components/Chapter13SectionCompletion';
 import { Network } from 'lucide-react';
 
 export default function Ch13NonlinearLatentVariableModelsPage() {
@@ -6,7 +8,7 @@ export default function Ch13NonlinearLatentVariableModelsPage() {
     <BishopSectionPage
       sectionPath="/ch13/nonlinear-latent-variable-models"
       heroIcon={<Network className="w-9 h-9 text-blue-600" />}
-      summary={"非线性隐变量模型用神经网络参数化编码器与解码器，能够捕捉复杂流形结构。由于似然积分通常难以计算，VAE、GAN、流模型与自回归模型采取了不同的近似或绕过策略。"}
+      summary={"非线性隐变量模型用深度网络表达从潜在空间到数据空间的复杂变换。由于边缘似然或逆映射通常难解，Bishop §16.4.4 将后续生成方法归纳为 GAN、VAE、Normalizing Flow 与 Diffusion 四条路线。"}
       concepts={[
         {
           title: "非线性流形",
@@ -19,7 +21,7 @@ export default function Ch13NonlinearLatentVariableModelsPage() {
         },
         {
           title: "四类生成方法",
-          description: "自回归模型、归一化流、GAN 与 VAE 在表示能力、训练目标与采样方式上各有取舍。",
+          description: "GAN、VAE、Normalizing Flow 与 Diffusion 在似然可计算性、结构约束与采样成本上各有取舍。",
         },
         {
           title: "离散数据扩展",
@@ -54,7 +56,7 @@ export default function Ch13NonlinearLatentVariableModelsPage() {
             bishopMapping={{
         chapter: "Ch 16",
         section: "16.4",
-        pages: "Ch 16",
+        pages: "§16.4, pp. 522–527",
         textbookSubsections: [
           "16.4 Nonlinear Latent Variable Models",
           "16.4.1 Nonlinear manifolds",
@@ -63,26 +65,15 @@ export default function Ch13NonlinearLatentVariableModelsPage() {
           "16.4.4 Four approaches to generative modelling"
         ],
         formulas: ["p(x)=∫p(x|z)p(z)dz"],
-        algorithms: ["VAE", "GAN", "Normalizing Flows", "Autoregressive models"],
+        algorithms: ["VAE", "GAN", "Normalizing Flows", "Diffusion models"],
         exercises: ["比较四类生成模型的似然可计算性。", "说明离散观测下解码器分布的选择。"],
       }}
-      demo={{
-        title: "非线性流形曲率",
-        label: "曲率参数",
-        param: 1,
-        min: 0,
-        max: 3,
-        step: 0.1,
-        compute: (curvature) => {
-          const linearApproxError = curvature * 0.5;
-          return {
-            label: '线性近似误差',
-            value: linearApproxError,
-            display: String.raw`0.5 \times ${curvature.toFixed(1)} = ${linearApproxError.toFixed(2)}`,
-          };
-        },
-        formula: String.raw`\text{线性近似误差} \propto \text{流形曲率}`,
-      }}
+      extraContent={(
+        <>
+          <ContinuousLatentChapterLab mode="nonlinear" />
+          <Chapter13SectionCompletion sectionKey="nonlinear" />
+        </>
+      )}
     />
   );
 }

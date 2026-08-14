@@ -1,6 +1,8 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import PCALab from '@/components/demos/PCALab';
 import PCAReconstructionLab from '@/components/demos/PCAReconstructionLab';
+import ContinuousLatentChapterLab from '@/components/demos/ContinuousLatentChapterLab';
+import Chapter13SectionCompletion from '@/components/Chapter13SectionCompletion';
 import { Shrink } from 'lucide-react';
 
 export default function Ch13PrincipalComponentAnalysisPage() {
@@ -61,7 +63,7 @@ export default function Ch13PrincipalComponentAnalysisPage() {
             bishopMapping={{
         chapter: "Ch 16",
         section: "16.1",
-        pages: "Ch 16",
+        pages: "§16.1, pp. 497–505",
         textbookSubsections: [
           "16.1 Principal Component Analysis",
           "16.1.1 Maximum variance formulation",
@@ -74,7 +76,13 @@ export default function Ch13PrincipalComponentAnalysisPage() {
         exercises: ["证明最大方差方向与最小重构误差方向一致。", "对二维相关高斯数据计算主成分。"],
       }}
       interactiveDemo={<PCALab />}
-      extraContent={<PCAReconstructionLab />}
+      extraContent={(
+        <>
+          <PCAReconstructionLab />
+          <ContinuousLatentChapterLab mode="pca" />
+          <Chapter13SectionCompletion sectionKey="pca" />
+        </>
+      )}
     />
   );
 }

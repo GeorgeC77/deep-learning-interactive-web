@@ -1,5 +1,7 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import PPCAELBODemo from '@/components/demos/PPCAELBODemo';
+import ContinuousLatentChapterLab from '@/components/demos/ContinuousLatentChapterLab';
+import Chapter13SectionCompletion from '@/components/Chapter13SectionCompletion';
 import { Scale } from 'lucide-react';
 
 export default function Ch13EvidenceLowerBoundPage() {
@@ -60,7 +62,7 @@ export default function Ch13EvidenceLowerBoundPage() {
             bishopMapping={{
         chapter: "Ch 16",
         section: "16.3",
-        pages: "Ch 16",
+        pages: "§16.3, pp. 516–521",
         textbookSubsections: [
           "16.3 Evidence Lower Bound",
           "16.3.1 Expectation maximization",
@@ -71,7 +73,13 @@ export default function Ch13EvidenceLowerBoundPage() {
         algorithms: ["连续隐变量 EM", "概率 PCA 的 EM", "因子分析的 EM"],
         exercises: ["推导概率 PCA 的 E-step 后验均值与协方差。", "比较概率 PCA 与因子分析的 M-step 差异。"],
       }}
-      extraContent={<PPCAELBODemo />}
+      extraContent={(
+        <>
+          <ContinuousLatentChapterLab mode="elbo" />
+          <PPCAELBODemo />
+          <Chapter13SectionCompletion sectionKey="elbo" />
+        </>
+      )}
     />
   );
 }

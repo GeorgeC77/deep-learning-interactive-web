@@ -1,4 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ContinuousLatentChapterLab from '@/components/demos/ContinuousLatentChapterLab';
+import Chapter13SectionCompletion from '@/components/Chapter13SectionCompletion';
 import { GitBranch } from 'lucide-react';
 
 const LatentTypeTable = () => (
@@ -109,7 +111,7 @@ export default function Ch13ProbabilisticLatentVariablesPage() {
             bishopMapping={{
         chapter: "Ch 16",
         section: "16.2",
-        pages: "Ch 16",
+        pages: "§16.2, pp. 506–515",
         textbookSubsections: [
           "16.2 Probabilistic Latent Variables",
           "16.2.1 Generative model",
@@ -123,20 +125,12 @@ export default function Ch13ProbabilisticLatentVariablesPage() {
         algorithms: ["EM 算法", "因子分析", "ICA"],
         exercises: ["推导线性高斯隐变量模型的边缘分布。", "比较因子分析与概率 PCA 的噪声假设。"],
       }}
-      demo={{
-        title: "隐变量先验对边缘方差的贡献",
-        label: "隐变量方差 σ_z²",
-        param: 1,
-        min: 0.1,
-        max: 4,
-        step: 0.1,
-        compute: (sz2) => ({
-          label: '观测方差（单位载荷）',
-          value: sz2 + 0.2,
-          display: String.raw`\\sigma_x^2=${(sz2 + 0.2).toFixed(2)}`,
-        }),
-        formula: String.raw`\sigma_x^2 = W^2 \sigma_z^2 + \sigma_\epsilon^2`,
-      }}
+      extraContent={(
+        <>
+          <ContinuousLatentChapterLab mode="probabilistic" />
+          <Chapter13SectionCompletion sectionKey="probabilistic" />
+        </>
+      )}
     />
   );
 }
