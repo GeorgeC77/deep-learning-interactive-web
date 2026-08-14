@@ -1021,7 +1021,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch10-machine-learning-on-graphs",
@@ -1037,7 +1037,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch10-neural-message-passing",
@@ -1069,7 +1069,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch11-overview",
@@ -1085,7 +1085,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch11-basic-sampling-algorithms",
@@ -1101,7 +1101,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch11-markov-chain-monte-carlo",
@@ -1117,7 +1117,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch11-langevin-sampling",
@@ -1133,7 +1133,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch12-overview",
@@ -1149,7 +1149,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch12-k-means-clustering",
@@ -1165,7 +1165,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch12-mixtures-of-gaussians",
@@ -1181,7 +1181,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch12-expectation-maximization",
@@ -1197,7 +1197,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch12-evidence-lower-bound",
@@ -1213,7 +1213,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "ch13-overview",

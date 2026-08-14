@@ -169,7 +169,7 @@ export default function KMeansPage() {
 /* -------------------------------------------------------------------------- */
 /* 交互演示                                                                   */
 /* -------------------------------------------------------------------------- */
-function KMeansDemo() {
+export function KMeansDemo() {
   const [points, setPoints] = useState<Point[]>(() => generateSampleData());
   const [centroids, setCentroids] = useState<Centroid[]>([]);
   const [k, setK] = useState(3);
