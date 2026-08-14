@@ -1,4 +1,4 @@
-import SectionMetadata from '@/components/SectionMetadata';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Binary, ShieldAlert, ArrowRight, Calculator, Shuffle } from 'lucide-react';
@@ -110,7 +110,7 @@ export default function PrerequisiteChapter02InformationPage() {
             <Binary className="w-9 h-9 text-violet-600" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">2.4 信息论</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">2.5 信息论</h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">
           信息论为不确定性提供了定量度量。熵描述分布的“惊讶程度”，KL 散度衡量两个分布之间的差异，
           互信息刻画变量之间的统计依赖。
@@ -229,7 +229,7 @@ export default function PrerequisiteChapter02InformationPage() {
           to="/prerequisite/ch02/bayesian"
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors"
         >
-          下一节：2.5 贝叶斯概率
+          下一节：2.6 贝叶斯概率
           <ArrowRight className="w-4 h-4" />
         </Link>
       </section>
@@ -264,12 +264,7 @@ export default function PrerequisiteChapter02InformationPage() {
         </div>
       </section>
     
-      <SectionMetadata
-        bishopChapter={"Ch 2"}
-        bishopSection={"information"}
-        learningObjectives={["理解 Information 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+      <PrerequisiteSectionCompletion sectionKey="information" />
 </div>
   );
 }

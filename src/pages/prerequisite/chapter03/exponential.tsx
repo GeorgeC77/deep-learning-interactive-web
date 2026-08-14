@@ -1,4 +1,4 @@
-import SectionMetadata from '@/components/SectionMetadata';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { useState, useMemo } from 'react';
 import { FunctionSquare, BookOpen, ShieldAlert, Layers } from 'lucide-react';
 import KaTeX from '../../../components/KaTeX';
@@ -21,7 +21,7 @@ export default function ExponentialFamilyPage() {
             <FunctionSquare className="w-9 h-9 text-violet-600" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">3.3 指数族</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">3.4 指数族</h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">
           指数族把许多看似不同的分布统一在同一个框架下。理解它的参数化方式，是学习广义线性模型（GLM）与变分推断的关键一步。
         </p>
@@ -244,12 +244,7 @@ export default function ExponentialFamilyPage() {
         </div>
       </section>
     
-      <SectionMetadata
-        bishopChapter={"Ch 3"}
-        bishopSection={"exponential"}
-        learningObjectives={["理解 Exponential 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+      <PrerequisiteSectionCompletion sectionKey="exponential" />
 </div>
   );
 }

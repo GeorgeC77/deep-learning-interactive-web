@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { Shuffle } from 'lucide-react';
 
 export default function PrerequisiteCh02TransformationPage() {
@@ -51,7 +52,7 @@ export default function PrerequisiteCh02TransformationPage() {
             bishopMapping={{
         chapter: "Ch 2",
         section: "2.4",
-        pages: "Ch 2",
+        pages: "pp. 42–46",
         textbookSubsections: [
           "2.4 Transformation of Densities",
           "2.4.1 Multivariate distributions"
@@ -74,6 +75,7 @@ export default function PrerequisiteCh02TransformationPage() {
         }),
         formula: String.raw`p_y(y) = p_x(ay) \cdot a`,
       }}
+      extraContent={<PrerequisiteSectionCompletion sectionKey="transformation" />}
     />
   );
 }

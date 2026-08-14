@@ -3,13 +3,24 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Scale, Calculator, ArrowRight, ShieldAlert } from 'lucide-react';
 import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  { exerciseSetId: 'prerequisite-ch02-rules', label: '2.1 概率规则', path: '/prerequisite/ch02/rules', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch02-densities', label: '2.2 概率密度', path: '/prerequisite/ch02/densities', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch02-gaussian', label: '2.3 高斯分布', path: '/prerequisite/ch02/gaussian', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch02-transformation', label: '2.4 密度变换', path: '/prerequisite/ch02/transformation', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch02-information', label: '2.5 信息论', path: '/prerequisite/ch02/information', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch02-bayesian', label: '2.6 贝叶斯概率', path: '/prerequisite/ch02/bayesian', exerciseCount: 3 },
+];
 
 const sections = [
   { label: '2.1 概率规则', path: '/prerequisite/ch02/rules', desc: '和规则、积规则、贝叶斯定理' },
   { label: '2.2 概率密度', path: '/prerequisite/ch02/densities', desc: '连续随机变量、期望与协方差' },
   { label: '2.3 高斯分布', path: '/prerequisite/ch02/gaussian', desc: '均值、方差、最大似然与线性回归' },
-  { label: '2.4 信息论', path: '/prerequisite/ch02/information', desc: '熵、KL 散度、互信息' },
-  { label: '2.5 贝叶斯概率', path: '/prerequisite/ch02/bayesian', desc: '参数、正则化与贝叶斯机器学习' },
+  { label: '2.4 密度变换', path: '/prerequisite/ch02/transformation', desc: '变量替换与 Jacobian 行列式' },
+  { label: '2.5 信息论', path: '/prerequisite/ch02/information', desc: '熵、KL 散度、互信息' },
+  { label: '2.6 贝叶斯概率', path: '/prerequisite/ch02/bayesian', desc: '参数、正则化与贝叶斯机器学习' },
 ];
 
 export default function PrerequisiteChapter02OverviewPage() {
@@ -32,6 +43,12 @@ export default function PrerequisiteChapter02OverviewPage() {
           仅供教学与非商业学习使用。
         </p>
       </section>
+
+      <ChapterProgressCard title="先修第二章掌握进度" sections={progressSections} />
+
+      <p className="rounded-xl border border-violet-200 bg-violet-50 p-4 text-sm text-violet-900">
+        完成六节共 18 道原创练习即可点亮整章进度；每节同时提供四步推导与即时反馈。
+      </p>
 
       {/* Two kinds of uncertainty */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -118,10 +135,16 @@ export default function PrerequisiteChapter02OverviewPage() {
     
       <SectionMetadata
         bishopChapter={"Ch 2"}
-        bishopSection={"overview"}
-        learningObjectives={["理解 Overview 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+        bishopSection={"pp. 23–58"}
+        textbookSections={['2.1 概率规则', '2.2 概率密度', '2.3 高斯分布', '2.4 密度变换', '2.5 信息论', '2.6 贝叶斯概率']}
+        learningObjectives={[
+          '用概率分布统一表达数据、参数和预测中的不确定性。',
+          '连接概率规则、高斯建模、信息量与贝叶斯更新。',
+          '在进入标准分布前完成六节练习并复核关键推导。',
+        ]}
+        coreIntuition={<p>概率模型把未知量视为随机变量：数据提供证据，分布表达不确定性，贝叶斯规则负责一致地更新信念。</p>}
+        commonMistakes={['把概率密度值直接当成概率。', '混淆似然、先验、后验与证据各自的角色。', '只背公式而不检查归一化、独立性和支持集。']}
+      />
 </div>
   );
 }

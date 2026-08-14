@@ -3,12 +3,22 @@ import { Link } from 'react-router-dom';
 import { BookOpen, Dice5, ChartSpline, Layers, ArrowRight, ShieldAlert } from 'lucide-react';
 import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  { exerciseSetId: 'prerequisite-ch03-discrete', label: '3.1 离散变量', path: '/prerequisite/ch03/discrete', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch03-mvgaussian', label: '3.2 多元高斯', path: '/prerequisite/ch03/mvgaussian', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch03-periodic', label: '3.3 周期变量', path: '/prerequisite/ch03/periodic', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch03-exponential', label: '3.4 指数族', path: '/prerequisite/ch03/exponential', exerciseCount: 3 },
+  { exerciseSetId: 'prerequisite-ch03-nonparametric', label: '3.5 非参数方法', path: '/prerequisite/ch03/nonparametric', exerciseCount: 3 },
+];
 
 const sections = [
   { label: '3.1 离散变量', path: '/prerequisite/ch03/discrete', desc: 'Bernoulli、Binomial、Multinomial' },
   { label: '3.2 多元高斯', path: '/prerequisite/ch03/mvgaussian', desc: '几何、条件分布、边缘分布' },
-  { label: '3.3 指数族', path: '/prerequisite/ch03/exponential', desc: '统一形式与充分统计量' },
-  { label: '3.4 非参数方法', path: '/prerequisite/ch03/nonparametric', desc: '直方图、核密度、最近邻' },
+  { label: '3.3 周期变量', path: '/prerequisite/ch03/periodic', desc: 'Von Mises 分布与圆周统计' },
+  { label: '3.4 指数族', path: '/prerequisite/ch03/exponential', desc: '统一形式与充分统计量' },
+  { label: '3.5 非参数方法', path: '/prerequisite/ch03/nonparametric', desc: '直方图、核密度、最近邻' },
 ];
 
 export default function PrerequisiteChapter03OverviewPage() {
@@ -31,6 +41,12 @@ export default function PrerequisiteChapter03OverviewPage() {
           仅供教学与非商业学习使用。
         </p>
       </section>
+
+      <ChapterProgressCard title="先修第三章掌握进度" sections={progressSections} />
+
+      <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+        完成五节共 15 道原创练习即可点亮整章进度；每节同时提供四步推导与即时反馈。
+      </p>
 
       {/* Distribution families */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -111,10 +127,16 @@ export default function PrerequisiteChapter03OverviewPage() {
     
       <SectionMetadata
         bishopChapter={"Ch 3"}
-        bishopSection={"overview"}
-        learningObjectives={["理解 Overview 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+        bishopSection={"pp. 65–105"}
+        textbookSections={['3.1 离散变量', '3.2 多元高斯', '3.3 周期变量', '3.4 指数族', '3.5 非参数方法']}
+        learningObjectives={[
+          '根据数据支持集和结构选择离散、连续或周期分布。',
+          '用指数族看见常见参数分布之间的统一结构。',
+          '比较参数模型与非参数估计的假设及偏差—方差权衡。',
+        ]}
+        coreIntuition={<p>标准分布是概率建模的积木：选择分布就是编码变量可能取值、几何结构和噪声形态的假设。</p>}
+        commonMistakes={['忽略角度的周期边界。', '把单高斯用于明显多峰数据却不检查拟合。', '把“非参数”误解为不需要带宽、距离或其他建模选择。']}
+      />
 </div>
   );
 }

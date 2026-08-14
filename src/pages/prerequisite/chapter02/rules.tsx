@@ -1,4 +1,4 @@
-import SectionMetadata from '@/components/SectionMetadata';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Scale, ShieldAlert, ArrowRight, Stethoscope, Calculator } from 'lucide-react';
@@ -9,11 +9,13 @@ import InteractivePanel from '../../../components/InteractivePanel';
 import KaTeX from '../../../components/KaTeX';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import MedicalScreeningPredictionLab from '@/components/demos/MedicalScreeningPredictionLab';
 
 export default function PrerequisiteChapter02RulesPage() {
   const [prior, setPrior] = useState(0.01);
   const [sensitivity, setSensitivity] = useState(0.9);
   const [falsePositive, setFalsePositive] = useState(0.03);
+  const [experimentUnlocked, setExperimentUnlocked] = useState(false);
 
   const pTestPositive = useMemo(
     () => sensitivity * prior + falsePositive * (1 - prior),
@@ -116,8 +118,10 @@ export default function PrerequisiteChapter02RulesPage() {
         />
       </section>
 
+      <MedicalScreeningPredictionLab onUnlock={() => setExperimentUnlocked(true)} />
+
       {/* Interactive medical screening */}
-      <InteractiveDemo title="互动演示：医学筛查中的贝叶斯更新">
+      {experimentUnlocked && <InteractiveDemo title="互动演示：医学筛查中的贝叶斯更新">
         <InteractivePanel
           hint="调整先验患病率、检测灵敏度与假阳性率，观察后验概率的变化。经典案例：1% 患病率、90% 灵敏度、3% 假阳性率，阳性后的真实患病概率仅约 23%。"
           chart={
@@ -221,7 +225,7 @@ export default function PrerequisiteChapter02RulesPage() {
             </div>
           }
         />
-      </InteractiveDemo>
+      </InteractiveDemo>}
 
       {/* Summary and navigation */}
       <section className="bg-gradient-to-br from-violet-50 to-indigo-50 rounded-xl border border-violet-200 p-6">
@@ -269,12 +273,7 @@ export default function PrerequisiteChapter02RulesPage() {
         </div>
       </section>
     
-      <SectionMetadata
-        bishopChapter={"Ch 2"}
-        bishopSection={"rules"}
-        learningObjectives={["理解 Rules 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+      <PrerequisiteSectionCompletion sectionKey="rules" />
 </div>
   );
 }

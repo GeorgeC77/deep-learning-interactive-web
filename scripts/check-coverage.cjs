@@ -128,16 +128,21 @@ function resolveImportPath(importPath) {
   return null;
 }
 
-function findWrappedSource(pageSource) {
-  // Detect wrapper: import X from '...'; return <X /> or fragment containing <X />
-  const importMatch = pageSource.match(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/);
-  if (!importMatch) return null;
-  const importedName = importMatch[1];
-  const importPath = importMatch[2];
-  // Match <X /> or <X/> in any context (including fragments)
-  const usesImport = pageSource.includes(`<${importedName} />`) || pageSource.includes(`<${importedName}/>`);
-  if (!usesImport) return null;
-  return resolveImportPath(importPath);
+function findMetadataSource(pageSource) {
+  // A page may delegate its metadata panel to a shared component with props.
+  // Follow every rendered default import rather than only a prop-free wrapper.
+  for (const match of pageSource.matchAll(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g)) {
+    const importedName = match[1];
+    const importPath = match[2];
+    if (!pageSource.includes(`<${importedName}`)) continue;
+    const candidate = resolveImportPath(importPath);
+    if (!candidate) continue;
+    const importedSource = fs.readFileSync(candidate, 'utf8');
+    if (/bishopChapter|bishopMapping|教材映射|learningObjectives|学习目标/i.test(importedSource)) {
+      return candidate;
+    }
+  }
+  return null;
 }
 
 function main() {
@@ -206,7 +211,7 @@ function main() {
     if (pageFile) {
       const src = fs.readFileSync(pageFile, 'utf8');
       let checks = pageChecks(src);
-      const wrapped = findWrappedSource(src);
+      const wrapped = findMetadataSource(src);
       if (wrapped) {
         const wrappedSrc = fs.readFileSync(wrapped, 'utf8');
         const wrappedChecks = pageChecks(wrappedSrc);

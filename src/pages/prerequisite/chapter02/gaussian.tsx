@@ -1,4 +1,4 @@
-import SectionMetadata from '@/components/SectionMetadata';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChartSpline, ShieldAlert, ArrowRight, Calculator, TrendingUp } from 'lucide-react';
@@ -264,10 +264,10 @@ export default function PrerequisiteChapter02GaussianPage() {
           样本均值是无偏的，但样本方差需要除以 N−1 才是真实方差的无偏估计。
         </p>
         <Link
-          to="/prerequisite/ch02/information"
+          to="/prerequisite/ch02/transformation"
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors"
         >
-          下一节：2.4 信息论
+          下一节：2.4 密度变换
           <ArrowRight className="w-4 h-4" />
         </Link>
       </section>
@@ -302,12 +302,7 @@ export default function PrerequisiteChapter02GaussianPage() {
         </div>
       </section>
     
-      <SectionMetadata
-        bishopChapter={"Ch 2"}
-        bishopSection={"gaussian"}
-        learningObjectives={["理解 Gaussian 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+      <PrerequisiteSectionCompletion sectionKey="gaussian" />
 </div>
   );
 }

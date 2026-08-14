@@ -1,4 +1,4 @@
-import SectionMetadata from '@/components/SectionMetadata';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RefreshCcw, ShieldAlert, ArrowRight, Scale, Dices, RotateCcw } from 'lucide-react';
@@ -179,7 +179,7 @@ export default function PrerequisiteChapter02BayesianPage() {
             <RefreshCcw className="w-9 h-9 text-violet-600" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">2.5 贝叶斯概率</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">2.6 贝叶斯概率</h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">
           贝叶斯方法把模型参数也视为随机变量。通过先验分布与似然函数相乘并归一化，
           我们得到后验分布，从而对参数的不确定性给出完整描述。
@@ -414,12 +414,7 @@ export default function PrerequisiteChapter02BayesianPage() {
         </div>
       </section>
     
-      <SectionMetadata
-        bishopChapter={"Ch 2"}
-        bishopSection={"bayesian"}
-        learningObjectives={["理解 Bayesian 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+      <PrerequisiteSectionCompletion sectionKey="bayesian" />
 </div>
   );
 }

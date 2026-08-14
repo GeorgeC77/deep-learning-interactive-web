@@ -1,4 +1,4 @@
-import SectionMetadata from '@/components/SectionMetadata';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Waves, ShieldAlert, ArrowRight, Calculator, Ruler } from 'lucide-react';
@@ -309,12 +309,7 @@ export default function PrerequisiteChapter02DensitiesPage() {
         </div>
       </section>
     
-      <SectionMetadata
-        bishopChapter={"Ch 2"}
-        bishopSection={"densities"}
-        learningObjectives={["理解 Densities 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+      <PrerequisiteSectionCompletion sectionKey="densities" />
 </div>
   );
 }

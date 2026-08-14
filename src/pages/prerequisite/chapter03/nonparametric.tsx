@@ -1,4 +1,4 @@
-import SectionMetadata from '@/components/SectionMetadata';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { useState, useMemo, useCallback, useRef } from 'react';
 import type { MouseEvent } from 'react';
 import { BarChart3, Waves, Activity, ShieldAlert, BookOpen, RefreshCw } from 'lucide-react';
@@ -7,6 +7,7 @@ import FormulaCard from '../../../components/FormulaCard';
 import ConceptCard from '../../../components/ConceptCard';
 import InteractiveDemo from '../../../components/InteractiveDemo';
 import InteractivePanel from '../../../components/InteractivePanel';
+import KdeBandwidthPredictionLab from '@/components/demos/KdeBandwidthPredictionLab';
 
 function gaussian(u: number): number {
   return (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * u * u);
@@ -34,6 +35,7 @@ function kde(x: number, data: number[], h: number): number {
 export default function NonparametricMethodsPage() {
   const [data, setData] = useState<number[]>(() => generateData());
   const [h, setH] = useState(0.6);
+  const [experimentUnlocked, setExperimentUnlocked] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
 
   const xMin = -5;
@@ -76,7 +78,7 @@ export default function NonparametricMethodsPage() {
             <Waves className="w-9 h-9 text-sky-600" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">3.4 非参数方法</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">3.5 非参数方法</h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">
           非参数方法不假设数据来自某个固定参数族，而是让数据本身决定分布的形状。直方图、核密度估计与 k 近邻是其中的代表。
         </p>
@@ -169,8 +171,10 @@ export default function NonparametricMethodsPage() {
         </div>
       </section>
 
+      <KdeBandwidthPredictionLab onUnlock={() => setExperimentUnlocked(true)} />
+
       {/* Interactive demo */}
-      <InteractiveDemo title="交互演示：一维核密度估计">
+      {experimentUnlocked && <InteractiveDemo title="交互演示：一维核密度估计">
         <p className="text-gray-700 mb-4">
           点击图表可添加数据点，或点击“随机生成”。拖动带宽 h，观察 KDE 曲线在欠平滑与过平滑之间的变化。
         </p>
@@ -319,7 +323,7 @@ export default function NonparametricMethodsPage() {
             </div>
           }
         />
-      </InteractiveDemo>
+      </InteractiveDemo>}
 
       {/* Why? */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -351,12 +355,7 @@ export default function NonparametricMethodsPage() {
         </div>
       </section>
     
-      <SectionMetadata
-        bishopChapter={"Ch 3"}
-        bishopSection={"nonparametric"}
-        learningObjectives={["理解 Nonparametric 的核心概念与直观含义。", "掌握与本小节相关的关键公式与算法流程。", "能够在简单示例中应用所学方法并识别常见误区。"]}
-        commonMistakes={["只记忆公式而忽略其背后的概率或优化假设。", "混淆相近概念的定义与适用场景。", "在应用时忽视数据分布与模型假设的匹配。"]}
-              />
+      <PrerequisiteSectionCompletion sectionKey="nonparametric" />
 </div>
   );
 }

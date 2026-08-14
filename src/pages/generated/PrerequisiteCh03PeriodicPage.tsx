@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
 import { RotateCw } from 'lucide-react';
 
 export default function PrerequisiteCh03PeriodicPage() {
@@ -50,7 +51,7 @@ export default function PrerequisiteCh03PeriodicPage() {
             bishopMapping={{
         chapter: "Ch 3",
         section: "3.3",
-        pages: "Ch 3",
+        pages: "pp. 89–94",
         textbookSubsections: [
           "3.3 Periodic Variables",
           "3.3.1 Von Mises distribution"
@@ -76,6 +77,7 @@ export default function PrerequisiteCh03PeriodicPage() {
         },
         formula: String.raw`p(\theta_0) \approx \sqrt{\frac{m}{2\pi}} \quad (m \gg 1)`,
       }}
+      extraContent={<PrerequisiteSectionCompletion sectionKey="periodic" />}
     />
   );
 }
