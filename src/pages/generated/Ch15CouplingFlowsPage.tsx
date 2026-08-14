@@ -1,4 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import Chapter15SectionCompletion from '@/components/Chapter15SectionCompletion';
+import DiscreteFlowChapterLab from '@/components/demos/DiscreteFlowChapterLab';
 import { GitCommitHorizontal } from 'lucide-react';
 
 export default function Ch15CouplingFlowsPage() {
@@ -63,10 +65,10 @@ p_x(\mathbf{x}) = p_z(\mathbf{z})\,|\det K_f(\mathbf{z})|^{-1}
         "把一维演示 ln|det K|=s 直接套用到 32 维，得到 ln|det K|=s 而不是 32s——说明维度数量对 log-det 有决定性影响。",
         "认为耦合层中不变的一半永远不变；实际上通过多层交替划分，所有维度最终都会参与变换——说明“不变”只是单层局部性质。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 18",
         section: "18.1",
-        pages: "Ch 18",
+        pages: "§18.1, pp. 549–552",
         textbookSubsections: [
           "18.1 Coupling Flows"
         ],
@@ -79,24 +81,12 @@ p_x(\mathbf{x}) = p_z(\mathbf{z})\,|\det K_f(\mathbf{z})|^{-1}
         algorithms: ["RealNVP", "耦合流训练"],
         exercises: ["推导二维仿射耦合层的 Jacobian 并计算行列式。", "说明交替划分维度的必要性。"],
       }}
-      demo={{
-        title: "多维耦合层 log-det-Jacobian（一维玩具推广）",
-        label: "每个被变换维度的缩放因子 s",
-        param: 0,
-        min: -2,
-        max: 2,
-        step: 0.1,
-        compute: (s) => {
-          const D = 32;
-          const total = D * s;
-          return {
-            label: 'ln|det K|（32 维求和）',
-            value: total,
-            display: String.raw`\sum_{i=1}^{32} s_i = 32 \cdot ${s.toFixed(1)} = ${total.toFixed(1)}`,
-          };
-        },
-        formula: String.raw`\ln |\det K| = \sum_i s_i`,
-      }}
+      extraContent={(
+        <>
+          <DiscreteFlowChapterLab mode="coupling" />
+          <Chapter15SectionCompletion sectionKey="coupling" />
+        </>
+      )}
     />
   );
 }

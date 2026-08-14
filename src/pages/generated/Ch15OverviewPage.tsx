@@ -1,6 +1,13 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
 import FlowArchitectureLab from '@/components/demos/FlowArchitectureLab';
 import { ArrowLeftRight } from 'lucide-react';
+
+const progressSections = [
+  { exerciseSetId: 'chapter15-coupling', label: '18.1 耦合流', path: '/ch15/coupling-flows', exerciseCount: 3 },
+  { exerciseSetId: 'chapter15-autoregressive', label: '18.2 自回归流', path: '/ch15/autoregressive-flows', exerciseCount: 3 },
+  { exerciseSetId: 'chapter15-continuous', label: '18.3 连续流', path: '/ch15/continuous-flows', exerciseCount: 3 },
+];
 
 export default function Ch15OverviewPage() {
   return (
@@ -15,8 +22,8 @@ export default function Ch15OverviewPage() {
         },
         {
           title: "变量替换公式",
-          description: "x 空间的密度等于 z 空间密度在逆映射处的值乘以 Jacobian 行列式的倒数。",
-          formula: String.raw`\ln p_x(\mathbf{x}) = \ln p_z(g(\mathbf{x})) - \ln \left| \det \frac{\partial f}{\partial \mathbf{z}} \right|`,
+          description: "教材用逆映射 z=g(x) 时乘 |det J_g|；若改用正向映射 x=f(z)，则除以 |det K_f|。两种写法等价，但 Jacobian 方向与符号必须配套。",
+          formula: String.raw`p_x(\mathbf{x})=p_z(g(\mathbf{x}))\left|\det\frac{\partial g}{\partial\mathbf{x}}\right|=p_z(\mathbf z)\left|\det\frac{\partial f}{\partial\mathbf z}\right|^{-1}`,
         },
         {
           title: "流架构权衡",
@@ -34,9 +41,9 @@ export default function Ch15OverviewPage() {
         "为了可逆性牺牲过多表达能力，导致模型无法拟合复杂数据。",
         "忽视不同流架构在训练、采样与密度评估上的计算差异。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 18",
-        pages: "Ch 18",
+        pages: "pp. 547–561",
         textbookSubsections: [
           "18.1 Coupling Flows",
           "18.2 Autoregressive Flows",
@@ -48,11 +55,19 @@ export default function Ch15OverviewPage() {
           "IAF",
           "FFJORD"
         ],
-        formulas: ["变量替换公式", "p_x(x)=p_z(g(x))|det J|^{-1}"],
+        formulas: ["逆映射：p_x(x)=p_z(g(x))|det J_g(x)|", "正向映射：p_x(f(z))=p_z(z)|det K_f(z)|^{-1}"],
         algorithms: ["RealNVP", "MAF/IAF", "Neural ODE flows"],
         exercises: ["从 f(z)=2z 推导一维变量替换公式。", "比较三种流架构的采样与密度评估复杂度。"],
       }}
       interactiveDemo={<FlowArchitectureLab />}
+      extraContent={(
+        <>
+          <ChapterProgressCard title="归一化流掌握进度" sections={progressSections} />
+          <p className="text-center text-sm text-emerald-800">
+            完成三节共 9 道原创练习，即可串联变量替换、三角 Jacobian、MAF/IAF 方向与连续时间密度演化。
+          </p>
+        </>
+      )}
     />
   );
 }

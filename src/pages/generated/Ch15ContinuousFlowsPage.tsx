@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import Chapter15SectionCompletion from '@/components/Chapter15SectionCompletion';
 import ContinuousFlowLab from '@/components/demos/ContinuousFlowLab';
 import { Waves } from 'lucide-react';
 
@@ -61,10 +62,10 @@ export default function Ch15ContinuousFlowsPage() {
         "认为神经 ODE 的向量场 f 必须可逆——实际上 f 不必是双射，可逆的是积分后的流映射。",
         "在高维数据中精确计算 Jacobian 迹，计算成本爆炸——说明 FFJORD 的随机迹估计不是可选优化而是必要技术。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 18",
         section: "18.3",
-        pages: "Ch 18",
+        pages: "§18.3, pp. 554–558",
         textbookSubsections: [
           "18.3.1 Neural differential equations",
           "18.3.2 Neural ODE backpropagation",
@@ -78,7 +79,12 @@ export default function Ch15ContinuousFlowsPage() {
         algorithms: ["Neural ODE", "Adjoint sensitivity", "FFJORD"],
         exercises: ["解释为什么 d/dt ln p 等于负散度。", "比较 FFJORD 与离散流在计算 Jacobian 上的复杂度差异。", "说明向量场 f 不必可逆为什么仍能得到可逆流映射。"]
       }}
-      interactiveDemo={<ContinuousFlowLab />}
+      extraContent={(
+        <>
+          <ContinuousFlowLab />
+          <Chapter15SectionCompletion sectionKey="continuous" />
+        </>
+      )}
     />
   );
 }
