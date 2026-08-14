@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import Chapter16SectionCompletion from '@/components/Chapter16SectionCompletion';
 import MaskedAutoencoderDemo from '@/components/demos/MaskedAutoencoderDemo';
 import { Box } from 'lucide-react';
 
@@ -11,7 +12,7 @@ export default function Ch16DeterministicAutoencodersPage() {
       concepts={[
         {
           title: "线性自编码器与 PCA 的主子空间",
-          description: "单隐层、使用恒等激活与均方误差的欠完备线性自编码器，其最优解由数据协方差的前 M 个特征向量张成，即学习与 PCA 相同的主子空间。但参数化不唯一，隐空间坐标一般不是正交 PCA 坐标；只有附加正交或 tied-weight 约束时才对应标准 PCA。",
+          description: "单隐层、使用恒等激活与均方误差的欠完备线性自编码器，其最优解由数据协方差的前 M 个特征向量张成，即学习与 PCA 相同的主子空间。但参数化不唯一，隐空间坐标一般不是正交 PCA 坐标；即使使用 tied weights，子空间内仍可发生正交旋转，只有把编码轴进一步对齐到协方差特征向量才得到通常的 PCA 坐标。",
         },
         {
           title: "深层自编码器",
@@ -57,10 +58,10 @@ export default function Ch16DeterministicAutoencodersPage() {
         "用无约束的自编码器处理图像，隐层学到恒等映射，无法提取任何特征——说明约束是特征学习的关键。",
         "认为线性自编码器与 PCA 完全等价——实际上它们只保证学到相同的主子空间，参数化与坐标可以不同。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 19",
         section: "19.1",
-        pages: "Ch 19",
+        pages: "§19.1, pp. 564–568",
         textbookSubsections: [
           "19.1.1 Linear autoencoders",
           "19.1.2 Deep autoencoders",
@@ -76,7 +77,12 @@ export default function Ch16DeterministicAutoencodersPage() {
         algorithms: ["线性自编码器", "深层自编码器", "稀疏自编码器", "去噪自编码器", "MAE"],
         exercises: ["证明线性自编码器与 PCA 的主子空间关系。", "说明为什么线性自编码器的参数化不唯一。", "比较去噪自编码器与 MAE 的损坏方式差异。"]
       }}
-      extraContent={<MaskedAutoencoderDemo />}
+      extraContent={(
+        <>
+          <MaskedAutoencoderDemo />
+          <Chapter16SectionCompletion sectionKey="deterministic" />
+        </>
+      )}
     />
   );
 }

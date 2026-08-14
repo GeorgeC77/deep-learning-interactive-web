@@ -1,4 +1,5 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import Chapter16SectionCompletion from '@/components/Chapter16SectionCompletion';
 import VAELatentCloudLab from '@/components/demos/VAELatentCloudLab';
 import { Sparkles } from 'lucide-react';
 
@@ -12,7 +13,7 @@ export default function Ch16VariationalAutoencodersPage() {
         {
           title: "摊销推断",
           description: "编码器网络同时输出所有数据点的变分后验参数，避免逐点变分优化。",
-          formula: String.raw`q_\phi(\mathbf{z} \mid \mathbf{x}) = \mathcal{N}(\mathbf{z} \mid \boldsymbol{\mu}_\phi(\mathbf{x}), \sigma_\phi^2(\mathbf{x}) I)`,
+          formula: String.raw`q_\phi(\mathbf{z}\mid\mathbf{x})=\prod_j\mathcal N\!\left(z_j\mid\mu_{\phi j}(\mathbf{x}),\sigma_{\phi j}^2(\mathbf{x})\right)`,
         },
         {
           title: "重参数化技巧",
@@ -38,7 +39,7 @@ export default function Ch16VariationalAutoencodersPage() {
         "理解变分后验 q(z|x) 与生成模型 p(x|z) 的角色。",
         "掌握重参数化技巧为什么能估计梯度。",
         "能写出 VAE 的 ELBO 并解释两项的权衡。",
-        "理解 β-VAE 与标准 ELBO 的区别：β 改变目标函数，不再保证标准下界。",
+        "理解 β-VAE 与标准 ELBO 的区别：β>1 仍给出更松的下界，而 0<β<1 不再保证下界。",
       ]}
       coreIntuition={"VAE 把每个数据点编码成隐空间上的一朵‘云’而不是一个点；KL 项约束这朵云既不能太散，也不能离标准高斯太远。β-VAE 则通过调节 KL 权重，让这朵云在可解释性与重构能力之间重新取舍。"}
       commonMistakes={[
@@ -59,12 +60,12 @@ export default function Ch16VariationalAutoencodersPage() {
       ]}
       counterexamples={[
         "把 VAE 的编码器输出当成确定性隐变量，直接用于下游任务——忽视了后验分布的不确定性。",
-        "认为 β-VAE 只是微调 ELBO——实际上 β-VAE 改变了目标函数，不再保证是似然的下界。",
+        "认为 β-VAE 只是微调标准 ELBO——实际上 β 改变了目标函数；尤其 0<β<1 时不再保证是似然下界。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 19",
         section: "19.2",
-        pages: "Ch 19",
+        pages: "§19.2, pp. 569–578; Ex. 19.1–19.6, pp. 578–579",
         textbookSubsections: [
           "19.2.1 Amortized inference",
           "19.2.2 The reparameterization trick"
@@ -77,21 +78,12 @@ export default function Ch16VariationalAutoencodersPage() {
         algorithms: ["VAE", "重参数化技巧"],
         exercises: ["推导对角高斯后验与标准高斯先验的 KL 散度。", "说明为什么重参数化技巧能得到无偏梯度估计。", "比较 β=1、β>1 与 0<β<1 时目标函数的下界性质。"]
       }}
-      demo={{
-        title: "KL 散度随 (μ, σ) 变化",
-        label: "后验标准差 σ（μ 固定为 0）",
-        param: 1,
-        min: 0.1,
-        max: 3,
-        step: 0.1,
-        compute: (sigma) => ({
-          label: 'KL(q||N(0,1))',
-          value: 0.5 * (sigma * sigma - Math.log(sigma * sigma) - 1),
-          display: String.raw`D_{KL}=\\frac{1}{2}(${sigma.toFixed(1)}^2-\\ln ${sigma.toFixed(1)}^2-1)`,
-        }),
-        formula: String.raw`D_{KL}\bigl(\mathcal{N}(\mu,\sigma^2) \| \mathcal{N}(0,1)\bigr) = \frac{1}{2}\left(\sigma^2 - \ln \sigma^2 - 1 + \mu^2\right)`,
-      }}
-      interactiveDemo={<VAELatentCloudLab />}
+      extraContent={(
+        <>
+          <VAELatentCloudLab />
+          <Chapter16SectionCompletion sectionKey="variational" />
+        </>
+      )}
     />
   );
 }

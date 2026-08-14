@@ -298,7 +298,7 @@ export default function VAELatentCloudLab() {
         </div>
 
         <PredictionGate
-          resetKey={beta}
+          resetKey="vae-beta-bound"
           prediction={betaPred}
           onPredictionChange={setBetaPred}
           submitted={betaSubmitted}
@@ -309,6 +309,10 @@ export default function VAELatentCloudLab() {
           question="当 β > 1 时，优化目标是否仍然是标准 ELBO？"
           hint="想一想标准 ELBO 的定义中 β 等于多少。"
           evaluatePrediction={evaluateBetaPrediction}
+          options={[
+            { value: '是', label: '是' },
+            { value: '否', label: '否' },
+          ]}
           revealContent={
             <div className="space-y-3 text-sm text-gray-700">
               <div>
@@ -339,29 +343,7 @@ export default function VAELatentCloudLab() {
               )}
             </div>
           }
-        >
-          <div className="space-y-2">
-            <div className="text-sm text-gray-700 font-medium">请选择你的判断</div>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={betaPred === '是' ? 'default' : 'outline'}
-                onClick={() => setBetaPred('是')}
-                disabled={betaSubmitted}
-              >
-                是
-              </Button>
-              <Button
-                type="button"
-                variant={betaPred === '否' ? 'default' : 'outline'}
-                onClick={() => setBetaPred('否')}
-                disabled={betaSubmitted}
-              >
-                否
-              </Button>
-            </div>
-          </div>
-        </PredictionGate>
+        />
 
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
           <h4 className="font-bold text-amber-900">迁移挑战：先验方差对 KL 的影响</h4>

@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import InteractiveDemo from '@/components/InteractiveDemo';
+import PredictionGate, { type Evaluation } from '@/components/PredictionGate';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import {
@@ -25,6 +27,9 @@ export default function MaskedAutoencoderDemo() {
   const [maskRatio, setMaskRatio] = useState(0.75);
   const [imageSeed, setImageSeed] = useState(0);
   const [maskSeed, setMaskSeed] = useState(0);
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   const original = useMemo(
     () => generateImage(GRID, imageType, imageSeed),
@@ -55,8 +60,39 @@ export default function MaskedAutoencoderDemo() {
     { name: 'Toy encoder-decoder', recon: toy },
   ];
 
+  const evaluatePrediction = (value: string): Evaluation => ({
+    correct: value === 'masked-only',
+    category: 'MAE 训练目标',
+    feedback: value === 'masked-only'
+      ? '正确。可见 patch 提供上下文，被遮罩 patch 才是预测目标；损失只在遮罩集合上平均。'
+      : 'MAE 不要求复制已经可见的 patch。Encoder 只看可见 patch，训练损失只评价被遮罩 patch 的重建。',
+  });
+
   return (
-    <div className="space-y-6">
+    <InteractiveDemo title="MAE 遮罩重建实验：目标集合决定学习信号">
+      <div className="space-y-6">
+        <PredictionGate
+          resetKey="mae-loss-target"
+          prediction={prediction}
+          onPredictionChange={setPrediction}
+          submitted={submitted}
+          onSubmit={() => setSubmitted(true)}
+          revealed={revealed}
+          onReveal={() => setRevealed((value) => !value)}
+          canReveal={submitted}
+          question="图像 MAE 预训练时，重构 MSE 应该在哪些 patch 上计算？"
+          hint="可见 patch 已经作为 encoder 的输入；模型真正缺少的是哪部分？"
+          evaluatePrediction={evaluatePrediction}
+          options={[
+            { value: 'masked-only', label: '只在被遮罩的 patch 上' },
+            { value: 'visible-only', label: '只在可见 patch 上' },
+            { value: 'encoder-weights', label: '只在 encoder 权重上' },
+          ]}
+          revealContent={<p>教材图 19.5 强调目标是输入的补集；预训练结束后 decoder 被丢弃，encoder 用完整、未遮罩图像产生下游表示。</p>}
+        />
+
+        {revealed && (
+          <div aria-label="MAE 遮罩重建实验区" className="space-y-6">
       <div className="flex flex-col lg:flex-row gap-4 lg:items-end">
         <div className="flex-1">
           <label className="text-sm font-medium text-gray-700">图像类型</label>
@@ -152,7 +188,14 @@ export default function MaskedAutoencoderDemo() {
           因此 masked-patch MSE 才是训练真正优化的指标；all-patch MSE 同时惩罚可见 patch 的失真，反映整体视觉质量。玩具重建器（toy）仅做平滑插值，不代表真实 MAE 的学习能力。
         </p>
       </div>
-    </div>
+
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+              <strong>迁移挑战：</strong>若遮罩从随机 patch 改成一整块连续区域，局部邻域基线会失去更多直接线索；此时更需要 encoder 从远距离上下文学习全局结构。
+            </div>
+          </div>
+        )}
+      </div>
+    </InteractiveDemo>
   );
 }
 

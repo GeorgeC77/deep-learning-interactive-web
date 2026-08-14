@@ -1,5 +1,11 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
 import { Shrink } from 'lucide-react';
+
+const progressSections = [
+  { exerciseSetId: 'chapter16-deterministic', label: '19.1 确定性自编码器', path: '/ch16/deterministic-autoencoders', exerciseCount: 3 },
+  { exerciseSetId: 'chapter16-variational', label: '19.2 变分自编码器', path: '/ch16/variational-autoencoders', exerciseCount: 3 },
+];
 
 export default function Ch16OverviewPage() {
   return (
@@ -36,9 +42,9 @@ export default function Ch16OverviewPage() {
         "忽视隐层维度与约束的匹配：过宽且无约束容易学到恒等映射。",
         "把重构误差小直接等同于表示质量好；好的表示还应便于下游任务或插值。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 19",
-        pages: "Ch 19",
+        pages: "pp. 563–579",
         textbookSubsections: [
           "19.1 Deterministic Autoencoders",
           "19.2 Variational Autoencoders"
@@ -46,6 +52,14 @@ export default function Ch16OverviewPage() {
         algorithms: ["编码器-解码器结构"],
         exercises: ["列出三种防止自编码器学到恒等映射的方法。", "比较自编码器与 PCA 在降维上的异同。"],
       }}
+      extraContent={(
+        <>
+          <ChapterProgressCard title="自编码器掌握进度" sections={progressSections} />
+          <p className="text-center text-sm text-emerald-800">
+            完成两节共 6 道原创练习，即可串联重构约束、MAE 遮罩目标、ELBO、重参数化与 posterior collapse。
+          </p>
+        </>
+      )}
     />
   );
 }
