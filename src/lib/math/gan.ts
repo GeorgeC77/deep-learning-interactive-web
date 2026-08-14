@@ -86,3 +86,77 @@ export function ganMetrics(a: number) {
     gradNonSaturatingD: gradNonSaturatingD(D),
   };
 }
+
+/**
+ * Pointwise optimum of the discriminator for fixed data and generator densities.
+ *
+ *   D*(x) = p_data(x) / (p_data(x) + p_G(x))
+ */
+export function optimalDiscriminator(pData: number, pGenerator: number): number {
+  if (!Number.isFinite(pData) || !Number.isFinite(pGenerator) || pData < 0 || pGenerator < 0) {
+    throw new RangeError('Densities must be finite and non-negative.');
+  }
+  const total = pData + pGenerator;
+  if (total === 0) {
+    throw new RangeError('At least one density must be positive.');
+  }
+  return pData / total;
+}
+
+export type CycleGanLoss = {
+  adversarial: number;
+  cycle: number;
+  total: number;
+};
+
+/** Combine the two adversarial directions and the two reconstruction cycles. */
+export function cycleGanObjective(
+  adversarialX: number,
+  adversarialY: number,
+  cycleX: number,
+  cycleY: number,
+  cycleWeight: number,
+): CycleGanLoss {
+  const values = [adversarialX, adversarialY, cycleX, cycleY, cycleWeight];
+  if (values.some((value) => !Number.isFinite(value) || value < 0)) {
+    throw new RangeError('CycleGAN loss terms and weight must be finite and non-negative.');
+  }
+  const adversarial = adversarialX + adversarialY;
+  const cycle = cycleX + cycleY;
+  return { adversarial, cycle, total: adversarial + cycleWeight * cycle };
+}
+
+export type CycleGanCandidate = {
+  id: 'semantic' | 'shortcut';
+  label: string;
+  adversarial: number;
+  cycle: number;
+};
+
+/**
+ * A deliberately small counterexample: cycle consistency can prefer a reversible
+ * shortcut even when that mapping is not the intended semantic translation.
+ */
+export const cycleGanCandidates: CycleGanCandidate[] = [
+  { id: 'semantic', label: '语义正确映射', adversarial: 0.9, cycle: 0.35 },
+  { id: 'shortcut', label: '可逆捷径映射', adversarial: 1.6, cycle: 0.05 },
+];
+
+export function scoreCycleGanCandidate(
+  candidate: CycleGanCandidate,
+  cycleWeight: number,
+): number {
+  if (!Number.isFinite(cycleWeight) || cycleWeight < 0) {
+    throw new RangeError('Cycle weight must be finite and non-negative.');
+  }
+  return candidate.adversarial + cycleWeight * candidate.cycle;
+}
+
+export function rankCycleGanCandidates(
+  cycleWeight: number,
+  candidates: CycleGanCandidate[] = cycleGanCandidates,
+): Array<CycleGanCandidate & { total: number }> {
+  return candidates
+    .map((candidate) => ({ ...candidate, total: scoreCycleGanCandidate(candidate, cycleWeight) }))
+    .sort((left, right) => left.total - right.total);
+}

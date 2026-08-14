@@ -1,4 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import CycleGANTradeoffLab from '@/components/demos/CycleGANTradeoffLab';
+import Chapter14SectionCompletion from '@/components/Chapter14SectionCompletion';
 import { Image } from 'lucide-react';
 
 export default function Ch14ImageGansPage() {
@@ -23,9 +25,9 @@ export default function Ch14ImageGansPage() {
         },
       ]}
       learningObjectives={[
-        "理解 DCGAN 在图像生成中的关键设计。",
-        "能写出条件 GAN 的损失形式。",
-        "理解 CycleGAN 循环一致性的作用。",
+        "理解卷积生成器与条件信息为何适合高分辨率图像生成。",
+        "能写出 CycleGAN 的双向对抗项与循环一致性项。",
+        "能解释循环权重的取舍，以及循环一致性不保证语义正确的边界。",
       ]}
       coreIntuition={"DCGAN 让 GAN 长出了‘眼睛’（卷积）；条件 GAN 给了它‘指令’；CycleGAN 则让它学会‘翻译’图像而不需要逐句对照。"}
       commonMistakes={[
@@ -47,10 +49,10 @@ export default function Ch14ImageGansPage() {
         "把条件 GAN 当成 CycleGAN 使用，试图做图像到图像转换——说明任务类型决定模型选择。",
         "认为循环一致性损失能保证语义一致——它只能约束像素可逆，不能保证“马变成斑马后还是马”。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 17",
         section: "17.2",
-        pages: "Ch 17",
+        pages: "§17.2, pp. 539–543",
         textbookSubsections: [
           "17.2 Image GANs",
           "17.2.1 CycleGAN"
@@ -59,27 +61,16 @@ export default function Ch14ImageGansPage() {
           "DCGAN",
           "conditional GAN"
         ],
-        formulas: ["cycle consistency loss"],
+        formulas: ["two-direction adversarial loss", "cycle consistency loss", "weighted total error"],
         algorithms: ["CycleGAN"],
         exercises: ["说明 CycleGAN 为什么不需要成对数据。"],
       }}
-      demo={{
-        title: "CycleGAN 循环一致性损失",
-        label: "循环权重 λ",
-        param: 1,
-        min: 0,
-        max: 5,
-        step: 0.1,
-        compute: (lambda) => {
-          const totalLoss = 1 + lambda;
-          return {
-            label: '总损失（对抗+循环）',
-            value: totalLoss,
-            display: String.raw`1 + ${lambda.toFixed(1)} = ${totalLoss.toFixed(1)}`,
-          };
-        },
-        formula: String.raw`L = L_{\text{adv}} + \lambda L_{\text{cyc}}`,
-      }}
+      extraContent={(
+        <>
+          <CycleGANTradeoffLab />
+          <Chapter14SectionCompletion sectionKey="image" />
+        </>
+      )}
     />
   );
 }

@@ -7,6 +7,9 @@ import {
   gradNonSaturatingLogit,
   gradMinimaxD,
   gradNonSaturatingD,
+  optimalDiscriminator,
+  cycleGanObjective,
+  rankCycleGanCandidates,
 } from '../lib/math/gan';
 
 describe('gan', () => {
@@ -69,5 +72,26 @@ describe('gan', () => {
     const aNewNs = a - eta * dNonSaturating;
     expect(sigmoid(aNewMm)).toBeGreaterThan(D);
     expect(sigmoid(aNewNs)).toBeGreaterThan(D);
+  });
+
+  it('computes the pointwise optimal discriminator from density ratios', () => {
+    expect(optimalDiscriminator(0.6, 0.2)).toBeCloseTo(0.75, 12);
+    expect(optimalDiscriminator(0.4, 0.4)).toBeCloseTo(0.5, 12);
+    expect(() => optimalDiscriminator(0, 0)).toThrow(/positive/);
+  });
+
+  it('combines both adversarial and both cycle directions', () => {
+    const loss = cycleGanObjective(0.4, 0.5, 0.2, 0.15, 4);
+    expect(loss.adversarial).toBeCloseTo(0.9, 12);
+    expect(loss.cycle).toBeCloseTo(0.35, 12);
+    expect(loss.total).toBeCloseTo(2.3, 12);
+  });
+
+  it('shows how a large cycle weight can prefer a reversible shortcut', () => {
+    expect(rankCycleGanCandidates(2)[0].id).toBe('semantic');
+    const highWeight = rankCycleGanCandidates(4);
+    expect(highWeight[0].id).toBe('shortcut');
+    expect(highWeight[0].total).toBeCloseTo(1.8, 12);
+    expect(highWeight[1].total).toBeCloseTo(2.3, 12);
   });
 });

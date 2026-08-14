@@ -1,5 +1,11 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
 import { Swords } from 'lucide-react';
+
+const progressSections = [
+  { exerciseSetId: 'chapter14-adversarial', label: '17.1 对抗训练', path: '/ch14/adversarial-training', exerciseCount: 3 },
+  { exerciseSetId: 'chapter14-image', label: '17.2 图像 GAN', path: '/ch14/image-gans', exerciseCount: 3 },
+];
 
 export default function Ch14OverviewPage() {
   return (
@@ -36,9 +42,9 @@ export default function Ch14OverviewPage() {
         "把生成器单独训练而忽视判别器质量对梯度的影响。",
         "期望 GAN 训练稳定；实际常需精心设计网络、损失与超参数。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 17",
-        pages: "Ch 17",
+        pages: "pp. 533–545",
         textbookSubsections: [
           "17.1 Adversarial Training",
           "17.2 Image GANs"
@@ -46,6 +52,14 @@ export default function Ch14OverviewPage() {
         algorithms: ["GAN"],
         exercises: ["说明 GAN 为何是隐式生成模型。", "列举 GAN 训练中的三种常见困难。"],
       }}
+      extraContent={(
+        <>
+          <ChapterProgressCard title="生成对抗网络掌握进度" sections={progressSections} />
+          <p className="text-center text-sm text-emerald-800">
+            完成两节共 6 道原创练习，即可串联对抗目标、梯度稳定性、图像生成与无配对翻译。
+          </p>
+        </>
+      )}
     />
   );
 }

@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import GANGradientLab from '@/components/demos/GANGradientLab';
+import Chapter14SectionCompletion from '@/components/Chapter14SectionCompletion';
 import { Scale } from 'lucide-react';
 
 export default function Ch14AdversarialTrainingPage() {
@@ -54,10 +55,10 @@ export default function Ch14AdversarialTrainingPage() {
         "判别器训练得太好，生成器梯度几乎为零——说明 GAN 需要平衡双方能力。",
         "认为非饱和损失和原始损失等价——实际上非饱和损失改变了生成器的梯度尺度。",
       ]}
-            bishopMapping={{
+      bishopMapping={{
         chapter: "Ch 17",
         section: "17.1",
-        pages: "Ch 17",
+        pages: "§17.1, pp. 534–538; Ex. 17.1, p. 544",
         textbookSubsections: [
           "17.1.1 Loss function",
           "17.1.2 GAN training in practice"
@@ -68,25 +69,16 @@ export default function Ch14AdversarialTrainingPage() {
           "instance noise",
           "gradient penalty"
         ],
-        formulas: ["minimax loss", "non-saturating loss"],
+        formulas: ["GAN cross-entropy", "opposite-sign parameter updates", "optimal discriminator", "non-saturating loss"],
         algorithms: ["GAN training"],
         exercises: ["推导固定 G 时最优判别器 D*(x)。", "比较原始损失与非饱和损失的梯度行为。"],
       }}
-      demo={{
-        title: "判别器对生成样本的输出",
-        label: "判别器输出 D(G(z))",
-        param: 0.3,
-        min: 0.01,
-        max: 0.99,
-        step: 0.01,
-        compute: (d) => ({
-          label: '生成器损失',
-          value: -Math.log(d),
-          display: String.raw`L_G=-\\ln ${d.toFixed(2)}=${(-Math.log(d)).toFixed(3)}`,
-        }),
-        formula: String.raw`L_G = -\ln D(G(z))`,
-      }}
-      interactiveDemo={<GANGradientLab />}
+      extraContent={(
+        <>
+          <GANGradientLab />
+          <Chapter14SectionCompletion sectionKey="adversarial" />
+        </>
+      )}
     />
   );
 }
