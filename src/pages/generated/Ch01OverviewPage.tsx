@@ -1,6 +1,13 @@
 import { Link } from 'react-router-dom';
 import { BookOpen, FunctionSquare, Scale, TrendingDown, ArrowRight, Brain, Target, Lightbulb } from 'lucide-react';
 import KaTeX from '@/components/KaTeX';
+import ChapterProgressCard from '@/components/ChapterProgressCard';
+
+const progressSections = [
+  { exerciseSetId: 'regression-linear', label: '4.1 线性回归', path: '/ch01/linear-regression', exerciseCount: 3 },
+  { exerciseSetId: 'regression-decision', label: '4.2 决策理论', path: '/ch01/decision-theory', exerciseCount: 3 },
+  { exerciseSetId: 'regression-bias-variance', label: '4.3 偏差–方差', path: '/ch01/bias-variance', exerciseCount: 3 },
+];
 
 const roadmapItems = [
   {
@@ -47,6 +54,11 @@ export default function Ch01OverviewPage() {
           Bishop &amp; Bishop §4.1–4.3（教材页码 111–128）
         </div>
       </section>
+
+      <ChapterProgressCard title="回归章节掌握进度" sections={progressSections} />
+      <p className="text-center text-sm text-emerald-800">
+        完成三节共 9 道原创练习，即可形成从参数估计、贝叶斯决策到泛化诊断的完整学习闭环。
+      </p>
 
       {/* Why regression first */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

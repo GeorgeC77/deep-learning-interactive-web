@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Slider } from '@/components/ui/slider';
 import {
   Select,
@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/select';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import KaTeX from '@/components/KaTeX';
+import PredictionGate, { type Evaluation } from '@/components/PredictionGate';
 import {
   symmetricGaussian,
   skewedMixture,
@@ -96,6 +97,24 @@ export default function RegressionDecisionTheoryLab() {
   const [lossKey, setLossKey] = useState<LossKey>('squared');
   const [alpha, setAlpha] = useState(2);
   const [delta, setDelta] = useState(0.5);
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+
+  const handlePredictionChange = useCallback((value: string) => {
+    setPrediction(value);
+    setSubmitted(false);
+    setRevealed(false);
+  }, []);
+  const handleSubmit = useCallback(() => setSubmitted(true), []);
+  const handleReveal = useCallback(() => setRevealed((value) => !value), []);
+  const evaluatePrediction = useCallback((value: string): Evaluation => ({
+    correct: value === 'median',
+    category: '损失函数与贝叶斯决策',
+    feedback: value === 'median'
+      ? '绝对损失由后验中位数最小化；少量远端概率质量会拉动均值，但通常不会同样幅度地移动中位数。'
+      : '后验分布本身没有因为损失函数改变；改变的是从后验到点预测的决策规则。绝对损失对应中位数。',
+  }), []);
 
   const posteriorFn: DensityFunction = useMemo(() => {
     switch (posteriorKey) {
@@ -171,6 +190,33 @@ export default function RegressionDecisionTheoryLab() {
           <KaTeX math="y^*" /> 如何变化。平方损失对应后验均值，绝对损失对应后验中位数，
           非对称损失会把最优预测拉向惩罚更大的一侧。
         </p>
+
+        <PredictionGate
+          resetKey="regression-decision-loss"
+          prediction={prediction}
+          onPredictionChange={handlePredictionChange}
+          submitted={submitted}
+          onSubmit={handleSubmit}
+          revealed={revealed}
+          onReveal={handleReveal}
+          canReveal={submitted}
+          question="后验含有少量很大的异常值。把损失从平方损失换成绝对损失后，最优点预测会怎样？"
+          hint="平方损失与绝对损失分别由后验的哪个位置统计量最小化？"
+          options={[
+            { value: 'median', label: '从易受异常值拉动的均值转向更稳健的中位数' },
+            { value: 'outliers', label: '进一步向异常值尾部移动，因为绝对损失增长更快' },
+            { value: 'same', label: '保持完全不变，因为损失函数不参与决策' },
+          ]}
+          evaluatePrediction={evaluatePrediction}
+          revealContent={(
+            <p className="text-sm text-gray-700">
+              推断得到的后验不变，但风险最小化规则会改变。解锁后选择“含异常值”，对比平方损失与绝对损失的 y*、均值和中位数。
+            </p>
+          )}
+        />
+
+        {revealed && (
+          <div className="space-y-5" aria-label="回归决策实验区">
 
         {/* Controls */}
         <div className="grid sm:grid-cols-2 gap-4">
@@ -458,6 +504,8 @@ export default function RegressionDecisionTheoryLab() {
             </li>
           </ul>
         </div>
+          </div>
+        )}
       </div>
     </InteractiveDemo>
   );

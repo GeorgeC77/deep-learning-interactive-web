@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { Slider } from '@/components/ui/slider';
 import InteractiveDemo from '@/components/InteractiveDemo';
 import KaTeX from '@/components/KaTeX';
+import PredictionGate, { type Evaluation } from '@/components/PredictionGate';
 import { biasVarianceDecomposition } from '@/lib/math/biasVariance';
 
 const W = 560;
@@ -20,6 +21,24 @@ export default function PolynomialRegressionDemo() {
   const [R, setR] = useState(50);
   const [seed, setSeed] = useState(42);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [prediction, setPrediction] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+
+  const handlePredictionChange = useCallback((value: string) => {
+    setPrediction(value);
+    setSubmitted(false);
+    setRevealed(false);
+  }, []);
+  const handleSubmit = useCallback(() => setSubmitted(true), []);
+  const handleReveal = useCallback(() => setRevealed((value) => !value), []);
+  const evaluatePrediction = useCallback((value: string): Evaluation => ({
+    correct: value === 'variance',
+    category: '模型复杂度',
+    feedback: value === 'variance'
+      ? '小样本下，高阶模型会更紧密地追随每次抽样的偶然波动，因此训练误差下降而跨训练集方差上升。'
+      : '高阶模型通常会降低训练误差和近似偏差；真正变大的，是模型对训练集细节的敏感度，也就是方差。',
+  }), []);
 
   const result = useMemo(
     () => biasVarianceDecomposition(N, degree, sigma, lambda, R, seed),
@@ -71,6 +90,32 @@ export default function PolynomialRegressionDemo() {
   return (
     <InteractiveDemo title="偏差-方差分解实验">
       <div className="space-y-6">
+        <PredictionGate
+          resetKey="polynomial-complexity"
+          prediction={prediction}
+          onPredictionChange={handlePredictionChange}
+          submitted={submitted}
+          onSubmit={handleSubmit}
+          revealed={revealed}
+          onReveal={handleReveal}
+          canReveal={submitted}
+          question="训练样本很少时，把多项式次数从 2 提高到 14，最可能出现什么变化？"
+          hint="分别想象多次重新抽样：训练曲线能否贴得更紧？不同训练集所得曲线是否更一致？"
+          options={[
+            { value: 'variance', label: '训练误差通常下降，但不同训练集得到的曲线更分散，方差上升' },
+            { value: 'bias', label: '训练误差上升，且模型偏差必然继续增大' },
+            { value: 'noise', label: '数据生成过程的不可约噪声会被模型次数直接放大' },
+          ]}
+          evaluatePrediction={evaluatePrediction}
+          revealContent={(
+            <p className="text-sm text-gray-700">
+              下面的实验会对多个独立训练集重复拟合。先观察蓝色单次曲线的分散程度，再用偏差²、方差与测试误差验证你的判断。
+            </p>
+          )}
+        />
+
+        {revealed && (
+          <div className="space-y-6" aria-label="偏差方差实验区">
         {/* Controls */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
@@ -257,6 +302,8 @@ export default function PolynomialRegressionDemo() {
             蓝色半透明曲线是 {R} 次独立拟合；红色曲线是它们的平均预测。红色半透明带表示偏差，琥珀色带表示方差。
           </p>
         </div>
+          </div>
+        )}
       </div>
     </InteractiveDemo>
   );

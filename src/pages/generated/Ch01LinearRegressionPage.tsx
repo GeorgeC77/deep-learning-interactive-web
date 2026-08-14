@@ -1,6 +1,7 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import { FunctionSquare } from 'lucide-react';
 import PolynomialRegressionDemo from '@/components/demos/PolynomialRegressionDemo';
+import RegressionSectionCompletion from '@/components/RegressionSectionCompletion';
 
 export default function Ch01LinearRegressionPage() {
   return (
@@ -100,7 +101,12 @@ export default function Ch01LinearRegressionPage() {
           "实现一个 epoch 的 SGD 并观察收敛轨迹",
         ],
       }}
-      extraContent={<PolynomialRegressionDemo />}
+      extraContent={(
+        <>
+          <PolynomialRegressionDemo />
+          <RegressionSectionCompletion sectionKey="linear" />
+        </>
+      )}
     />
   );
 }

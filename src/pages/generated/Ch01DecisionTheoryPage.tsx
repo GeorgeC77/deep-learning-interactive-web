@@ -1,5 +1,6 @@
 import BishopSectionPage from '@/components/BishopSectionPage';
 import RegressionDecisionTheoryLab from '@/components/demos/RegressionDecisionTheoryLab';
+import RegressionSectionCompletion from '@/components/RegressionSectionCompletion';
 import { Scale } from 'lucide-react';
 
 export default function Ch01DecisionTheoryPage() {
@@ -88,7 +89,12 @@ export default function Ch01DecisionTheoryPage() {
           "举例说明为何推断与决策的分离在医疗诊断中有实用价值",
         ],
       }}
-      interactiveDemo={<RegressionDecisionTheoryLab />}
+      extraContent={(
+        <>
+          <RegressionDecisionTheoryLab />
+          <RegressionSectionCompletion sectionKey="decision" />
+        </>
+      )}
     />
   );
 }
