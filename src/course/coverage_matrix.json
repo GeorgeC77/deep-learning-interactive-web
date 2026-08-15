@@ -1549,7 +1549,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "appendix-b-overview",
@@ -1565,7 +1565,7 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   },
   {
     "id": "appendix-c-overview",
@@ -1581,6 +1581,6 @@
     ],
     "learningObjectives": [],
     "commonMistakes": [],
-    "status": "content-reviewed"
+    "status": "teaching-ready"
   }
 ]

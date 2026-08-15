@@ -931,7 +931,7 @@ export const courseManifest: Part[] = [
             id: "appendix-a-overview",
             title: "矩阵运算",
             path: "/appendix/a/overview",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "矩阵恒等式、迹、行列式、导数与特征向量。",
           }
         ],
@@ -946,7 +946,7 @@ export const courseManifest: Part[] = [
             id: "appendix-b-overview",
             title: "变分法基础",
             path: "/appendix/b/overview",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "泛函导数与欧拉-拉格朗日方程。",
           }
         ],
@@ -961,7 +961,7 @@ export const courseManifest: Part[] = [
             id: "appendix-c-overview",
             title: "约束优化",
             path: "/appendix/c/overview",
-            status: "content-reviewed",
+            status: "teaching-ready",
             description: "等式约束与拉格朗日乘子法。",
           }
         ],

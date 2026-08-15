@@ -377,6 +377,10 @@
   "20.4.1 Classifier guidance",
   "20.4.2 Classifier-free guidance",
   "Appendix A Linear Algebra",
+  "A.1 Matrix Identities",
+  "A.2 Traces and Determinants",
+  "A.3 Matrix Derivatives",
+  "A.4 Eigenvectors",
   "Appendix B Calculus of Variations",
   "Appendix C Lagrange Multipliers"
 ]
