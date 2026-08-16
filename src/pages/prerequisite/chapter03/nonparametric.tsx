@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState, useMemo, useCallback, useRef } from 'react';
 import type { MouseEvent } from 'react';
 import { BarChart3, Waves, Activity, ShieldAlert, BookOpen, RefreshCw } from 'lucide-react';
@@ -339,6 +340,10 @@ export default function NonparametricMethodsPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        非参数方法不先规定固定形状，而让附近的数据决定局部形状。邻域或带宽太小会追随噪声，太大又会抹平结构，因此调节尺度就是在方差与偏差之间取舍。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState, useMemo } from 'react';
 import { FunctionSquare, BookOpen, ShieldAlert, Layers } from 'lucide-react';
 import KaTeX from '../../../components/KaTeX';
@@ -228,6 +229,10 @@ export default function ExponentialFamilyPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        指数族把许多常见分布写成同一种“参数与充分统计量做内积”的结构。统一形式让推断算法可以复用，而充分统计量保留了估计参数真正需要的信息。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

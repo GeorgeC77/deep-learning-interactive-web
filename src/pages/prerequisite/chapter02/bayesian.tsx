@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { RefreshCcw, ShieldAlert, ArrowRight, Scale, Dices, RotateCcw } from 'lucide-react';
@@ -255,7 +256,7 @@ export default function PrerequisiteChapter02BayesianPage() {
                   <strong>MAP 估计：</strong>
                   <KaTeX
                     math={String.raw`\hat{\theta}_{\mathrm{MAP}} = \frac{\alpha - 1}{\alpha + \beta - 2} = ${
-                      alpha > 1 && beta > 1 ? ((alpha - 1) / (alpha + beta - 2)).toFixed(3) : '—'
+                      alpha > 1 && beta > 1 ? ((alpha - 1) / (alpha + beta - 2)).toFixed(3) : String.raw`\mathrm{N/A}`
                     }`}
                   />
                 </p>
@@ -398,6 +399,10 @@ export default function PrerequisiteChapter02BayesianPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        先验是观察数据前的起点，似然说明不同假设生成当前证据的能力，后验则是两者结合后的新信念。数据越多，证据通常越能压过不合理的先验。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

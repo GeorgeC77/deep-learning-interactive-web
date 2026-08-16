@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Scale, ShieldAlert, ArrowRight, Stethoscope, Calculator } from 'lucide-react';
@@ -257,6 +258,10 @@ export default function PrerequisiteChapter02RulesPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        概率规则可以看成两种动作：把暂时不关心的变量“加掉”，以及把已有条件与新证据“乘起来”。贝叶斯定理只是把这两种动作重新排列，用证据持续修正信念。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

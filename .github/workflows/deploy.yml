@@ -30,6 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
       - name: Math tests
         run: npm run test:math
 
@@ -47,6 +50,12 @@ jobs:
 
       - name: Bishop audit
         run: npm run audit:bishop
+
+      - name: Teaching-ready validation
+        run: npm run validate:teaching-ready
+
+      - name: Pedagogical review
+        run: npm run review:pedagogical
 
       - name: Build
         run: npm run build

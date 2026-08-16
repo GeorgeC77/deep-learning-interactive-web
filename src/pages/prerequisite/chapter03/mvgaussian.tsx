@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState, useMemo } from 'react';
 import { ChartSpline, Move, Maximize2, ShieldAlert, BookOpen } from 'lucide-react';
 import KaTeX from '../../../components/KaTeX';
@@ -266,6 +267,10 @@ export default function MultivariateGaussianPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        多元高斯的等密度线像一组椭圆：中心由均值决定，长短轴和旋转方向由协方差决定。变量越相关，椭圆越倾斜，说明它们倾向于一起变化。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

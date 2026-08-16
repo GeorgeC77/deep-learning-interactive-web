@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Binary, ShieldAlert, ArrowRight, Calculator, Shuffle } from 'lucide-react';
@@ -248,6 +249,10 @@ export default function PrerequisiteChapter02InformationPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        熵衡量的是看到结果前平均有多意外；KL 散度衡量用错误分布编码数据时多付出的平均代价。概率越集中，消息越可预测，所需的信息量通常越少。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

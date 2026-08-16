@@ -42,6 +42,10 @@ function extractImportPaths(appSource) {
   while ((m = regex.exec(appSource)) !== null) {
     map[m[1]] = m[2];
   }
+  const lazyRegex = /const\s+(\w+)\s*=\s*lazy\(\(\)\s*=>\s*import\('([^']+)'\)\)\s*;?/g;
+  while ((m = lazyRegex.exec(appSource)) !== null) {
+    map[m[1]] = m[2];
+  }
   return map;
 }
 

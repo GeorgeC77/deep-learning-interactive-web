@@ -67,6 +67,9 @@ const importMap: Record<string, string> = {};
 for (const m of appText.matchAll(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]\s*;?/g)) {
   importMap[m[1]] = m[2];
 }
+for (const m of appText.matchAll(/const\s+(\w+)\s*=\s*lazy\(\(\)\s*=>\s*import\(['"]([^'"]+)['"]\)\)\s*;?/g)) {
+  importMap[m[1]] = m[2];
+}
 
 const routeComponentMap: Record<string, string> = {};
 const scMatch = appText.match(/const sectionComponents: Record<string, React\.ComponentType> = \{([\s\S]*?)\n\};/);

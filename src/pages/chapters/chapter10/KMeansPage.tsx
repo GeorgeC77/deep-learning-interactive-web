@@ -86,7 +86,7 @@ export default function KMeansPage() {
         </p>
         <FormulaCard
           title="失真函数"
-          formula={<KaTeX math="J(c, \\mu) = \\sum_{i=1}^n \\bigl\\|x^{(i)} - \\mu_{c^{(i)}}\\bigr\\|^2" display />}
+          formula={<KaTeX math={String.raw`J(c, \mu) = \sum_{i=1}^n \bigl\|x^{(i)} - \mu_{c^{(i)}}\bigr\|^2`} display />}
           description="在规则固定时，一次标准的 Lloyd 迭代（先分配、再更新）不会增加 J；算法通常在有限步后达到稳定分配。结果依赖于初始化，且只保证局部最优或固定点。"
         />
       </section>

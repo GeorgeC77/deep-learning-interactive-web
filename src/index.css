@@ -4,6 +4,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keep KaTeX's hidden MathML accessibility tree from contributing to the
+   document scroll width, while allowing long visible display formulas to
+   scroll inside their own block on narrow screens. */
+.katex .katex-mathml {
+  contain: strict;
+}
+
+.katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25rem;
+}
+
+.katex-display > .katex {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .formula-block {
   @apply my-4 p-4 bg-gray-50 rounded-lg border border-gray-200 text-center overflow-x-auto;
 }

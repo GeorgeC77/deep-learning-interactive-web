@@ -41,7 +41,7 @@ export default function GraphAttentionLab() {
       <div className="space-y-4">
         <p className="text-sm text-gray-600">
           调整中心节点与邻居的二维特征，观察 GAT 的注意力系数{' '}
-          <KaTeX math="\\alpha_{uv}" /> 如何在以 <KaTeX math="v" /> 为中心的邻居上 softmax 归一化，
+          <KaTeX math={String.raw`\alpha_{uv}`} /> 如何在以 <KaTeX math="v" /> 为中心的邻居上 softmax 归一化，
           并与 GCN 的均值聚合对比。
         </p>
 
@@ -117,7 +117,7 @@ export default function GraphAttentionLab() {
         <div className="text-sm text-gray-700 bg-slate-50 p-4 rounded-lg border">
           <strong>注意：</strong> 分母求和始终围绕中心节点 <KaTeX math="v" />：
           <KaTeX
-            math="\\alpha_{uv}=\\frac{\\exp(\\text{LeakyReLU}(\\mathbf{a}^\\top[W\\mathbf{h}_u \\| W\\mathbf{h}_v]))}{\\sum_{k\\in\\mathcal{N}(v)}\\exp(\\text{LeakyReLU}(\\mathbf{a}^\\top[W\\mathbf{h}_k \\| W\\mathbf{h}_v]))}"
+            math={String.raw`\alpha_{uv}=\frac{\exp(\text{LeakyReLU}(\mathbf{a}^\top[W\mathbf{h}_u \| W\mathbf{h}_v]))}{\sum_{k\in\mathcal{N}(v)}\exp(\text{LeakyReLU}(\mathbf{a}^\top[W\mathbf{h}_k \| W\mathbf{h}_v]))}`}
             display
           />
         </div>

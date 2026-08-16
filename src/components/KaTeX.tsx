@@ -1,5 +1,4 @@
 import katex from 'katex';
-import 'katex/dist/katex.min.css';
 import { useMemo } from 'react';
 
 interface KaTeXProps {
@@ -15,6 +14,7 @@ export default function KaTeX({ math, display = false, className = '' }: KaTeXPr
     try {
       return katex.renderToString(source, {
         displayMode: display,
+        output: 'html',
         throwOnError: false,
         trust: true,
       });
@@ -28,7 +28,7 @@ export default function KaTeX({ math, display = false, className = '' }: KaTeXPr
   if (display) {
     return (
       <div
-        className={className}
+        className={`max-w-full overflow-x-auto overflow-y-hidden ${className}`.trim()}
         aria-label={label}
         title={label}
         dangerouslySetInnerHTML={{ __html: html }}

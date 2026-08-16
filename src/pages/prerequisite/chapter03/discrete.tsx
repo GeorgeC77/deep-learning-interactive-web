@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState, useMemo } from 'react';
 import { Dice5, Layers, ChartSpline, ShieldAlert, BookOpen } from 'lucide-react';
 import KaTeX from '../../../components/KaTeX';
@@ -308,6 +309,10 @@ export default function DiscreteDistributionsPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        离散分布是不同“计数问题”的模板：Bernoulli 描述一次成败，Binomial 描述多次试验的成功数，Multinomial 再把两类推广到多类计数。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

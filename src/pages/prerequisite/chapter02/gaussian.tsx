@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChartSpline, ShieldAlert, ArrowRight, Calculator, TrendingUp } from 'lucide-react';
@@ -286,6 +287,10 @@ export default function PrerequisiteChapter02GaussianPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        高斯分布把不确定性概括成“中心在哪里”和“散布有多宽”：均值移动钟形曲线，方差改变曲线的宽窄。许多小而独立的扰动叠加后会自然接近这种形状。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

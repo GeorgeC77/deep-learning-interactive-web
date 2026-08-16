@@ -20,6 +20,9 @@ const importMap: Record<string, string> = {};
 for (const m of appText.matchAll(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]\s*;?/g)) {
   importMap[m[1]] = m[2];
 }
+for (const m of appText.matchAll(/const\s+(\w+)\s*=\s*lazy\(\(\)\s*=>\s*import\(['"]([^'"]+)['"]\)\)\s*;?/g)) {
+  importMap[m[1]] = m[2];
+}
 
 const routeComponentMap: Record<string, string> = {};
 const scMatch = appText.match(/const sectionComponents: Record<string, React\.ComponentType> = \{([\s\S]*?)\n\};/);
@@ -59,12 +62,12 @@ function resolveWrappedComponent(file: string): string {
 type Dim = { key: string; label: string; test: (text: string) => boolean };
 
 const DIMS: Dim[] = [
-  { key: 'what', label: 'What', test: (t) => /summary=\{/.test(t) || /text-lg text-gray-600/.test(t) || /text-gray-600 max-w-2xl/.test(t) },
+  { key: 'what', label: 'What', test: (t) => /summary\s*=\s*(?:\{|["'])/.test(t) || /text-lg text-gray-600/.test(t) || /text-gray-600 max-w-2xl/.test(t) },
   { key: 'why', label: 'Why', test: (t) => /whyCards=\{/.test(t) || /为什么/.test(t) || /MessageCircleQuestion/.test(t) },
-  { key: 'how', label: 'How', test: (t) => /concepts=\{/.test(t) || /coreIntuition=\{/.test(t) || /ConceptCard/.test(t) || /核心概念/.test(t) || /算法步骤/.test(t) || /模型与算法/.test(t) },
+  { key: 'how', label: 'How', test: (t) => /concepts\s*=\s*(?:\{|["'])/.test(t) || /coreIntuition\s*=\s*(?:\{|["'])/.test(t) || /ConceptCard/.test(t) || /核心概念/.test(t) || /算法步骤/.test(t) || /模型与算法/.test(t) },
   { key: 'counterexample', label: 'Counterexample', test: (t) => /counterexamples=\{/.test(t) || /反例/.test(t) || /FlaskConical/.test(t) },
   { key: 'interactive', label: 'Interactive', test: (t) => /interactiveDemo=\{/.test(t) || /extraContent=\{/.test(t) || /demo=\{\{/.test(t) || /InteractiveDemo/.test(t) || /components\/demos\//.test(t) || /Demo\s*\/>/.test(t) || /useState/.test(t) },
-  { key: 'realWorld', label: 'Real-world Intuition', test: (t) => /coreIntuition=\{/.test(t) || /核心直觉/.test(t) || /直觉/.test(t) || /intuition/.test(t) || /核心思想/.test(t) || /核心概念/.test(t) },
+  { key: 'realWorld', label: 'Real-world Intuition', test: (t) => /coreIntuition\s*=\s*(?:\{|["'])/.test(t) || /CoreIntuitionCard/.test(t) || /核心直觉/.test(t) || /直觉/.test(t) || /intuition/i.test(t) || /核心思想/.test(t) || /核心概念/.test(t) },
 ];
 
 type Row = {

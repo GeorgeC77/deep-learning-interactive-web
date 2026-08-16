@@ -1,4 +1,5 @@
 import PrerequisiteSectionCompletion from '@/components/PrerequisiteSectionCompletion';
+import CoreIntuitionCard from '@/components/CoreIntuitionCard';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Waves, ShieldAlert, ArrowRight, Calculator, Ruler } from 'lucide-react';
@@ -293,6 +294,10 @@ export default function PrerequisiteChapter02DensitiesPage() {
           </p>
         </div>
       </section>
+
+      <CoreIntuitionCard>
+        连续变量在某一点的密度高度不是概率；真正的概率来自一段区间下的面积。密度描述“概率质量在附近挤得多紧”，积分才把它变成可比较的概率。
+      </CoreIntuitionCard>
 
       {/* Counterexamples */}
       <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
